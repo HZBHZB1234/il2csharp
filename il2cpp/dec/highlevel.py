@@ -1344,6 +1344,17 @@ class _HighLevelMixin:
         # follow the indent directly and `=` must stand alone.
         bare_rx = _re.compile(r'^(\s*)(' + '|'.join(_re.escape(n) for n in new_names)
                               + r') = (?!==|=|>)(.*)$')
+        # fix 138: `_for_sugar` folds a counter's entry copy into the loop
+        # head without a type when the counter outlives the loop (or its
+        # init is not a literal): `for (num4 = 0; ...)`. When no enclosing
+        # scope has declared the counter yet, nothing ever does (CS0103 at
+        # every head/body/after-loop read, ~11.6k in gate b12). Declare it
+        # bare on the line before the head, in the block that holds the
+        # loop, with the same tracked-type lookup as a first-use bare
+        # assignment; the later scope repair hoists it when a read escapes
+        # that block. Nothing is initialised -- the head still assigns.
+        forhead_rx = _re.compile(r'^(\s*)for \((' + '|'.join(_re.escape(n) for n in new_names)
+                                 + r') = (?!=)([^;]*);')
         gp_blocked = getattr(self.L, '_gp_blocked', ())
         # `Foo.Method()` (bare, no `<T>`) is what a shared-generic call for a
         # reference-type argument compiles down to (`GetComponent<T>()` and
@@ -1657,6 +1668,17 @@ class _HighLevelMixin:
                 else:
                     st = '%s%s = %s' % (m.group(1), nm, rhs)
             else:
+                fh = forhead_rx.match(st)
+                if fh is not None and fh.group(2) not in decl:
+                    nm = fh.group(2)
+                    dt = self._decl_type_of(tok_of.get(nm, nm), fh.group(3) + ';')
+                    try:
+                        dt = _hetero_decl(nm, dt, fh.group(3) + ';')
+                    except Exception:
+                        pass
+                    if dt and dt != 'var':
+                        decl[nm] = (dt, depth)
+                        out.append('%s%s %s;' % (fh.group(1), dt, nm))
                 b = bare_rx.match(st)
                 if b is not None and b.group(2) not in decl:
                     nm = b.group(2)

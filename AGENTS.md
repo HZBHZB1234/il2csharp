@@ -105,6 +105,14 @@ unproven shape keeps today's spelling; raw is always honest.
 
 ## In flight (2026-10-06)
 
+- Fix 137 (accessor sugar, call-shaped markers) + fix 138 (2026-10-11,
+  undeclared for-head counters get a bare `int numN;` before the head,
+  `_rename_locals`): gate b13 = 474,095 (-12,464 vs b12, CS0103
+  -19,091, zero parse codes; -42.8% vs r_base). Portable 1,313 passed;
+  game suite has exactly the 4 fix-137 pin moves (mi 26747 golden + 3
+  mi 5694 temp-renumber pins) awaiting a user re-pin call. Next slice
+  candidate: interface-offset-table scans read as 1-byte raw loads
+  (2,320 CS0019 on for heads). See `docs/todo.md` top.
 - Fix 135 (CS0019 slice): integer-only `object objN` temps are declared
   `int`/`long` (`_numeric_obj_retype`, highlevel.py). Gate -5,375
   (CS0019 -3,319, CS0266 -3,036); suites green. Pushed (`22a5186`).

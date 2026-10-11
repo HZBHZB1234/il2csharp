@@ -2,6 +2,32 @@
 
 ## Current work: fixes 126-134 compile-gate slices (2026-10-06, on `main`)
 
+**Fix 138 (2026-10-11, for-head counter declarations; closes the fix 137
+blocker): `_for_sugar` folds a counter's entry copy into the loop head
+without a type when the counter outlives the loop or its init is not a
+literal (`for (num4 = 0; ...)`). When no enclosing scope had declared
+the counter, nothing ever did -- a pre-existing class, 11,582 CS0103 on
+for-head lines alone in gate b12 (769 files), of which RegistryKey
+`num10` (mi 516 FixupPath) was the fix-137-exposed instance.
+`_rename_locals` (`il2cpp/dec/highlevel.py`, `forhead_rx`) now emits a
+bare `T name;` on the line before such a head (same tracked-type lookup
+as a first-use bare assignment; every one of the 3,037 minted decls in
+b13 is `int`); `hoist_escaping_locals` lifts it when a read escapes the
+block. Already-declared counters and typed heads are untouched. Patch
+`work/cg8/patch138.py`; tests `tests/test_fix138_forhead_decl.py` (4),
+`tests/test_game_fix138_forhead_decl.py` (mi 24664
+ConstrictedInteractable.CheckForCurItem, mi 516). Gate b13 (post-137b +
+138, 10/10 groups exit 0, 11,262 files, brace audit 0) vs b12: 486,559
+-> 474,095 (-12,464; CS0103 -19,091, CS0019 +6,349, CS0266 +117, CS0021
++61, CS0029 +44, CS1503 +35), ZERO parse codes; vs r_base 828,571 ->
+474,095 (-42.8%). For-head CS0103 11,582 -> 0. The CS0019 rise is newly
+visible type errors on lines whose undeclared counter used to mask them:
+for-head CS0019 62 -> 2,479, 2,320 of them the interface-offset-table
+scan `((byte*)__addr(k) + (i + i)*8 + 0x0)[0] != typeof(I)` (the 1-byte
+index-form raw read deferred from fix 134 -- next slice candidate).
+Suites: portable 1,313 passed; game FAILED set identical to game138 (the
+4 fix-137 pin moves below, still awaiting the user's re-pin call).**
+
 **Fix 137 (IN FLIGHT, accessor sugar): proved property-row accessors use
 the member syntax the emitter declares (`lifter/calls.py` `_accessor_prop`
 / `_accessor_sugar`: `s.get_Chars(i)` -> `s[i]`, static getters ->
@@ -39,7 +65,7 @@ precedent as fix 135/136): CaseInsensitiveAscii.cs:37
 `obj7.get_Chars(0)` (CS1061) -> `obj7[0]` (CS0021); Guid.cs
 `string.IndexOf(...)` same statement, shifted line; XsdDateTime.cs file
 total 2,434 -> 1,445 (-989) with its CS1503 +205 unveiled on
-object-typed receivers. OPEN (landing blocker, under investigation):
+object-typed receivers. RESOLVED by fix 138 (was the landing blocker):
 mscorlib RegistryKey.cs +14 CS0103 `num10` -- the newly-pure
 `stringBuilder1[num10]` loop resugared while->for and the minted
 for-header reads `num10` with no declaration in the body (rename /
