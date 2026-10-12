@@ -46,7 +46,10 @@ class Expr:
                   # fix 139: (mi, class_args, name) of the interface slot an
                   # `il2cpp_interface_get_method` result resolves; `_call`
                   # renders `call [rax]` through it as a managed call
-                  '_ifm')
+                  '_ifm',
+                  # fix 140: the object a `K.typeHierarchy` read came from
+                  # (record-only: `recv` would change binding behaviour)
+                  '_hobj')
 
     def __init__(self, text, ty=None, kind='?', recv=None):
         self.text = text      # rendered C# expression

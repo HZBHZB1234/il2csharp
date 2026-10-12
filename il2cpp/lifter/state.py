@@ -1696,6 +1696,9 @@ class _StateMixin:
         # per-method (per-pass) type evidence: token -> Il2CppType tuple,
         # gathered at calls/stores/returns and consumed live by _field_expr
         self._type_hints = {}
+        # fix 140: object text -> type proven by an inlined castclass /
+        # isinst hierarchy check (`klass.typeHierarchy[T.depth-1] == T`)
+        self._cast_narrow = {}
         # tokens whose _bind-time type was withheld specifically because it
         # was an unresolved generic parameter (fix 21f) -- a later type hint
         # for one of these means the token's DECLARATION text was rescued

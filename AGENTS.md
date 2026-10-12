@@ -105,6 +105,13 @@ unproven shape keeps today's spelling; raw is always honest.
 
 ## In flight (2026-10-06)
 
+- Fix 140 (2026-10-12, unresolved vtable-slot receivers): VIRT_CALL slot
+  resolution falls back to the klass-load object (`vt_recv`), arg1 behind
+  an sret buffer, or a type proven by an inlined castclass/isinst
+  hierarchy check (`_note_cast_narrow`, rendered `((T)x).M()`); the sret
+  struct-return fold also folds parameter/local/`arr[i]` receivers.
+  Gate b19 = 454,955 (-2,542 vs b15; unresolved vtable sites 1,193 ->
+  381; -45.1% vs r_base).
 - Fix 139 (2026-10-11, inline interface dispatch): `il2cpp/dec/ifaceprune.py`
   forces the inlined interface-table scan onto the resolve-helper arm
   (structural + liveness gates); the helper result carries the slot's

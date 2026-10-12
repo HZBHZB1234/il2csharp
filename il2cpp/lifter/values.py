@@ -631,7 +631,10 @@ class _ValuesMixin:
                 return ve
             km = self._klass_member(disp)
             if km != '%#x' % disp:
-                return Expr('%s.%s' % (base.text, km), base.ty, 'kmember')
+                kme = Expr('%s.%s' % (base.text, km), base.ty, 'kmember')
+                # fix 140: the hierarchy check names its object
+                kme._hobj = getattr(base, 'recv', None)
+                return kme
             return Expr('*(%s %s)' % (base.text, disp_add(disp)), None, 'ptr')
         if base.kind == 'sfblob':
             td_idx = self._td_of(base.ty)

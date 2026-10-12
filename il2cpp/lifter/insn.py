@@ -1253,6 +1253,7 @@ class _InsnMixin:
                 else:
                     be = self.reg(reg_name(ins.op1_register))
                     self.flags = (a, be)
+                    self._note_cast_narrow(ins, be)
                 return
             a = self.reg(reg_name(ins.op0_register)) if A(0) == OpKind.REGISTER else None
             if A(1) in IMM_OPS:
@@ -1583,6 +1584,39 @@ class _InsnMixin:
         if w is None:
             return e
         return Expr('(__w_%s)%s' % (w[0], t), (0, w[1] << 16), 'int')
+
+    def _note_cast_narrow(self, ins, be) -> None:
+        """fix 140: the inlined castclass / isinst hierarchy test
+        `cmp [K.typeHierarchy + depth*8 - 8], typeof(T)` (after the
+        `K.typeHierarchyDepth < T.typeHierarchyDepth` pre-check). On the
+        fall-through arm the object K was read from IS a T; failing arms
+        end in the noreturn cast throw (or the null of `as`), so a later
+        unresolved vtable dispatch on that object may resolve through T.
+        Recorded by the object's text; consumed only by VIRT_CALL slot
+        resolution when the receiver's own type names no slot."""
+        try:
+            if be is None or be.kind != 'klass' or not isinstance(be.ty, tuple):
+                return
+            if ins.memory_index == IReg.NONE or ins.memory_index_scale != 8 \
+                    or ins.memory_base == IReg.NONE:
+                return
+            d = ins.memory_displacement
+            if d not in (-8, 0xFFFFFFF8, 0xFFFFFFFFFFFFFFF8):
+                return
+            # uncounted read: a counted one would bind the hierarchy
+            # pointer to a temp (the check itself already consumed it)
+            hb = dict.get(self.regs, reg_name(ins.memory_base))
+            if hb is None or hb.kind != 'kmember' \
+                    or not (hb.text or '').endswith('.typeHierarchy'):
+                return
+            ob = getattr(hb, '_hobj', None)
+            if ob is None or not ob.text:
+                return
+            if not hasattr(self, '_cast_narrow') or self._cast_narrow is None:
+                self._cast_narrow = {}
+            self._cast_narrow[ob.text] = be.ty
+        except Exception:
+            return
 
     def _read_mem_raw(self, ins, asm) -> Optional[Expr]:
         if hasattr(self.il, '_sf_field_size'):

@@ -2,6 +2,36 @@
 
 ## Current work: fixes 126-134 compile-gate slices (2026-10-06, on `main`)
 
+**Fix 140 (2026-10-12, unresolved vtable-slot receivers): a
+`/*vtable slot N*/ recv(recv, ...)` site (1,193 at b15) now resolves the
+slot through the object the klass was read from. Three receiver
+sources, in order, in `lifter/calls.py` VIRT_CALL resolution: (a) the
+klass-load object `vt_recv` when arg0's own type names no slot; (b) arg1
+when arg0 is the hidden sret buffer (`&objN`) -- accepted only when the
+resolved callee really returns through a buffer; (c) a dominating
+inlined castclass/isinst hierarchy check, recorded by
+`_note_cast_narrow` (`lifter/insn.py`) at `cmp [K.typeHierarchy +
+d*8 - 8], typeof(T)` (the throw arms are already elided as noreturn
+guards, so the cast was invisible), rendered `((T)x).M()` (ASN1.GetBytes:
+`((Mono.Security.ASN1)enumerator1.Current).GetBytes()`). A receiver arg
+typed above the dispatch type gets the same `(T)x` spelling. Slots
+resolved this way bind at the call (as the unresolved form did; a lazy
+render duplicated the call). Also: the sret struct-return fold now folds
+parameter / named-local / `arr[i]` / `(T)x` receivers (`node.GetVertex(1)`,
+was `TriangleMeshNode.GetVertex(node, 1)` -- CS1501 on every sret
+instance call with a parameter receiver, not just vtable ones; also the
+ReadSpan / GetBounds goldens: `buffer.Slice(num3)`,
+`matrix.MultiplyPoint3x4(...)`). The hierarchy-pointer read in
+`_note_cast_narrow` is uncounted (`dict.get`): a counted `regs.get` bound
+it to a temp and split the `else if` cast check (mi 7021). Gate b19
+vs b15: 457,497 -> 454,955 (-2,542; CS1061 -828, CS0149 -486, CS1501
+-422, CS0103 -346, CS1955 -227, CS1503 -139; rise CS0214 +60 = newly
+resolved calls exposing raw pointer reads); parse codes unchanged, brace 0; vs
+r_base -45.1%. Unresolved vtable sites 1,193 -> 381 (simple 219, slot
+None 112, sret 37, member 13). Known nit: a bound narrowed result can
+declare `object` (`object obj35 = ((ASN1)...).GetBytes()`, mi 277) though
+the bind carries byte[].**
+
 **Fix 139 (2026-10-11, inline interface dispatch): IL2CPP inlines an
 interface call as a scan of the receiver klass's interface table
 (`movzx n,word [k+0x12E]`, `mov t,[k+0xB0]`, `cmp [t+i*16],iface` loop;

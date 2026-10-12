@@ -2920,10 +2920,95 @@ class _CallsMixin:
         # instance-style rendering and property-accessor folding below apply to
         # virtual calls exactly as they do to direct ones.
         vt_slot = self.vt_recv_slot
+        _vt_fb = False
         if name == 'VIRT_CALL' and vt_slot is not None:
             recv0 = recv if recv is not None else getattr(self, 'vt_recv', None)
             recv_td = self._td_of(recv0.ty) if recv0 is not None else None
             vm = self.il.vtable_method(recv_td, vt_slot) if recv_td is not None else None
+            if vm is None:
+                # fix 140: `obj->klass->vtable[N](obj, ...)` -- the object
+                # whose klass the slot was read from (vt_recv) is the
+                # dispatch type when arg0's own type is unknown; arg0 may
+                # also be the hidden sret buffer (`&objN`), the receiver
+                # then being arg1. An sret reading is accepted only when
+                # the resolved callee really returns through a buffer.
+                _sbuf = bool(args) and args[0].startswith('&')
+                _vr = getattr(self, 'vt_recv', None)
+                _alts = [_vr]
+                if _sbuf and len(arg_exprs) > 1:
+                    _alts.append(arg_exprs[1])
+                for _r in _alts:
+                    if _r is None or _r is recv0:
+                        continue
+                    _td = self._td_of(_r.ty)
+                    _vm = self.il.vtable_method(_td, vt_slot) if _td is not None else None
+                    if _vm is None or not (0 <= _vm < len(self.meta.methods)):
+                        continue
+                    _m = self.meta.methods[_vm]
+                    _rt = self.il.types[_m.return_type] \
+                        if 0 <= _m.return_type < len(self.il.types) else None
+                    if _sbuf != bool(_rt is not None and self.il.returns_sret(_rt)):
+                        continue
+                    vm, recv0, recv_td = _vm, _r, _td
+                    _k = 1 if _sbuf else 0
+                    if len(arg_exprs) > _k and len(args) > _k:
+                        # the receiver arg is statically typed above the
+                        # dispatch type (`GraphNode node` dispatching as a
+                        # TriangleMeshNode): spell the cast the member
+                        # call needs, as the castclass path does
+                        _a = arg_exprs[_k]
+                        _atd = self._td_of(_a.ty)
+                        try:
+                            _chain = self.il.base_chain_tds(_atd) if _atd is not None else ()
+                        except Exception:
+                            _chain = ()
+                        if _m.declaring not in _chain and args[_k] == _a.text:
+                            try:
+                                _tn = self.il.type_name(_r.ty)
+                            except Exception:
+                                _tn = None
+                            if _tn:
+                                args = list(args)
+                                args[_k] = '(%s)%s' % (_tn, _a.text)
+                                arg_exprs = list(arg_exprs)
+                                arg_exprs[_k] = Expr(args[_k], _r.ty, 'obj')
+                        # an sret instance call: arg1 is the receiver the
+                        # member render folds (`recv`), not the buffer
+                        recv = arg_exprs[_k]
+                    _vt_fb = True
+                    break
+            if vm is None and getattr(self, '_cast_narrow', None):
+                # fix 140: a dominating inlined castclass names the type
+                _k = 1 if (args and args[0].startswith('&') and len(args) > 1) else 0
+                for _r in (recv0, getattr(self, 'vt_recv', None)):
+                    _nty = self._cast_narrow.get(_r.text) if _r is not None else None
+                    if _nty is None:
+                        continue
+                    _td = self._td_of(_nty)
+                    _vm = self.il.vtable_method(_td, vt_slot) if _td is not None else None
+                    if _vm is None or not (0 <= _vm < len(self.meta.methods)):
+                        continue
+                    _m = self.meta.methods[_vm]
+                    _rt = self.il.types[_m.return_type] \
+                        if 0 <= _m.return_type < len(self.il.types) else None
+                    if (_k == 1) != bool(_rt is not None and self.il.returns_sret(_rt)):
+                        continue
+                    try:
+                        _tn = self.il.type_name(_nty)
+                    except Exception:
+                        _tn = None
+                    if not _tn or len(args) <= _k or args[_k] != _r.text:
+                        continue
+                    args = list(args)
+                    args[_k] = '(%s)%s' % (_tn, _r.text)
+                    if len(arg_exprs) > _k:
+                        arg_exprs = list(arg_exprs)
+                        arg_exprs[_k] = Expr(args[_k], _nty, 'obj')
+                    vm, recv0, recv_td = _vm, arg_exprs[_k] if len(arg_exprs) > _k else _r, _td
+                    if _k == 0 and arg_exprs:
+                        recv = arg_exprs[0]
+                    _vt_fb = True
+                    break
             if vm is not None and 0 <= vm < len(self.meta.methods):
                 mi = vm
                 m2 = self.meta.methods[vm]
@@ -3195,8 +3280,15 @@ class _CallsMixin:
                 mbase2 = m2.name.rpartition('.')[2] if '.' in m2.name else m2.name
                 if not m2.is_static and rest and rest[0] not in ('?', ''):
                     rt2 = rest[0][1:] if rest[0].startswith('&') else rest[0]
+                    # fix 140: a parameter / named-local receiver (`node`)
+                    # and the receiver cast `(T)x` fold too -- arg1 of an
+                    # sret instance call is the receiver by the ABI
                     if rt2 == 'this' or '.' in rt2 or _BARE_TOKEN_RX.match(rt2) \
-                            or re.match(r'^s_[0-9a-fA-F]+$', rt2):
+                            or re.match(r'^s_[0-9a-fA-F]+$', rt2) \
+                            or (re.match(r'^[A-Za-z_]\w*$', rt2)
+                                and rt2 not in ('null', 'true', 'false', 'default')) \
+                            or re.match(r'^\([\w.<>\[\], ]+\)[\w.]+$', rt2) \
+                            or re.match(r'^[A-Za-z_][\w.]*(?:\[[^\[\]]*\])+$', rt2):
                         if mbase2 == 'get_Item' and len(rest) == 2:
                             short2 = '%s[%s]' % (rt2, rest[1])
                         elif mbase2.startswith('get_') and len(rest) == 1:
@@ -3669,7 +3761,10 @@ class _CallsMixin:
             # one actually iterated). Materialize once at the call
             # instruction instead, like the shared-return path above.
             # Getters keep the inline property render.
-            if iface_identity and not getattr(self, 'dry', False):
+            # fix 140: a slot resolved only through vt_recv / sret / a
+            # castclass was materialized at the call while unresolved;
+            # keep that ordering (a lazy render duplicates the call)
+            if (iface_identity or _vt_fb) and not getattr(self, 'dry', False):
                 base = self.meta.methods[mi].name.rpartition('.')[2]
                 if not base.startswith('get_'):
                     self._bind(result)
