@@ -42,7 +42,11 @@ class Expr:
                   # proof (origin text, offset, width, closed type key,
                   # bytes). Consumers reroot exact tiles through it;
                   # nothing reads it yet (record-only).
-                  '_tile_proof')
+                  '_tile_proof',
+                  # fix 139: (mi, class_args, name) of the interface slot an
+                  # `il2cpp_interface_get_method` result resolves; `_call`
+                  # renders `call [rax]` through it as a managed call
+                  '_ifm')
 
     def __init__(self, text, ty=None, kind='?', recv=None):
         self.text = text      # rendered C# expression

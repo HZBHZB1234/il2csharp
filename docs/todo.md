@@ -2,6 +2,42 @@
 
 ## Current work: fixes 126-134 compile-gate slices (2026-10-06, on `main`)
 
+**Fix 139 (2026-10-11, inline interface dispatch): IL2CPP inlines an
+interface call as a scan of the receiver klass's interface table
+(`movzx n,word [k+0x12E]`, `mov t,[k+0xB0]`, `cmp [t+i*16],iface` loop;
+hit arm folds `k + 0x138 + 16*(offset+slot)`) whose miss arm calls the
+resolve helper `il2cpp_interface_get_method(obj, typeof(I), S)`; both
+join with the same VirtualInvokeData and `call [entry]`. New
+`il2cpp/dec/ifaceprune.py` (called from `lift_method` after
+`_prewire_switches`) forces the entry test onto the miss arm when the
+scan region is entered only through the test, exits only to miss/join,
+holds the 0x138 fold + 0xB0 table load, does no store/call/non-GPR
+write, and every callee-saved register it writes is dead at the join
+(volatiles are undefined after the miss call); the forced test's
+count load + compare join `skip_ips` when nothing else reads them.
+Lifter (`lifter/calls.py` `_iface_resolve_target`, `values.py`
+`_field_expr`, `Expr._ifm`): the helper result carries slot S of I
+(declared method S, class VARs closed from typeof(I), sret/open
+returns decline) and `call [rax]` / `mov rax,[rdx]; call rax` render
+through the existing `ic_mi` resolved-call path (arity trim drops the
+`[rax+8]` MethodInfo). Census: 2,163 of 2,262 helper sites pruned (90
+decline on non-copy tails, 9 on entry shape). Tests
+`tests/test_fix139_iface_inline.py` (5, fixture bytes + mutations),
+`tests/test_game_fix139_iface_inline.py` (mi 26440 Teleport, mi 141
+OnStartElement with RDI counter, mi 277 MoveNext via copied entry).
+Gate b15 vs b13: 474,095 -> 457,497 (-16,598; CS0019 -7,041, CS1061
+-3,438, CS0103 -2,054, CS0165 -1,297, CS0266 -1,279, CS0149 -1,060;
+rises CS0214 +148, CS1503 +86, CS1955 +74), zero parse codes, brace 0;
+vs r_base -44.8%. Newly visible follow-up: CS1955 `IEnumerator.Current`
+(152 at b14) -- an unresolved `/*vtable slot N*/` call on the Current
+result renders the receiver text as the callee (`recv.Current(recv.Current,
+...)`, ASN1.GetBytes); also a duplicated virtual `GetEnumerator()` when
+the result is spilled to a stack slot first (mi 277). Portable 1,318
+passed; game 259 passed / 9 failed -> 8 after the fix139 test accepts
+`!(e.MoveNext())`: 4 fix-137 pin moves + 4 fix-139 pin moves (iface_resolve
+mi 122, interface_dispatch x2 mi 25368/25872, fix131 mi 25872 counter
+rename) -- re-pin pending user approval.**
+
 **Fix 138 (2026-10-11, for-head counter declarations; closes the fix 137
 blocker): `_for_sugar` folds a counter's entry copy into the loop head
 without a type when the counter outlives the loop or its init is not a

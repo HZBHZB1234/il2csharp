@@ -567,6 +567,16 @@ class _ValuesMixin:
         return td_idx is not None and self.meta.typedefs[td_idx].is_valuetype
 
     def _field_expr(self, base: Expr, disp: int, size: int, elem_fold=False) -> Expr:
+        _ifm = getattr(base, '_ifm', None)
+        if _ifm is not None and len(_ifm) == 4 and disp in (0, 8) and size == 8:
+            # fix 139: VirtualInvokeData.{methodPtr, method} of a resolved
+            # interface slot; `_call` renders `call reg` through the first,
+            # the second is the hidden MethodInfo the arity trim drops.
+            # Neither may bind a temp when it rides an argument register.
+            pe = Expr('*(%s %s)' % (base.text, disp_add(disp)), None, 'ptr')
+            pe._ifm = _ifm + ('methodPtr' if disp == 0 else 'method',)
+            pe._no_bind = True
+            return pe
         if size == 8 and getattr(self, '_xor_twin_loads', None) \
                 and getattr(self, '_cur_ip', None) in self._xor_twin_loads:
             # proved packed-xor twin lane (double3 negate): the

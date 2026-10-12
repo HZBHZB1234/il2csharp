@@ -1698,6 +1698,58 @@ class _CallsMixin:
                 return False
         return True
 
+    def _iface_resolve_target(self, arg_exprs):
+        """fix 139: (mi, class_args, name, rty) for a resolved interface slot.
+
+        The inline interface dispatch calls the resolve helper (named
+        `il2cpp_interface_get_method`, proved structurally) with
+        (RCX=receiver, RDX=typeof(I), R8=slot) and invokes the returned
+        VirtualInvokeData through `call [rax]` with `[rax+8]` as the
+        hidden MethodInfo. Slot S of interface I is I's S-th declared
+        method -- the same index `_nullary_interface_dispatch` resolves.
+        Declines (None) on an opaque klass, a non-interface, an
+        out-of-range slot, a static, or a return the ABI path cannot
+        close (open VAR, sret buffer). Never raises.
+        """
+        try:
+            if len(arg_exprs) < 3:
+                return None
+            recv, iface, slot = arg_exprs[:3]
+            if recv is None or iface is None or slot is None or recv._unk:
+                return None
+            offset = _int_lit(slot.text)
+            if offset is None or not 0 <= offset <= 0xffff \
+                    or iface.kind != 'klass' or not iface.text.startswith('typeof('):
+                return None
+            td_index = self._td_of(iface.ty)
+            if td_index is None:
+                return None
+            td = self.meta.typedefs[td_index]
+            if not td.flags & 0x20 or not 0 <= offset < td.method_count:
+                return None
+            mi = td.method_start + offset
+            method = self.meta.methods[mi]
+            if method.is_static or not 0 <= method.return_type < len(self.il.types):
+                return None
+            if '.' in method.name.lstrip('.') or '<' in method.name:
+                return None
+            class_args = self._generic_class_args(iface.ty)
+            rty = self.il.types[method.return_type]
+            closed_key = getattr(self.il, '_closed_type_key', None)
+            if closed_key is not None and closed_key(rty) is None:
+                subst = getattr(self.il, '_subst_closed', None)
+                rty = subst(rty, class_args, None) if class_args and subst else None
+            if rty is None or not self.il._return_abi_is_known(rty) \
+                    or self.il.returns_sret(rty):
+                return None
+            t2 = td
+            ns2 = (t2.namespace + '.') if t2.namespace else ''
+            name = '%s%s.%s' % (ns2, t2.name,
+                                method.name.lstrip('.').replace('|', '_').replace('@', '_'))
+            return mi, (class_args or None), name, rty
+        except Exception:
+            return None
+
     def _nullary_interface_dispatch(self, target, arg_exprs):
         """Recognize the Win64 interface-offset search and shared tail call.
 
@@ -2321,6 +2373,8 @@ class _CallsMixin:
         target = None
         self.ind_slot = None
         self.ic_mi = None
+        self._ifm_args = None
+        self._ifm_rty = None
         self.delegate_mi = None
         self.delegate_recv = None
         self._call_class_args = None
@@ -2329,7 +2383,14 @@ class _CallsMixin:
             name = self._call_name(target)
         elif ins.op0_kind == OpKind.REGISTER:
             e = self.reg(reg_name(ins.op0_register))
-            if e is not None and e.kind == 'vtmethod':
+            _ifm = getattr(e, '_ifm', None) if e is not None else None
+            if _ifm is not None and len(_ifm) == 5 and _ifm[4] == 'methodPtr':
+                # fix 139: methodPtr loaded off a resolved interface entry
+                name = _ifm[2]
+                self.ic_mi = _ifm[0]
+                self._ifm_args = _ifm[1]
+                self._ifm_rty = _ifm[3]
+            elif e is not None and e.kind == 'vtmethod':
                 name = 'VIRT_CALL'
                 # `mov rax,[klass+0x138+16N]; call rax` -- the
                 # vtmethod expr's own text carries the slot (its
@@ -2380,7 +2441,15 @@ class _CallsMixin:
                 base = self.reg(reg_name(ins.memory_base)) if ins.memory_base != IReg.NONE else None
                 idxr = reg_name(ins.memory_index) if ins.memory_index != IReg.NONE else None
                 disp = ins.memory_displacement
-                if base is not None and base.kind == 'klass' and disp >= KLASS_VTABLE                         and (disp - KLASS_VTABLE) % 16 == 0:
+                _ifm = getattr(base, '_ifm', None) if base is not None else None
+                if _ifm is not None and len(_ifm) == 4 and disp == 0 and idxr is None:
+                    # fix 139: VirtualInvokeData.methodPtr of a resolved
+                    # interface slot -- a managed interface call
+                    name = _ifm[2]
+                    self.ic_mi = _ifm[0]
+                    self._ifm_args = _ifm[1]
+                    self._ifm_rty = _ifm[3]
+                elif base is not None and base.kind == 'klass' and disp >= KLASS_VTABLE                         and (disp - KLASS_VTABLE) % 16 == 0:
                     slotn = (disp - KLASS_VTABLE) // 16
                     self.vt_recv = base.recv if base.recv is not None else None
                     self.vt_recv_slot = slotn
@@ -2544,6 +2613,12 @@ class _CallsMixin:
             e = self.regs.get(r)
             arg_exprs.append(e)
             unk_slot.append(e is not None and e._unk)
+            if e is not None and getattr(e, '_ifm', None) is not None:
+                # fix 139: interface-entry plumbing (the resolve result,
+                # its methodPtr / MethodInfo) rides argument registers
+                # the arity trim drops; never spill it to a temp
+                args.append(e.text)
+                continue
             args.append(self._materialize(e, 110) if e else '_')
         gpr_texts = list(args)
         gpr_exprs = list(arg_exprs)
@@ -2890,6 +2965,15 @@ class _CallsMixin:
                 rt_idx = m2.return_type
                 rty = self.il.types[rt_idx] \
                     if 0 <= rt_idx < len(self.il.types) else None
+                if self._ifm_rty is not None:
+                    # fix 139: `IEnumerable<T>.GetEnumerator` returns the
+                    # IEnumerator<T> closed from typeof(I) at resolve time
+                    if self._ifm_args:
+                        self._call_class_args = self._ifm_args
+                    rty = self._ifm_rty
+                    # the enumerator result flows through a stack home
+                    # and a phi copy: materialize it once at the call
+                    iface_identity = True
         # Delegate invoke_impl is called with method_code in the managed
         # receiver slot, then the real arguments and trailing runtime
         # plumbing.  The delegate TypeDef's Invoke declaration supplies the
@@ -2917,6 +3001,21 @@ class _CallsMixin:
         for i in range(6):
             self.regs.pop('XMM%d' % i, None)
         self._fresh_unknowns()
+
+        # --- fix 139: il2cpp_interface_get_method(obj, typeof(I), S)
+        # resolves I's slot S on obj; its VirtualInvokeData feeds a
+        # `call [rax]` (see the MEMORY branch above). RAX carries the
+        # identity unbound; an unconsumed result keeps the call text.
+        if target is not None and name == 'il2cpp_interface_get_method':
+            _ifm = self._iface_resolve_target(arg_exprs)
+            if _ifm is not None:
+                _res = Expr('%s(%s)' % (name, ', '.join(args[:3])), None, 'ptr')
+                _res._ifm = _ifm
+                _res._no_bind = True
+                self.regs['RAX'] = _res
+                if self.asm_comments and asm:
+                    self.emit(ins.ip, '', asm)
+                return
 
         # --- IsInst intrinsic: sub_x(obj, typeof(T)) -> obj as T
         if target is not None and target in getattr(self, 'rt_isinst', ()) \

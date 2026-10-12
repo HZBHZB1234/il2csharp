@@ -105,6 +105,14 @@ unproven shape keeps today's spelling; raw is always honest.
 
 ## In flight (2026-10-06)
 
+- Fix 139 (2026-10-11, inline interface dispatch): `il2cpp/dec/ifaceprune.py`
+  forces the inlined interface-table scan onto the resolve-helper arm
+  (structural + liveness gates); the helper result carries the slot's
+  MethodDef (`Expr._ifm`) so `call [entry]` renders `recv.I_Method(args)`.
+  2,163/2,262 sites pruned. Gate b15 = 457,497 (-16,598 vs b13, zero
+  parse codes; -44.8% vs r_base). Portable 1,318 passed; game 8 pin
+  moves (4 fix 137 + 4 fix 139) awaiting re-pin approval. Follow-up:
+  CS1955 `IEnumerator.Current` unresolved vtable-slot callee text.
 - Fix 137 (accessor sugar, call-shaped markers) + fix 138 (2026-10-11,
   undeclared for-head counters get a bare `int numN;` before the head,
   `_rename_locals`): gate b13 = 474,095 (-12,464 vs b12, CS0103

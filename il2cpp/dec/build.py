@@ -319,6 +319,16 @@ class _BuildMixin:
                     self._pad_bids.add(bi)
             self._seh_helpers(blocks, bmap)
         self._prewire_switches(blocks)
+        # fix 139: the inlined interface-table scan joins the resolve
+        # helper's miss arm with the same VirtualInvokeData; keep only the
+        # helper arm so the join renders one managed interface call
+        if HAVE_ICED:
+            try:
+                from il2cpp.dec.ifaceprune import iface_fast_path_prune
+                iface_fast_path_prune(blocks, getattr(L, 'rt_names', None) or {},
+                                      skip=skip if isinstance(skip, set) else None)
+            except Exception:
+                pass
         self._prune_nonreturning(blocks)
         L._array_allocation_loop_guard = self._allocation_needs_loop_guard(blocks)
         self._analyze(m, td, blocks, bmap)
