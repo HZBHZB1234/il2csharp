@@ -131,7 +131,9 @@ python -m pytest -q -m "not game"   # portable
 python -m pytest -q                 # + fixture-backed (needs testgame/)
 ```
 
-Current: **1231 passed** (1012 portable + 219 fixture-backed). Corpus gates
+Current (fix 140, 2026-10-12): **1,593 tests** -- 1,322 portable passed;
+271 fixture-backed, of which 10 are pending pin moves awaiting re-pin (see
+`docs/todo.md` top). Corpus gates
 on a built tree:
 
 ```text

@@ -565,8 +565,10 @@ against one of these two real binaries, not asserted from reading code.
    goldens, the sweep and reading real output carry the rest.
    NOTE: `ts_gate.py` prints to stdout — redirect to a file (the
    repo's `work/` keeps the saved `ts_gate_*.txt` reports) if you want
-   a report to diff. Current gate numbers live in `docs/reviews/REVIEW80.md` and
-   validation_reports/review80/; older numbers here are history. Always bucket by row text — whole file-span rows (L1
+   a report to diff. Parse-gate numbers live in `docs/reviews/REVIEW80.md` and
+   validation_reports/review80/; current compile-gate (roslyn error)
+   numbers live at the top of `docs/todo.md` (fix 140: gate b19 =
+   454,955); older numbers here are history. Always bucket by row text — whole file-span rows (L1
    headers, `internal sealed partial class`) inflate counts, and ONE
    unparseable line can cascade over a whole file (batch 19 hit 81
    ERROR nodes in Timer.cs off a single bad condition), so a big

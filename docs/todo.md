@@ -1,6 +1,6 @@
 # il2csharp — TODO (open work and historical triage)
 
-## Current work: fixes 126-134 compile-gate slices (2026-10-06, on `main`)
+## Current work: fixes 126-140 compile-gate slices (2026-10-06 .. 2026-10-12, on `main`)
 
 **Fix 140 (2026-10-12, unresolved vtable-slot receivers): a
 `/*vtable slot N*/ recv(recv, ...)` site (1,193 at b15) now resolves the
@@ -30,7 +30,17 @@ resolved calls exposing raw pointer reads); parse codes unchanged, brace 0; vs
 r_base -45.1%. Unresolved vtable sites 1,193 -> 381 (simple 219, slot
 None 112, sret 37, member 13). Known nit: a bound narrowed result can
 declare `object` (`object obj35 = ((ASN1)...).GetBytes()`, mi 277) though
-the bind carries byte[].**
+the bind carries byte[]. Closes the fix 139 follow-up: CS1955
+`IEnumerator.Current` 250 -> 23. Tests: `tests/test_fix140_vslot_recv.py`
+(4 portable), `tests/test_game_fix140_vslot_recv.py` (3 game: mi 277
+ASN1.GetBytes cast receiver, mi 104143 `this.GetFeetPosition()`, mi
+105366/105369 sret param / `arr[i]` receivers). Commit 72e3590. Suites:
+portable 1,322 passed; game 261 passed / 10 failed = the 8 fix 137/139
+pin moves + 2 golden improvements (`mi-11974-ReadSpan`,
+`mi-104428-GetBounds`) -- re-pin of all 10 pending user approval.
+Remaining: 381 unresolved vtable sites (simple 219 = receiver type has
+no slot and no klass-load object / narrowing; slot None 112), 90 fix 139
+d_tail ifaceprune declines, `!(x.MoveNext())` paren cosmetic.**
 
 **Fix 139 (2026-10-11, inline interface dispatch): IL2CPP inlines an
 interface call as a scan of the receiver klass's interface table

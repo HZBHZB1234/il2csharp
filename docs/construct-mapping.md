@@ -350,7 +350,8 @@ cross-check in a debugger or Ghidra.
 
 ## Validation
 
-Current gates (r10 tree): **1253 tests (1027 portable + 226 game)**;
+Gates at the r10 tree (historical; current suite and compile-gate
+numbers are at the top of `docs/todo.md`): **1253 tests (1027 portable + 226 game)**;
 a strict 11,183-file/114,458-body build with no failures or fallbacks; a
 0-error syntax parse of every C# file; and a paired 116,178-method direct
 sweep with 0 crashes and structural metrics unchanged (into_block

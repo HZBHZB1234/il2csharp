@@ -103,7 +103,7 @@ unproven shape keeps today's spelling; raw is always honest.
   without an explicit user call. Stash-prove-clean before attributing a
   break to your change.
 
-## In flight (2026-10-06)
+## In flight (2026-10-12)
 
 - Fix 140 (2026-10-12, unresolved vtable-slot receivers): VIRT_CALL slot
   resolution falls back to the klass-load object (`vt_recv`), arg1 behind
@@ -111,15 +111,19 @@ unproven shape keeps today's spelling; raw is always honest.
   hierarchy check (`_note_cast_narrow`, rendered `((T)x).M()`); the sret
   struct-return fold also folds parameter/local/`arr[i]` receivers.
   Gate b19 = 454,955 (-2,542 vs b15; unresolved vtable sites 1,193 ->
-  381; -45.1% vs r_base).
+  381; CS1955 250 -> 23; -45.1% vs r_base). Commit 72e3590. Portable
+  1,322 passed; game 261 passed / 10 failed = 8 fix 137/139 pin moves + 2
+  golden improvements (ReadSpan, GetBounds) -- re-pin awaiting approval.
+  Gotcha: `self.regs.get` / `self.regs[...]` COUNT a use (and may bind a
+  temp); side probes must read uncounted via `dict.get(self.regs, r)`.
 - Fix 139 (2026-10-11, inline interface dispatch): `il2cpp/dec/ifaceprune.py`
   forces the inlined interface-table scan onto the resolve-helper arm
   (structural + liveness gates); the helper result carries the slot's
   MethodDef (`Expr._ifm`) so `call [entry]` renders `recv.I_Method(args)`.
   2,163/2,262 sites pruned. Gate b15 = 457,497 (-16,598 vs b13, zero
   parse codes; -44.8% vs r_base). Portable 1,318 passed; game 8 pin
-  moves (4 fix 137 + 4 fix 139) awaiting re-pin approval. Follow-up:
-  CS1955 `IEnumerator.Current` unresolved vtable-slot callee text.
+  moves (4 fix 137 + 4 fix 139) awaiting re-pin approval. Follow-up
+  (CS1955 `IEnumerator.Current` vtable-slot callee text) done by fix 140.
 - Fix 137 (accessor sugar, call-shaped markers) + fix 138 (2026-10-11,
   undeclared for-head counters get a bare `int numN;` before the head,
   `_rename_locals`): gate b13 = 474,095 (-12,464 vs b12, CS0103
