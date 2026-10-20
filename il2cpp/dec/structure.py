@@ -686,17 +686,39 @@ class _StructureMixin:
             return False
         return True
 
+    # How far to look before declaring an address noreturn.  A real
+    # il2cpp throw helper is `prologue; call T; int3` and decides within
+    # a handful of instructions (measured: 1, 2, 5, 8, 13, 14, 48, 51).
+    # The cap only has to be long enough that an ordinary function's first
+    # `ret` is actually REACHED -- the old fixed limits (a 256-byte read
+    # and a 64-instruction scan) could not see past roughly instruction 60,
+    # so a routine returning at instruction 78, 100 or 214 read as
+    # "no ret" and was published as a throw helper.
+    _EH_NORETURN_MAX_INSNS = 512
+    _EH_NORETURN_MAX_BYTES = 8192
+
     def _eh_helper_returns(self, va):
         """True when `va` positively contains a reachable `ret`.
 
         An il2cpp throw helper is noreturn by construction: its call site is
         followed by int3 padding, which _make_blocks already reads as
-        ('abort',). A `ret` before that padding is therefore proof the
+        ('abort',). A `ret` BEFORE that padding is therefore proof the
         target is not a throw helper, whatever the pad shapes voted, and
         unlike a witness count it is a property of the callee alone -- so
         it screens the per-method evidence and the program-wide set alike.
         Only positive evidence rejects: an unreadable target keeps the
         previous behaviour. -- fix 91
+
+        The decision is the FIRST of {ret, int3/ud2, invalid}, not "a ret
+        somewhere in a fixed window": the old 256-byte / 64-instruction
+        window stopped before many routines' first `ret`, so 7 returning
+        routines passed this screen and every one of them was live as a
+        helper. The worst, 0x1807e3db0 (32 votes), is a link in the
+        delegate-creation chain, not a throw helper; labelling it
+        rethrow turned a real call into a bare `throw;` and left the
+        delegate-cache store behind it unreachable. Reaching the cap or
+        an invalid instruction is "unknown" and keeps today's accept.
+        -- P1-a
         """
         cache = getattr(self, '_eh_returns_cache', None)
         if cache is None:
@@ -710,7 +732,7 @@ class _StructureMixin:
         if HAVE_ICED and b is not None:
             try:
                 if b.is_exec_va(va):
-                    code = b.read(va, 256)
+                    code = b.read(va, self._EH_NORETURN_MAX_BYTES)
             except Exception:
                 code = None
         if code:
@@ -720,15 +742,15 @@ class _StructureMixin:
                 seen = 0
                 for ins in dec:
                     if ins.is_invalid:
-                        break
+                        break            # unknown -> keep today's accept
                     if ins.mnemonic in (Mnemonic.INT3, Mnemonic.UD2):
-                        break
+                        break            # noreturn -> not a returner
                     if ins.mnemonic == Mnemonic.RET:
                         res = True
                         break
                     seen += 1
-                    if seen >= 64:
-                        break
+                    if seen >= self._EH_NORETURN_MAX_INSNS:
+                        break            # unknown -> keep today's accept
             except Exception:
                 res = False
         cache[va] = res
