@@ -532,6 +532,37 @@ class _BuildMixin:
                 i += 1
         return [raw[i] for i in sorted(keep)], over
 
+    # How far past a guard's `cmp` to look for its `jcc`, and which
+    # instructions may sit between them.  MSVC parks the branch target
+    # under a save of the live SIMD/GPR state, so the jump is regularly
+    # 3-6 instructions after the compare -- `movq rdi,xmm6; movaps
+    # xmm6,[rsp+1F0h]; jne` is the common shape.  The original 4-wide,
+    # MOV/MOVZX-only window missed 975 of 14,326 guards in an 8,000-method
+    # sample (6.8%); widening to 8 with the full move family recovers 913
+    # of them.  Only pure data moves are admitted: each one copies bytes
+    # between registers, or from memory into a register, and cannot change
+    # the state the guard protects.  Arithmetic (CVTDQ2PS/SUBSS/MULSS/
+    # SHUFPS/CDQE/ADDSS/CVTTSD2SI) stays out, and so does XORPS: although
+    # `xorps xmm,xmm` is a zeroing idiom, it is a register write the
+    # source may read, and excluding it costs 3 sites of 14,326.
+    _GUARD_JCC_WINDOW = 8
+    # How far past the guard's `jcc` to look for the `mov byte [slot],1`
+    # that closes it.  A guard initializing N types emits N
+    # `(lea rcx,[...]; call rt_init_meta; lock or [rsp],0)` triples first,
+    # so the store lands at jcc + 3N + 2.  Over 8,000 methods (14,262
+    # guards with both a jcc and a flag store) the distances run 4..226;
+    # cap 24 admitted 97.38%, cap 48 is the knee at 99.68%, and cap 64
+    # admits 99.85% with headroom over the densest tail.  A longer window
+    # changes only how far the SAME whitelist is applied -- every
+    # instruction must still be a permitted move/call/barrier and
+    # `saw_rt_call` must still be set -- so it cannot admit a shape the
+    # shorter window would have rejected.
+    _GUARD_FLAG_WINDOW = 64
+    _GUARD_JCC_MOVES = (Mnemonic.MOV, Mnemonic.MOVZX, Mnemonic.MOVQ,
+                        Mnemonic.MOVAPS, Mnemonic.MOVSS, Mnemonic.MOVSD,
+                        Mnemonic.MOVUPS, Mnemonic.MOVD, Mnemonic.MOVDQA,
+                        Mnemonic.MOVSXD, Mnemonic.LEA)
+
     @staticmethod
     def _is_init_barrier(ins):
         """True for the MSVC release fence `lock or [rsp], 0`.
@@ -556,12 +587,12 @@ class _BuildMixin:
                     and imm_of(ins, 1) == 0:
                 slotA = ins.ip_rel_memory_address
                 j_idx = None
-                for k in range(i + 1, min(i + 5, len(raw))):
+                for k in range(i + 1, min(i + self._GUARD_JCC_WINDOW, len(raw))):
                     w = raw[k]
                     if w.flow_control == FlowControl.CONDITIONAL_BRANCH and w.op0_kind == OpKind.NEAR_BRANCH64:
                         j_idx = k
                         break
-                    if w.mnemonic not in (Mnemonic.MOV, Mnemonic.MOVZX):
+                    if w.mnemonic not in self._GUARD_JCC_MOVES:
                         break
                 if j_idx is None:
                     continue
@@ -572,7 +603,7 @@ class _BuildMixin:
                 # has actually called the metadata-init helper.  It is set in
                 # THIS sweep, the only one that runs before the read below.
                 saw_rt_call = False
-                for k in range(j_idx + 1, min(j_idx + 24, len(raw))):
+                for k in range(j_idx + 1, min(j_idx + self._GUARD_FLAG_WINDOW, len(raw))):
                     w = raw[k]
                     if w.mnemonic == Mnemonic.MOV and w.op0_kind == OpKind.MEMORY \
                             and w.memory_base == IReg.RIP and w.memory_size == 1 \
