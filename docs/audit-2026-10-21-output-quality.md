@@ -454,8 +454,180 @@ unsafe
 | 项 | 状态 |
 | --- | --- |
 | P1-b `else if` 折叠 | **已完成** `c99e579` |
-| P0-a 类初始化守卫 | **已完成**（本文 A.2） |
-| P0-b KLASS 标定 | 未开始（§8 三条路线） |
-| P1-a 委托缓存 + noreturn | 未开始 |
+| P0-a 类初始化守卫（含屏障 + 两处窗口） | **已完成** `3be886b` + `8c86828` |
+| P0-b KLASS 标定 | 未开始（§8 三条路线）—— 现在最大的单项噪音来源 |
+| P1-a 委托缓存 + noreturn | **第 1 部分已完成**（A.5，`1be6de0`） |
 | URE P0 `sub_` 失败原因注释 | 未开始 |
-| A.3 GC 写屏障 | 新发现，未开始 |
+| A.3 GC 写屏障 | 新发现，未开始（38,764 个 `!= 0` guard + 相关 `(byte*)` 噪音） |
+
+## A.5 P1-a 第 1 部分：EH helper 的 noreturn 屏幕窗口太短（已修 `1be6de0`）
+
+`_eh_helper_returns` 用"前 64 条指令 + 256 字节窗口内有没有 `ret`"
+来筛掉冒充 throw helper 的普通函数。真正的 helper 是
+`prologue; call T; int3`，几条内就判定；但第一个 `ret` 位于第 78
+条（甚至 100、214 条）的普通函数被读成"没有 ret"而通过。
+
+**全量普查**（本二进制上所有获得过 pad 形状投票的地址，97 个，
+来自 9,606 个带 EH pad 的方法）：
+
+| 新规则判定 | 计数 |
+| --- | --- |
+| noreturn | 90 |
+| returns | 7 |
+| 其中 7 个全部通过当时的 `_eh_helper_ok` | 7 |
+
+即**每一个误报都是活的**。最严重的是 `0x1807e3db0`（32 票）——
+它根本不是 helper，而是委托创建链的一环
+（`mov rcx,[klass]; mov rbx,[static_fields]; call 0x1807e3db0`）。
+把它标成 `rethrow_va` 后，真实调用被替换成裸 `throw;`，
+后面的委托缓存存储变成不可达代码，`<>9__23_0` 再也无法恢复：
+
+```
+throw;                                                             ← 假的
+object obj14 = sub_1840cac60/*shared body, 3 candidates*/(...);     ← 死代码
+PassiveAbility_1051402.<>c.<>9__23_0 = obj15;                       ← 不可达
+```
+
+**修法**：判定改为 `{ret, int3/ud2, invalid}` 中**最先出现者**决定，
+同时把读取窗口和指令上限都放大（512 条 / 8 KiB），让迟到的 `ret`
+真的被读到。本二进制上真正的 helper 在 ≤8 条内判定
+（实测 1, 2, 5, 8, 13, 14, 48, 51），所以上限对普通代码才是余量。
+撞到上限或读到非法指令算"未知"，维持今天接受的 Conservative 行为。
+
+**实测**（mi 45435 `OnBeforeStartCoin`）：`throw;` 消失，委托创建链
+完整渲染，缓存存储可达，`predicate12 = predicate13` 恢复局部变量。
+
+**语料库效果**（6,000 方法）：`bare throw;` **0** 处，
+委托链调用 2,264 处正常渲染，GC 屏障守卫 1,946 处**未被误删**，
+崩溃 0。portable 套件 1325 passed / 0 failed。
+
+## A.6 全量基线普查（24,781 文件 / 5,842,621 行，修复前）
+
+`limbus_out1`（构建于本轮修复之前，rc=0，176,704 bodies / 0 failed）
+的完整标记普查，取代审计时的 40 文件抽样：
+
+| 标记 | 总数 | 每千行 |
+| --- | --- | --- |
+| `objN` 使用 | **1,361,067** | 232.95 |
+| `object objN` 声明 | 71,108 | 12.17 |
+| `obj \| 0` | **91,326** | 15.63 |
+| `obj \|= 0` | **193,019** | 33.04 |
+| `byte guard == 0` | 90,968 | 15.57 |
+| `any guard != 0` | 38,764 | 6.63 |
+| `bare throw;` | **48,359** | 8.28 |
+| `unsafe` 修饰符 | 42,799 | 7.33 |
+| `(byte*)` 转换 | 283,194 | 48.47 |
+| `(T*)` 转换 | 334,659 | 57.28 |
+| `sub_` 标记 | 85,258 | 14.59 |
+| shared body 标记 | 27,562 | 4.72 |
+| `unknown` | 9,557 | 1.64 |
+| `goto` | 21,720 | 3.72 |
+| `.getClass()` | 24,773 | 4.24 |
+| `/* nothing */` | **1** | 0.00 |
+
+最差 12 个文件（按标记数）：
+
+| 文件 | 行数 | 标记数 | 主要成分 |
+| --- | --- | --- | --- |
+| `BuffDetail.cs` | 36,115 | 27,328 | objN=12,761 (T*)=4,989 (byte*)=4,528 |
+| `BattleUnitModel.cs` | 38,191 | 20,129 | objN=10,089 (T*)=2,703 (byte*)=2,434 |
+| `BattleObjectManager.cs` | 24,361 | 19,819 | objN=8,930 (T*)=3,554 (byte*)=3,201 |
+| `BattleUnitView.cs` | 34,322 | 16,995 | objN=8,892 (T*)=1,991 (byte*)=1,788 |
+| `RpgFieldAttackController.cs` | 18,719 | 11,214 | objN=6,131 (T*)=1,548 (byte*)=1,400 |
+| `SinManager.cs` | 14,908 | 11,141 | objN=5,390 (T*)=1,736 (byte*)=1,526 |
+| `RpgNpcController.cs` | 23,246 | 9,899 | objN=5,540 (T*)=909 (byte*)=793 |
+| `PassiveDetail.cs` | 17,005 | 9,816 | objN=4,828 (T*)=1,423 (byte*)=1,407 |
+| `RpgPlayerManager.cs` | 17,328 | 9,282 | objN=5,182 `obj\|=0`=791 (T*)=759 |
+| `RpgNpcAttackAgent.cs` | 20,081 | 8,945 | objN=5,273 `obj\|=0`=679 (T*)=626 |
+| `BattleCamManager.cs` | 18,637 | 8,269 | objN=4,745 (T*)=679 goto=527 |
+| `CharacterAppearance.cs` | 14,431 | 8,205 | objN=4,207 (T*)=1,061 (byte*)=959 |
+
+`BuffDetail.cs` 36,115 行里 27,328 个标记 —— **75.6% 的行含噪音**。
+用户"大量 .cs 堆砌难以分辨、内部逻辑解析差很多"的判断，在全量数据上成立。
+
+本轮三个修复直接命中其中最大的几项：
+- **P0-a**：`obj|0` 系 284,345 个、byte guard 90,968 个、以及随之而来的 `unsafe` 42,799 个
+- **P1-a#1**：`bare throw;` 48,359 个（语料库实测已归零）
+- **P1-b**：`else if` 嵌套扁平化（不体现在上表，但直接影响可读性）
+
+## A.7 P0-a 后续：jcc 窗口与 flag-store 窗口过窄（已修 `8c86828`）
+
+屏障修掉后，实测仍有 ~7% 的 guard 被漏掉，原因与屏障无关，是
+`_guards` 的两个窗口太窄。
+
+### (1) jcc 搜索窗口只有 4 条，白名单只有 (MOV, MOVZX)
+
+MSVC 会把分支目标压在活跃 SIMD/GPR 状态的保存之下，跳转因此
+regularly 出现在 cmp 之后第 3-6 条：
+
+```
+mi=29 Execute:
+  0x18090a7fe  cmp [18946506Ah],bpl
+  0x18090a805  movq rdi,xmm6              ← 不在白名单，扫描 break
+  0x18090a80a  movaps xmm6,[rsp+1F0h]     ← 不在白名单
+  0x18090a812  jne short 18090A83B        ← jcc 在第 3 条，刚出窗口
+
+mi=34 OnRenderImage:
+  0x18090ae90  cmp byte ptr [189461CEDh],0
+  0x18090ae97  mov rax,[rsi+0B8h]
+  0x18090ae9e  movss dword ptr [rsp+20h],xmm7   ← 不在白名单
+  0x18090aea4  movss dword ptr [rsp+24h],xmm1
+  0x18090aeaa  mov qword ptr [rsp+28h],0
+  0x18090aeb3  mov ebp,[rax+8]
+  0x18090aeb6  jne short 18090AEE1        ← jcc 在第 5 条，超出窗口
+```
+
+**8,000 方法实测**（14,326 个 guard cmp）：
+
+| 项 | 计数 |
+| --- | --- |
+| 今天找到 jcc | 13,351（93.2%） |
+| 今天漏掉 | 975（6.8%） |
+| 新规则可恢复 | **913**（漏掉的 93.6%） |
+| 仍漏掉 | 62 |
+
+**当前 blocker 全部是纯数据移动**：MOVAPS 166、MOVSXD 10、
+MOVUPS 7、MOVSS 5、MOVSD 5、MOVDQA 5、MOVD 5、MOVQ 2、LEA 1。
+
+**新规则下仍被正确挡住的**（同一轮实测）：CVTDQ2PS 6、SUBSS 4、
+MULSS 2、SHUFPS 1、CDQE 1、ADDSS 1、CVTTSD2SI 1 —— 全是真实算术。
+
+`XORPS` 有 3 例，**故意不放行**：`xorps xmm,xmm` 虽是清零惯用法，
+但它仍是对寄存器的写，源码可能读到；按 decline-by-default 排除，
+代价只有 3 / 14,326。
+
+窗口 4 → 8，白名单加入移动家族
+（MOVQ/MOVAPS/MOVSS/MOVSD/MOVUPS/MOVD/MOVDQA/MOVSXD/LEA）。
+
+### (2) flag-store 窗口只有 24 条
+
+一个初始化 N 个类型的 guard 会先发出 N 组
+`(lea rcx,[...]; call rt_init_meta; lock or [rsp],0)`，
+flag store 因此落在 `jcc + 3N + 2`。**8,000 方法实测**
+（14,262 个 jcc 与 flag store 都定位成功的 guard），距离分布 4..226：
+
+| cap | 接受数 | 累计 |
+| --- | --- | --- |
+| 24（原值） | 13,888 | 97.38% |
+| 32 | 14,064 | 98.61% |
+| 48 | 14,217 | **99.68%（拐点）** |
+| 64 | 14,240 | **99.85%** |
+| 256 | 14,262 | 100.00% |
+
+取 **cap=64**。更长的窗口只是让**同一套白名单**看得更远：
+每条指令仍必须是许可的移动/调用/屏障，`saw_rt_call` 仍必须已置位，
+所以它不可能接受短窗口本来会拒绝的形状。
+
+### 修复效果
+
+1,500 方法抽样中残留的 `objN | 0`：**136 → 113 → 8**。
+
+剩下 8 例**都不是**类初始化守卫，分属其他已知问题：
+- 4 例 `if (((byte*)UnityEngine.Playables...` —— GC 卡片标记屏障的
+  另一种形态（见 A.3）
+- 1 例 `if (0f == 0)` —— 常量条件
+- 1 例 `((int*)((byte*)taskAwaiter11 + 0x38))[0]` 之后的屏障 ——
+  字段读取后的写屏障，与 guard 无关
+- 2 例其他
+
+portable 套件 1325 passed / 0 failed。
