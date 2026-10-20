@@ -532,6 +532,21 @@ class _BuildMixin:
                 i += 1
         return [raw[i] for i in sorted(keep)], over
 
+    @staticmethod
+    def _is_init_barrier(ins):
+        """True for the MSVC release fence `lock or [rsp], 0`.
+
+        `or` with immediate 0 is a bit-wise identity, so this writes
+        back exactly what it read; the destination is this frame's own
+        stack, which no managed load can observe.  A non-zero
+        immediate, a different base register, or a different mnemonic
+        (`xadd`/`xchg`/`cmpxchg` are real atomics) all decline.
+        """
+        return (ins.mnemonic == Mnemonic.OR
+                and ins.op0_kind == OpKind.MEMORY
+                and ins.memory_base == IReg.RSP
+                and imm_of(ins, 1) == 0)
+
     def _guards(self, raw):
         L = self.L
         skip = set()
@@ -552,6 +567,11 @@ class _BuildMixin:
                     continue
                 T = raw[j_idx].near_branch_target
                 found = False
+                # saw_rt_call gates the barrier exemption: a `lock or [rsp],0`
+                # only means the init sequence's release fence once this window
+                # has actually called the metadata-init helper.  It is set in
+                # THIS sweep, the only one that runs before the read below.
+                saw_rt_call = False
                 for k in range(j_idx + 1, min(j_idx + 24, len(raw))):
                     w = raw[k]
                     if w.mnemonic == Mnemonic.MOV and w.op0_kind == OpKind.MEMORY \
@@ -560,9 +580,15 @@ class _BuildMixin:
                         if w.next_ip == T or (k + 1 < len(raw) and raw[k + 1].ip == T):
                             found = True
                         break
+                    if w.mnemonic == Mnemonic.CALL and w.op0_kind == OpKind.NEAR_BRANCH64 \
+                            and w.near_branch_target == L.rt_init_meta:
+                        saw_rt_call = True
                     if w.mnemonic not in (Mnemonic.LEA, Mnemonic.MOV, Mnemonic.CALL,
-                                          Mnemonic.MOVZX, Mnemonic.XOR, Mnemonic.PUSH, Mnemonic.SUB):
+                                          Mnemonic.MOVZX, Mnemonic.XOR, Mnemonic.PUSH, Mnemonic.SUB) \
+                            and not (saw_rt_call and self._is_init_barrier(w)):
                         break
+                    if saw_rt_call and self._is_init_barrier(w):
+                        skip.add(w.ip)
                     if w.ip >= T:
                         break
                 if not found:
@@ -576,9 +602,8 @@ class _BuildMixin:
                             and w.ip_rel_memory_address == slotA:
                         skip.add(w.ip)
                         break
-                    if w.mnemonic == Mnemonic.LEA and w.op0_register == IReg.RCP \
-                            if False else (w.mnemonic == Mnemonic.LEA and w.op0_register == IReg.RCX
-                                           and w.memory_base == IReg.RIP):
+                    if w.mnemonic == Mnemonic.LEA and w.op0_register == IReg.RCX \
+                            and w.memory_base == IReg.RIP:
                         skip.add(w.ip)
                     elif w.mnemonic == Mnemonic.CALL and w.op0_kind == OpKind.NEAR_BRANCH64 \
                             and w.near_branch_target == L.rt_init_meta:
