@@ -230,6 +230,124 @@ class _FlowMixin:
             k += 1
         return out
 
+
+    # ------------------------------------------------------------------
+    # An `else` block holding SEVERAL sequential lone ifs is exactly an
+    # else-if chain, so lift them out.  `_elseif_flatten` above declines
+    # this shape by design: it needs `lone_if`, and an else block with
+    # two ifs is not one construct.  Nothing is duplicated or deleted --
+    # only the braces move -- and every statement in the block must be
+    # an if, so the block has no work of its own that lifting could
+    # reorder.
+    # a tuple, not a frozenset: str.startswith takes a tuple
+    _MULTI_IF_CTRL = (
+        'while (', 'while(', 'do', 'for (', 'for(', 'foreach (',
+        'foreach(', 'switch (', 'switch(', 'try', 'try{', 'lock (',
+        'lock(', 'using (', 'using(', 'fixed (', 'unsafe')
+
+    @staticmethod
+    def _match_brace(lines, open_idx):
+        """Index of the `}` matching lines[open_idx] == '{', else -1."""
+        depth = 0
+        for k in range(open_idx, len(lines)):
+            t = lines[k].strip()
+            if t == '{':
+                depth += 1
+            elif t == '}':
+                depth -= 1
+                if depth == 0:
+                    return k
+        return -1
+
+    @staticmethod
+    def _else_block_chunks(body):
+        """Split an else-block's lines into top-level if-constructs.
+
+        Returns a list of chunks (each starting at its own `if (` head)
+        when EVERY non-blank line of the block belongs to one of them,
+        else None.  A non-if statement before the first if, or between
+        two ifs, declines.
+        """
+        chunks = []
+        depth = 0
+        cur = None
+        for x in body:
+            t = x.strip()
+            if depth == 0 and t.startswith('if (') and t.endswith(')'):
+                if cur is not None:
+                    chunks.append(cur)
+                cur = [x]
+                depth += x.count('{') - x.count('}')
+                continue
+            if cur is None:
+                return None          # work before the first if
+            cur.append(x)
+            depth += x.count('{') - x.count('}')
+        if cur is not None:
+            chunks.append(cur)
+        return chunks or None
+
+    @staticmethod
+    def _chunk_is_liftable(chunk):
+        """A chunk must be one if with no else and no nested control."""
+        depth = 0
+        for x in chunk:
+            t = x.strip()
+            if depth == 0:
+                if t == 'else':
+                    return False
+                if t.startswith(_FlowMixin._MULTI_IF_CTRL):
+                    return False
+                if t.endswith(':') and not t.startswith(
+                        ('case ', 'default', 'L_')):
+                    return False
+                depth += x.count('{') - x.count('}')
+        return True
+
+    def _elseif_flatten_multi(self, lines):
+        out = []
+        i, n = 0, len(lines)
+        while i < n:
+            s = lines[i].strip()
+            if not (s.startswith('if (') and s.endswith(')')):
+                out.append(lines[i]); i += 1; continue
+            j = i + 1
+            while j < n and not lines[j].strip():
+                j += 1
+            if j >= n or lines[j].strip() != '{':
+                out.append(lines[i]); i += 1; continue
+            t_open = j
+            t_close = self._match_brace(lines, t_open)
+            if t_close < 0:
+                out.append(lines[i]); i += 1; continue
+            k = t_close + 1
+            while k < n and not lines[k].strip():
+                k += 1
+            if k >= n or lines[k].strip() != 'else':
+                out.append(lines[i]); i += 1; continue
+            k += 1
+            while k < n and not lines[k].strip():
+                k += 1
+            if k >= n or lines[k].strip() != '{':
+                out.append(lines[i]); i += 1; continue
+            f_open = k
+            f_close = self._match_brace(lines, f_open)
+            if f_close < 0:
+                out.append(lines[i]); i += 1; continue
+            chunks = self._else_block_chunks(lines[f_open + 1:f_close])
+            if chunks is None or len(chunks) < 2:
+                out.append(lines[i]); i += 1; continue
+            if not all(self._chunk_is_liftable(c) for c in chunks):
+                out.append(lines[i]); i += 1; continue
+            # emit: the outer if and its true arm verbatim, then each
+            # chunk with its head rewritten to `else if (`
+            out.extend(lines[i:t_close + 1])
+            for c in chunks:
+                head = c[0].strip()
+                out.append('else ' + head)
+                out.extend(c[1:])
+            i = f_close + 1
+        return out
     # fix 72e: the case-body emitter for _switch_synth -- verbatim
     # arm body one indent level deeper, a synthetic break unless the
     # body's last statement is itself a flow transfer (an EMPTY body

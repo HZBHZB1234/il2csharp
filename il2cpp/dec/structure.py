@@ -154,6 +154,11 @@ class _StructureMixin:
         # heads still never match (exact if-head shapes only).
         raw = self._flag_inline(raw)
         raw = self._elseif_flatten(raw)
+        # an else block holding several sequential lone ifs is an
+        # else-if chain; _elseif_flatten needs a single construct and
+        # declines it.  Runs before _switch_synth so the chains it
+        # produces are visible to the switch synthesis below.
+        raw = self._elseif_flatten_multi(raw)
         raw = self._phi_chain_decl_hoist(raw)
         # fix 72e: the flat chains the flattener just produced are
         # the switch-synthesis input; nothing after this point
