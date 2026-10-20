@@ -123,9 +123,11 @@ class Metadata:
         self.version = i32(self.d, 4)
         if u32(self.d, 0) != 0xFAB11BAF:
             raise ValueError('not a global-metadata.dat file: %s' % path)
-        if not (24 <= self.version <= 31):
+        if not (24 <= self.version <= 39):
             raise ValueError('unsupported metadata version %d' % self.version)
         self.v31 = self.version >= 31
+        self.v35 = self.version >= 35
+        self.v38 = self.version >= 38
         self._parse_header()
         self._parse_tables()
 
@@ -142,11 +144,32 @@ class Metadata:
                 continue
             self.hdr[name + 'Offset'] = i32(d, off)
             self.hdr[name + 'Size'] = i32(d, off + 4)
-            off += 8
+            if self.v38:
+                self.hdr[name + 'Count'] = i32(d, off + 8)
+                off += 12
+            else:
+                off += 8
         self.header_ints = off // 4
 
     def toff(self, table): return self.hdr[table + 'Offset']
     def tsize(self, table): return self.hdr[table + 'Size']
+
+    @staticmethod
+    def _vw(count: int) -> int:
+        if count <= 0xFF:
+            return 1
+        if count <= 0xFFFF:
+            return 2
+        return 4
+
+    def _read_vw(self, off: int, width: int) -> int:
+        if width == 1:
+            v = self.d[off]
+            return -1 if v == 0xFF else v
+        if width == 2:
+            v = struct.unpack_from('<H', self.d, off)[0]
+            return -1 if v == 0xFFFF else v
+        return i32(self.d, off)
 
     # -- tables ---------------------------------------------------------------
     def _parse_tables(self):
@@ -155,52 +178,129 @@ class Metadata:
         self.string_size = h['stringSize']
         self._str_cache: Dict[int, str] = {}
 
-        # string literals
+        # v38+ variable-width index sizes. The widths are derived from the
+        # table counts, exactly like the runtime's metadata reader.
+        if self.v38:
+            self.td_w = self._vw(h['typeDefinitionsCount'])
+            self.gc_w = self._vw(h['genericContainersCount'])
+            self.param_w = self._vw(h['parametersCount'])
+            pc = h['parametersCount']
+            self.type_w = (h['parametersSize'] // pc - 8) if pc else 4
+            if self.type_w not in (1, 2, 4):
+                self.type_w = 4
+
+        # string literals: v35+ drops the per-row length and stores the
+        # sorted string pool as a boundary array (count = strings + 1).
         so, sc = h['stringLiteralOffset'], h['stringLiteralSize']
-        self.string_literals: List[Tuple[int, int]] = [
-            (u32(d, so + i * 8), u32(d, so + i * 8 + 4)) for i in range(sc // 8)]
+        if self.v35:
+            n = h.get('stringLiteralCount', sc // 4)
+            bounds = [u32(d, so + i * 4) for i in range(n)]
+            self.string_literals: List[Tuple[int, int]] = [
+                (bounds[i + 1] - bounds[i], bounds[i])
+                for i in range(max(0, n - 1))]
+        else:
+            self.string_literals: List[Tuple[int, int]] = [
+                (u32(d, so + i * 8), u32(d, so + i * 8 + 4)) for i in range(sc // 8)]
 
         # images
         io, ic = h['imagesOffset'], h['imagesSize']
         self.images: List[ImageDef] = []
-        for i in range(ic // 40):
-            b = io + i * 40
-            self.images.append(ImageDef(
-                self.getstr(u32(d, b)), i32(d, b + 4), i32(d, b + 8),
-                u32(d, b + 12), i32(d, b + 24), u32(d, b + 28)))
+        if self.v38:
+            for i in range(h['imagesCount']):
+                b = io + i * 36
+                p = b + 8
+                type_start = self._read_vw(p, self.td_w); p += self.td_w
+                type_count = u32(d, p); p += 4
+                p += self.td_w + 4          # exportedTypeStart/Count
+                entry_point = i32(d, p); p += 4
+                token = u32(d, p)
+                self.images.append(ImageDef(
+                    self.getstr(u32(d, b)), i32(d, b + 4), type_start,
+                    type_count, entry_point, token))
+        else:
+            for i in range(ic // 40):
+                b = io + i * 40
+                self.images.append(ImageDef(
+                    self.getstr(u32(d, b)), i32(d, b + 4), i32(d, b + 8),
+                    u32(d, b + 12), i32(d, b + 24), u32(d, b + 28)))
 
-        # type definitions: v31 adds nothing to typedef; stride 88 for >=24.2
-        tdo, tdc = h['typeDefinitionsOffset'], h['typeDefinitionsSize']
-        stride = 88 if self.version >= 24.2 else 84
-        n = tdc // stride
+        # type definitions: v38+ uses variable-width indices and drops
+        # byref/element; v31 row is 88 bytes (84 before 24.2).
+        tdo = h['typeDefinitionsOffset']
         self.typedefs: List[TypeDef] = []
-        for i in range(n):
-            b = tdo + i * stride
-            f = struct.unpack_from('<16i', d, b)
-            counts = struct.unpack_from('<8H', d, b + 64)
-            self.typedefs.append(TypeDef(
-                i, self.getstr(f[0]), self.getstr(f[1]), f[2], f[3], f[4], f[5],
-                f[6], u32(d, b + 28), f[8], f[9], f[10], f[11], f[12], f[13],
-                f[14], f[15], counts[0], counts[1], counts[2], counts[3],
-                counts[4], counts[5], counts[6], counts[7],
-                u32(d, b + 80), u32(d, b + 84)))
+        if self.v38:
+            n = h['typeDefinitionsCount']
+            # The row is packed, so its stride follows the variable
+            # widths: 4 name + 4 namespace + 3*type_w (byval, declaring,
+            # parent) + gc_w (generic container) + 4 flags + 32 starts +
+            # 16 counts + 4 bitfield + 4 token.  Limbus is 82
+            # (type_w 4, gc_w 2); a <=255-container file is 81.
+            td_stride = 4 + 4 + 3 * self.type_w + self.gc_w + 4 + 32 + 16 + 4 + 4
+            for i in range(n):
+                b = tdo + i * td_stride
+                p = b + 8
+                byval = self._read_vw(p, self.type_w); p += self.type_w
+                decl = self._read_vw(p, self.type_w); p += self.type_w
+                parent = self._read_vw(p, self.type_w); p += self.type_w
+                generic = self._read_vw(p, self.gc_w); p += self.gc_w
+                flags = u32(d, p); p += 4
+                starts = struct.unpack_from('<8i', d, p); p += 32
+                counts = struct.unpack_from('<8H', d, p); p += 16
+                self.typedefs.append(TypeDef(
+                    i, self.getstr(u32(d, b)), self.getstr(u32(d, b + 4)),
+                    byval, decl, parent, -1, generic, flags,
+                    starts[0], starts[1], starts[2], starts[3], starts[4],
+                    starts[5], starts[6], starts[7],
+                    counts[0], counts[1], counts[2], counts[3],
+                    counts[4], counts[5], counts[6], counts[7],
+                    u32(d, p), u32(d, p + 4)))
+        else:
+            stride = 88 if self.version >= 24.2 else 84
+            n = h['typeDefinitionsSize'] // stride
+            for i in range(n):
+                b = tdo + i * stride
+                f = struct.unpack_from('<16i', d, b)
+                counts = struct.unpack_from('<8H', d, b + 64)
+                self.typedefs.append(TypeDef(
+                    i, self.getstr(f[0]), self.getstr(f[1]), f[2], f[3], f[4], f[5],
+                    f[6], u32(d, b + 28), f[8], f[9], f[10], f[11], f[12], f[13],
+                    f[14], f[15], counts[0], counts[1], counts[2], counts[3],
+                    counts[4], counts[5], counts[6], counts[7],
+                    u32(d, b + 80), u32(d, b + 84)))
 
-        # methods: v31 adds returnParameterToken
+        # methods: v31 adds returnParameterToken; v38+ uses variable-width
+        # declaring/return/parameter indices and a 32-byte row.
         mo, mc = h['methodsOffset'], h['methodsSize']
-        mstride = 36 if self.v31 else 32
-        nm = mc // mstride
         self.methods: List[MethodDef] = []
-        for i in range(nm):
-            b = mo + i * mstride
-            if self.v31:
-                nameI, decl, rtok, _rp, pstart, gci, token = struct.unpack_from('<7i', d, b)
-                tail = struct.unpack_from('<4H', d, b + 28)
-            else:
-                nameI, decl, rtok, pstart, gci, token = struct.unpack_from('<6i', d, b)
-                tail = struct.unpack_from('<4H', d, b + 24)
-            self.methods.append(MethodDef(
-                i, self.getstr(nameI), decl, rtok, pstart, gci,
-                u32(d, b + 24 if self.v31 else b + 20), tail[0], tail[1], tail[2], tail[3]))
+        if self.v38:
+            nm = h['methodsCount']
+            for i in range(nm):
+                b = mo + i * 32
+                p = b + 4
+                decl = self._read_vw(p, self.td_w); p += self.td_w
+                rtok = self._read_vw(p, self.type_w); p += self.type_w
+                rptok = i32(d, p); p += 4
+                pstart = self._read_vw(p, self.param_w); p += self.param_w
+                gci = self._read_vw(p, self.gc_w); p += self.gc_w
+                token = u32(d, p); p += 4
+                tail = struct.unpack_from('<4H', d, p)
+                self.methods.append(MethodDef(
+                    i, self.getstr(u32(d, b)), decl, rtok, pstart, gci,
+                    token, tail[0], tail[1], tail[2], tail[3]))
+        else:
+            mstride = 36 if self.v31 else 32
+            nm = mc // mstride
+            for i in range(nm):
+                b = mo + i * mstride
+                if self.v31:
+                    nameI, decl, rtok, _rp, pstart, gci, token = struct.unpack_from('<7i', d, b)
+                    tail = struct.unpack_from('<4H', d, b + 28)
+                else:
+                    nameI, decl, rtok, pstart, gci, token = struct.unpack_from('<6i', d, b)
+                    tail = struct.unpack_from('<4H', d, b + 24)
+                self.methods.append(MethodDef(
+                    i, self.getstr(nameI), decl, rtok, pstart, gci,
+                    u32(d, b + 24 if self.v31 else b + 20), tail[0], tail[1], tail[2], tail[3]))
 
         # parameters / fields / properties / events
         po, pc = h['parametersOffset'], h['parametersSize']
@@ -220,17 +320,25 @@ class Metadata:
         gco, gcc = h['genericContainersOffset'], h['genericContainersSize']
         self.generic_containers = [struct.unpack_from('<4i', d, gco + i * 16) for i in range(gcc // 16)]
         gpo, gpc = h['genericParametersOffset'], h['genericParametersSize']
-        gp_stride = 16 if self.version >= 24.2 else 12
         self.generic_parameters = []
-        for i in range(gpc // gp_stride):
-            b = gpo + i * gp_stride
-            owner = i32(d, b)
-            name = self.getstr(u32(d, b + 4))
-            if gp_stride == 16:
-                cs, cc, num, flags = struct.unpack_from('<hhHH', d, b + 8)
-            else:
-                cs, cc, num, flags = struct.unpack_from('<iiHH', d, b + 8)
-            self.generic_parameters.append((owner, name, cs, cc, num, flags))
+        if self.v38:
+            for i in range(h['genericParametersCount']):
+                b = gpo + i * 14
+                owner = self._read_vw(b, self.gc_w)
+                name = self.getstr(u32(d, b + self.gc_w))
+                cs, cc, num, flags = struct.unpack_from('<hhHH', d, b + self.gc_w + 4)
+                self.generic_parameters.append((owner, name, cs, cc, num, flags))
+        else:
+            gp_stride = 16 if self.version >= 24.2 else 12
+            for i in range(gpc // gp_stride):
+                b = gpo + i * gp_stride
+                owner = i32(d, b)
+                name = self.getstr(u32(d, b + 4))
+                if gp_stride == 16:
+                    cs, cc, num, flags = struct.unpack_from('<hhHH', d, b + 8)
+                else:
+                    cs, cc, num, flags = struct.unpack_from('<iiHH', d, b + 8)
+                self.generic_parameters.append((owner, name, cs, cc, num, flags))
 
         # misc index tables
         nto, ntc = h['nestedTypesOffset'], h['nestedTypesSize']
@@ -268,6 +376,8 @@ class Metadata:
         return s
 
     def string_literal(self, idx: int) -> str:
+        if not (0 <= idx < len(self.string_literals)):
+            return ''
         ln, do = self.string_literals[idx]
         return self.d[self.hdr['stringLiteralDataOffset'] + do:
                       self.hdr['stringLiteralDataOffset'] + do + ln].decode('utf-8', 'replace')

@@ -144,7 +144,11 @@ class _RegistrationMixin:
         # Android loader reads): -16 is the count, -15 the wrappers.
         self.reverse_p_invoke_count = q(-16)
         self.reverse_p_invoke_wrappers = q(-15)
-        self.code_reg_va = X - 18 * 8
+        # The struct is 17 qwords: [0] reversePInvokeWrapperCount ...
+        # [16] codeGenModules, which sits at X.  So the base is
+        # X - 16*8, not X - 18*8 (the old value was 0x10 low and only
+        # ever printed -- no field is read from it).
+        self.code_reg_va = X - 16 * 8
         self.log('CodeRegistration @ %#x' % self.code_reg_va)
 
         # 5. MetadataRegistration: [TD, ptr, TD, ptr] anchor
@@ -417,15 +421,28 @@ class _RegistrationMixin:
             for j in range(len(qs) - 3):
                 if qs[j] == td and qs[j + 2] == td:
                     fo_ptr, sz_ptr = qs[j + 1], qs[j + 3]
-                    # validate fieldOffsets[1..3] point to int arrays starting ~0x10
-                    ok = 0
-                    for k in (1, 2, 3):
-                        e = b.qword(fo_ptr + k * 8) if fo_ptr else None
-                        if e:
+                    # validate a window of fieldOffsets entries: each non-NULL
+                    # pointer must address an int array starting small.  Null
+                    # slots are legitimate (typedefs with no fields, e.g.
+                    # <Module>), so scan past them instead of failing on the
+                    # first three entries.
+                    ok = seen = 0
+                    if fo_ptr and b.valid_va(fo_ptr):
+                        for k in range(1, min(64, td)):
+                            e = b.qword(fo_ptr + k * 8)
+                            if not e:
+                                continue
+                            seen += 1
                             v = b.dword(e)
                             if v is not None and 0 <= v < 0x10000:
                                 ok += 1
-                    if ok >= 2:
+                    sz_ok = False
+                    if sz_ptr and b.valid_va(sz_ptr):
+                        p = b.qword(sz_ptr)
+                        o = b.va2off(p) if p else None
+                        v = u32(b.d, o) if o is not None else None
+                        sz_ok = v is not None and 0 < v < 0x1000000
+                    if ok >= 2 and ok * 2 >= seen and sz_ok:
                         self.meta_reg_anchor = s.addr + j * 8
                         self.meta_reg_va = self.meta_reg_anchor - 10 * 8
                         return
