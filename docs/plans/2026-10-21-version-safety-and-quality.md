@@ -160,7 +160,17 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 
 ## 5b. Round 3 记录
 
-**已完成（round 3）**：
+**已完成（round 4）**：
+
+- `b4f2f6e` 元素访问助手 stub 语义标注：`__SharedBodyStubs.cs` 里
+  高频 `sub_` 的注释从"unregistered native target"升级为具体家族
+  （list/array indexer getter/setter 等）。字节模板识别，家族已验证：
+  getter ×18（`sub_180010df0` 6,777 站点）、setter ×9（`sub_180002950`
+  6,447）、array-element ×1、element-address ×9。**只改注释，不改调用点
+  与 body，golden 不动**。这是 URE §5"说清为什么没能命名"的可诊断性，
+  零风险交付。6 个字节缓冲单测。
+
+**round 3 记录**：
 
 - `79d98f6` A.3 补全：空卡表 `while (<expr> >> 12 & 63 != 0) { }` **任意位置**
   删除。论证：条件 `card_bit != 0` 是 `lock cmpxchg` 重试的错误建模、**非
