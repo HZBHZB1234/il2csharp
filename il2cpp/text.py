@@ -1,5 +1,64 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 
+
+# ---- literal/comment NUL mask (shared by textpass + highlevel) -----------
+# One precompiled regex scans a rendered line left-to-right, exactly as the
+# old char-by-char loop did: `//` to end-of-string, `/* ... */` (open on a
+# line keeps the caller's block-comment state set), `@"..."` verbatim strings
+# (`""` is an escaped quote), `"..."` regular strings (backslash escapes),
+# and `'...'` char literals. Matched spans are NUL-blanked so the result is
+# the same length as the input (token spans stay aligned). An unterminated
+# literal/comment masks to end-of-string (the old loop's behaviour). A real
+# rendered line never carries a raw newline, so `[\s\S]` == the old `.*`.
+_MASK_RE = re.compile(
+    r'(?P<line>//[\s\S]*)'
+    r'|(?P<block>/\*[^*]*\*+(?:[^/*][^*]*\*+)*/)'
+    r'|(?P<block_unterm>/\*[\s\S]*)'
+    r'|(?P<vstr>@"(?:[^"]|"")*")'
+    r'|(?P<vstr_unterm>@"[\s\S]*)'
+    r'|(?P<str>"(?:\\.|[^"\\])*")'
+    r'|(?P<str_unterm>"[\s\S]*)'
+    r"|(?P<chr>'(?:\\.|[^'\\])*')"
+    r"|(?P<chr_unterm>'[\s\S]*)"
+)
+
+
+def _mask_scan(line, i, n):
+    """Mask literals/comments in `line[i:n]`; set the block flag if an
+    unterminated `/*` opened one. Returns (masked, in_block_comment)."""
+    out = []
+    last = i
+    inbc = False
+    for m in _MASK_RE.finditer(line, i):
+        s, e = m.span()
+        if s > last:
+            out.append(line[last:s])
+        out.append('\x00' * (e - s))
+        last = e
+        if m.lastgroup == 'block_unterm':
+            inbc = True
+    if last < n:
+        out.append(line[last:n])
+    return ''.join(out), inbc
+
+
+def mask_spans(line, in_block_comment):
+    """Blank string/char literals and comments with NULs, same length.
+
+    Byte-for-byte equivalent to the old char-by-char mask (verified on every
+    line of the built tree): token spans stay aligned with the original line
+    while the scanners only ever see code. `in_block_comment` carries a `/*`
+    still open on the previous line."""
+    n = len(line)
+    if in_block_comment:
+        j = line.find('*/')
+        if j < 0:
+            return '\x00' * n, True
+        pre = j + 2
+        rest, inbc = _mask_scan(line, pre, n)
+        return '\x00' * pre + rest, inbc
+    return _mask_scan(line, 0, n)
+
 def _build_reg_canon() -> dict:
     canon = {}
     fams = ['RAX', 'RCX', 'RDX', 'RBX', 'RSP', 'RBP', 'RSI', 'RDI'] +            ['R%d' % i for i in range(8, 16)]

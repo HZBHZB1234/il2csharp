@@ -5,6 +5,7 @@ from il2cpp.metadata import MethodDef
 from il2cpp.names import safe_ident
 from il2cpp.stmt_text import _split_top
 from il2cpp.expr import _mentions
+from il2cpp.text import mask_spans as _mask_spans
 
 class _HighLevelMixin:
     def _jumps_into(self, lines, lo, hi) -> bool:
@@ -4629,64 +4630,9 @@ class _HighLevelMixin:
     def _mask_literals(line: str, in_block_comment: bool) -> Tuple[str, bool]:
         """Blank string/char literals and comments with NULs, same length.
 
-        `_rename_locals` collected and substituted vN/tN/s_XX tokens over
-        the whole line, so a literal carrying such a token was rewritten
-        (the ADO.NET diffgram namespace rendered `...-obj83`) and a
-        literal-only token shifted the numbering. Masking keeps token
-        spans aligned with the original line while the scanners only
-        ever see code.
-        """
-        out = []
-        i = 0
-        n = len(line)
-        while i < n:
-            if in_block_comment:
-                j = line.find('*/', i)
-                if j < 0:
-                    out.append('\x00' * (n - i))
-                    return ''.join(out), True
-                out.append('\x00' * (j + 2 - i))
-                i = j + 2
-                in_block_comment = False
-                continue
-            if line.startswith('//', i):
-                out.append('\x00' * (n - i))
-                break
-            if line.startswith('/*', i):
-                in_block_comment = True
-                out.append('\x00' * 2)
-                i += 2
-                continue
-            if line.startswith('@"', i):
-                j = i + 2
-                while j < n:
-                    if line.startswith('""', j):
-                        j += 2
-                        continue
-                    if line[j] == '"':
-                        j += 1
-                        break
-                    j += 1
-                out.append('\x00' * (j - i))
-                i = j
-                continue
-            c = line[i]
-            if c in ('"', "'"):
-                j = i + 1
-                while j < n:
-                    if line[j] == '\\':
-                        j += 2
-                        continue
-                    if line[j] == c:
-                        j += 1
-                        break
-                    j += 1
-                out.append('\x00' * (j - i))
-                i = j
-                continue
-            out.append(c)
-            i += 1
-        return ''.join(out), in_block_comment
+        Thin wrapper over `il2cpp.text.mask_spans` (the precompiled-regex
+        twin), so every call site and the mixin API stay unchanged."""
+        return _mask_spans(line, in_block_comment)
 
     @staticmethod
     def _replace_semantic_names(line: str, names: Dict[str, str],
