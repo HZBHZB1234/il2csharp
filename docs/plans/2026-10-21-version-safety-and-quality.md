@@ -115,7 +115,7 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 | P1-a#2 委托缓存恢复 | 部分 | #1 已让委托链可达；缓存恢复的 `?? (x = new)` 折叠待查 |
 | URE §5.3.3 `--publicize`/`--raw-addr` 头部免责 | **已完成** `97e233b` | 零风险，默认树字节不变 |
 | URE P1 状态机 Stage 1（识别+标注） | **已完成** `3c6ef10` | 1,863 识别，0 误报；只加类注释 |
-| URE §5.3.1 `sub_` 失败原因注释 | 未开始（改 `--explain` opt-in） | 全量内联会膨胀，须可选 |
+| URE §5.3.1 `sub_` 失败原因注释 | **不做**（有据） | 95% 的 plain `sub_` 无 metadata 候选，原因是同一个；全量内联严重膨胀，opt-in 价值也低（见 §5 决策） |
 | 全量前后对比验证 | **进行中**（round 2） | 后台重建 `limbus_fixed1` + `compare_trees.py` |
 | P2 重复 getter 去重 / `[Address]` 形式化 | 未开始 | |
 | C# 复刻版 | 未决 | 范围问题用户未回答 |
@@ -151,6 +151,12 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
   emitter 特化渲染才有价值，留待后续。
 - **jcc 窗口放宽复核**：`decompiler` 路径走 `_guards`（build.py），
   与 `Lifter.lift`（state.py, 死代码）无关；round 1 的修改点正确。
+- **URE §5.3.1 `sub_` 失败原因注释——决定不做（有据）**：57,696 个
+  plain `sub_` 集中在 2,125 个 VA，其中 95% 是**无 metadata 候选**的运行时
+  助手——同一原因重复 5 万次，把原因内联进每个调用点会让树严重膨胀；
+  做成 `--explain` 则又因每个 VA 原因相同而信息量很低。真正高价值的是
+  **命名**这些助手（如已查明的 `List<T>` 索引器），而非给它们贴"为什么
+  没命名"的注释。故本轮不做，改由后续"命名高频助手"承接。
 
 ## 6. A.3 GC 写屏障：探查结论与实现（round 1）
 
