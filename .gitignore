@@ -72,3 +72,4 @@ limbus_*.log
 limbus_*heartbeat*.txt
 limbus_out*/
 limbus_build_heartbeat.txt
+limbus_fixed1/

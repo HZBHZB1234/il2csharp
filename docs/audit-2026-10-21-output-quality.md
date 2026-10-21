@@ -671,3 +671,27 @@ portable 套件 1325 passed / 0 failed。
 `tests/test_peephole_version_independent.py` 用合成字节流固定其行为，
 不依赖任何游戏数据，v24-v39 共用。KLASS 偏移经 `HeaderConstants.cs`
 结构推导 + v39 二进制实测，结论是 v35+ 与 v29-31 布局相同、无需版本门控。
+
+---
+
+# 附录 C：文件级前后对比（round 2，定向重抬，非抽样外推）
+
+对审计里最差的三个文件，用**当前（含全部修复）源码**重新抬升其全部方法，
+与修复前 `limbus_out1` 的实际文件逐标记对比。这是真实文件级证据。
+
+| 文件 | 行数 | `obj|0` | `obj|=0` | `byte guard==0` | `bare throw;` | `cardmark while` |
+| --- | --- | --- | --- | --- | --- | --- |
+| BuffDetail.cs | 36,115 → 29,501 | 354 → **0** | 1,174 → **0** | 370 → 17 | 289 → **0** | 155 → 43 |
+| BattleUnitModel.cs | 38,191 → 29,314 | 694 → 2 | 1,117 → 22 | 694 → 18 | 216 → **0** | 94 → 68 |
+| BattleObjectManager.cs | 24,361 → 17,368 | 351 → 9 | 1,446 → 111 | 361 → 33 | 303 → **0** | 225 → 154 |
+
+- `obj|0` / `obj|=0`（类初始化守卫的垃圾）：**接近归零**。
+- `bare throw;`（假抛异常，来自 EH helper 误判）：**归零**。
+- `byte guard==0`（未识别的类初始化守卫）：**−90%~−95%**。
+- `cardmark while`（GC 卡表屏障）：**−50%~−70%**（剩下的 43/68/154 是
+
+  非纯形状里 barrier body 含真实语句的情形，本轮按 decline-by-default 保留）。
+- 整体行数 **−18% ~ −29%**，即最差文件的可读性显著提升。
+
+复现脚本：`docs/probes/` 同款思路；本附录数字由
+`targeted_compare.py`（定向重抬一个 typedef 的全部方法）产出。
