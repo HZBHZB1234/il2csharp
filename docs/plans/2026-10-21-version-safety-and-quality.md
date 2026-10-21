@@ -173,14 +173,16 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
   `if not cands`（无 metadata 候选）分支调用；有候选的地址（如
   `0x1840cac60` 3 owners）正常显示 owner 列表、不加元素标签。安全。
 - **构建健康推进**：pid 42620，3,100+ 文件，含 round-1/2/3 全部实质修复。
-- **GC 卡表计算残留片段（转入 next-round todo）**：`cardmark while` 已清，
-  但 GC 屏障被**拆散成独立赋值**的残余仍在：
+- **GC 卡表计算残留片段（已修）**：`cardmark while` 已清，但 GC 屏障被
+  **拆散成独立赋值**的残余仍在：
   `T name = (typeof(X)._F & 8589930496) >> 12 & 63` / `>> 18`
   （`8589930496`=0x200000000 是 Boehm 卡表掩码）。实测 604 个此类片段中
   **245 个（41%）是纯死代码**（变量声明后从不使用），且**声明类型错误**
-  （int 存进类类型，编译必失败）。RHS 是纯静态字段算术、无副作用，删除
-  语义安全；但属 body 层改动（动 golden，本机无 fixture 审阅）+ 会让当前
-  构建落后，故**下一轮**用 `_final_text` pass 严格匹配该特异形状清理。
+  （int 存进类类型，编译必失败）。新增 `drop_dead_cardmark_fragments`
+  严格匹配该特异形状（RHS 含 GC 掩码且以 `>> 18`/`>> 12 & 63` 结尾）+
+  变量方法内未用才删。AbilityBase 全部方法残留归零。6 个单测。
+  （此提交晚于当前构建启动，故 limbus_fixed1 不含它——纯死代码删除，
+  只减行数，不影响核心修复验证。）
 
 **已完成（round 6）**：
 
