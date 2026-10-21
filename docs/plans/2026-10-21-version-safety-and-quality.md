@@ -160,6 +160,23 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 
 ## 5b. Round 3 记录
 
+**已完成（round 5）**：
+
+- **元素助手 arity 截断——评估后不做（有据）**：`sub_180010df0`
+  等调用的 4 参 spray 想按 getter=2/setter=3 截断。但既有机制
+  `entry_live_args`（fix 132）对这些助手返回 `('gx','gx','gx','gx')`
+  全活跃（分支/重试循环使保守分析不收敛），改它要动全语料依赖的核心
+  ABI 分析器，风险不成比例；用字节模板另起炉灶又要重复精确的读写
+  分析，投入产出比低。**保留 4 参 spray**——它是既有诚实行为，不是
+  本轮引入的回归。
+- **`__SharedBodyStubs.cs` 端到端验证**：firstpass 程序集已产出 stub
+  文件（1,247 行）；对 `sub_180010df0`/`sub_180002950` 走真实 emitter
+  `_stub_owners` 路径确认输出
+  `// 0x...: unregistered native target -- list/array indexer getter (...)`
+  / `-- ... setter (... GC write barrier)`，round-4 的标注逻辑端到端正确。
+- **URE §5.3.2（`/* nothing */` / 空体警告）**：当前构建里
+  `/* nothing */` 与 `/* no code */` 均为 0——无对象可改。
+
 **已完成（round 4）**：
 
 - `b4f2f6e` 元素访问助手 stub 语义标注：`__SharedBodyStubs.cs` 里
