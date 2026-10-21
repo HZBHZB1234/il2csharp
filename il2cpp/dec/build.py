@@ -1072,20 +1072,40 @@ _GC_BARRIER_WHILE_RX = re.compile(
     r'^while \(.+(?:>> 12 & 63|>> 12 & 0x3[fF])(?: != 0)?\)$')
 
 
-def drop_gc_cardmark_barriers(lines):
+def _drop_empty_cardmark_whiles(lines):
+    """Remove every `while (<expr> >> 12 & 63 [!= 0]) { }` (empty body)
+    anywhere.  The condition is the mis-modelled cmpxchg retry and a
+    literal loop is wrong; the empty body + side-effect-free condition
+    make removal always sound.  A non-empty body is left alone."""
     out = []
     i, n = 0, len(lines)
     while i < n:
-        if (i + 5 < n
+        if (i + 2 < n
+                and _GC_BARRIER_WHILE_RX.match(lines[i].strip())
+                and lines[i + 1].strip() == '{'
+                and lines[i + 2].strip() == '}'):
+            i += 3
+            continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+def drop_gc_cardmark_barriers(lines):
+    # 1) drop the empty cardmark while everywhere (always sound).
+    lines = _drop_empty_cardmark_whiles(lines)
+    # 2) drop a `if (data_X != 0) { <empty> }` guard whose body the
+    #    step above emptied, and the original pure shape.
+    out = []
+    i, n = 0, len(lines)
+    while i < n:
+        if (i + 2 < n
                 and _GC_BARRIER_GUARD_RX.match(lines[i].strip())
                 and lines[i + 1].strip() == '{'
-                and _GC_BARRIER_WHILE_RX.match(lines[i + 2].strip())
-                and lines[i + 3].strip() == '{'
-                and lines[i + 4].strip() == '}'
-                and lines[i + 5].strip() == '}'
-                and not (i + 6 < n
-                         and lines[i + 6].strip().startswith('else'))):
-            i += 6
+                and lines[i + 2].strip() == '}'
+                and not (i + 3 < n
+                         and lines[i + 3].strip().startswith('else'))):
+            i += 3
             continue
         out.append(lines[i])
         i += 1
