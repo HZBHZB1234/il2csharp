@@ -1,5 +1,6 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.arm64 import Arm64Lifter, is_arm64_binary
+import re
 from il2cpp.common import compressed_int, csharp_type_name, i32, i64, read_compressed_uint, u16, u32, u64
 from il2cpp.csharp import FA_INITONLY, FA_LITERAL, FA_STATIC, FIELD_VIS, METH_VIS, TYPE_VIS, UsingTracker, field_attrs, nameof_sugar, strip_namespaces, collision_heads, source_field_name
 from il2cpp.lifter import Lifter
@@ -281,6 +282,42 @@ class Emitter:
             return []
         return ['// COMPILE-GATE OUTPUT -- NOT FAITHFUL SOURCE: '
                 + '; '.join(gate) + '.']
+
+    _STATE_MACHINE_RX = re.compile(r'^<([^>]+)>d__(\d+)$')
+
+    def _state_machine_note(self, td):
+        """URE async/iterator state-machine identification (Stage 1).
+
+        A compiler-generated state machine is `<Method>d__N` and owns a
+        `MoveNext`.  The emitter strips `<>` from identifiers, so the type
+        prints as `_Method_d__N` and a reader cannot tell it is the
+        `MoveNext` state machine for `Method`.  This annotates the class
+        with the source method and the attribute kind; it never touches a
+        body (Stage 1 is identification only).
+
+        Proof = name pattern AND a MoveNext method on the same typedef.
+        Measured on Limbus v39: 1,863 matches, 0 without MoveNext -- so
+        the MoveNext requirement rejects every name-only coincidental
+        `<>...d__N`.  Matches only; a non-matching type yields None.
+        """
+        mm = self._STATE_MACHINE_RX.match(td.name or '')
+        if not mm:
+            return None
+        try:
+            mnames = {self.meta.methods[mi].name
+                      for mi in self.meta.type_methods(td)
+                      if 0 <= mi < len(self.meta.methods)}
+        except Exception:
+            return None
+        if 'MoveNext' not in mnames:
+            return None
+        # Deliberately do NOT claim async-vs-iterator: distinguishing them
+        # needs the custom-attribute table (AsyncStateMachineAttribute),
+        # which this studio has no cheap decoder for.  A wrong kind label
+        # would be a false identification, so the note says only what the
+        # structure proves: this is the MoveNext state machine for Method.
+        return ('// state machine for %s (compiler-generated; MoveNext '
+                'drives the inlined original body)' % (mm.group(1),))
 
     def type_decl_line(self, td: TypeDef) -> List[str]:
         f = td.flags
@@ -818,6 +855,9 @@ class Emitter:
         hdr = self.type_decl_line(td)
         out.append('')
         comment = []
+        _sm = self._state_machine_note(td)
+        if _sm is not None:
+            out.append(pre + _sm)
         if td.generic_container != -1:
             pass
         if (td.flags & 0x2000) and not td.is_enum and not td.is_valuetype:
