@@ -1465,110 +1465,166 @@ class Emitter:
                     pending.append((self.meta.nested_types[k], full))
         return False
 
-    def write_assembly_split(self, img: ImageDef) -> int:
-        asm_name = self.seg(img.name[:-4] if img.name.lower().endswith('.dll') else img.name)
-        asm_dir = os.path.join(self.out_dir, asm_name)
-        os.makedirs(asm_dir, exist_ok=True)
-        top_types = []
-        for ti in range(img.type_start, min(img.type_start + img.type_count, len(self.meta.typedefs))):
+    def _assembly_dir_name(self, name: str) -> str:
+        return self.seg(name[:-4] if name.lower().endswith('.dll') else name)
+
+    def _iter_top_types(self, img: ImageDef):
+        for ti in range(img.type_start,
+                         min(img.type_start + img.type_count, len(self.meta.typedefs))):
             td = self.meta.typedefs[ti]
             if td.declaring < 0:
-                top_types.append(td)
-        written = 0
+                yield td
+
+    def _plan_top_files(self, img: ImageDef):
+        """Top-level types of `img` that pass the filter, each paired with
+        its final assembly-local file base name.
+
+        Dedup runs in metadata order over the assembly's own top types, so
+        the name a type gets is independent of the schedule and matches the
+        serial build byte-for-byte. The plan is what the parent hands to the
+        per-type workers; a serial build walks the same plan.
+        """
+        plan = []
         used = {}
-        all_sub = set()
-        any_raw = False
-        for td in top_types:
+        for td in self._iter_top_types(img):
             if td.name == '<Module>' or not self._matches_type_filter(td):
                 continue
             ns = td.namespace
-            rel = [self.seg(x) for x in ns.split('.')] if ns else []
-            dirp = os.path.join(asm_dir, *rel)
+            rel = tuple(self.seg(x) for x in ns.split('.')) if ns else ()
             base = self.file_name_for(td)
-            key = (dirp, base.lower())
+            key = (rel, base.lower())
             used[key] = used.get(key, 0) + 1
             if used[key] > 1:
                 base += '_%d' % used[key]
-            buf = []
-            try:
-                indent = '    ' if ns else ''
-                self.emit_type(td, buf, indent)
-            except Exception as ex:
-                self.emit_failed += 1
-                if self.verbose:
-                    print('warning: type emission failed %s: %s' % (td.name, ex), file=sys.stderr)
-                buf = ['// emit failed for %s: %s' % (td.name, ex)]
-            all_sub |= self._stub_collect('\n'.join(buf))
-            tr = UsingTracker(self.il)
-            for l in buf:
-                tr.add_text(l)
-            uses_set = set(tr.used)   # own ns too: in scope inside its block
-            if uses_set:
-                dup = collision_heads("\n".join(buf), ns, uses_set, self._short_ns_index())
-                buf = strip_namespaces(buf, uses_set, ns, dup)
-            members = self._nameof_members(uses_set)
+            plan.append((td, base))
+        return plan
+
+    def _emit_one_top(self, td: TypeDef, img_name: str, asm_dir: str,
+                      base: str):
+        """Render and write one top-level type's `.cs` file (nested types
+        recurse through `emit_type`). Returns `(sub_refs, raw)`:
+        `sub_refs` is the set of `sub_<hex>` VAs the PRE-transform body text
+        names (the aggregate stub file is built from the union of these), and
+        `raw` is whether `--raw-addr` rewrote this file.
+
+        The file content depends only on this type's own subtree plus the
+        `raw` flag -- every header step (`UsingTracker`, `nameof`, `reindent`,
+        label-`;`, `MANGLED_IDENT`) is single-file. That is what lets the
+        per-type pool write each file independently and still match serial.
+        """
+        ns = td.namespace
+        rel = [self.seg(x) for x in ns.split('.')] if ns else []
+        dirp = os.path.join(asm_dir, *rel)
+        buf = []
+        try:
+            indent = '    ' if ns else ''
+            self.emit_type(td, buf, indent)
+        except Exception as ex:
+            self.emit_failed += 1
+            if self.verbose:
+                print('warning: type emission failed %s: %s' % (td.name, ex), file=sys.stderr)
+            buf = ['// emit failed for %s: %s' % (td.name, ex)]
+        # the aggregate stub set is collected from the PRE-transform body
+        # (matches the serial build exactly); the header's own `using
+        # static __SharedBodyStubs;` decision below re-tests the POST-transform
+        # text, as it always has
+        sub = self._stub_collect('\n'.join(buf))
+        tr = UsingTracker(self.il)
+        for l in buf:
+            tr.add_text(l)
+        uses_set = set(tr.used)   # own ns too: in scope inside its block
+        if uses_set:
+            dup = collision_heads('\n'.join(buf), ns, uses_set, self._short_ns_index())
+            buf = strip_namespaces(buf, uses_set, ns, dup)
+        members = self._nameof_members(uses_set)
+        if members:
+            # the enum must be referenced elsewhere in the file too:
+            # nameof's argument does not survive compilation, so a file
+            # that never names the enum almost surely had a plain string
+            toks = set(re.findall(r'[A-Za-z_]\w*', '\n'.join(buf)))
+            members = {mn: en for mn, en in members.items() if en in toks}
             if members:
-                # the enum must be referenced elsewhere in the file too:
-                # nameof's argument does not survive compilation, so a file
-                # that never names the enum almost surely had a plain string
-                toks = set(re.findall(r'[A-Za-z_]\w*', '\n'.join(buf)))
-                members = {mn: en for mn, en in members.items() if en in toks}
-                if members:
-                    buf = nameof_sugar(buf, members)
-            # Fix 128, opt-in `--raw-addr`: `(byte*)E` -> `(byte*)__addr(E)`
-            raw = False
-            if getattr(self, 'raw_addr', False):
-                buf, raw = rawaddr.rewrite_lines(buf)
-                any_raw = any_raw or raw
-            hdr = ['// Decompiled by il2csharp | %s | TypeDefIndex: %d' % (img.name, td.index)]
-            hdr.extend(self._gate_header())
-            uses = tr.render(skip=[ns] if ns else [])
-            if uses:
-                hdr.append('')
-                hdr.extend(uses)
-            if self._stub_collect('\n'.join(buf)):
-                hdr.append('')
-                hdr.append('using static __SharedBodyStubs;')
-            if raw:
-                hdr.append('')
-                hdr.append('using static %s;' % rawaddr.CLASS)
-            if ns:
-                hdr.append('')
-                hdr.append('namespace %s' % ns)
-                hdr.append('{')
-                content = '\n'.join(hdr) + '\n' + '\n'.join(buf) + '\n}\n'
-            else:
-                content = '\n'.join(hdr) + '\n' + '\n'.join(buf) + '\n'
-            # lay every line at its real brace depth (see `reindent`): the
-            # threaded-`indent` emitters drift a level and bodies read as
-            # sitting outside their own braces. No-op on correct files.
-            if os.environ.get('IL2CSHARP_NO_REINDENT') != '1':
-                content = reindent(content)
-            # a label in front of `}`/EOF needs a statement after it
-            # (C# rule; tree-sitter MISSING). The structured path
-            # fixes this in `_final_text`; the legacy flat lift never
-            # runs it, so do it at the file boundary.
-            _fl = content.split('\n')
-            for _li in range(len(_fl)):
-                if not re.match(r'^\s*L_[0-9a-fA-F]+:$', _fl[_li]):
-                    continue
-                _lj = _li + 1
-                while _lj < len(_fl) and not _fl[_lj].strip():
-                    _lj += 1
-                if _lj >= len(_fl) or _fl[_lj].lstrip().startswith('}'):
-                    _fl[_li] = _fl[_li] + ' ;'
-            content = '\n'.join(_fl)
-            # generated identifiers carry IL-only characters (`<>c`,
-            # `<Foo>d__13`, `<>9__0_0`) that no C# grammar accepts; mangle
-            # them deterministically at the file boundary so declarations
-            # and every reference move together
-            content = MANGLED_IDENT_RX.sub(
-                lambda m: m.group(0).replace('<', '_').replace('>', '_')
-                .replace('.', '_').replace('|', '_'), content)
-            os.makedirs(dirp, exist_ok=True)
-            with open(os.path.join(dirp, base + '.cs'), 'w', encoding='utf-8') as fh:
-                fh.write(content)
+                buf = nameof_sugar(buf, members)
+        # Fix 128, opt-in `--raw-addr`: `(byte*)E` -> `(byte*)__addr(E)`
+        raw = False
+        if getattr(self, 'raw_addr', False):
+            buf, raw = rawaddr.rewrite_lines(buf)
+        hdr = ['// Decompiled by il2csharp | %s | TypeDefIndex: %d' % (img_name, td.index)]
+        hdr.extend(self._gate_header())
+        uses = tr.render(skip=[ns] if ns else [])
+        if uses:
+            hdr.append('')
+            hdr.extend(uses)
+        if self._stub_collect('\n'.join(buf)):
+            hdr.append('')
+            hdr.append('using static __SharedBodyStubs;')
+        if raw:
+            hdr.append('')
+            hdr.append('using static %s;' % rawaddr.CLASS)
+        if ns:
+            hdr.append('')
+            hdr.append('namespace %s' % ns)
+            hdr.append('{')
+            content = '\n'.join(hdr) + '\n' + '\n'.join(buf) + '\n}\n'
+        else:
+            content = '\n'.join(hdr) + '\n' + '\n'.join(buf) + '\n'
+        # lay every line at its real brace depth (see `reindent`): the
+        # threaded-`indent` emitters drift a level and bodies read as
+        # sitting outside their own braces. No-op on correct files.
+        if os.environ.get('IL2CSHARP_NO_REINDENT') != '1':
+            content = reindent(content)
+        # a label in front of `}`/EOF needs a statement after it
+        # (C# rule; tree-sitter MISSING). The structured path
+        # fixes this in `_final_text`; the legacy flat lift never
+        # runs it, so do it at the file boundary.
+        _fl = content.split('\n')
+        for _li in range(len(_fl)):
+            if not re.match(r'^\s*L_[0-9a-fA-F]+:$', _fl[_li]):
+                continue
+            _lj = _li + 1
+            while _lj < len(_fl) and not _fl[_lj].strip():
+                _lj += 1
+            if _lj >= len(_fl) or _fl[_lj].lstrip().startswith('}'):
+                _fl[_li] = _fl[_li] + ' ;'
+        content = '\n'.join(_fl)
+        # generated identifiers carry IL-only characters (`<>c`,
+        # `<Foo>d__13`, `<>9__0_0`) that no C# grammar accepts; mangle
+        # them deterministically at the file boundary so declarations
+        # and every reference move together
+        content = MANGLED_IDENT_RX.sub(
+            lambda m: m.group(0).replace('<', '_').replace('>', '_')
+            .replace('.', '_').replace('|', '_'), content)
+        os.makedirs(dirp, exist_ok=True)
+        with open(os.path.join(dirp, base + '.cs'), 'w', encoding='utf-8') as fh:
+            fh.write(content)
+        return sub, raw
+
+    def write_assembly_split(self, img: ImageDef) -> int:
+        asm_name = self._assembly_dir_name(img.name)
+        asm_dir = os.path.join(self.out_dir, asm_name)
+        os.makedirs(asm_dir, exist_ok=True)
+        written = 0
+        all_sub = set()
+        any_raw = False
+        for td, base in self._plan_top_files(img):
+            sub, raw = self._emit_one_top(td, img.name, asm_dir, base)
+            all_sub |= sub
+            any_raw = any_raw or raw
             written += 1
+        return written + self.write_assembly_tail(img, all_sub, any_raw)
+
+    def write_assembly_tail(self, img: ImageDef, all_sub, any_raw) -> int:
+        """Write the per-assembly files that follow the type files:
+        `__SharedBodyStubs.cs` (the union of every type file's `sub_` VAs,
+        minus real metadata names), the `--raw-addr` helper, and the
+        `.csproj`. Shared by the serial walk and the per-type pool: the
+        pool's parent collects `all_sub`/`any_raw` from the worker deltas
+        and calls this once per image. The content depends only on the
+        collected set, never on the schedule, so the pool matches serial
+        byte-for-byte. Returns how many files it wrote here."""
+        asm_dir = os.path.join(self.out_dir, self._assembly_dir_name(img.name))
+        os.makedirs(asm_dir, exist_ok=True)
+        written = 0
         all_sub = set(v for v in all_sub if v not in self._real_sub_names(self.meta))
         if all_sub:
             with open(os.path.join(asm_dir, '__SharedBodyStubs.cs'), 'w', encoding='utf-8') as fh:
@@ -1578,6 +1634,13 @@ class Emitter:
             with open(os.path.join(asm_dir, rawaddr.CLASS + '.cs'), 'w', encoding='utf-8') as fh:
                 fh.write(rawaddr.helper_file_text())
             written += 1
+        self.write_csproj(img)
+        return written + 1
+
+    def write_csproj(self, img: ImageDef) -> None:
+        asm_name = self._assembly_dir_name(img.name)
+        asm_dir = os.path.join(self.out_dir, asm_name)
+        os.makedirs(asm_dir, exist_ok=True)
         with open(os.path.join(asm_dir, asm_name + '.csproj'), 'w', encoding='utf-8') as fh:
             fh.write('<Project Sdk="Microsoft.NET.Sdk">\n'
                      '  <PropertyGroup>\n'
@@ -1589,7 +1652,6 @@ class Emitter:
                      '    <NoWarn>CS0169;CS0649;CS0108;CS0114;CS8019</NoWarn>\n'
                      '  </PropertyGroup>\n'
                      '</Project>\n' % asm_name)
-        return written
 
     def _short_ns_index(self):
         """short typedef name (sans arity) -> namespaces. Built once per

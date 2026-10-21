@@ -1,5 +1,67 @@
 # il2csharp — TODO (open work and historical triage)
 
+## Current work: perf — per-type parallel emission + hotspot rewrite (2026-10-21, on `main`)
+
+Context: `docs/il2csharp-jit-feasibility.md` (in `../docs/`) proved a Python JIT
+is the wrong lever (CPython 3.13 here ships no JIT; iced-x86 is a C ext at 0% of
+runtime; the interpreter share is small and sits on regex/C-API). The real
+levers are **parallelism** and **hotspot algorithms**. Plan:
+`../docs/il2csharp-opt-plan.md`.
+
+Measured baseline (2026-10-21, current source, Assembly-CSharp one image):
+`--workers 4` uses **~90% of ONE core** (7 idle) because `--workers` only split
+ACROSS images and AC is one image. Full AC build = **2.98 h / 176,704 bodies**.
+Per-method lifting ~128–138 ms; phases `_structure` 37.4% / `_decode` 23.3% /
+`_analyze` 21.1% / `_make_blocks` 7.4%; `textpass._mask_line_spans` alone 14.8%.
+
+### Phase A — per-type parallel emission (LANDED 2026-10-21)
+
+`--workers N` now runs ONE pool over per-image, **per-top-type** tasks, so a
+single monolithic image uses every core. Every task writes only its own type
+file; the per-assembly files (`__SharedBodyStubs.cs`/`__Addr.cs`/`.csproj`) are
+written ONCE by the parent from the collected union, so the tree is
+**byte-identical to serial regardless of schedule**.
+
+- `emitter.py`: extracted `_emit_one_top` (one top type's file, returns the
+  pre-transform `sub_` set + raw flag), `_plan_top_files` (assembly-local
+  file-base names, dedup in metadata order — proven identical to the old
+  sequential naming across **all 162 images / 36,321 names**), `_iter_top_types`,
+  `_assembly_dir_name`, and `write_assembly_tail`/`write_csproj` (the per-
+  assembly tail, shared by serial and the pool parent). `write_assembly_split`
+  is now a thin serial walk over the same plan.
+- `cli.py`: `_worker_emit_types(payload)` (per-type batch; fresh Emitter per
+  task over ONE runtime load in `_per_type_init` — isolates per-type caches
+  like `_short_ns_idx`/`_us_cache` while loading metadata once per worker);
+  `_emit_assemblies` builds the flat job list (`_split_balanced`, contiguous,
+  heaviest image first), collects deltas + `sub`/`raw` union per image, then
+  writes each image's tail in metadata order. `_worker_count` **relaxes the
+  "one image ⇒ serial" rule**; only `--max-methods`/`--bodies` still decline.
+- **Evidence**: A-1 refactor byte-identical (1443/1443 files, old-vs-new @
+  `--types Dungeon`). A-2 pool vs serial @ `--types Dungeon --workers 4`:
+  **1607/1607 paths identical, 0 differ, 0 only-side** (incl. the union
+  `__SharedBodyStubs.cs`, every `.csproj`); timing 562 s vs 731 s serial *with
+  4× the 37 s metadata load*, and real speedup grows with body count (fixed
+  load dominates this small scope; a monolithic AC image has 176k bodies).
+  Portable suite 1367 passed (+10: `tests/test_per_type_parallel.py`, plus
+  `test_parallel_build.py`'s single-image rule flipped to `(8, None)`).
+  ProcessPoolExecutor works in this sandbox here (no EPERM). `testgame/` is
+  absent in this checkout, so all `-m game` tests (incl. the real-fixture
+  serial-vs-pool byte-identity) skip; my real-Limbus `--types Dungeon` A/B is
+  the standing proof.
+
+### Phase B — `_mask_line_spans`/`_mask_literals` precompiled-regex rewrite (TODO)
+
+Single hot spot (14.8%, char-by-char `while` + 4.6M `startswith`). Replace with
+one precompiled-regex single pass (keep cross-line `in_block_comment` state and
+equal-length NUL masking). Gate: dual-implementation equivalence on the whole
+corpus (`old_mask == new_mask` incl. the return flag), then byte-identical tree.
+
+### Phase C — dynamic `re.*` → `lru_cache` `_rx` factory (TODO)
+
+260 literal `re.sub/search/...` sites recompile per call (`re._compile` hit
+~1.8e4 times/method, ~6% of runtime). Add `il2cpp/text_rx.py` `_rx(pattern,
+flags)` over `functools.lru_cache`, mechanically replace; zero output diff.
+
 ## Current work: fixes 126-140 compile-gate slices (2026-10-06 .. 2026-10-12, on `main`)
 
 **Fix 140 (2026-10-12, unresolved vtable-slot receivers): a

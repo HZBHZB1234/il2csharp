@@ -106,20 +106,46 @@ def _load_runtime(gmd, bp, verbose):
     return meta, il
 
 
-def _worker_init(gmd, bp, out_dir, asm_comments, with_bodies, max_methods,
-                 verbose, type_filter, publicize=False, raw_addr=False):
-    """One runtime and one Emitter per worker process, reused for every
-    image that process is handed (the load costs ~4 s, an image ~12 s)."""
+def _worker_init_runtime(gmd, bp, verbose):
+    """Load metadata+binary once per worker process (the ~10-40s phase).
+
+    Kept separate from the Emitter so a worker handling many small per-type
+    tasks does not reload the runtime per task."""
     meta, il = _load_runtime(gmd, bp, verbose)
-    _W['meta'] = meta
-    _W['em'] = Emitter(il, out_dir, asm_comments=asm_comments,
+    _W['meta'], _W['il'] = meta, il
+
+
+def _worker_make_emitter(out_dir, asm_comments, with_bodies, max_methods,
+                         verbose, type_filter, publicize=False, raw_addr=False):
+    """Build one Emitter over the already-loaded runtime; reused per task."""
+    _W['em'] = Emitter(_W['il'], out_dir, asm_comments=asm_comments,
                        with_bodies=with_bodies, max_methods=max_methods,
                        verbose=verbose, type_filter=type_filter,
                        publicize=publicize, raw_addr=raw_addr)
 
 
+def _worker_init(gmd, bp, out_dir, asm_comments, with_bodies, max_methods,
+                 verbose, type_filter, publicize=False, raw_addr=False):
+    """One runtime and one Emitter per worker process, reused for every
+    image that process is handed (the load costs ~4-40s, an image ~12s)."""
+    _worker_init_runtime(gmd, bp, verbose)
+    _worker_make_emitter(out_dir, asm_comments, with_bodies, max_methods,
+                         verbose, type_filter, publicize, raw_addr)
+
+
+def _per_type_init(gmd, bp, out_dir, asm_comments, with_bodies, max_methods,
+                   verbose, type_filter, publicize=False, raw_addr=False):
+    """Pool initializer for the per-type pool: load the runtime ONCE, then
+    mint a fresh Emitter per task inside `_worker_emit_types` (state isolation
+    between tasks, single runtime load, same bytes as a serial build)."""
+    _worker_init_runtime(gmd, bp, verbose)
+    _W['emitter_args'] = (out_dir, asm_comments, with_bodies, max_methods,
+                          verbose, type_filter, publicize, raw_addr)
+
+
 def _worker_emit(image_name):
-    """Emit one image and report per-image deltas.
+    """Emit one image (all its type files + per-assembly tail) and report
+    per-image deltas.
 
     Deltas, not totals: the parent's running totals are then the serial
     ones, so `--workers N` prints the same log as `--workers 1`.
@@ -144,6 +170,49 @@ def _worker_emit(image_name):
             'lifter': em.lifter is not None, 'error': error}
 
 
+def _worker_emit_types(payload):
+    """Emit a batch of top-level types of one image; report deltas.
+
+    `payload = (image_name, [(ti, base), ...])`: `ti` is a global TypeDef
+    index (the parent planned the batch, including its final file base
+    names, so the schedule never affects output). Each task builds its own
+    Emitter over the shared runtime, so per-task state cannot leak. Only
+    the type FILES are emitted here; the per-assembly tail
+    (`__SharedBodyStubs.cs`/`__Addr.cs`/`.csproj`) is written once by the
+    parent from the union of every task's `sub`/`raw`."""
+    image_name, items = payload
+    _worker_make_emitter(*_W['emitter_args'])
+    em, meta = _W['em'], _W['meta']
+    img = next((i for i in meta.images if i.name == image_name), None)
+    if img is None:
+        return {'files': 0, 'lifted': 0, 'failed': 0, 'fallbacks': 0,
+                'emit_failed': 0, 'lifter': em.lifter is not None,
+                'sub': set(), 'raw': False,
+                'error': 'image not found: %s' % image_name}
+    asm_dir = os.path.join(em.out_dir, em._assembly_dir_name(img.name))
+    os.makedirs(asm_dir, exist_ok=True)
+    before = (em.lifted, em.failed, em.fallbacks, em.emit_failed)
+    files = 0
+    sub = set()
+    raw = False
+    error = None
+    for ti, base in items:
+        try:
+            s, r = em._emit_one_top(meta.typedefs[ti], img.name, asm_dir, base)
+            sub |= s
+            raw = raw or r
+            files += 1
+        except Exception as ex:
+            error = '%s (type %d): %s: %s' % (image_name, ti, type(ex).__name__, ex)
+            break
+    after = (em.lifted, em.failed, em.fallbacks, em.emit_failed)
+    return {'files': files, 'lifted': after[0] - before[0],
+            'failed': after[1] - before[1],
+            'fallbacks': after[2] - before[2],
+            'emit_failed': after[3] - before[3],
+            'sub': sub, 'raw': raw, 'error': error}
+
+
 def _auto_workers():
     """Default width for `--workers 0`: half the cores, never more than 8.
 
@@ -159,11 +228,12 @@ def _auto_workers():
 
 
 def _worker_count(args, images):
-    """Resolve --workers, declining the combinations that cannot hold."""
+    """Resolve --workers. A single image may now use the per-type pool,
+    so only the whole-build brakes (--max-methods, --bodies) decline."""
     if args.workers < 0:
         return 0, '--workers must be >= 0'
     workers = args.workers if args.workers else _auto_workers()
-    if len(images) < 2 or workers < 2:
+    if workers < 2:
         return 1, None
     if args.max_methods is not None:
         # the cap is a whole-build brake; a per-worker cap would lift up
@@ -201,11 +271,16 @@ def _weighted_order(images, meta):
 
 
 def _emit_assemblies(images, em, args, gmd, bp):
-    """Emit every image, serially or across worker processes.
+    """Emit every image, serially or across a per-type process pool.
 
-    An image owns its output directory, its `__SharedBodyStubs.cs` and its
-    `.csproj`, and reads nothing another image wrote, so the tree does not
-    depend on the schedule. Returns the serial counters either way.
+    The pool runs over a flat list of per-image, per-top-type tasks (heaviest
+    image's types first), so a single monolithic image (Assembly-CSharp is
+    ~176k bodies in one image) uses every core instead of one. Every task
+    writes only its own type file; the per-assembly files
+    (`__SharedBodyStubs.cs`/`__Addr.cs`/`.csproj`) are written ONCE here in
+    the parent from the collected union, so the tree is byte-identical to the
+    serial build regardless of the schedule. Returns the serial counters
+    either way (deltas summed in image order, so the log is the serial log).
     """
     quiet = getattr(args, 'quiet', False)
     workers, note = _worker_count(args, images)
@@ -231,38 +306,74 @@ def _emit_assemblies(images, em, args, gmd, bp):
                 args.max_methods, args.verbose, args.types,
                 getattr(args, 'publicize', False),
                 getattr(args, 'raw_addr', False))
+    # plan every image's top types up front, in metadata order (so the file
+    # base names match serial); schedule the plan heaviest image first, then
+    # split each image's plan into contiguous, size-balanced batches
+    planned = {img.name: em._plan_top_files(img) for img in images}
+    order = _weighted_order(images, getattr(em, 'meta', None))
+    by_name = {img.name: img for img in images}
+    jobs = []
+    for img in order:
+        items = [(td.index, base) for td, base in planned[img.name]]
+        if items:
+            for chunk in _split_balanced(items, max(1, len(items) // (workers * 4))):
+                jobs.append((img.name, chunk))
     # say the width before the pool exists: a run killed part-way (a machine
     # under memory pressure will kill the parent, not a worker) otherwise
     # leaves a log that never mentions how wide it got
     if not quiet:
-        print('workers: %d processes | %d images' % (workers, len(images)),
-              flush=True)
+        print('workers: %d processes | %d images | %d type-tasks' % (
+            workers, len(images), len(jobs)), flush=True)
+    agg = {img.name: {'files': 0, 'lifted': 0, 'failed': 0, 'fallbacks': 0,
+                      'emit_failed': 0, 'lifter': True, 'sub': set(),
+                      'raw': False, 'error': None} for img in images}
+    with ProcessPoolExecutor(max_workers=workers, initializer=_per_type_init,
+                             initargs=initargs) as pool:
+        for img_name, r in zip([j[0] for j in jobs], pool.map(_worker_emit_types, jobs)):
+            a = agg[img_name]
+            if r['error'] and not a['error']:
+                a['error'] = r['error']
+            a['files'] += r['files']
+            a['lifted'] += r['lifted']
+            a['failed'] += r['failed']
+            a['fallbacks'] += r['fallbacks']
+            a['emit_failed'] += r['emit_failed']
+            a['lifter'] = a['lifter'] and r.get('lifter', True)
+            a['sub'] |= r['sub']
+            a['raw'] = a['raw'] or r['raw']
+    # write each image's per-assembly tail once, in metadata order, from the
+    # collected union (this is what makes the pool byte-identical to serial)
     total = {'files': 0, 'lifted': 0, 'failed': 0, 'fallbacks': 0,
              'emit_failed': 0, 'lifter': True, 'errors': []}
-    # heaviest first: the tail is the last image handed to a worker
-    scheduled = _weighted_order(images, getattr(em, 'meta', None))
-    with ProcessPoolExecutor(max_workers=workers, initializer=_worker_init,
-                             initargs=initargs) as pool:
-        futures = {img.name: pool.submit(_worker_emit, img.name)
-                   for img in scheduled}
-        for img in images:          # report in metadata order, like serial
-            r = futures[img.name].result()
-            if r['error']:
-                total['errors'].append('%s: %s' % (img.name, r['error']))
-            total['files'] += r['files']
-            total['lifted'] += r['lifted']
-            total['failed'] += r['failed']
-            total['fallbacks'] += r['fallbacks']
-            total['emit_failed'] += r['emit_failed']
-            total['lifter'] = total['lifter'] and r['lifter']
-            if not quiet:
-                print('  %-52s %5d types  (%d bodies, %d failed)' % (
-                    img.name, r['files'], total['lifted'], total['failed']),
-                    flush=True)
+    for img in images:
+        a = agg[img.name]
+        try:
+            a['files'] += em.write_assembly_tail(img, a['sub'], a['raw'])
+        except Exception as ex:
+            a['error'] = a['error'] or '%s: %s' % (type(ex).__name__, ex)
+        if a['error']:
+            total['errors'].append('%s: %s' % (img.name, a['error']))
+        total['files'] += a['files']
+        total['lifted'] += a['lifted']
+        total['failed'] += a['failed']
+        total['fallbacks'] += a['fallbacks']
+        total['emit_failed'] += a['emit_failed']
+        total['lifter'] = total['lifter'] and a['lifter']
+        if not quiet:
+            print('  %-52s %5d types  (%d bodies, %d failed)' % (
+                img.name, a['files'], total['lifted'], total['failed']),
+                flush=True)
     if not quiet:
         print('workers: %d processes | wall %d ms' % (workers, time_ms() - t0),
               flush=True)
     return total
+
+
+def _split_balanced(items, batch):
+    """Split `items` into contiguous chunks of ~`batch` (the last may be
+    small). Contiguous, so a chunk's file writes keep planning order."""
+    batch = max(1, batch)
+    return [items[i:i + batch] for i in range(0, len(items), batch)]
 
 
 def main(argv):

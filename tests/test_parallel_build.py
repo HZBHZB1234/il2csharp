@@ -58,9 +58,11 @@ def test_explicit_worker_count_is_kept():
     assert _worker_count(_args(workers=8), _images(88)) == (8, None)
 
 
-def test_a_single_image_stays_serial():
-    # one image cannot be parallel, and must not pay for a pool
-    assert _worker_count(_args(workers=8), _images(1)) == (1, None)
+def test_a_single_image_uses_the_per_type_pool():
+    # a single monolithic image (Assembly-CSharp is ~176k bodies in one image)
+    # now spreads its top types across the per-type pool, so it is no longer
+    # forced serial; only the whole-build brakes (--max-methods/--bodies) decline.
+    assert _worker_count(_args(workers=8), _images(1)) == (8, None)
 
 
 def test_max_methods_forces_serial_and_says_why():
