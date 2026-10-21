@@ -160,6 +160,28 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 
 ## 5b. Round 3 记录
 
+**已完成（round 6）**：
+
+- **全量前后对比证据（附录 D，1,954 文件）**：`limbus_fixed1` 与 pre-fix
+  `limbus_out1` 逐标记对比 —— 行数 **−17.4%**、`obj|0` **−99.3%**、
+  `obj|=0` **−97.3%**、`byte guard==0` **−96.9%**、`bare throw;` **−100%**、
+  `cardmark while` **3,397→2（−100%）**。`cardmark` 近乎归零证明 round-3
+  的"任意位置删空卡表 while"完全生效（round-1 只删纯形状时残留大量非纯
+  嵌套）。`unsafe`/`(byte*)`/`goto` 每千行上升纯属分母缩小，绝对数不变。
+- **决策：停止"构建期间提交 → 再重启"的循环**。当前构建（pid 42620，
+  11:21 启动）含 round-1/2/3 全部实质修复，是质量主体；round-4 元素助手
+  注释是纯附加（不影响指标），已由单测 + 真实 emitter 定向验证覆盖。
+  不再为纳入纯注释而重启数小时构建。
+- **async 状态机 Stage 2 有据暂缓**：会改 body → 动 golden hash，而 golden
+  fixture 本机不可得，无法执行计划 §5.1 的"hash 变化逐个读 diff"铁律。
+  在无 fixture 时做体级改动违反纪律。
+- **P2 接口 getter 重复——非缺陷**：`get__showOnLeftPassiveUI` 在数十个
+  typedef 重复且共享地址 `0x1808cda40`，是接口方法在各实现类的正常声明
+  （IL2CPP 折叠相同方法体）。审计把它当缺陷是误判，**不改**。
+- **死读 `(byte*)getClass()+0x780`**：实测 `[klass]` 处是直接数据非有效
+  klass 指针，`[r10+0x780]` 类型无法确定；全树 1,054 个中仅 74 未用，删
+  内存读有 AV 风险，收益不足。**不改**。
+
 **已完成（round 5）**：
 
 - **元素助手 arity 截断——评估后不做（有据）**：`sub_180010df0`
