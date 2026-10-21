@@ -340,6 +340,7 @@ class _BuildMixin:
         lines = self._final_text(self._structure(blocks, bmap, m))
         lines = drop_empty_init_guards(lines)
         lines = drop_gc_cardmark_barriers(lines)
+        lines = drop_dead_cardmark_fragments(lines)
         try:
             params = {safe_ident(p.name) for p in self.L.meta.method_params(m)}
         except Exception:
@@ -1109,4 +1110,34 @@ def drop_gc_cardmark_barriers(lines):
             continue
         out.append(lines[i])
         i += 1
+    return out
+
+
+# GC cardmark-index fragment residue.  When a write barrier is not the
+# `if (data_X) { while(...) }` shape but is split into standalone
+# assignments, the lifter emits lines like
+#     T name = (typeof(X)._F & 8589930496) >> 12 & 63;
+# where 8589930496 = 0x200000000 is Boehm's card-table mask.  The RHS
+# is pure static-field arithmetic with no side effect; when `name` is
+# declared and never used again in the method (41% of them are, and the
+# declared type is usually wrong to begin with), the line is dead code
+# -- a compiler would have dropped it.  Only this exact shape with the
+# GC magic mask is touched; any other bit expression is left alone.
+_GC_FRAG_RX = re.compile(
+    r'^\s*(?:[\w.<>\[\], ]+ )?(\w+) = \(.*8589930496\) >> '
+    r'(?:18|12 & 63);\s*$')
+
+
+def drop_dead_cardmark_fragments(lines):
+    out = []
+    for i, ln in enumerate(lines):
+        m = _GC_FRAG_RX.match(ln)
+        if m:
+            name = m.group(1)
+            tok = re.compile(r'(?<![\w.])%s(?![\w])' % re.escape(name))
+            used = any(tok.search(other)
+                        for j, other in enumerate(lines) if j != i)
+            if not used:
+                continue            # dead: drop the whole line
+        out.append(ln)
     return out
