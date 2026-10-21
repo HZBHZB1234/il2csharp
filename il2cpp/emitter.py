@@ -1306,6 +1306,9 @@ class Emitter:
         try:
             cands = self.il.addr_candidates.get(int(va, 16)) or []
             if not cands:
+                sem = self._elem_helper_semantic(va)
+                if sem is not None:
+                    return 'unregistered native target -- %s' % sem
                 return 'unregistered native target'
             names = []
             for c in cands[:4]:
@@ -1324,6 +1327,52 @@ class Emitter:
             return '%d owners: %s%s' % (len(cands), ', '.join(names), more)
         except Exception:
             return 'unresolved target'
+
+    # Element-access helper families, recognised by their exact opening
+    # bytes (the same structural approach the lifter uses for
+    # `il2cpp_array_addr`).  All are `sub rsp,0x28; cmp edx,[rcx+0x18];
+    # jae<bounds>` -- the Il2CppArray/List layout (length at +0x18).  The
+    # byte right after the short jae's rel8 picks the family.  This is a
+    # semantic LABEL for the stub comment only: the call site keeps its
+    # honest `sub_<va>`, and nothing about lifting changes.  Version
+    # independent (it is the compiler's own code shape).
+    _ELEM_HELPER_SEM = {
+        '488b4910': 'list/array indexer getter (bounds-checked; '
+                    '[rcx+0x10]=items array, [rcx+0x18]=size, '
+                    'returns elements[index])',
+        '488b44d120': 'array element getter (bounds-checked; returns '
+                      'elements[index] at [rcx+index*8+0x20])',
+        '833d': 'list/array indexer setter (bounds-checked store with a '
+                'GC write barrier)',
+        '4c8944d120': 'array element setter (bounds-checked store)',
+        '488d42': 'array element-address helper (bounds-checked; returns '
+                  '&elements[index])',
+        '488d04': 'array element-address helper (bounds-checked stride)',
+    }
+
+    def _elem_helper_semantic(self, va):
+        """One-line semantic label for a known element-access helper, else
+        None.  Reads 16 bytes at `va`; matches the fixed opening."""
+        try:
+            iv = int(va, 16)
+            b = self.il.bin
+            if not b.is_exec_va(iv):
+                return None
+            code = b.read(iv, 20)
+            if not code or len(code) < 11:
+                return None
+            if code[:7] != bytes.fromhex('4883ec283b5118'):
+                return None
+            if code[7] != 0x73:            # short jae; a near jcc declines
+                return None
+            body = code[9:15]
+            bhex = body.hex()
+            for pre, label in self._ELEM_HELPER_SEM.items():
+                if bhex.startswith(pre):
+                    return label
+            return None
+        except Exception:
+            return None
 
     _STUB_ASM_MAX_INSN = 16
     _STUB_ASM_MAX_BYTES = 64
