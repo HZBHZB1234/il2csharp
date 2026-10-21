@@ -19,6 +19,25 @@ sources are untouched by the move. All repo paths below are root-relative.
 - `docs/handoff-2026-10-06.md` — live handoff: compile-gate chain
   125-132 state, gate numbers, standard per-slice procedure, e-MCP
   session mechanics.
+- `docs/handoff-2026-10-20-v39.md` — v39 / Unity 6000.3.12f1 metadata
+  adaptation stop record (Limbus Company target).
+- `docs/research-2026-10-21-urengine.md` — UREngine benchmark: two things
+  worth adopting — (P0) diagnosability of failures, i.e. why a call could
+  not be resolved and where it was reached from, and (P1) async /
+  coroutine state machines. Records which source material is credible
+  and which is marketing.
+- `docs/plans/2026-10-21-async-state-machine.md` — the P1 plan, with a
+  mandatory probe phase first; also holds the P0 placeholder (§9).
+- `docs/plans/2026-10-21-version-safety-and-quality.md` — the round's
+  plan: per-commit version-impact analysis (keep v24–v38 while adding
+  v39), KLASS-offset calibration (no gate needed: HeaderV35Plus and
+  HeaderV29 share the Il2CppClass layout), and the GC write-barrier
+  design.
+- `docs/probes/` — archived scratch probes cited by the documents above
+  (not tests; read their printed numbers).
+- `docs/audit-2026-10-21-output-quality.md` — empirical output-quality audit
+  of `limbus_out1`: five concrete defects with real samples, root-cause
+  reads, and fixes ranked by payoff-per-risk.
 - `docs/reference.md` — working-loop rules (§4), baselines / promotion /
   known artifacts (§6), gotchas (§7), next-up families (§2), Batch 19
   gate methodology (§5). Read §4 and §7 before any nontrivial change.
