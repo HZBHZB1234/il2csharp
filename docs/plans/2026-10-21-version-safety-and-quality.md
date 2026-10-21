@@ -160,6 +160,20 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 
 ## 5b. Round 3 记录
 
+**已完成（round 7）**：
+
+- **剩余 `guard != 0`（2.99/1k）本质查明——CFG 结构问题，非文本可修**：
+  1,519/1,524 个残留 `if (data_1894383ec != 0) { ... }` 用同一 GC 开关 cell，
+  且 guard 体内是**真实代码**（不是空 while 残留）。根因：块内含
+  `L_xxx:` 标签，该标签被后方 `goto L_xxx;` **回跳**引用，于是 CFG 构造出
+  `if (data != 0) { ...label... }` 的重入结构。要修必须动 `_seq`/`_hoist_shared_tails`
+  的 goto 回跳处理，改 body → 动 golden，且本机无 golden fixture 可审阅。
+  **有据不做**（文本层无安全修复空间）。
+- **`_elem_helper_semantic` 无误伤验证**：该标注只在 `_stub_owners` 的
+  `if not cands`（无 metadata 候选）分支调用；有候选的地址（如
+  `0x1840cac60` 3 owners）正常显示 owner 列表、不加元素标签。安全。
+- **构建健康推进**：pid 42620，3,100+ 文件，含 round-1/2/3 全部实质修复。
+
 **已完成（round 6）**：
 
 - **全量前后对比证据（附录 D，1,954 文件）**：`limbus_fixed1` 与 pre-fix
