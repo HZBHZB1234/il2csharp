@@ -110,19 +110,49 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 
 | 项 | 状态 | 说明 |
 | --- | --- | --- |
-| P0-b KLASS 标定 | **已结案**（§2：无需版本化） | 但"`(byte*)this.getClass()+0x780` 静态字段读取"这个**渲染**问题仍在，见 §5 |
-| A.3 GC 写屏障 | 未开始 | `data_X != 0` 的卡片标记屏障；38,764 个 `!=0` guard。需单独设计（不是删除，而是识别为屏障并渲染成托管无害形式或省略） |
+| P0-b KLASS 标定 | **已结案**（§2：无需版本化） | `(byte*)getClass()+0x780` 渲染问题见 §8 结论（不做） |
+| A.3 GC 写屏障 | **已完成**（纯形状）`177d4ed` | 1,108/4k 纯形状删；非纯 683 保留 |
 | P1-a#2 委托缓存恢复 | 部分 | #1 已让委托链可达；缓存恢复的 `?? (x = new)` 折叠待查 |
-| URE §5.3.3 `--publicize`/`--raw-addr` 头部免责 | **已完成** `97e233b` | 零风险：只在 opt-in 模式加一行头注释，默认树字节不变 |
-| URE §5.3.1 `sub_` 失败原因注释 | 未开始 | 见 §5 分析：57,696 plain 仅 2,125 VA，注释不如命名 |
-| A.3 GC 写屏障 | **探查中**（本轮） | 38,764 个 `!=0` guard，最大单块噪音 |
+| URE §5.3.3 `--publicize`/`--raw-addr` 头部免责 | **已完成** `97e233b` | 零风险，默认树字节不变 |
+| URE P1 状态机 Stage 1（识别+标注） | **已完成** `3c6ef10` | 1,863 识别，0 误报；只加类注释 |
+| URE §5.3.1 `sub_` 失败原因注释 | 未开始（改 `--explain` opt-in） | 全量内联会膨胀，须可选 |
+| 全量前后对比验证 | **进行中**（round 2） | 后台重建 `limbus_fixed1` + `compare_trees.py` |
 | P2 重复 getter 去重 / `[Address]` 形式化 | 未开始 | |
-| 全 162 镜像构建（应用全部修复） | 未开始 | 现有 `limbus_out1` 是修复前基线 |
 | C# 复刻版 | 未决 | 范围问题用户未回答 |
 
-## 5. 下一个具体动作
+## 5. Round 2 记录
 
-## 6. A.3 GC 写屏障：探查结论与实现（本轮）
+**已完成（round 2）**：
+
+- `3c6ef10` URE P1 状态机 Stage 1：给 `_Method_d__N` 类加
+  `// state machine for Method` 注释。检测 = 名字正则 + 同 typedef 有
+  MoveNext；实测 1,863 匹配、0 误报、306 漏认（可接受）。不改 body，
+  golden 不动。不宣称 async/iterator（需 custom attribute 表，无廉价
+  解码，错标即误识别）。
+
+**进行中**：后台重建 `limbus_fixed1`（Assembly-CSharp 全量，应用本轮
+全部修复），完成后用 `compare_trees.py` 对 `limbus_out1`（修复前）做
+逐标记前后对比，产出真实证据（而非抽样外推）。
+
+**Round 2 调查结论（记录以免重复）**：
+
+- **P0-b `(byte*)this.getClass()+0x780`**：`r10=[rbx]`(klass) →
+  `[r10+0x780]` 是 BSS 静态单元读取（由 `mov [BSS],rax` 填充）。
+  `0x780` 超 vtable(0x138)，归属单一类型的最深基类静态字段，无廉价
+  metadata 反查；仅 308 处，收益不抵风险。**不做**，除非接入
+  `bss_usage_map` 的 klass 关联。
+- **`(byte*)` 的 217k 主流**都是 `((byte*)objN + N)[0]`，`objN` 是类型
+  未知的原生指针；CLAUDE.md 铁律要求保留 `object objN`（诚实标记），
+  不能为好看改名。**不做**。
+- **`unknown` 9,557 处**多为未定义池常量/未建模参数，是诚实标记，不强填。**不做**。
+- **`sub_180010df0`（6,777 次）**已查明是 `List<T>` 索引器 getter
+  （`[rcx+0x10]`=items, `[rcx+0x18]`=size, 双重边界检查）；
+  **`sub_180002950`** 是同布局的 setter + 卡表屏障。可命名，但要
+  emitter 特化渲染才有价值，留待后续。
+- **jcc 窗口放宽复核**：`decompiler` 路径走 `_guards`（build.py），
+  与 `Lifter.lift`（state.py, 死代码）无关；round 1 的修改点正确。
+
+## 6. A.3 GC 写屏障：探查结论与实现（round 1）
 
 ### 6.1 真实身份（反汇编 + Boehm 源码双重确认）
 
@@ -182,6 +212,6 @@ if (data_<hex> != 0)            <- GUARD
 ## 7. 下一个具体动作
 
 (byte*)this.getClass() + 0x780)[0] 这类**静态字段读取**：
- x780 远超 vtable 结束位置，说明它是 static_fields 块内某字段的偏移。
+x780 远超 vtable 结束位置，说明它是 static_fields 块内某字段的偏移。
 当前渲染成原始指针算术。应做成：static_fields 基 + metadata 的
 ieldOffsets 反查 → TypeName.fieldName。这是能看到的最大单点可读性收益之一。
