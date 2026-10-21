@@ -66,3 +66,9 @@ validation_reports/**/output_changes.diff.gz
 validation_reports/**/*comparison.json
 validation_reports/**/output_audit.json
 validation_reports/**/*_vs*.json
+
+# local build artifacts (never commit)
+limbus_*.log
+limbus_*heartbeat*.txt
+limbus_out*/
+limbus_build_heartbeat.txt
