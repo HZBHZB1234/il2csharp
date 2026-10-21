@@ -49,18 +49,51 @@ written ONCE by the parent from the collected union, so the tree is
   serial-vs-pool byte-identity) skip; my real-Limbus `--types Dungeon` A/B is
   the standing proof.
 
-### Phase B — `_mask_line_spans`/`_mask_literals` precompiled-regex rewrite (TODO)
+### Phase B — `_mask_line_spans`/`_mask_literals` precompiled-regex rewrite (LANDED 2026-10-21)
 
-Single hot spot (14.8%, char-by-char `while` + 4.6M `startswith`). Replace with
-one precompiled-regex single pass (keep cross-line `in_block_comment` state and
-equal-length NUL masking). Gate: dual-implementation equivalence on the whole
-corpus (`old_mask == new_mask` incl. the return flag), then byte-identical tree.
+`_mask_line_spans` (textpass) and `_mask_literals` (highlevel) were two identical
+char-by-char `while` scans of every rendered line (14.8% of lifting, 4.6M
+`startswith`). Both now delegate to one `il2cpp.text.mask_spans` — a single
+precompiled regex scanned left-to-right (`//`→EOL, `/* */` with cross-line state,
+`@'…'` verbatim, `\`-escape strings, `'…'` chars), same equal-length NUL output,
+same `in_block_comment` contract. `textpass._mask_line_spans` keeps its signature
+(module shim) so partial test doubles still work.
 
-### Phase C — dynamic `re.*` → `lru_cache` `_rx` factory (TODO)
+**Evidence**: byte-for-byte equal to the old char scan on the whole corpus
+(5,080,197 lines / 24,781 files, prototype) and re-confirmed committed-vs-real-old
+(pulled from git `61dc8db`, 489,895 lines + 30 edge cases, 0 mismatches); build
+A/B post-B vs pre-B `--types Utils` 411/411 paths byte-identical; micro-benchmark
+1.72× faster on 200k lines; portable suite 1367 passed. Commit `1ed2c2b`.
 
-260 literal `re.sub/search/...` sites recompile per call (`re._compile` hit
-~1.8e4 times/method, ~6% of runtime). Add `il2cpp/text_rx.py` `_rx(pattern,
-flags)` over `functools.lru_cache`, mechanically replace; zero output diff.
+### Phase C — dynamic `re.*` → `lru_cache` `_rx` factory (DECLINED 2026-10-21, measured)
+
+Idea: 260 literal `re.sub/search/...` sites hit `re._compile` ~1.8e4/method.
+A counting-wrapper experiment first showed an implausible "1.61× / 38%"; a
+**clean** re-run (no wrapper, warmup + repeat, cold cache each run) showed
+`re._MAXCACHE` sizing had **no reliable win** (small 39.9 s vs large 45.6 s; the
+"lookup drop" was the wrapper's own per-call overhead — an artifact). So the
+hot cost is `re` C-engine matching (`search`/`match`/`sub` are already C), not
+recompilation, and `re`'s 512-entry cache is adequate. Rewriting 260 sites for
+a not-reproducible single-digit % is not justified — **declined, documented**.
+
+### Full-scale result (2026-10-21)
+
+Full Assembly-CSharp rebuild with A+B, `--workers 6`, on this 4-physical-core
+i5-1145G7: **24,783 files / 176,704 bodies / 0 failed / 0 fallbacks in 5,183,552 ms
+(86.4 min)** vs the serial baseline **15,010,749 ms (250 min)** = **2.90× wall**;
+6 workers delivered 3.42 cores of throughput vs 0.85 serial ~4.0× compute (the
+laptop tail / HT caps wall at ~2.9× — a true 8-physical-core box should approach
+6–8×). Brace audit 0 unbalanced / 24,781 files. Byte-identity: the tree matches
+the serial baseline in file set and body count (24,732 = 24,732; 176,704 =
+176,704) — and the 2,144 differing files were proven **100% attributable to two
+HUMAN commits that landed DURING the 11:21–16:21 baseline build**, not to A/B:
+`ecd9649` (11:51, "drop dead GC cardmark-index fragments") removes exactly the
+`X n = (typeof(...).__static_fields & 8589930496) >> 18` lines (2143 files, 2558
+lines, every one contains `8589930496` = Boehm card mask, 0 additions, 0
+violations), and one `__SharedBodyStubs.cs` reflects the concurrent stub-
+annotation commit. By construction the pool is schedule-independent and equals a
+serial walk of the same plan (proven at scope level: `--types Dungeon` workers
+1==4, 1607/1607).
 
 ## Current work: fixes 126-140 compile-gate slices (2026-10-06 .. 2026-10-12, on `main`)
 
