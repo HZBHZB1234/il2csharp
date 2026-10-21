@@ -113,14 +113,75 @@ nestedTypes@0xa0 implementedInterfaces@0xa8 interfaceOffsets@0xb0
 | P0-b KLASS 标定 | **已结案**（§2：无需版本化） | 但"`(byte*)this.getClass()+0x780` 静态字段读取"这个**渲染**问题仍在，见 §5 |
 | A.3 GC 写屏障 | 未开始 | `data_X != 0` 的卡片标记屏障；38,764 个 `!=0` guard。需单独设计（不是删除，而是识别为屏障并渲染成托管无害形式或省略） |
 | P1-a#2 委托缓存恢复 | 部分 | #1 已让委托链可达；缓存恢复的 `?? (x = new)` 折叠待查 |
-| URE P0 `sub_` 失败原因注释 + `--publicize` 头部免责 | 未开始 | 见 `research-2026-10-21-urengine.md` §5 |
+| URE §5.3.3 `--publicize`/`--raw-addr` 头部免责 | **已完成** `97e233b` | 零风险：只在 opt-in 模式加一行头注释，默认树字节不变 |
+| URE §5.3.1 `sub_` 失败原因注释 | 未开始 | 见 §5 分析：57,696 plain 仅 2,125 VA，注释不如命名 |
+| A.3 GC 写屏障 | **探查中**（本轮） | 38,764 个 `!=0` guard，最大单块噪音 |
 | P2 重复 getter 去重 / `[Address]` 形式化 | 未开始 | |
 | 全 162 镜像构建（应用全部修复） | 未开始 | 现有 `limbus_out1` 是修复前基线 |
 | C# 复刻版 | 未决 | 范围问题用户未回答 |
 
 ## 5. 下一个具体动作
 
-`(byte*)this.getClass() + 0x780)[0]` 这类**静态字段读取**：
-`0x780` 远超 vtable 结束位置，说明它是 `static_fields` 块内某字段的偏移。
-当前渲染成原始指针算术。应做成：`static_fields` 基 + metadata 的
-`fieldOffsets` 反查 → `TypeName.fieldName`。这是能看到的最大单点可读性收益之一。
+## 6. A.3 GC 写屏障：探查结论与实现（本轮）
+
+### 6.1 真实身份（反汇编 + Boehm 源码双重确认）
+
+典型内联块（mi 8 .ctor）：
+
+`
+cmp dword ptr [1894383ECh],0     ; Boehm GC 的增量/卡表启用开关（单一 BSS 单元）
+mov [rax+20h],dil                ; ← 真正的托管赋值在这里，屏障之前
+mov [rbx+10h],rax                ; ← 真正的引用字段写入也在这里
+je  skip                          ; 未启用则跳过
+lea r8,[rbx+10h]                  ; 被写入的引用地址
+shr rdx,12h ; and edx,7FFFh       ; 卡片索引 = addr >> 12 & 0x7FFF
+shr r8,0Ch  ; and r8d,3Fh         ; 卡内位
+mov rax,[18946B420h+rdx*8]        ; 卡片表项
+bts rcx,r8                        ; 置位
+lock cmpxchg [18946B420h+rdx*8],rcx
+jne retry                         ; 原子重试循环 → 被错误建模成空 while
+`
+
+>> 12 是 Boehm GC 的 PAGE_SHIFT：x86-64 上 HBLKSIZE=4096=2^12
+（dwgc/include/private/gcconfig.h，CPP_WORDSZ=64），因此
+ddr >> PAGE_SHIFT(12) 即卡片索引起点，& 0x3F（CPP_WORDSZ-1）是卡内位。
+这是**布尔特 GC 的 cardmarking 写屏障**，纯运行时机制。
+
+### 6.2 为什么可以安全省略
+
+1. 屏障只写卡片表（GC 私有结构），**不改变任何托管可见状态**。
+2. 真正的引用赋值在屏障**之前**已完成（反汇编证实）。
+3. 形状与地址无关：4,000 方法抽样中 **1,108 个纯形状 guard 全部用同一单元
+   data_1894383ec**；条件是 xpr >> 12 & 63 != 0，是 Boehm 卡表算法本身。
+4. 只省略**纯形状**（guard 体内只有唯一一个空 while，while 条件含
+   >> 12 & 63，无 else）；683 个混合形状（屏障后有别的语句）一律保留。
+
+### 6.3 与版本安全
+
+形状来自编译器插桩的 GC 屏障，v24–v39 的 Unity（同一 Boehm GC）
+都一样；data_<hex> 是结构指纹（BSS 单元），不是硬编码地址。因此这是
+**版本无关**的规则；对 v31 同理适用（会移动 golden，属改进）。
+
+### 6.4 实现
+
+在 il2cpp/dec/flow.py 增 _drop_gc_cardmark_barriers，
+于 structure.py 的 _final_text/_structure 末尾调用（纯文本 stage，
+与 drop_empty_init_guards 同级）。匹配：
+
+`
+if (data_<hex> != 0)            <- GUARD
+{                               <- {
+    while (<expr> >> 12 & 63 != 0)   <- WHILE（必须是唯一体语句）
+    {                           <- {
+    }                           <- }
+}                               <- }
+`
+
+整块删除。非纯形状（体内还有其他语句）不动。
+
+## 7. 下一个具体动作
+
+(byte*)this.getClass() + 0x780)[0] 这类**静态字段读取**：
+ x780 远超 vtable 结束位置，说明它是 static_fields 块内某字段的偏移。
+当前渲染成原始指针算术。应做成：static_fields 基 + metadata 的
+ieldOffsets 反查 → TypeName.fieldName。这是能看到的最大单点可读性收益之一。

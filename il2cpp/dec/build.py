@@ -339,6 +339,7 @@ class _BuildMixin:
             return ['/* nothing */']
         lines = self._final_text(self._structure(blocks, bmap, m))
         lines = drop_empty_init_guards(lines)
+        lines = drop_gc_cardmark_barriers(lines)
         try:
             params = {safe_ident(p.name) for p in self.L.meta.method_params(m)}
         except Exception:
@@ -1054,6 +1055,37 @@ def drop_empty_init_guards(lines):
                 and not (i + 3 < n
                          and lines[i + 3].strip().startswith('else'))):
             i += 3
+            continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+# A.3: the pure Boehm GC cardmark write barrier.  `if (data_X != 0) {`
+# whose ONLY body is an empty `while (<expr> >> 12 & 63 != 0) { }`.
+# PAGE_SHIFT is 12 on x86-64 (HBLKSIZE=4096), so `>> 12 & 63` is the
+# card-table algorithm; the fence writes GC-private state only and the
+# real store sits before it, so dropping it cannot change behaviour.  A
+# body with ANY other statement is a real block and is kept.
+_GC_BARRIER_GUARD_RX = re.compile(r'^if \(data_[0-9a-fA-F]+ != 0\)$')
+_GC_BARRIER_WHILE_RX = re.compile(
+    r'^while \(.+(?:>> 12 & 63|>> 12 & 0x3[fF])(?: != 0)?\)$')
+
+
+def drop_gc_cardmark_barriers(lines):
+    out = []
+    i, n = 0, len(lines)
+    while i < n:
+        if (i + 5 < n
+                and _GC_BARRIER_GUARD_RX.match(lines[i].strip())
+                and lines[i + 1].strip() == '{'
+                and _GC_BARRIER_WHILE_RX.match(lines[i + 2].strip())
+                and lines[i + 3].strip() == '{'
+                and lines[i + 4].strip() == '}'
+                and lines[i + 5].strip() == '}'
+                and not (i + 6 < n
+                         and lines[i + 6].strip().startswith('else'))):
+            i += 6
             continue
         out.append(lines[i])
         i += 1
