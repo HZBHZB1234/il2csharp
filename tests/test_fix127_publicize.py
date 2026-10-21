@@ -60,3 +60,32 @@ def test_publicize_drops_readonly_only_under_the_flag():
     import inspect
     src = inspect.getsource(Emitter)
     assert "if fa & FA_INITONLY and not getattr(self, 'publicize', False):" in src
+
+# -- URE §5.3.3: the compile-gate modes must announce themselves ----------
+def _gate(publicize, raw_addr):
+    em = Emitter.__new__(Emitter)
+    em.publicize = publicize
+    em.raw_addr = raw_addr
+    return em._gate_header()
+
+
+def test_gate_header_silent_in_normal_output():
+    assert _gate(False, False) == []
+
+
+def test_gate_header_names_publicize():
+    h = _gate(True, False)
+    assert len(h) == 1 and '--publicize' in h[0]
+    assert 'NOT FAITHFUL SOURCE' in h[0]
+
+
+def test_gate_header_names_raw_addr():
+    h = _gate(False, True)
+    assert len(h) == 1 and '--raw-addr' in h[0]
+    assert '__addr(e)' in h[0]
+
+
+def test_gate_header_names_both_modes():
+    h = _gate(True, True)
+    assert len(h) == 1
+    assert '--publicize' in h[0] and '--raw-addr' in h[0]

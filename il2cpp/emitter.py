@@ -262,6 +262,26 @@ class Emitter:
             return 'public '
         return vis
 
+    def _gate_header(self):
+        """File-header disclaimer for the two compile-gate modes (URE §5.3.3).
+
+        `--publicize` rewrites every accessibility and `--raw-addr` routes
+        raw pointer bases through `__addr(e)`.  Both are deliberate
+        recompilation aids that make the tree differ from the recovered
+        source, so every file they touch says so at the top -- otherwise a
+        reader takes `public` or `__addr(...)` for the original.  In
+        normal output this returns nothing and the file is unchanged."""
+        gate = []
+        if getattr(self, 'publicize', False):
+            gate.append('all members were made public by `--publicize`')
+        if getattr(self, 'raw_addr', False):
+            gate.append('`(byte*)__addr(e)` marks raw native addresses '
+                        'produced by `--raw-addr`')
+        if not gate:
+            return []
+        return ['// COMPILE-GATE OUTPUT -- NOT FAITHFUL SOURCE: '
+                + '; '.join(gate) + '.']
+
     def type_decl_line(self, td: TypeDef) -> List[str]:
         f = td.flags
         vis = TYPE_VIS.get((f >> 0) & 7, '')
@@ -1412,6 +1432,7 @@ class Emitter:
                 buf, raw = rawaddr.rewrite_lines(buf)
                 any_raw = any_raw or raw
             hdr = ['// Decompiled by il2csharp | %s | TypeDefIndex: %d' % (img.name, td.index)]
+            hdr.extend(self._gate_header())
             uses = tr.render(skip=[ns] if ns else [])
             if uses:
                 hdr.append('')
