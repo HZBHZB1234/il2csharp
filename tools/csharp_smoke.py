@@ -261,7 +261,7 @@ def main():
             run = subprocess.run(
                 [args.dotnet, "run", "--project", str(out / "Smoke.csproj"),
                  "--configuration", "Release", "--verbosity", "quiet"],
-                capture_output=True, text=True, timeout=180, env=env)
+                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=180, env=env)
             log = run.stdout + run.stderr
             code = run.returncode
             passed = code == 0 and "PASS:" in run.stdout
@@ -269,7 +269,7 @@ def main():
             build = subprocess.run(
                 [args.dotnet, "build", str(unsafe_project),
                  "--configuration", "Release", "--verbosity", "quiet"],
-                capture_output=True, text=True, timeout=180, env=env)
+                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=180, env=env)
             log += build.stdout + build.stderr
             report["generated_unsafe_project_compiled"] = build.returncode == 0
             code = code or build.returncode

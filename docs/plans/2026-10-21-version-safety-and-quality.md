@@ -1,5 +1,10 @@
 # 计划：URE 学习迁移 + 产物质量优化（2026-10-21 起）
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 **目标**：继续完成一整轮「从 UREngine 学习并迁移」与「产物质量优化」，
 在**不破坏 il2csharp 既有版本支持（v24–v38）**的前提下增加并完善 **v39** 支持。
 

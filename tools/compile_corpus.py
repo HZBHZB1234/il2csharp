@@ -54,7 +54,7 @@ def compile_tree(tree, report):
         options.extend('"' + str(p) + '"' for p in sources + [merged])
         response.write_text("\n".join(options), encoding="utf-8")
         result = subprocess.run([dotnet, str(compilers[-1]), "@" + str(response)],
-                                capture_output=True, text=True, timeout=600)
+                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
     log = result.stdout + result.stderr
     report = Path(report)
     report.parent.mkdir(parents=True, exist_ok=True)

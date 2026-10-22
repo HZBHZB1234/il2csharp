@@ -1,9 +1,9 @@
 {
   "kind": "fixes 94-96 gated output promotion verification",
   "verified_at_utc": "2026-09-13T16:28:17.102689+00:00",
-  "source": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\review94_out",
+  "source": "<repo-root>\\work\\review94_out",
   "destination": "final_out",
-  "previous_final_out_backup": "C:\\Users\\crax\\Downloads\\il2csharp\\bckups\\final_out_review89",
+  "previous_final_out_backup": "<repo-root>\\bckups\\final_out_review89",
   "previous_final_out_files": 11200,
   "previous_final_out_aggregate_sha256": "1199399d61e5748dbf0524633a67a040773c041346db40376dbb1dbce2619a66",
   "files_verified": 11200,

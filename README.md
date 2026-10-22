@@ -118,32 +118,35 @@ docs/               reference docs, review log, public-release checklist
 validation_reports/ frozen gate evidence
 ```
 
-`final_out/` (last promoted output), `testgame/` (licensed fixture) and
-`work/` (probes and gates) are local-only and git-ignored; a fresh clone
+`final_out/` (the last promoted output), game fixtures under `fixtures/` and
+build trees under `out/` are local-only and git-ignored; a fresh clone
 contains the decompiler, tests, tools and docs. See
-[`docs/public_release.md`](docs/public_release.md) for the fixture rules
-and the 2026-09-28 history-scrub record.
+[`docs/fixtures.md`](docs/fixtures.md) for how real-game testing works, and
+[`docs/public_release.md`](docs/public_release.md) for the fixture rules and
+the 2026-09-28 history-scrub record.
 
 ## Testing
 
 ```text
-python -m pytest -q -m "not game"   # portable
-python -m pytest -q                 # + fixture-backed (needs testgame/)
+python -m pytest -q -m "not game"   # portable, no game needed
+python -m pytest -q                 # + fixture-backed (game tests skip without a fixture)
 ```
 
-Current (fix 140, 2026-10-12): **1,593 tests** -- 1,322 portable passed;
-271 fixture-backed, of which 10 are pending pin moves awaiting re-pin (see
-`docs/todo.md` top). Corpus gates
-on a built tree:
+Register a game once in `fixtures/registry.json` (see
+[`docs/fixtures.md`](docs/fixtures.md)) or point
+`IL2CSHARP_METADATA`/`IL2CSHARP_BINARY` at a build. Corpus gates on a
+built tree:
 
 ```text
-python tools/validate_corpus.py parse  <built-tree> --report parse.json
-python tools/validate_corpus.py sweep  --metadata <file> --binary <file> --report sweep.json
+python tools/gate.py brace --fixture <id> --label <name>   # brace audit
+python tools/gate.py parse --fixture <id> --label <name>   # tree-sitter parse gate
+python tools/gate.py sweep --fixture <id> --only Assembly-CSharp   # in-memory sweep
 ```
 
 Latest r11 evidence: `validation_reports/promotion_r11.json` (aggregate
 `735f2e9a…1707f`, 0 mismatches); r10 audit evidence: `validation_reports/audit_batch3.json`.
-Gate history and methodology: [`docs/reference.md`](docs/reference.md).
+Gate history and methodology: [`docs/reference.md`](docs/reference.md);
+the fixture/gate workflow: [`docs/fixtures.md`](docs/fixtures.md).
 
 ## Limitations
 

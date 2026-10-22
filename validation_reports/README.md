@@ -1,5 +1,12 @@
 # Validation evidence
 
+**Where new evidence goes.** Gate runs made through `tools/gate.py` write
+`validation_reports/<fixture>/<label>.<gate>.json` (small summaries only — never
+a built tree). See `../docs/fixtures.md`. The r4c–r11 records below are frozen
+historical evidence: their machine-local absolute paths were rebased to
+`<repo-root>`, and the trees they named (`final_out/`, `work/...`) exist only on
+the authoring machine.
+
 **Fix 124 (wide raw stores byte-address their displacement, 2026-10-04,
 branch `fix124-wide-store-byte-offsets`, not promoted).** Start with
 `review124_summary.json` (native table, gate matrix, environment caveat),

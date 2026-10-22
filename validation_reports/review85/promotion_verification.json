@@ -1,9 +1,9 @@
 {
   "kind": "fix 91 gated output promotion verification",
   "verified_at_utc": "2026-09-11T08:27:08.194736+00:00",
-  "source": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\review88_out",
+  "source": "<repo-root>\\work\\review88_out",
   "destination": "final_out",
-  "previous_final_out_backup": "C:\\Users\\crax\\Downloads\\il2csharp\\bckups\\final_out_r84",
+  "previous_final_out_backup": "<repo-root>\\bckups\\final_out_r84",
   "files_verified": 11200,
   "candidate_aggregate_sha256": "0ef7607e317dbb00f59ad72ccaa8089b36ccf0a79c42bae7f525ebeb30118d00",
   "promoted_aggregate_sha256": "0ef7607e317dbb00f59ad72ccaa8089b36ccf0a79c42bae7f525ebeb30118d00",

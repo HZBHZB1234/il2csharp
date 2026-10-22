@@ -1,5 +1,10 @@
 # Review 86 - deterministic, evidence-based EH helper naming (fixes 90, 91)
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 Fixes 90 and 91 replace the way the decompiler decides that a call target is
 an il2cpp exception helper. Review 85 section 7 diagnosed this as order
 dependence and proposed making the discovery deterministic. That diagnosis

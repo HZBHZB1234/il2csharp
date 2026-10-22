@@ -1,6 +1,6 @@
 {
   "kind": "tree-sitter C# syntax gate",
-  "tree": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\review93_out",
+  "tree": "<repo-root>\\work\\review93_out",
   "files": 11107,
   "bad_files": 0,
   "errors": 0,

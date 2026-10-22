@@ -412,12 +412,12 @@ full-body file with `tools/make_goldens.py --full` (never commit it).
 
 Use `tools/csharp_smoke.py` for the .NET 8 compiled-pattern checks, including the
 actual loop emitter. They passed for Review 80 but were not rerun for Reviews
-81–97 (or the package split, which `work/split/rebuild_verify.py` proves byte-identical)
+81–97 (or the package split, which a machine-local `rebuild_verify.py` proved byte-identical)
 because this environment has no .NET SDK; they are never a build of the
-complete recovered game. The supplied game fixtures live in the local,
-git-ignored `testgame/` only (licensed game data; never track or distribute
-them — the 2026-09-28 scrub removed them from history; see
-`docs/public_release.md`).
+complete recovered game. Game fixtures live in the local, git-ignored
+`fixtures/<id>/game/` only (licensed game data; never track or distribute
+them — the 2026-09-28 scrub removed the old `testgame/` copy from history;
+see `docs/fixtures.md` and `docs/public_release.md`).
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -451,15 +451,15 @@ recover as what C# — read it before assuming a construct is unhandled
 
 ## Repo layout (2026-09-08 consolidation)
 
-Project root is `il2csharp/` itself. The old parent folder held a sibling
-`work/` (20 files, now merged into `work/`), five loose scripts (now in
-`tools/`: `compare_content.py`, `compare_outputs.py`, `count_diffs.py`,
-`test_import.py`, `test_import2.py`), and the game folder (now the local,
-git-ignored `testgame/`; never tracked). Pre-consolidation history in `docs/archive/`
-still refers to `../work/`, `il2csharp/final_out/`, sibling `bXX_out1`
-trees, and `Shift At Midnight` at the old root — read those as `work/`,
-`final_out/`, reaped batch trees, and `testgame/`. Backup zips live in the
-parent folder, not in this repo.
+Project root is `il2csharp/` itself. Game fixtures are **local-only and
+never committed**: today that means a `fixtures/registry.json` (git-ignored,
+schema in `fixtures/registry.example.json`) plus a `fixtures/<id>/game/`
+directory per game, and built trees under `out/<id>/<label>/`. See
+`docs/fixtures.md`. Pre-consolidation history in `docs/archive/` still refers
+to `../work/`, `il2csharp/final_out/`, sibling `bXX_out1` trees, and `Shift At
+Midnight` at the old root; those are the **owner machine's** directories,
+absent from this fork — read them as "scratch trees", "the promoted tree" and
+"the old fixture". No such directory exists here.
 
 ## Commands
 
@@ -467,8 +467,9 @@ There is no build step — the decompiler itself is the `il2cpp/` package plus
 scratch/validation scripts (`il2csharp.py` is a thin launcher), run directly. There IS a test suite now:
 `tests/` (portable unit tests plus optional game-backed goldens, see
 `docs/reviews/REVIEW84.md` and `docs/todo.md`), run with `PYTHONHASHSEED=0 python -m pytest -m "not game"`
-(portable only) or `PYTHONHASHSEED=0 python -m pytest` with
-`IL2CSHARP_METADATA`/`IL2CSHARP_BINARY` pointing at `testgame/`.
+(portable only) or `PYTHONHASHSEED=0 python -m pytest` with a game fixture
+registered in `fixtures/registry.json` (or `IL2CSHARP_METADATA`/
+`IL2CSHARP_BINARY`); game tests skip cleanly when none is present.
 Dependencies are pinned in `requirements.txt` / `requirements-dev.txt`
 (`requirements-arm64.txt` for the ARM64 scaffold).
 
@@ -487,8 +488,8 @@ python il2csharp.py <game-dir-or-metadata> -o <outdir> [options]   # or: python 
 ```
 
 The two compile-gate flags are opt-in and never part of the promoted tree;
-they exist so the Roslyn gate (`work/cgate/`) measures lifting errors
-instead of accessibility/raw-pointer noise (see `docs/todo.md` top).
+they exist so the Roslyn compile gate (`tools/gate.py compile`) measures
+lifting errors instead of accessibility/raw-pointer noise.
 
 Requires `iced-x86` (`pip install iced-x86`). Syntax-check a change with
 `python -c "import compileall,sys; sys.exit(0 if compileall.compile_dir('il2cpp', quiet=1) else 1)"`
@@ -512,21 +513,30 @@ way; see `docs/archive/batches-c.md` §0ap's incident record). Build in memory, 
 then write once; make backups once and never re-derive them from the
 live file.
 
-**The real target for validation** is a licensed Windows build of *Shift At
-Midnight* (Kwalee), metadata v31, x64, kept in the local, git-ignored
-`testgame/` (never tracked, never redistributed; the 2026-09-28 history
-scrub removed every earlier trace — see `docs/public_release.md`). A Unity 2022 sample
-(`Simple_2022_3_35`) under `temptools/Cpp2IL/TestFiles/` is a second,
-smaller data point when that external checkout is present (it is not
-bundled with this repo). There's no synthetic/bundled test fixture — every claim
-about output correctness in this codebase's own commit history was checked
-against one of these two real binaries, not asserted from reading code.
+**The real target for validation** is a licensed Windows build kept in the
+local, git-ignored `fixtures/<id>/game/` (never tracked, never redistributed;
+see `docs/public_release.md`). Historically that was *Shift At Midnight*
+(Kwalee, metadata v31) under `testgame/`, and a Unity 2022 sample
+(`Simple_2022_3_35`, previously under `temptools/Cpp2IL/TestFiles/`); both are
+owner-machine paths that do not exist in a fresh clone. Register whatever game
+you have in `fixtures/registry.json` (see `docs/fixtures.md`) and drive every
+gate through `tools/gate.py --fixture <id>`. There is no synthetic/bundled
+fixture — every correctness claim in this codebase's history was checked
+against a real binary.
 
 ### Validating a change
 
-1. A **direct re-lift** of one method is the fast loop — see
-   `work/` (now grouped into `lib/`, `runners/`, etc.; routing table in `work/README.md`;
-   the old sibling `../work/` was merged into this repo on 2026-09-08) for the pattern: load
+The commands below name `work/lib/*` and `work/runners/*` scripts that lived
+only on the authoring machine and are absent here. Their shipped equivalents
+are in `tools/`: `tree_brace_audit.py` → `tools/gates/tree_brace_audit.py`
+(via `tools/gate.py brace`), `ts_gate.py` → `tools/gate.py parse`,
+`sweep_audit.py` → `tools/gate.py sweep`, `gate_diff.py` →
+`tools/validate_corpus.py compare` / `tools/gates/compare_trees.py`,
+`make_goldens.py` → `tools/make_goldens.py`. Read the bullets for the
+*method*; use `tools/gate.py` for the *command*.
+
+1. A **direct re-lift** of one method is the fast loop — see `tools/`
+   (`inspect_methods.py`, `corpus_common.py`) and `docs/fixtures.md`: load
    `Metadata`/`Il2Cpp`/`Lifter`/`Decompiler`, find a method by VA in
    `meta.methods`, call `dec.lift_method(m, td)`, print. No file I/O.
 1b. **Golden snapshot tests:** `PYTHONHASHSEED=0 python -m pytest -q
@@ -543,7 +553,7 @@ against one of these two real binaries, not asserted from reading code.
    only 5 of the then-50 bodies. For statement-pass soundness changes,
    the golden suite finds the SHAPE of a wrong transformation, the
    full-corpus sweep (item 3) sizes it — run both before a build.
-2. A **tree-sitter parse gate** (`work/lib/ts_gate.py` in this repo, pip:
+2. A **tree-sitter parse gate** (`tools/gate.py parse`, pip:
    `tree-sitter tree-sitter-c-sharp`) is the gate that sees what brace
    counting can't (bare `do {}`, NUL/`...` in statements, missing call
    parens, illegal identifiers, unlexable literals). Historical corpus:
@@ -575,21 +585,21 @@ against one of these two real binaries, not asserted from reading code.
    per-file count usually means one defect, not many. When the bad-file
    set is unchanged between two gates, every ERROR delta is confined to
    those files — that IS the per-file diff (used this way at batch 35).
-   `work/lib/gate_diff.py A.txt B.txt` diffs two saved
-   reports per file (newly-bad / cleared / worse / better) — always run
-   it when you have saved reports, the summary line alone hides a
-   regression under a bigger win.
-   Note: `_final_text`'s line-local transforms are mirrored in
-   `work/lib/sim_rewrite.py` — a built tree + ~2 min sim re-gate is the
-   fast full-corpus loop for `?`/`unknown`/`default`/select-family
-   changes, but a REAL rebuild (18.1 min measured at r9, a `work/runners/run_build_*.py` into
-   `<out>`) is the only truth for Lifter-side changes. Two traps in
-   that loop, both paid for in batch 19:
+   `tools/validate_corpus.py compare A.json B.json --report out.json`
+   diffs two saved reports per file (newly-bad / cleared / worse / better)
+   — always run it when you have saved reports, the summary line alone
+   hides a regression under a bigger win.
+   Note: `_final_text`'s line-local transforms were mirrored in a machine-
+   local `sim_rewrite.py` (not shipped here) — a built tree + ~2 min sim
+   re-gate was the fast full-corpus loop for `?`/`unknown`/`default`/
+   select-family changes, but a REAL rebuild (`python il2csharp.py
+   --fixture <id> --label <name>`) is the only truth for Lifter-side
+   changes. Two traps in that loop, both paid for in batch 19:
    - **A sim tree may only be compared against another sim tree.**
      `sim_rewrite.py` does not mirror `_fix_select`, so it strips
      `: default` that the real pipeline re-synthesizes; a sim-vs-built
-     diff shows ~80 phantom regressions. `work/lib/make_sim_base.py`
-     generates the old-rules control to diff against.
+     diff shows ~80 phantom regressions. `tools/gates/compare_trees.py`
+     replaces the old make-sim-base control for tree-to-tree diffs.
    - **Measure a rule's hazards against what ENTERS the pass, not the
      tree it already produced.** A built tree has the old rule's output
      baked in, so a shape the old rule collapsed reads as "0 sites"
@@ -601,12 +611,13 @@ against one of these two real binaries, not asserted from reading code.
    subtle bugs found in this codebase's history were actually caught
    (a silently-crashing regex, and a brace-balance regression neither the
    crash count nor the per-file audit below could see on its own).
-   `work/lib/sweep_audit.py <tag>` is the driver: per-method literal-aware
+   `tools/gate.py sweep` is the driver (`tools/validate_corpus.py sweep`):
+   per-method literal-aware
    counts of `brace`, `dangling` (goto with no label), `into_block`
    (goto into a nested block), `empty_arg` (`f(a, , b)`), `follower`, and
    crashes — batch 15's gates. Known baseline at b74_out1: 0 / 0 /
    13,505 / 0 / 0 / 0 (sites/methods for into_block: 13,505/2,978;
-   driver now `work/lib/sweep_1a_audit.py`). into_block history: 21,326 (batch 20) ->
+   driver folded into `tools/gate.py sweep`). into_block history: 21,326 (batch 20) ->
    21,464 (batch 21, explained uptick) -> 17,718 (the shared-tail
    hoist pass, batches 12-15 era baseline through b41) -> 32,094
    (batch 42: the funnel applied to classic hoists un-did ~14.4k
@@ -615,7 +626,7 @@ against one of these two real binaries, not asserted from reading code.
    -> 15,419 (batch 43's tail duplication) -> 12,950 at b63_out1
    -> 13,815/2,960 (batch 54's second-table recovery) -> 13,505/2,978
    (batch 55's bound/group-table fixes, held through b74) ->
-   13,518/2,979 (batch 75, `work/sweep_b75b.log` with the fold
+   13,518/2,979 (batch 75, with the fold
    active: +13/+1 off b74, +63,252 lines net of phi materialization
    and fold collapse).
    **Crashes are 0 as of batch 53** (`docs/archive/batches-d.md` §0ag): the two
@@ -623,9 +634,10 @@ against one of these two real binaries, not asserted from reading code.
    TextMeshPro/TextMeshProUGUI.GenerateTextMesh cleared when fix 63b
    raised the block cap 1500 -> 3000, so ANY crash in a sweep from now
    on is one you introduced.
-4. A **full rebuild + brace audit** (`python il2csharp.py <target> -o
-   <outdir>`, then `python work/lib/tree_brace_audit.py <outdir>`) is the
-   final gate before promoting a build to the baseline. `--workers N`
+4. A **full rebuild + brace audit** (`python il2csharp.py --fixture <id>
+   --label <name>`, then `python tools/gate.py brace --fixture <id>
+   --label <name>`) is the final gate before promoting a build to the
+   baseline. `--workers N`
    emits the 91 images across a process pool, heaviest image (by native
    method count) submitted first, and is the same tree byte-for-byte: the
    full 8-worker r10 tree is 11,276/11,276 files identical to `final_out`
@@ -638,7 +650,7 @@ against one of these two real binaries, not asserted from reading code.
    errors in the same file both read as 0. Prefer the full-corpus
    sweep's **per-method** count when chasing structural bugs
    specifically — and that count MUST be literal-aware:
-   `work/lib/sweep_trybrace.py`'s `brace_delta()` skips braces inside
+   `tools/validate_corpus.py`'s `audit_body()` skips braces inside
    string/char literals and `/* */` comments, because a naive
    `l.count('{') - l.count('}')` counts `"BitVector32{"`-style literals
    as imbalance (all 24 "imbalanced" methods in batch 13 were that false
@@ -730,7 +742,7 @@ after-fork emission. One pass — `_hoist_shared_tails` (after the second
 label's tail out past its construct when every into-goto provably falls
 through to the hoist point (no code between, no loop/switch/SEH level
 crossed) and every sibling `else` arm ends in flow-break (the funnel
-rule). Its soundness predicates are replicated by `work/lib/classify_into2.py`
+rule). Its soundness predicates were replicated by a machine-local `classify_into2.py`
 (per-label census; SOUND = 0 tree-wide after batch 15); treat the
 `_falls_to` switch-level rejection and the nested-label guard as load-
 bearing — both were root-caused against real wrong output, not taste.

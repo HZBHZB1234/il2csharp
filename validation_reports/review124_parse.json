@@ -1,6 +1,6 @@
 {
   "kind": "tree-sitter C# syntax gate",
-  "tree": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\fix124_ab\\flat",
+  "tree": "<repo-root>\\work\\fix124_ab\\flat",
   "files": 11183,
   "bad_files": 0,
   "errors": 0,

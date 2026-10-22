@@ -1,5 +1,10 @@
 # 产出质量审计：缺陷与改进措施（2026-10-21）
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 **触发**：用户审阅 `limbus_out1` 导出后反馈"质量远远不及预期，大量 .cs 堆砌
 难以分辨，内部逻辑解析差很多"。
 

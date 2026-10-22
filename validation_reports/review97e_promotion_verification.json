@@ -1,9 +1,9 @@
 {
   "kind": "fix 97 (bare first-use temp declarations) + 97e render-strip repair promotion verification",
   "verified_at_utc": "2026-09-14T16:15:35.532315+00:00",
-  "source": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\review97_out",
+  "source": "<repo-root>\\work\\review97_out",
   "destination": "final_out",
-  "previous_final_out_backup": "C:\\Users\\crax\\Downloads\\il2csharp\\bckups\\final_out_review94",
+  "previous_final_out_backup": "<repo-root>\\bckups\\final_out_review94",
   "previous_final_out_files": 11200,
   "previous_final_out_aggregate_sha256": "6ec3c6f45deb2f653c1f3bf02053a82251c322f169f5b0df7c8f0249b64e679b",
   "files_verified": 11200,

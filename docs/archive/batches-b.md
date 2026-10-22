@@ -1,3 +1,8 @@
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 ## 0h. Batch 26 (2026-08-21, backlog #2 investigation + label-tail MISSING fix, CLOSED)
 
 Picked up backlog #2 (read-before-def audit, flagged top item) and §2's

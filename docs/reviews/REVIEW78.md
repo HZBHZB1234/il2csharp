@@ -1,3 +1,8 @@
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 > **Historical document — Review 78.** Retained as provenance, not current
 > release instructions. Review 79 is current; see `REVIEW79.md`, the live
 > `todo.md`, and `validation_reports/review79/`. Past counts and unresolved

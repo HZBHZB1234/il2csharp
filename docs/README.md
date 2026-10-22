@@ -6,8 +6,20 @@ Project notes live here since the 2026-09-12 reorg (previously loose
 deleted on 2026-09-19, so this history is the record). The two Python
 sources are untouched by the move. All repo paths below are root-relative.
 
+> **Local-only paths.** `work/`, `final_out/`, `bckups/`, `temptools/` and
+> `testgame/` are directories that existed only on the authoring machine and
+> are **absent from this fork**. They appear throughout the archive/review
+> notes below as history; do not expect them on disk. The live replacement
+> is `fixtures/` (games) + `out/<id>/<label>/` (builds), driven by
+> `tools/fixtures.py` and `tools/gate.py` — see [`fixtures.md`](fixtures.md).
+> `validation_reports/` records were rebased to `<repo-root>` and are kept as
+> frozen evidence.
+
 ## Start here (live)
 
+- [`fixtures.md`](fixtures.md) — **how to run against real games**: the
+  `fixtures/` registry, `out/` trees, the gate matrix, compare/promote, and
+  how game tests skip cleanly. Read this before building or gating anything.
 - `docs/todo.md` — current work (codegen-intrinsic landing 1, r10
   promoted tree), validation status, next priorities, replacement
   records.

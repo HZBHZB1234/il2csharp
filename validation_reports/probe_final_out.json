@@ -1,5 +1,5 @@
 {
-  "tree": "C:\\Users\\crax\\Downloads\\il2csharp\\final_out",
+  "tree": "<repo-root>\\final_out",
   "source_files": 11181,
   "merged_stubs": 2647,
   "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.302\\Roslyn\\bincore\\csc.dll",

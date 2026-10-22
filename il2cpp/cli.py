@@ -412,6 +412,13 @@ def main(argv):
                     help='print a one-line JSON summary on stdout')
     ap.add_argument('--manifest', metavar='FILE',
                     help='write the same JSON summary to FILE')
+    ap.add_argument('--fixture', metavar='ID',
+                    help='resolve the target from fixtures/registry.json '
+                         '(paths never live in the repo) instead of a '
+                         'literal target path')
+    ap.add_argument('--label', metavar='NAME',
+                    help='tag this build under out/<fixture>/<label> and '
+                         'record it in the tree MANIFEST.json')
     ap.add_argument('--bodies', nargs='?', const='bodies.json', metavar='FILE',
                     help='write address-keyed C# bodies for Sunshine --rival '
                          '(default: <out>/bodies.json)')
@@ -421,6 +428,24 @@ def main(argv):
         ap.error('--max-methods must be nonnegative')
     if args.workers < 0:
         ap.error('--workers must be >= 0 (0 picks half the cores, max 8)')
+    fixture_id = args.fixture
+    if args.fixture:
+        # --fixture resolves the game through the local registry; an explicit
+        # --target/--metadata/--binary still wins, so existing commands and
+        # tests keep working unchanged.
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                        '..', 'tools'))
+        try:
+            import fixtures as _fixtures
+            fx = _fixtures.resolve(args.fixture)
+        except Exception as ex:
+            print('error: fixture %r: %s' % (args.fixture, ex))
+            return 1
+        if args.target is None and not (args.metadata and args.binary):
+            args.target = str(fx.game_dir)
+            args.metadata = args.metadata or str(fx.metadata)
+            args.binary = args.binary or str(fx.binary)
+        fixture_id = fx.id
     if not args.target and not (args.metadata and args.binary):
         ap.error('provide a target or both --metadata and --binary')
     try:
@@ -501,6 +526,13 @@ def main(argv):
         print('error: --only matched no assembly:', args.only)
         return 1
 
+    if args.label and args.out == 'il2csharp_out':
+        # A label with no explicit -o lands in the fixture's out/ namespace,
+        # so a build is self-describing and git-ignored as a whole.
+        if not fixture_id:
+            print('error: --label needs --fixture')
+            return 1
+        args.out = os.path.join('out', fixture_id, args.label)
     os.makedirs(args.out, exist_ok=True)
     if args.emit_h:
         t0 = time_ms()
@@ -550,6 +582,7 @@ def main(argv):
         'structured fallbacks: %d, type emit failures: %d' % (
         stats['files'], elapsed, stats['lifted'], stats['failed'],
         stats['fallbacks'], stats['emit_failed']))
+    _write_manifest(args, summary, gmd, bp)
     if args.json:
         import json
         print(json.dumps(summary, separators=(',', ':')))
@@ -557,6 +590,77 @@ def main(argv):
     if args.strict and not args.decls_only:
         failed = failed or bool(stats['fallbacks']) or not stats['lifter']
     return 1 if failed else 0
+
+
+def _write_manifest(args, summary, gmd, bp):
+    """Record what produced this tree, beside the tree.
+
+    The historical promotion records kept this in hand-written JSON;
+    making it a build by-product means nobody can forget it. Never fatal:
+    a manifest failure must not lose a completed build.
+    """
+    import hashlib
+    import json
+    import subprocess
+    try:
+        def sha(path):
+            h = hashlib.sha256()
+            with open(path, 'rb') as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b''):
+                    h.update(chunk)
+            return h.hexdigest()
+        try:
+            commit = subprocess.run(['git', 'rev-parse', 'HEAD'],
+                                    cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                    capture_output=True, text=True,
+                                    timeout=20).stdout.strip()
+        except Exception:
+            commit = None
+        # cli.py lives in il2cpp/, so the repo root is one level up
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sources = {}
+        for name in ('il2csharp.py',):
+            p = os.path.join(root, name)
+            if os.path.isfile(p):
+                sources[name] = sha(p)
+        pkg = os.path.join(root, 'il2cpp')
+        for dirpath, dirnames, filenames in os.walk(pkg):
+            dirnames[:] = [x for x in dirnames if x != '__pycache__']
+            for name in sorted(filenames):
+                if name.endswith('.py'):
+                    p = os.path.join(dirpath, name)
+                    sources[os.path.relpath(p, root).replace(os.sep, '/')] = sha(p)
+        payload = {
+            'kind': 'build manifest',
+            'fixture': getattr(args, 'fixture', None),
+            'label': getattr(args, 'label', None),
+            'out': summary['out'],
+            'source_commit': commit or None,
+            'source_fingerprints': sources,
+            'flags': {
+                'strict': bool(args.strict),
+                'decls_only': bool(args.decls_only),
+                'publicize': bool(args.publicize),
+                'raw_addr': bool(args.raw_addr),
+                'only': args.only,
+                'types': args.types,
+                'workers': args.workers,
+                'max_methods': args.max_methods,
+            },
+            'metadata': os.path.abspath(gmd),
+            'binary': os.path.abspath(bp),
+            'metadata_sha256': sha(gmd),
+            'binary_sha256': sha(bp),
+            **{k: summary[k] for k in ('files', 'lifted', 'failed', 'fallbacks',
+                                       'emit_failed', 'ms', 'bodies')},
+        }
+        path = os.path.join(summary['out'], 'MANIFEST.json')
+        with open(path, 'w', encoding='utf-8') as fh:
+            json.dump(payload, fh, indent=1)
+        if not args.quiet:
+            print('manifest:', path)
+    except Exception as ex:
+        print('warning: could not write MANIFEST.json:', ex)
 
 
 def time_ms():

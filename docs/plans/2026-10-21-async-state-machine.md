@@ -1,5 +1,10 @@
 # 计划：async / 协程状态机还原（2026-10-21）
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 **状态：待启动（探针未跑，不要先动手改源码）**
 **上游依据：`docs/research-2026-10-21-urengine.md` §4**
 **优先级：P1**（P0 是 `sub_` 失败原因，见 §9）

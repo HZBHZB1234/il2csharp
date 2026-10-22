@@ -116,7 +116,11 @@ def run_gate(tree, csc_dll=None, timeout=600):
         else:
             cmd = [csc, "/t:library", "/nologo", "/unsafe",
                    "/langversion:latest", "/out:" + out_dll, "@" + rsp]
+        # csc writes UTF-8; on a non-UTF-8 locale the default text=True
+        # decoding (e.g. GBK) kills the reader thread and reports a bare
+        # returncode with no diagnostics -- pin the encoding explicitly.
         pr = subprocess.run(cmd, capture_output=True, text=True,
+                            encoding='utf-8', errors='replace',
                             timeout=timeout)
         text = (pr.stdout or "") + "\n" + (pr.stderr or "")
         s, b, top = classify(text)

@@ -3,6 +3,10 @@
 The original goldens_review77.json is retained unchanged. Review 84 keeps the
 same 64 MethodDefs and freezes its constructor/allocation bodies only after the
 complete strict-build, parse, direct-sweep, and output-audit gates.
+
+Fixture resolution goes through ``tests/conftest.py``: ``IL2CSHARP_METADATA``/
+``IL2CSHARP_BINARY`` still work, and a machine with a ``fixtures/registry.json``
+(the normal case going forward) needs no env vars at all.
 """
 import hashlib
 import json
@@ -13,7 +17,8 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from corpus_common import load, sha256
+from corpus_common import load, sha256  # noqa: E402
+from conftest import fixture_paths_or_skip  # noqa: E402
 
 GOLDEN_PATH = Path(__file__).with_name("goldens_review84.json")
 GOLDENS = json.loads(GOLDEN_PATH.read_text(encoding="utf-8")) if GOLDEN_PATH.exists() else {}
@@ -22,14 +27,21 @@ SNAPSHOTS = GOLDENS.get("methods", [None])
 
 @pytest.fixture(scope="module")
 def game_decompiler():
-    metadata, binary = (os.environ.get(name) for name in ("IL2CSHARP_METADATA", "IL2CSHARP_BINARY"))
-    if not metadata or not binary:
-        pytest.skip("Set IL2CSHARP_METADATA and IL2CSHARP_BINARY to run licensed-fixture snapshots.")
+    metadata, binary = fixture_paths_or_skip("licensed-fixture snapshots need a game fixture")
     if not GOLDENS:
         pytest.skip("Generate snapshots only after the documented full gates.")
     assert os.environ.get("PYTHONHASHSEED") == "0", "Use PYTHONHASHSEED=0 for snapshot comparisons."
-    assert sha256(metadata) == GOLDENS["metadata_sha256"], "Different metadata fixture."
-    assert sha256(binary) == GOLDENS["binary_sha256"], "Different native binary fixture."
+    actual = (sha256(metadata), sha256(binary))
+    pinned = (GOLDENS["metadata_sha256"], GOLDENS["binary_sha256"])
+    if actual != pinned:
+        # MethodDef rows are positional, so a game update invalidates every
+        # pin at once. Comparing would test the fixture, not the decompiler.
+        pytest.skip(
+            "goldens_review84.json is pinned to a different game build "
+            "(metadata %s..., binary %s...; this fixture is metadata %s..., "
+            "binary %s...). Re-pin only after a clean gated build, with "
+            "tools/make_goldens.py --replace."
+            % (pinned[0][:12], pinned[1][:12], actual[0][:12], actual[1][:12]))
     il = load(Path(__file__).resolve().parents[1], metadata, binary)
     from il2cpp import Lifter
     from il2cpp import Decompiler

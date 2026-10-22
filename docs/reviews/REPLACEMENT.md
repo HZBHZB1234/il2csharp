@@ -1,5 +1,10 @@
 # Replace the project folder — Review 84
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 > **HISTORICAL (Review 84 era, 2026-08).** This describes a private ZIP
 > handoff whose contents included the licensed game fixtures and the
 > decompiled `final_out/` tree. No public artifact may contain them; live

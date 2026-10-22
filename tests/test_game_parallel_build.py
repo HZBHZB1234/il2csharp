@@ -11,6 +11,7 @@ The images are deliberately trivial (`--only` on two 1-4 type modules) so
 this stays a determinism test rather than a second full build.
 """
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -19,6 +20,8 @@ from pathlib import Path
 
 import pytest
 
+from conftest import fixture_paths_or_skip
+
 pytestmark = pytest.mark.game
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,20 +29,41 @@ ONLY = 'Unity.Burst.Unsafe,UnityEngine.JSONSerializeModule'
 
 
 def _build(tmp_path, workers):
+    metadata, binary = fixture_paths_or_skip("parallel-build determinism needs a game fixture")
     out = tmp_path / ('w%d' % workers)
     result = subprocess.run(
-        [sys.executable, str(ROOT / 'il2csharp.py'), 'testgame',
+        [sys.executable, str(ROOT / 'il2csharp.py'),
+         '--metadata', metadata, '--binary', binary,
          '-o', str(out), '--only', ONLY, '--strict',
          '--workers', str(workers)],
-        cwd=str(ROOT), capture_output=True, text=True, timeout=900,
+        cwd=str(ROOT), capture_output=True, text=True,
+        encoding='utf-8', errors='replace', timeout=900,
         env=dict(os.environ, PYTHONHASHSEED='0'))
     assert result.returncode == 0, result.stdout + result.stderr
     return out, result.stdout
 
 
 def _tree(tree):
+    # MANIFEST.json records the flags (including --workers) and the elapsed
+    # time, so it must differ by design. Everything the build emitted must not.
     return {p.relative_to(tree).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in sorted(tree.rglob('*')) if p.is_file()}
+            for p in sorted(tree.rglob('*'))
+            if p.is_file() and p.name != 'MANIFEST.json'}
+
+
+def _manifest(tree):
+    return json.loads((tree / 'MANIFEST.json').read_text(encoding='utf-8'))
+
+
+def _stable_manifest(payload):
+    """Manifest fields that must agree across schedules.
+
+    ``out`` names the (different) temp directory, ``ms`` is the duration and
+    ``flags.workers`` is the one flag this test deliberately varies.
+    """
+    stable = {k: v for k, v in payload.items() if k not in ('out', 'ms')}
+    stable['flags'] = {k: v for k, v in stable['flags'].items() if k != 'workers'}
+    return stable
 
 
 def _done_line(log):
@@ -61,6 +85,10 @@ def test_parallel_build_is_byte_identical_to_serial(tmp_path):
     assert 'workers:' not in serial_log
     assert _tree(serial) == _tree(parallel)
     assert _tree(serial), 'the scoped build emitted nothing'
+    serial_manifest, parallel_manifest = _manifest(serial), _manifest(parallel)
+    assert serial_manifest['flags']['workers'] == 1
+    assert parallel_manifest['flags']['workers'] == 2
+    assert _stable_manifest(serial_manifest) == _stable_manifest(parallel_manifest)
     assert _done_line(serial_log) == _done_line(parallel_log)
 
 

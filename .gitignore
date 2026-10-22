@@ -73,3 +73,11 @@ limbus_*heartbeat*.txt
 limbus_out*/
 limbus_build_heartbeat.txt
 limbus_fixed1/
+# --- fixtures / out (2026-10-21 fixture framework) ----------------------
+# Local-only game fixtures: registry.json holds this machine's paths (see
+# docs/fixtures.md); everything else under fixtures/ is licensed game data.
+# Ignore everything, then re-include the tracked template.
+fixtures/**
+!fixtures/registry.example.json
+out/
+*.manifest.json

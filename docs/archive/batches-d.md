@@ -1,3 +1,8 @@
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 ## 0aj. Batch 56 (2026-08-24, todo lead #3's largest residue bucket: an
 icall thunk-cell call is a call to a KNOWN method, and the identity had
 been in hand -- and thrown away -- since the cache scanner was written)

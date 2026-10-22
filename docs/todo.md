@@ -1,5 +1,12 @@
 # il2csharp — TODO (open work and historical triage)
 
+> **Local-only paths.** `work/`, `final_out/`, `bckups/`, `temptools/`,
+> `testgame/` and `b*_out1/` trees referenced below existed only on the
+> authoring machine and are **absent from this fork**. They are history, not
+> commands. The live replacement is `fixtures/` (games) + `out/<id>/<label>/`
+> (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
+> [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
+
 ## Current work: perf — per-type parallel emission + hotspot rewrite (2026-10-21, on `main`)
 
 Context: `docs/il2csharp-jit-feasibility.md` (in `../docs/`) proved a Python JIT

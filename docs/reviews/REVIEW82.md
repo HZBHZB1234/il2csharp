@@ -1,5 +1,10 @@
 # Review 82 — semantic local names and conservative object typing
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 Date: 2026-09-09. This is a complete private replacement of the supplied
 `il2csharp/` folder and supersedes Review 81. The original game DLL and metadata
 remain byte-for-byte unchanged. They were read statically and never executed.

@@ -1,5 +1,10 @@
 # Review 85 - enum member identity, integer literals, and signed immediates
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 **Completed:** 2026-09-10  
 **Scope:** enum member decoding, enum-valued arguments, integer literal parsing, address composition, and immediate signedness  
 **Authority:** `validation_reports/review85/`

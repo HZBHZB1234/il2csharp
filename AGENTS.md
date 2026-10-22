@@ -40,22 +40,28 @@ start there, then `docs/todo.md` (Current work section).
 - `tests/` — portable unit tests (LF) + game goldens
   (`test_game_goldens.py`, `tests/goldens_review84.json` — frozen).
 - `tools/` — `inspect_methods.py` (`--mi` exact MethodDef rows),
-  `corpus_common.py` (fixture loader). Add `tools/` to `PYTHONPATH`.
-- `work/` — scratch runners (`work/lib/`: `sweep_audit.py`,
-  `tree_brace_audit.py`, `ts_gate.py`; routing in `work/README.md`).
-- `testgame/` — local, git-ignored licensed fixture (never tracked or
-  redistributed; see `docs/public_release.md`).
-- `final_out/` — last promoted tree (r11, 2026-10-01). Read-only reference.
-  Never edit, never rebuild into.
-- `validation_reports/` — frozen gate evidence. Don't touch.
-- Temp scratch: `C:\Users\crax\AppData\Local\Temp\opencode` (outside repo).
+  `corpus_common.py` (fixture loader), `fixtures.py` (fixture registry —
+  **the only place a game path is resolved**), `gate.py` (all gates),
+  `gates/` (`tree_brace_audit.py`, `compare_trees.py`), `promote.py`.
+  Add `tools/` to `PYTHONPATH`.
+- `fixtures/` — **local-only** game fixtures (`fixtures/registry.json` +
+  `fixtures/<id>/game/`, git-ignored). See `docs/fixtures.md`. A fresh
+  clone has only the tracked `fixtures/registry.example.json`.
+- `out/` — **local-only** build trees (`out/<id>/<label>/`, git-ignored).
+  Replaces the old `final_out/` / `*_out1/` naming for new work.
+- `validation_reports/` — gate evidence; per-fixture summaries live under
+  `validation_reports/<id>/`. Historical r4c–r11 records are kept as-is
+  (their paths were rebased to `<repo-root>`).
 
 ## Session setup (PowerShell)
 
 ```powershell
 $env:PYTHONHASHSEED = '0'
-$env:IL2CSHARP_METADATA = (Resolve-Path 'testgame/ShiftAtMidnight_Data/il2cpp_data/Metadata/global-metadata.dat').Path
-$env:IL2CSHARP_BINARY = (Resolve-Path 'testgame/GameAssembly.dll').Path
+# Preferred: register the game once in fixtures/registry.json, then:
+python tools/fixtures.py doctor --id limbus
+# Legacy override still works:
+#   $env:IL2CSHARP_METADATA = '...global-metadata.dat'
+#   $env:IL2CSHARP_BINARY   = '...GameAssembly.dll'
 $env:PYTHONPATH = '<repo>;tools'
 ```
 
@@ -66,14 +72,16 @@ $env:PYTHONPATH = '<repo>;tools'
 Goldens key on MethodDef row (`mi`), never VA (shared bodies alias).
 
 **Portable tests:** `python -m pytest -q -m "not game" --disable-warnings`
-(1027 pass). **Full suite:** `python -m pytest -q` (~7 min, needs fixture
-env above; suite is fully green — any failure is yours).
+(no game needed). **Full suite:** `python -m pytest -q` — game-marked tests
+skip cleanly when no fixture is present, so a fresh clone is pass+skip, never
+fail.
 
-**Rebuild a tree:** `python il2csharp.py testgame -o <name_out1> [--only
-Assembly-CSharp] [--workers N]`. `--workers 0` = half the cores (max 8);
-the tree is byte-identical, only the schedule changes; `--max-methods`
-forces 1. Name output `*_out1/` (git-ignored). Gate with
-`python work/lib/tree_brace_audit.py <dir>` (must print 0 unbalanced).
+**Rebuild a tree:** `python il2csharp.py --fixture <id> --label <name>
+[--only Assembly-CSharp] [--workers N]`. `--workers 0` = half the cores
+(max 8); the tree is byte-identical, only the schedule changes; the build
+writes `out/<id>/<name>/MANIFEST.json`. Gate with
+`python tools/gate.py brace --fixture <id> --label <name>` (must print
+0 unbalanced).
 
 **Land a source fix:** repro first (probe script in temp dir, never in
 repo), binary-safe patch (below), compileall, portable suite, targeted
@@ -98,10 +106,18 @@ unproven shape keeps today's spelling; raw is always honest.
   commit hash changed; the intended local backup bundle is no longer
   present (see `docs/public_release.md`), so hashes in older docs no
   longer resolve anywhere. Never track or publish game data or
-  decompiled output (`testgame/`, `final_out/`, `work/` are all ignored),
+  decompiled output (`fixtures/`, `out/` are ignored; older docs write
+  these as `testgame/`, `final_out/`, `work/` — same rule, older names),
   never commit secrets, and never regen snapshots or promote output
   without an explicit user call. Stash-prove-clean before attributing a
   break to your change.
+
+> **Historical sections below.** From `## In flight` down, the text is a
+> stop-record timeline. It references `work/`, `final_out/`, `testgame/`,
+> `bckups/` and `b*_out1/` trees that existed only on the authoring
+> machine and are absent from this fork. Those names are history, not
+> instructions; the live replacement is `fixtures/` + `out/<id>/<label>/`
+> driven by `tools/fixtures.py` and `tools/gate.py` (see `docs/fixtures.md`).
 
 ## In flight (2026-10-12)
 

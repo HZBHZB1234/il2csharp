@@ -1,9 +1,9 @@
 {
   "kind": "fix 99 (post-render dead-pure-load DCE) promotion verification",
   "verified_at_utc": "2026-09-15T21:56:03.994179+00:00",
-  "source": "C:\\Users\\crax\\Downloads\\il2csharp\\work\\review99_out",
+  "source": "<repo-root>\\work\\review99_out",
   "destination": "final_out",
-  "previous_final_out_backup": "C:\\Users\\crax\\Downloads\\il2csharp\\bckups\\final_out_review97e",
+  "previous_final_out_backup": "<repo-root>\\bckups\\final_out_review97e",
   "files_verified": 11200,
   "candidate_aggregate_sha256": "c14263784492b2f209ff695018376404cf0093f06862e1b20e928da89391f2e7",
   "promoted_aggregate_sha256": "c14263784492b2f209ff695018376404cf0093f06862e1b20e928da89391f2e7",

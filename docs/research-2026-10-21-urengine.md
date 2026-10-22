@@ -1,5 +1,10 @@
 # UREngine 对标调研：il2csharp 能借鉴什么（2026-10-21）
 
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 ## 0. 结论先行
 
 **不要参考 UREngine 改 il2csharp 的架构。** 两者的核心设计是同一件事

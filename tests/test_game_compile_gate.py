@@ -13,6 +13,8 @@ from pathlib import Path
 
 import pytest
 
+from conftest import out_tree_or_skip
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
@@ -25,8 +27,8 @@ pytestmark = [pytestmark,
 
 def test_mscorlib_zero_syntax_errors():
     from compile_gate import run_gate
-    tree = ROOT / "final_out" / "mscorlib"
-    assert tree.is_dir(), "promoted tree required"
+    tree = out_tree_or_skip(reason="compile gate needs a built tree") / "mscorlib"
+    assert tree.is_dir(), "promoted tree required (mscorlib image)"
     assert os.environ.get("PYTHONHASHSEED") == "0"
     rep = run_gate(str(tree), timeout=900)
     assert rep.get("tool_error") is None, rep

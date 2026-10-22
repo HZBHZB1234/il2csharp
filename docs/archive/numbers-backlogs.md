@@ -1,3 +1,8 @@
+> **Historical record — local-only paths.** This file is a stop-record from the authoring machine.
+> It refers to `work/`, `final_out/`, `bckups/`, `temptools/`, `testgame/` and `b*_out1/` trees that
+> **do not exist in this fork**. Read those names as history, not as commands. The live replacement
+> is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
+
 ## 1. Archived numbers (current release is §0aw; corpus: Shift At Midnight; SOURCE at Review 77
 -- gated candidate still `b76_out1`, batch 76; `final_out/` on disk is
 the 2026-09-08 evening PARTIAL rebuild (6 assemblies, Review-77 source,

@@ -11,17 +11,22 @@ from pathlib import Path
 
 import pytest
 
+from conftest import fixture_paths_or_skip
+
 pytestmark = pytest.mark.game
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_only_no_match_is_an_error(tmp_path):
+    metadata, binary = fixture_paths_or_skip("--only test needs a game fixture")
     out = tmp_path / 'nomatch_out1'
     result = subprocess.run(
-        [sys.executable, str(ROOT / 'il2csharp.py'), 'testgame',
+        [sys.executable, str(ROOT / 'il2csharp.py'),
+         '--metadata', metadata, '--binary', binary,
          '-o', str(out), '--only', 'NoSuchAssembly.dll'],
-        cwd=str(ROOT), capture_output=True, text=True, timeout=600,
+        cwd=str(ROOT), capture_output=True, text=True,
+        encoding='utf-8', errors='replace', timeout=600,
         env=dict(os.environ, PYTHONHASHSEED='0'))
     assert result.returncode == 1, result.stdout + result.stderr
     assert '--only matched no assembly' in (result.stdout + result.stderr)

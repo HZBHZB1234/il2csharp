@@ -6,16 +6,26 @@ import os
 
 import pytest
 
+from conftest import fixture_paths_or_skip
+from test_game_goldens import GOLDENS
+
 pytestmark = pytest.mark.game
 
 
 @pytest.fixture(scope='module')
 def game_decompiler():
-    metadata, binary = (os.environ.get(n) for n in ('IL2CSHARP_METADATA', 'IL2CSHARP_BINARY'))
-    if not metadata or not binary:
-        pytest.skip('fixture env required')
+    metadata, binary = fixture_paths_or_skip('fix 133 needs a game fixture')
     from pathlib import Path
-    from tools.corpus_common import load
+    from tools.corpus_common import load, sha256
+    actual = (sha256(metadata), sha256(binary))
+    pinned = (GOLDENS.get('metadata_sha256') or '',
+              GOLDENS.get('binary_sha256') or '')
+    if actual != pinned:
+        pytest.skip(
+            'fix 133 MethodDef rows are pinned to the golden fixture '
+            '(metadata %s..., binary %s...); this build is metadata %s..., '
+            'binary %s...' % (pinned[0][:12], pinned[1][:12],
+                              actual[0][:12], actual[1][:12]))
     il = load(Path(__file__).resolve().parents[1], metadata, binary)
     from il2cpp import Decompiler, Lifter
     return il, Decompiler(Lifter(il))

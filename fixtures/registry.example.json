@@ -1,0 +1,40 @@
+{
+  "_comment": [
+    "Local game fixtures. Copy this file to registry.json (git-ignored) and",
+    "edit it; never commit registry.json or anything under fixtures/<id>/game/.",
+    "Every path is resolved against the repo root when relative, so a",
+    "registry written on one machine can be re-pointed on another by editing",
+    "only game_dir.",
+    "",
+    "metadata_version / unity_version are optional hints;",
+    "`python tools/fixtures.py doctor --id <id>` probes the real values and",
+    "prints the registry's answer beside them, so drift is visible.",
+    "redistributable=false means NO output from this fixture may ever be",
+    "committed (that is the default for licensed games)."
+  ],
+  "default": "limbus",
+  "fixtures": {
+    "limbus": {
+      "game_dir": "C:/Program Files (x86)/Steam/steamapps/common/Limbus Company",
+      "metadata": "BepInEx/decrypted-metadata.dat",
+      "binary": "GameAssembly.dll",
+      "license": "proprietary - ProjectMoon/Limbus Company, purchased copy",
+      "source_url": "",
+      "redistributable": false,
+      "metadata_version": 39,
+      "unity_version": "6000.3.12f1",
+      "notes": "The store global-metadata.dat stays encrypted; only BepInEx/decrypted-metadata.dat is readable, so --metadata is mandatory (directory discovery only looks for global-metadata.dat)."
+    },
+    "cppsample": {
+      "game_dir": "fixtures/cppsample/game",
+      "metadata": "Simple_2022_3_35/global-metadata.dat",
+      "binary": "Simple_2022_3_35/GameAssembly.dll",
+      "license": "MIT - Cpp2IL test sample, free to redistribute",
+      "source_url": "https://github.com/LukeFZ/Cpp2IL",
+      "redistributable": true,
+      "metadata_version": 29,
+      "unity_version": "2022.3.35f1",
+      "notes": "Second, smaller data point. Drop the unpacked Cpp2IL TestFiles tree under fixtures/cppsample/game/."
+    }
+  }
+}

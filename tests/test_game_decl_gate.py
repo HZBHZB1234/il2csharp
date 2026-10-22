@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+from conftest import fixture_paths_or_skip, out_tree_or_skip
+
 pytestmark = pytest.mark.game
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,13 +23,12 @@ ASM = "Unity.Burst.Unsafe.dll"
 def _run(args, env):
     return subprocess.run(
         [sys.executable] + args, cwd=str(ROOT), capture_output=True,
-        text=True, timeout=600, env=env)
+        text=True, encoding="utf-8", errors="replace", timeout=600, env=env)
 
 
 def test_decl_gate_end_to_end(tmp_path, monkeypatch):
-    metadata = os.environ.get("IL2CSHARP_METADATA")
-    binary = os.environ.get("IL2CSHARP_BINARY")
-    assert metadata and binary, "fixture env required"
+    metadata, binary = fixture_paths_or_skip("declaration gate needs a game fixture")
+    tree = out_tree_or_skip(reason="declaration gate needs a built tree")
     assert os.environ.get("PYTHONHASHSEED") == "0"
     env = dict(os.environ, PYTHONPATH=str(ROOT) + os.pathsep + str(ROOT / "tools"))
     dump = tmp_path / "dump.txt"
@@ -37,7 +38,7 @@ def test_decl_gate_end_to_end(tmp_path, monkeypatch):
     assert r.returncode == 0, r.stderr[-2000:]
     ext = tmp_path / "ext.txt"
     r = _run([str(ROOT / "tools" / "extract_decls.py"),
-              "--tree", str(ROOT / "final_out" / ONLY),
+              "--tree", str(tree / ONLY),
               "--assembly", ASM, "--out", str(ext)], env)
     assert r.returncode == 0, r.stderr[-2000:]
     r = _run([str(ROOT / "tools" / "diff_decls.py"),
