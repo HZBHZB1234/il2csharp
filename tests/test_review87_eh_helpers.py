@@ -68,7 +68,6 @@ def test_missing_targets_are_rejected():
 # --- native fixtures: the real binary -----------------------------------
 
 import il2cpp as I  # noqa: E402
-from test_game_goldens import game_decompiler  # noqa: E402,F401
 
 NEON_VADD_S8 = 106196
 NEON_VADD_S8_VA = "0x182508610"
@@ -84,7 +83,7 @@ def _fresh_body(il, mi):
     return dec.lift_method(m, il.meta.typedefs[m.declaring])
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_helper_naming_is_order_independent(game_decompiler):
     il, _ = game_decompiler
     m = il.meta.methods[NEON_VADD_S8]
@@ -98,7 +97,7 @@ def test_helper_naming_is_order_independent(game_decompiler):
     assert after == alone
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_pad_less_caller_renders_the_proven_helper_as_a_throw(game_decompiler):
     # SUPERSEDED EXPECTATION, kept deliberately. Under fix 90 alone this
     # method rendered `sub_180435670(...)`: vadd_s8 has no EH pad of its own,
@@ -124,7 +123,7 @@ def test_pad_less_caller_renders_the_proven_helper_as_a_throw(game_decompiler):
     assert any("NotImplementedException" in ln for ln in body)
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_registered_method_is_not_renamed_to_a_throw(game_decompiler):
     il, _ = game_decompiler
     body = _fresh_body(il, LOG_EXCEPTION_CALLER)

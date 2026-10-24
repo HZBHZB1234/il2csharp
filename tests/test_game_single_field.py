@@ -1,9 +1,8 @@
 """Single-field assign fold (F2-C1) ground truth pins."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_timespan_assign_folds_to_whole(game_decompiler):

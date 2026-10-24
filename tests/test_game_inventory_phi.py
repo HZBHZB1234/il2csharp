@@ -2,10 +2,9 @@
 
 import pytest
 
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_sprite_receiver_and_value_are_defined_on_both_arms(game_decompiler):

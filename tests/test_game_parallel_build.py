@@ -20,16 +20,14 @@ from pathlib import Path
 
 import pytest
 
-from conftest import fixture_paths_or_skip
-
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("limbus")
 
 ROOT = Path(__file__).resolve().parents[1]
 ONLY = 'Unity.Burst.Unsafe,UnityEngine.JSONSerializeModule'
 
 
-def _build(tmp_path, workers):
-    metadata, binary = fixture_paths_or_skip("parallel-build determinism needs a game fixture")
+def _build(tmp_path, workers, game_paths):
+    metadata, binary = game_paths
     out = tmp_path / ('w%d' % workers)
     result = subprocess.run(
         [sys.executable, str(ROOT / 'il2csharp.py'),
@@ -78,9 +76,9 @@ def _done_line(log):
     return re.sub(r'in \d+ ms', 'in <t> ms', line)
 
 
-def test_parallel_build_is_byte_identical_to_serial(tmp_path):
-    serial, serial_log = _build(tmp_path, 1)
-    parallel, parallel_log = _build(tmp_path, 2)
+def test_parallel_build_is_byte_identical_to_serial(tmp_path, game_paths):
+    serial, serial_log = _build(tmp_path, 1, game_paths)
+    parallel, parallel_log = _build(tmp_path, 2, game_paths)
     assert 'workers: 2 processes' in parallel_log
     assert 'workers:' not in serial_log
     assert _tree(serial) == _tree(parallel)
@@ -92,7 +90,7 @@ def test_parallel_build_is_byte_identical_to_serial(tmp_path):
     assert _done_line(serial_log) == _done_line(parallel_log)
 
 
-def test_scoped_parallel_build_engages_the_pool(tmp_path):
-    _, log = _build(tmp_path, 3)
+def test_scoped_parallel_build_engages_the_pool(tmp_path, game_paths):
+    _, log = _build(tmp_path, 3, game_paths)
     assert 'workers: 3 processes' in log
     assert 'bodies lifted:' in _done_line(log)

@@ -8,9 +8,8 @@ import re
 
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("limbus")
 
 
 def test_no_bss_cell_keeps_an_ambiguous_annotation(game_decompiler):

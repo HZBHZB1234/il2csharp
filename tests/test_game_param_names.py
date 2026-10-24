@@ -10,9 +10,8 @@ name instead of a silent capture.
 import pytest
 import re
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 CASES = [
     (113041, 'WriteBytes', '0x181fc5e20',

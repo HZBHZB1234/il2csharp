@@ -6,9 +6,8 @@ location and both values, and must not leave `sub_18043f880`.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_event_add_renders_interlocked_compare_exchange(game_decompiler):

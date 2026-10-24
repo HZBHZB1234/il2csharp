@@ -11,9 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import fixture_paths_or_skip, out_tree_or_skip
-
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("limbus")
 
 ROOT = Path(__file__).resolve().parents[1]
 ONLY = "Unity.Burst.Unsafe"
@@ -26,9 +24,8 @@ def _run(args, env):
         text=True, encoding="utf-8", errors="replace", timeout=600, env=env)
 
 
-def test_decl_gate_end_to_end(tmp_path, monkeypatch):
-    metadata, binary = fixture_paths_or_skip("declaration gate needs a game fixture")
-    tree = out_tree_or_skip(reason="declaration gate needs a built tree")
+def test_decl_gate_end_to_end(tmp_path, monkeypatch, game_paths, game_tree):
+    metadata, binary = game_paths
     assert os.environ.get("PYTHONHASHSEED") == "0"
     env = dict(os.environ, PYTHONPATH=str(ROOT) + os.pathsep + str(ROOT / "tools"))
     dump = tmp_path / "dump.txt"
@@ -38,7 +35,7 @@ def test_decl_gate_end_to_end(tmp_path, monkeypatch):
     assert r.returncode == 0, r.stderr[-2000:]
     ext = tmp_path / "ext.txt"
     r = _run([str(ROOT / "tools" / "extract_decls.py"),
-              "--tree", str(tree / ONLY),
+              "--tree", str(game_tree / ONLY),
               "--assembly", ASM, "--out", str(ext)], env)
     assert r.returncode == 0, r.stderr[-2000:]
     r = _run([str(ROOT / "tools" / "diff_decls.py"),

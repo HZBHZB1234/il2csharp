@@ -10,9 +10,8 @@ consumed it, so 7A0 read the sibling return block's `shr eax,1Fh`
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_setg_after_jne_reads_the_compare_result(game_decompiler):

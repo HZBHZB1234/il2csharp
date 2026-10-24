@@ -1,9 +1,8 @@
 """A closed Type argument disambiguates the folded inequality operators."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_type_operator_is_named_but_timespan_layout_declines(game_decompiler):

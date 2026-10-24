@@ -7,9 +7,8 @@ stale residues after (array, index). Naming routes through
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_character_info_sites_render_named(game_decompiler):

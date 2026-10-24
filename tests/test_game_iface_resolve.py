@@ -8,9 +8,8 @@ with arity 3, dropping the duplicate.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_security_parser_renders_the_named_resolve_helper(game_decompiler):

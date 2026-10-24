@@ -154,19 +154,22 @@ def unavailable():
 def resolve(fid=None):
     """Resolve one fixture by id, else by env/default, else the only one.
 
-    Explicit ``IL2CSHARP_METADATA``+``IL2CSHARP_BINARY`` bypass the registry
-    entirely and yield an ad-hoc fixture (id 'env'), which keeps every legacy
-    command working on machines that never created a registry.
+    An explicit ``fid`` always wins: selecting ``limbus`` must not be silently
+    replaced by ambient ``IL2CSHARP_METADATA``/``IL2CSHARP_BINARY``. With no
+    explicit id, the legacy environment pair bypasses the registry entirely
+    and yields an ad-hoc fixture (id 'env'), so every pre-registry command
+    keeps working on machines that never created a registry.
     """
-    env_meta = os.environ.get(ENV_METADATA)
-    env_bin = os.environ.get(ENV_BINARY)
-    if env_meta and env_bin:
-        entry = {'game_dir': os.path.dirname(os.path.dirname(os.path.dirname(
-            os.path.abspath(env_meta)))),
-            'metadata': os.path.abspath(env_meta),
-            'binary': os.path.abspath(env_bin),
-            'notes': 'ad-hoc fixture from %s/%s' % (ENV_METADATA, ENV_BINARY)}
-        return Fixture('env', entry)
+    if fid is None:
+        env_meta = os.environ.get(ENV_METADATA)
+        env_bin = os.environ.get(ENV_BINARY)
+        if env_meta and env_bin:
+            entry = {'game_dir': os.path.dirname(os.path.dirname(os.path.dirname(
+                os.path.abspath(env_meta)))),
+                'metadata': os.path.abspath(env_meta),
+                'binary': os.path.abspath(env_bin),
+                'notes': 'ad-hoc fixture from %s/%s' % (ENV_METADATA, ENV_BINARY)}
+            return Fixture('env', entry)
 
     registry = load_registry().get('fixtures') or {}
     if fid is None:

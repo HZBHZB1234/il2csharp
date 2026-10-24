@@ -2,10 +2,9 @@
 import pytest
 
 from il2cpp import Expr
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_shared_string_equality_accepts_only_exact_aliases_and_typed_args(

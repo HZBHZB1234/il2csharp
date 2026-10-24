@@ -72,9 +72,12 @@ $env:PYTHONPATH = '<repo>;tools'
 Goldens key on MethodDef row (`mi`), never VA (shared bodies alias).
 
 **Portable tests:** `python -m pytest -q -m "not game" --disable-warnings`
-(no game needed). **Full suite:** `python -m pytest -q` — game-marked tests
-skip cleanly when no fixture is present, so a fresh clone is pass+skip, never
-fail.
+(no game needed). **Limbus tests:** `python -m pytest -q --game limbus`
+(optional `--strict-games` to fail on a missing or mismatched archived
+fixture). **Full suite:** `python -m pytest -q` — game-marked tests skip
+cleanly when their fixture is absent, so a fresh clone is pass+skip, never
+fail. The older sample-game tests are marked `shiftatmidnight`; the archived
+Limbus fixture is `limbus` (see `docs/fixtures.md`).
 
 **Rebuild a tree:** `python il2csharp.py --fixture <id> --label <name>
 [--only Assembly-CSharp] [--workers N]`. `--workers 0` = half the cores

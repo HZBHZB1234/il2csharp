@@ -2,10 +2,9 @@
 
 import pytest
 
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 @pytest.mark.parametrize('mi,name,label', [

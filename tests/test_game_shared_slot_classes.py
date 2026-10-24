@@ -9,9 +9,8 @@ the ground truth from that proof.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def body(game_decompiler, mi):

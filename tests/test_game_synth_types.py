@@ -8,9 +8,8 @@ working. Anything unbound still declines -- never a half-open guess.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 SELECTABLE = 'UnityEngine.UI.Selectable'

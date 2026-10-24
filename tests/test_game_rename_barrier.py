@@ -7,9 +7,8 @@ dropped argument (`(obj2, obj2)`). The rename barrier reserves both.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_forwarded_args_survive_rename(game_decompiler):

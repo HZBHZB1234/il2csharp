@@ -7,9 +7,8 @@ tile and a different slot name than pass 2 (s_50 vs s_b0).
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def _owner(cls, name):

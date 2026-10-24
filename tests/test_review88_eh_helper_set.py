@@ -157,7 +157,6 @@ def test_acceptance_rule_stays_decisive():
 # --- native fixtures: the real binary -----------------------------------
 
 import il2cpp as I  # noqa: E402
-from test_game_goldens import game_decompiler  # noqa: E402,F401
 
 RETHROW_HELPER = 0x180435740          # 3403 rethrow witnesses vs 126 raise
 RAISE_HELPER = 0x180435670            # 183 raise witnesses vs 25 rethrow
@@ -177,7 +176,7 @@ def _body(dec, il, mi):
     return dec.lift_method(m, il.meta.typedefs[m.declaring])
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_proven_set_is_the_decisively_witnessed_pair(game_decompiler):
     il, _ = game_decompiler
     dec = _fresh(il)
@@ -188,7 +187,7 @@ def test_proven_set_is_the_decisively_witnessed_pair(game_decompiler):
     }
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_runtime_plumbing_is_rejected_on_the_real_binary(game_decompiler):
     _, dec = game_decompiler
     for va in (METADATA_INIT_THUNK, RAISE_IOOR, RAISE_NRE,
@@ -198,14 +197,14 @@ def test_runtime_plumbing_is_rejected_on_the_real_binary(game_decompiler):
         assert dec._eh_helper_ok(va) is True, hex(va)
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_returning_target_is_detected_from_its_own_bytes(game_decompiler):
     _, dec = game_decompiler
     assert dec._eh_helper_returns(RETURNING_HIGH_WITNESS) is True
     assert dec._eh_helper_returns(RETHROW_HELPER) is False
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_named_raisers_keep_their_evidence_derived_names(game_decompiler):
     _, dec = game_decompiler
     names = dec.L.rt_names
@@ -213,7 +212,7 @@ def test_named_raisers_keep_their_evidence_derived_names(game_decompiler):
     assert (names.get(RAISE_NRE) or "").startswith("raise_")
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_metadata_init_is_not_flattened_to_a_throw(game_decompiler):
     # This method has no EH pads, so only the program-wide set can render a
     # throw in it at all. The first draft printed three bare `throw;` here,

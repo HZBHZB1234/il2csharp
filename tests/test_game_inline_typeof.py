@@ -1,10 +1,9 @@
 """B1 inline-typeof dispatch pinned on EndlessGenerationManager 25132."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_scan_loop_typeof_dispatch(game_decompiler):

@@ -1,9 +1,8 @@
 """Interface-zero game pins (mi 5694 AppendFormatHelper)."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_custom_formatter_zero_is_null(game_decompiler):

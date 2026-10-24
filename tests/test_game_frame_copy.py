@@ -8,9 +8,8 @@ proof can ever split -- the markers must stay.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def lift_text(game_decompiler, mi, name, va):

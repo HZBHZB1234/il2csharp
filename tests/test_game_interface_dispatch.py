@@ -8,9 +8,8 @@ all three now resolve with every decline preserved.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_check_all_ready_names_all_dispatches(game_decompiler):

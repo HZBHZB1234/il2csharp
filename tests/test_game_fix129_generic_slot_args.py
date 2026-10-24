@@ -9,9 +9,8 @@ scratch (`Compare(comparer11.getClass().vtable[6], obj4)`).
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_comparer_float_compare_reads_xmm_args(game_decompiler):

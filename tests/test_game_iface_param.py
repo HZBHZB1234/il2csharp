@@ -10,9 +10,8 @@ the writes-first impostor keeps the honest marker.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_can_update_async_resolves(game_decompiler):

@@ -2,10 +2,9 @@
 import pytest
 from il2cpp import Emitter
 from il2cpp.csharp import source_field_name
-from test_game_goldens import game_decompiler
 from test_game_review78 import body
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_native_getter_reads_backing_storage_not_itself(game_decompiler):

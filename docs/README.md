@@ -33,6 +33,11 @@ sources are untouched by the move. All repo paths below are root-relative.
   session mechanics.
 - `docs/handoff-2026-10-20-v39.md` — v39 / Unity 6000.3.12f1 metadata
   adaptation stop record (Limbus Company target).
+- [`handoff-2026-10-24.md`](handoff-2026-10-24.md) — **latest stop record**:
+  archived v39 fixture, per-game test markers, current Limbus tests, known
+  mscorlib compile-gate xfail, and the uncommitted working tree.
+- [`limbus-v39-test-migration.md`](limbus-v39-test-migration.md) — concise
+  fixture/test migration record for the archived v39 build.
 - `docs/research-2026-10-21-urengine.md` — UREngine benchmark: two things
   worth adopting — (P0) diagnosability of failures, i.e. why a call could
   not be resolved and where it was reached from, and (P1) async /

@@ -16,9 +16,8 @@ missing sharer left behind, so mi 24077 keeps its four-argument spelling.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def lift_text(game_decompiler, mi, name, va):

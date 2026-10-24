@@ -11,15 +11,13 @@ from pathlib import Path
 
 import pytest
 
-from conftest import fixture_paths_or_skip
-
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("limbus")
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_only_no_match_is_an_error(tmp_path):
-    metadata, binary = fixture_paths_or_skip("--only test needs a game fixture")
+def test_only_no_match_is_an_error(tmp_path, game_paths):
+    metadata, binary = game_paths
     out = tmp_path / 'nomatch_out1'
     result = subprocess.run(
         [sys.executable, str(ROOT / 'il2csharp.py'),

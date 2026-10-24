@@ -12,9 +12,8 @@ Ground truth (disasm):
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def _lift(il, dec, mi, name):

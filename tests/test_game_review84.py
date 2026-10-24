@@ -1,10 +1,9 @@
 """Native-backed Review 84 constructor-chain and allocation-identity proofs."""
 import pytest
 
-from test_game_goldens import game_decompiler
 from test_game_review78 import body
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_object_parent_encoding_completes_the_base_chain(game_decompiler):

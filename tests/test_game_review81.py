@@ -1,9 +1,8 @@
 """Native-backed assertions for proved packed-sqrt/helper ABI recovery."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def body(game_decompiler, mi):

@@ -9,9 +9,8 @@ stale `_rbp_frame` into every method that follows -- which would render
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 FRAME_MI = 24062          # WrapRopePlayerController.Update: push rbp; mov rbp,rsp
 

@@ -9,9 +9,8 @@ temps); see the fix notes in il2cpp/lifter/{state,insn,values}.py.
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 MI = 25626
 

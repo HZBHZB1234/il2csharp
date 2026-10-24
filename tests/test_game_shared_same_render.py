@@ -1,9 +1,8 @@
 """Same-render shared bodies resolve without selecting an owner."""
 import pytest
 
-from test_game_goldens import game_decompiler
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_computestringhash_marker_resolves(game_decompiler):

@@ -7,9 +7,8 @@ proven target throws NotImplementedException on x64, so the tail
 """
 import pytest
 
-from test_game_goldens import game_decompiler  # noqa: F401 (fixture)
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def _lift_text(game_decompiler, mi, name, va):

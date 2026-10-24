@@ -6,10 +6,9 @@ Ground truth: AudioVolumeSliders 23548/23549 call the CRT log10f at
 """
 import pytest
 
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 @pytest.mark.parametrize('mi,name,label', [

@@ -3,10 +3,9 @@ import re
 
 import pytest
 
-from test_game_goldens import game_decompiler
 from test_game_review78 import body
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_shoot_uses_one_array_per_native_logging_allocation(game_decompiler):

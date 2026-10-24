@@ -7,10 +7,9 @@ import re
 
 import pytest
 
-from test_game_goldens import game_decompiler
 
 
-pytestmark = pytest.mark.game
+pytestmark = pytest.mark.game("shiftatmidnight")
 
 
 def test_lagcomp_twins_drop_first_store(game_decompiler):

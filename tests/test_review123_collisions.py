@@ -8,11 +8,10 @@ proven per file against the metadata short-name table.
 """
 from il2cpp.csharp import collision_heads, strip_namespaces
 
-from test_game_goldens import game_decompiler  # noqa: F401 (fixture)
 import pytest
 
 
-@pytest.mark.game
+@pytest.mark.game("shiftatmidnight")
 def test_fulldepth_generic_args_resolve(game_decompiler):
     il, dec = game_decompiler
     from il2cpp import Emitter
