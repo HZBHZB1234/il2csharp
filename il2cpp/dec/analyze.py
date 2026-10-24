@@ -662,6 +662,10 @@ class _AnalyzeMixin:
         # (Computer.ShouldRankBefore 0x18069C7A0: `return num1 >> 31 > 0`
         # for `return Compare(a, b) > 0`).
         end_flags = {}
+        # fix 141b: blocks whose pass-2 merge and body already ran. A phi
+        # is marked `_unk` only when every predecessor is in here; a loop
+        # header's latch still holds its dry end_state at merge time.
+        emitted = set()
 
         def _flags_key(fl):
             if not fl:
@@ -737,6 +741,15 @@ class _AnalyzeMixin:
                             self._var_types.setdefault(phi[key], pty)
                         L._aggregate_phi_sources[phi[key]] = vals
                         merged[k] = Expr(phi[key], pty, pkind)
+                        # fix 141: a phi whose every incoming value is
+                        # unknown (missing or explicitly `_unk`) is itself
+                        # unknown, exactly like the entry seed / post-call
+                        # clobber. The call argument builder drops unknown
+                        # slots, so a stale `vN`/`objN` no longer sprays
+                        # into every call that follows a guard join.
+                        if self._phi_all_unknown(vals) \
+                                and all(p in emitted for p in b.preds):
+                            merged[k]._unk = True
                         pts = [_merge_arr_proof(x) for x in vals]
                         if pts and all(t is not None for t in pts) \
                                 and len(set(pts)) == 1 \
@@ -810,6 +823,7 @@ class _AnalyzeMixin:
             narrow_null_edge(b, preds_done)
             exec_block(b, dry=False)
             b.end_state = dict(L.regs)
+            emitted.add(bid)
             _fl, _fmn = L.flags, getattr(L, '_flags_mn', None)
             if _fl is None and getattr(L, '_jcc_flags', None) is not None:
                 _fl, _fmn = L._jcc_flags
@@ -914,6 +928,18 @@ class _AnalyzeMixin:
                     continue
                 cps = self.phi_copies.setdefault((p, bid), [])
                 cps[:0] = ['%s = %s;' % (t, x) for t, x in pre]
+
+    @staticmethod
+    def _phi_all_unknown(vals):
+        """True when every incoming phi value is missing or `_unk`.
+
+        fix 141: such a phi is itself unknown (the merge marks it `_unk`),
+        so the call argument builder drops it as a stale slot. Mirrors the
+        per-edge test `_unknown_phis` applies, without needing the fixed
+        point: a merge-time unknown that is later fed by a real value is
+        simply no longer all-unknown.
+        """
+        return all(v is None or getattr(v, '_unk', False) for v in vals)
 
     @staticmethod
     def _unknown_phis(blocks, phi, FLAGS):

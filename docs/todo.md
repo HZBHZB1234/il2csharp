@@ -7,6 +7,63 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 141 hand-synced from upstream — all-unknown join phis are `_unk` (2026-10-24, on `main`)
+
+Upstream `mynamescrax/il2csharp` `c3195dc` (fix 141, 2026-10-23) applied to
+`main` by hand: local diverged after `5291b7c` (fix 140 docs), so the commit
+is not mergeable as-is (AGENTS.md / docs conflicts, and the upstream game
+test still targets the removed pre-fixture-framework world). Landed:
+`il2cpp/dec/analyze.py` +26 (at the pass-2 phi merge, a phi whose every
+incoming value is missing or `_unk` is itself `_unk` — guarded by "every
+predecessor emitted this pass" so a loop latch's stale dry end_state cannot
+falsely unknown a carried value; `_phi_all_unknown` shared with the fix-126
+fixed point), the upstream portable test `tests/test_fix141_unk_phi_spray.py`
+(3 tests), and `tests/test_game_fix141_unk_phi_spray.py` rewritten on the
+local `game("limbus")` framework (upstream's file imported the old
+`game_decompiler` + old-fixture mi rows 28594/26440, dead here). Doc
+conflicts resolve toward this structure; upstream's gate numbers were
+measured on the removed old fixture and do not transfer (b19 454,955 ->
+b20 439,578, CS0103 -15,619 — upstream's evidence only).
+
+Mechanism: a cached-function-pointer guard join whose resolve arm clobbers
+the volatile registers mints phis the call argument builder printed as
+undeclared trailing `objN` arguments (CS0103 at Roslyn). The merge now marks
+the all-unknown phi `_unk` and the builder drops it; phis carrying any real
+value stay honest.
+
+Local evidence (limbus v39 archive, `--mi` re-lifts pre vs post):
+
+- `FMOD.Channel.setFrequency` 0x18359AED0 (mi 287840): 8 args -> 5,
+  undeclared obj20..obj22 dropped (carried obj17..obj19 stay — they are not
+  all-unknown). Steam interface-pointer shared body 0x183473B70 (mi 253839,
+  `SteamAPI_SteamMusicRemote_v001` sharer): `(this, obj12..obj18)` ->
+  `(this)`; the real call takes no arguments.
+- Census (temp-dir probe: indirect-call lines whose trailing temps are
+  declared nowhere in the emitted file): standing `out/limbus/v39` tree =
+  2,213 lines across 521 files (pre-patch population). Paired image rebuild
+  `--only Facepunch.Steamworks.Win64` (`fix141-pre` = HEAD vs `fix141-post`
+  = worktree, `--workers 8`, 546 types / 4,942 bodies, 0 failed /
+  0 fallbacks both sides): 607 sprayed lines in 73 files -> 1 line in 1 file
+  (`Ugc/Editor.cs` L845, an async state-machine body whose tail is not an
+  all-unknown join phi — the 141b predecessor guard correctly declines it);
+  321/546 type files changed, 10,670 lines, all dropped `_unk` args on
+  indirect and `sub_` helper calls plus downstream temp renumbering. Brace
+  gate 0 unbalanced (`validation_reports/limbus/fix141-post.brace.json`);
+  the tree-sitter parse gate segfaults on this box for whole-image parses —
+  reproduced identically on `fix141-pre`, environmental, not the fix.
+- Suites: portable 1,380 passed (incl. the 3 new). `--game limbus` 1,400
+  passed / 2 failed / 1 xfailed — the 2 failures
+  (`test_game_compile_gate.py::test_small_image_zero_syntax_errors`,
+  `test_game_decl_gate.py::test_decl_gate_end_to_end`) need the
+  `Unity.Burst.Unsafe` image, which the standing partial `out/limbus/v39`
+  tree lacks; both reproduce byte-identically with the fix stashed (HEAD)
+  and pass against the complete `v39-gates` tree — pre-existing, zero new
+  failures, zero pin moves (every exact-text body pin green).
+
+Next: the remaining v39 spray sites are carried-value shapes fix 141
+declines; upstream continues the same Roslyn-gate program, so re-check
+upstream after future local landings.
+
 ## Current work: perf — per-type parallel emission + hotspot rewrite (2026-10-21, on `main`)
 
 Context: `docs/il2csharp-jit-feasibility.md` (in `../docs/`) proved a Python JIT

@@ -136,8 +136,16 @@ unproven shape keeps today's spelling; raw is always honest.
 > `tools/gate.py` (see `docs/fixtures.md`), the probes are archived in
 > `docs/probes/`, and the shipped gate scripts are `tools/`.
 
-## In flight (2026-10-12)
+## In flight (2026-10-24)
 
+- Fix 141 (2026-10-24, hand-synced from upstream `c3195dc` past the
+  fixture-framework divergence): pass-2 phi merge marks an all-unknown join
+  phi `_unk` (every incoming value missing or `_unk`; only when every
+  predecessor was emitted this pass), so guard-join `objN` spray stops
+  entering call args. Facepunch paired rebuild: 607 sprayed call lines -> 1;
+  suites green — 2 pre-existing env failures (need the Unity.Burst.Unsafe
+  image absent from the standing partial tree), zero pin moves. See
+  `docs/todo.md` top.
 - Fix 140 (2026-10-12, unresolved vtable-slot receivers): VIRT_CALL slot
   resolution falls back to the klass-load object (`vt_recv`), arg1 behind
   an sret buffer, or a type proven by an inlined castclass/isinst
