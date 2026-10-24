@@ -20,8 +20,9 @@ start there, then `docs/todo.md` (Current work section).
 
 ## Code map
 
-- `il2csharp.py` — thin CLI launcher (CRLF **with** BOM).
-- `il2cpp/` — the package (all CRLF, no BOM). Public names re-exported
+- `il2csharp.py` — thin CLI launcher (frozen CRLF **with** BOM; the only
+  CRLF file).
+- `il2cpp/` — the package (all LF, no BOM). Public names re-exported
   from `il2cpp/__init__.py`:
   - `metadata.py`, `binary.py` — `global-metadata.dat`, PE/ELF frontends.
   - `runtime/` — `Il2Cpp`: registrations, usage slots, EH4 (`core.py`
@@ -98,10 +99,11 @@ unproven shape keeps today's spelling; raw is always honest.
 
 ## Iron contracts (violations cause phantom diffs / flaky output)
 
-- `il2cpp/*.py` are CRLF no-BOM: edit via binary read/write scripts,
-  assert `d.count(b'\r\n') == d.count(b'\n')` after every touch.
-  Read-text/write-text, `sed -i`, and heredocs silently rewrite to LF.
-  `tests/*.py` and `*.md` are LF.
+- `il2cpp/*.py` are LF no-BOM (`*.py text eol=lf` pins the checkout; the
+  launcher alone stays CRLF+BOM under `-text`). After any touch assert
+  `data.count(b'\r') == 0` — a Windows text-mode write (Python
+  `open(..., 'w')`, PowerShell redirection) still emits CRLF and flips a
+  whole file. `tests/*.py`, `tools/*.py` and `*.md` are LF too.
 - Never open the target for writing until assertions pass (build in
   memory, assert, write once); never re-derive backups from live files.
 - `PYTHONHASHSEED=0` always — set iteration order leaks into temp names
@@ -109,7 +111,7 @@ unproven shape keeps today's spelling; raw is always honest.
 - Console note, about a specific shell rather than the project: in
   Windows PowerShell 5.1 there is no `head`/`tail`/`grep`/`rm`/`||`/`&&`,
   `>` redirect writes UTF-16, and paths with spaces need quoting. Git
-  Bash has none of those restrictions; the CRLF rule above binds in
+  Bash has none of those restrictions; the byte rule above binds in
   every shell.
 - GitHub is the history authority for the post-scrub history. The
   2026-09-28 scrub removed the licensed fixture and every full-body /

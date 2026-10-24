@@ -40,12 +40,17 @@ left, bucketed from `work/ts_gate_b19_out2.txt`:
 
 ## 4. Working loop (keep mirrored)
 
-- **Every `il2cpp/` module and the `il2csharp.py` launcher are CRLF.** A
-  read-text/write-text Python edit rewrites the whole file to LF (a
-  phantom diff over the module). Package modules carry no BOM; only the
-  launcher keeps its UTF-8 BOM. Patch them with binary read/write — `work/patches/patch_*.py`
-  are the pattern — and verify `d.count(b'\r\n')` vs `d.count(b'\n')`
-  afterwards. The `.md` files are LF; don't cross the two.
+- **Line endings are pinned, not guessed.** All `*.py` — package, tools,
+  tests, probes — check out LF everywhere (`*.py text eol=lf` in
+  `.gitattributes`); the `il2csharp.py` launcher alone is frozen CRLF+BOM
+  via `-text`. Historically the sources were CRLF in the working tree and
+  a wholesale rewrite to LF (`sed -i`, batch 50; the AI write tools) was
+  the phantom-diff hazard; since the 2026-10-24 LF pin their output is
+  correct and the hazard runs the other way — a Windows text-mode write
+  (Python `open(..., 'w')` without `newline=''`, PowerShell redirection)
+  emits CRLF and flips the whole file. After ANY touch check
+  `data.count(b'\r') == 0`; `tests/test_source_format.py` fails loudly
+  otherwise. The `.md` files are LF too; don't cross the launcher.
 - `_final_text` transforms are line-local, and ORDER MATTERS:
   `_rewrite_unknowns` (?-classifier), then `_strip_dangling_default`,
   then `_fix_select` — fix_select re-synthesizes `: default` only when

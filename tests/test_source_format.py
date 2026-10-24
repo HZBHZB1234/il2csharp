@@ -14,7 +14,7 @@ def test_launcher_keeps_its_bom_and_crlf_contract():
     assert launcher.count(b"\r\n") == launcher.count(b"\n")
 
 
-def test_package_sources_are_crlf_without_bom():
+def test_package_sources_are_lf_without_bom():
     sources = sorted(PKG.rglob("*.py"))
     assert len(sources) > 30
 
@@ -22,7 +22,7 @@ def test_package_sources_are_crlf_without_bom():
     for path in sources:
         data = path.read_bytes()
         assert not data.startswith(BOM), path
-        assert data.count(b"\r\n") == data.count(b"\n"), path
+        assert data.count(b"\r") == 0, path
         total += data.count(b"\n")
 
     # the two monoliths were ~18k lines between them; the package keeps them

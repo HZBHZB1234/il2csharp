@@ -79,6 +79,8 @@ absolute host paths in tracked files ... 0
 
 Line-ending contract holds: `il2cpp/*.py` and `tools/*.py` are CRLF no-BOM,
 `tests/*.py` and `*.md` are LF, JSON CRLF (all re-checked).
+(Superseded 2026-10-24: all `*.py` — package, tools, tests — are pinned to
+LF checkout via `.gitattributes`; only the launcher stays CRLF+BOM.)
 
 ## 4. Things a next session must know
 

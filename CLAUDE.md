@@ -402,8 +402,9 @@ fix-123 in `validation_reports/review123_*`.
   all-float vector slots (house `(float2)(l0,l1)`; 80548's part-less
   integer carries decline by construction).
 
-All package sources under `il2cpp/` are CRLF with no BOM; the root
-`il2csharp.py` launcher is CRLF and retains its UTF-8 BOM. A regression test
+All package sources under `il2cpp/` are LF with no BOM (`*.py text eol=lf`
+in `.gitattributes`); the root `il2csharp.py` launcher alone is frozen
+CRLF and retains its UTF-8 BOM (`-text`). A regression test
 (`tests/test_source_format.py`) enforces this contract. **1253 tests pass** (1027 portable + 226 game;
 64 golden snapshots, all green).
 `tests/goldens_review84.json` is **hash-only**: each of the 64 snapshots
@@ -503,14 +504,17 @@ before running anything — it's instant and catches typos before a
 multi-minute rebuild does. `python -c "import il2cpp"` additionally catches
 import cycles, which the package layout can reintroduce.
 
-**All source files under `il2cpp/` are CRLF with no BOM; the root `il2csharp.py` launcher is CRLF+BOM.**
-A read-text/write-text edit in Python silently rewrites the whole file to LF — a ~6,000-line phantom diff that
-buries the real change. **`sed -i` does exactly the same thing** (batch
-50), as will any tool that rewrites the file wholesale. Edit them with
-binary read/write (`work/patches/patch_*.py` are the pattern) and check
-`d.count(b'\r\n')` against `d.count(b'\n')` afterwards — after *any*
-touch, including a one-word comment change. The `.md` files here are LF;
-don't cross the two.
+**All source files under `il2cpp/` are LF with no BOM; the root `il2csharp.py` launcher is frozen CRLF+BOM.**
+`*.py text eol=lf` in `.gitattributes` pins the checkout, so the usual
+suspects (`sed -i`, heredocs, AI-session write tools, a Python text-mode
+round-trip) now emit the right form. The hazard runs the other way: a
+Windows text-mode write (`open(p, 'w')` without `newline=''`, PowerShell
+redirection) emits CRLF and flips a whole file — the same phantom-diff
+churn that `sed -i` caused back when the sources were CRLF (batch 50).
+After *any* touch, including a one-word comment change, check
+`data.count(b'\r') == 0`; `tests/test_source_format.py` fails loudly
+otherwise. The `.md`, `tests/*.py` and `tools/*.py` files are LF too;
+the launcher is the only CRLF file in the repo.
 **Rewrite scripts must never open the target for writing until every
 assertion has passed on the fully-built content** — `open(p, 'wb')
 .write(f())` evaluates `open` first, so a raising `f()` leaves a
