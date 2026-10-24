@@ -35,7 +35,7 @@ sources are untouched by the move. All repo paths below are root-relative.
   adaptation stop record (Limbus Company target).
 - [`handoff-2026-10-24.md`](handoff-2026-10-24.md) — **latest stop record**:
   archived v39 fixture, per-game test markers, current Limbus tests, known
-  mscorlib compile-gate xfail, and the uncommitted working tree.
+  mscorlib compile-gate xfail; landed in `d1ea2d2`.
 - [`limbus-v39-test-migration.md`](limbus-v39-test-migration.md) — concise
   fixture/test migration record for the archived v39 build.
 - `docs/research-2026-10-21-urengine.md` — UREngine benchmark: two things
