@@ -17,7 +17,9 @@ structural changes, 0 crashes), `review124_purity.json` (9,339/9,339 pure
 fix-124), `review124_parse.json` (whole 91-image tree, 0/0/0/0),
 `review124_golden_repin.json` (5 of 64 snapshots re-pinned) and
 `review124_environment.json` (the sandbox's multiprocessing-pipe denial,
-which fails 2 parallel-build tests and blocks `--workers` builds).
+which failed 2 parallel-build tests and blocked `--workers` builds at
+the time — superseded 2026-10-24: the denial no longer reproduces, see
+`docs/handoff-2026-10-24.md`).
 
 **Current live tree: r11 (2026-10-01, rebuilt from `main` `1cafd3f`).**
 Start with `promotion_r11.json` (11,276 files, aggregate `735f2e9a…1707f`, 0

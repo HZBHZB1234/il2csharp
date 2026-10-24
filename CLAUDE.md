@@ -31,10 +31,14 @@ naming, boxed-bool null fold, SIMD consumer-side recovery (tails and
 direct calls), each decline-by-default with portable + game pins; plus
 documented disproofs (hinted receivers, ?addr tightening,
 receiver-driven generics). 1465 tests (1223 portable + 242 game): 1463
-pass, and the two failures are this sandbox's named-pipe denial for
+pass, and the two failures were this sandbox's named-pipe denial for
 `tests/test_game_parallel_build.py` (`ProcessPoolExecutor` cannot create
 its pipe; proven by a three-line repro, see
-`validation_reports/review124_environment.json`), not fix 124. Rebuilt
+`validation_reports/review124_environment.json`), not fix 124 —
+superseded 2026-10-24: that denial no longer reproduces here,
+`ProcessPoolExecutor` and `--workers` builds run green, and the live
+suite state is the fixture migration in `docs/handoff-2026-10-24.md`
+(1397 passed / 259 skipped / 1 xfailed). Rebuilt
 and gated twice after fix 123 — r4a then r4c,
 both 114,458 bodies / 0 failed / 0 fallbacks, brace 0, parse 0/0/0 —
 and promoted 2026-09-23: `final_out/` holds r4c (11,183 `.cs` files /
@@ -413,7 +417,9 @@ full-body file with `tools/make_goldens.py --full` (never commit it).
 Use `tools/csharp_smoke.py` for the .NET 8 compiled-pattern checks, including the
 actual loop emitter. They passed for Review 80 but were not rerun for Reviews
 81–97 (or the package split, which a machine-local `rebuild_verify.py` proved byte-identical)
-because this environment has no .NET SDK; they are never a build of the
+because that environment had no .NET SDK — stale since then: a `dotnet`
+SDK is installed here now and the Roslyn compile gate runs for real
+(`docs/handoff-2026-10-24.md`). Neither is ever a build of the
 complete recovered game. Game fixtures live in the local, git-ignored
 `fixtures/<id>/game/` only (licensed game data; never track or distribute
 them — the 2026-09-28 scrub removed the old `testgame/` copy from history;

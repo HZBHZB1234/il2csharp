@@ -53,7 +53,7 @@ start there, then `docs/todo.md` (Current work section).
   `validation_reports/<id>/`. Historical r4c–r11 records are kept as-is
   (their paths were rebased to `<repo-root>`).
 
-## Session setup (PowerShell)
+## Session setup (PowerShell or Git Bash)
 
 ```powershell
 $env:PYTHONHASHSEED = '0'
@@ -64,6 +64,10 @@ python tools/fixtures.py doctor --id limbus
 #   $env:IL2CSHARP_BINARY   = '...GameAssembly.dll'
 $env:PYTHONPATH = '<repo>;tools'
 ```
+
+Git Bash equivalent: `export PYTHONHASHSEED=0` and
+`export PYTHONPATH='<repo>;tools'` — the path separator stays `;` on
+Windows.
 
 ## Common tasks
 
@@ -100,9 +104,13 @@ unproven shape keeps today's spelling; raw is always honest.
   `tests/*.py` and `*.md` are LF.
 - Never open the target for writing until assertions pass (build in
   memory, assert, write once); never re-derive backups from live files.
-- PowerShell 5.1: no `head`/`tail`/`grep`/`rm`/`||`/`&&`; no `>` redirect
-  (writes UTF-16); quote paths with spaces. `PYTHONHASHSEED=0` always —
-  set iteration order leaks into temp names otherwise.
+- `PYTHONHASHSEED=0` always — set iteration order leaks into temp names
+  otherwise (project contract, shell-independent).
+- Console note, about a specific shell rather than the project: in
+  Windows PowerShell 5.1 there is no `head`/`tail`/`grep`/`rm`/`||`/`&&`,
+  `>` redirect writes UTF-16, and paths with spaces need quoting. Git
+  Bash has none of those restrictions; the CRLF rule above binds in
+  every shell.
 - GitHub is the history authority for the post-scrub history. The
   2026-09-28 scrub removed the licensed fixture and every full-body /
   disassembly artifact from all of it and pruned LFS, so every pre-scrub
@@ -116,11 +124,15 @@ unproven shape keeps today's spelling; raw is always honest.
   break to your change.
 
 > **Historical sections below.** From `## In flight` down, the text is a
-> stop-record timeline. It references `work/`, `final_out/`, `testgame/`,
-> `bckups/` and `b*_out1/` trees that existed only on the authoring
-> machine and are absent from this fork. Those names are history, not
-> instructions; the live replacement is `fixtures/` + `out/<id>/<label>/`
-> driven by `tools/fixtures.py` and `tools/gate.py` (see `docs/fixtures.md`).
+> stop-record timeline. It references `work/` scripts (`launch.ps1`,
+> `work/cgate/patchlib.py`, `work/lib/*`), `%TEMP%\opencode` probe
+> scripts, a machine-local `rebuild_verify.py`, e-MCP session mechanics,
+> `final_out/`, `testgame/`, `bckups/` and `b*_out1/` trees that existed
+> only on the authoring machines and are absent from this fork. Those
+> names are history, not instructions; the live replacement is
+> `fixtures/` + `out/<id>/<label>/` driven by `tools/fixtures.py` and
+> `tools/gate.py` (see `docs/fixtures.md`), the probes are archived in
+> `docs/probes/`, and the shipped gate scripts are `tools/`.
 
 ## In flight (2026-10-12)
 
@@ -174,10 +186,11 @@ unproven shape keeps today's spelling; raw is always honest.
   on branch `fix124-wide-store-byte-offsets`, not merged or promoted:
   paired Assembly-CSharp + whole 91-image tree gates clean, 9,339 changed
   bodies proven pure fix-124, 5 goldens re-pinned, suite 1,463/1,465.
-  The 2 failures are this sandbox's named-pipe denial in
+  The 2 failures were this sandbox's named-pipe denial in
   `tests/test_game_parallel_build.py` (a bare `ProcessPoolExecutor(2)`
-  reproduces it), so `--workers` builds are unavailable here — split
-  multi-image work into per-image processes instead. Evidence:
+  reproduces it) — superseded 2026-10-24: the denial no longer
+  reproduces here, `--workers` builds and that test run green
+  (`docs/handoff-2026-10-24.md`). Evidence:
   `validation_reports/review124_*`.
 - Compiler-error backlog (process P1-P4, families C1-C10): the gates
   prove parseability, not compilability. Roslyn error count is the

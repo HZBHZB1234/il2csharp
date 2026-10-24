@@ -2447,8 +2447,9 @@ deletions**:
 - `WFX_BulletHoleDecal` static ctor: boundary stores index by stride 8;
   mid-element dwords stay `((int*)arr + 0xNN)[0]` (honest).
 
-Gates (Assembly-CSharp only, per this session's CPU rule): strict
-scoped build at `--workers 1`: 490 types / 6,622 bodies / **0 failed /
+Gates (Assembly-CSharp only — the scope was cut for that session's
+machine load, not a standing gate policy): strict scoped build at
+`--workers 1`: 490 types / 6,622 bodies / **0 failed /
 0 fallbacks**; brace **0/490**; parse **0 bad / 0 ERROR / 0 MISSING**;
 portable suite **949 passed**. The tree-wide effect is not rebuilt in
 this batch; a promotion-time full build will size it.
