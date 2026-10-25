@@ -216,8 +216,26 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
   `System.Type.GetType(name)`，局部盖真实 System.Type 类型）；
   (b) 2,636 行 `[mi+0x20]→+0xc0` 类初始化/委托内联走读 → 归
   C5 族；(c) 其余为已解析的 this/base..ctor 调用（良性）。
-- **Step 3（下一片）**：无 spray 身份的共享站点（receiver/type
-  臂加强）+ C5 的内联类初始化走读解码器（2,636 行）。
+- **Step 3（下一片，探针已备 2026-10-25）**：无 spray 身份的共享站点
+  分层抽样表明其主体是**共享 generic BCL 方法体**，三族：
+  (a) 委托构造 `(delegate, this, X.Y_handler, 0)`（3 参站点数千，
+  R8 是 kind-3 MethodRef 的**绑定方法**——不是 callee 身份；现有
+  delegate 臂要求 recv.ty→delegate-invoke，这些站点的 receiver
+  无类型 → 需要绑定方法属主臂）；
+  (b) List/Dictionary 实例方法（1-2 参站点 ~18k：`sub_x(list11)`、
+  `sub_x(dictionary21, key)`）——候选全 `('generic', spec)`，
+  receiver 链臂只匹配 `'method'` 行 → 需把 spec 的 class
+  instantiation 参数与 receiver 的闭型参数匹配；
+  (c) `Array.Sort` 族 4 参（2,700 站点 @35+ 候选）。
+  **关键探针事实（sub_1842e7380, 40 候选）**：35×
+  `List`1.ICollection<T>.get_IsReadOnly`（不同 class-inst）+
+  3×`IEnumerable<T>.GetEnumerator` + 1×`ListElementProperty.get_Name`
+  —— ICF 把**不同方法**折叠进一体；receiver 匹配必须在
+  class-inst 命中者中要求方法名全一致，分歧即 decline。
+  匹配用 `il.generic_insts_list[ci]` + `_argv_names`（探针已验），
+  渲染显式接口实现走 `((ICollection<T>)recv).Prop` 形。
+- **C5 插片候选**：内联类初始化/委托 mi-pointer-walk 解码器
+  （2,636 行，`[mi+0x20]→+0xc0→+0x10→+0x135` 链）。
 - **与 fix 141 的边界**：141 处理 guard-join phi 喷射（join 后的
   all-unknown phi），C1 处理共享体 methodinfo 形状（body 级 spray），
   互补不重叠。
