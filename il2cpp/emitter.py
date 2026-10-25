@@ -298,7 +298,9 @@ class Emitter:
         Proof = name pattern AND a MoveNext method on the same typedef.
         Measured on Limbus v39: 1,863 matches, 0 without MoveNext -- so
         the MoveNext requirement rejects every name-only coincidental
-        `<>...d__N`.  Matches only; a non-matching type yields None.
+        `<>...d__N`.  Stage 1.5 adds the kind from the typedef's own
+        interface list (binary truth).  Matches only; a non-matching
+        type yields None.
         """
         mm = self._STATE_MACHINE_RX.match(td.name or '')
         if not mm:
@@ -311,11 +313,31 @@ class Emitter:
             return None
         if 'MoveNext' not in mnames:
             return None
-        # Deliberately do NOT claim async-vs-iterator: distinguishing them
-        # needs the custom-attribute table (AsyncStateMachineAttribute),
-        # which this studio has no cheap decoder for.  A wrong kind label
-        # would be a false identification, so the note says only what the
-        # structure proves: this is the MoveNext state machine for Method.
+        # Stage 1.5: the kind is provable from the typedef's own interface
+        # list (binary truth, not the attribute table) -- the v39 census
+        # classified every machine with zero declines: 1,052 async
+        # (IAsyncStateMachine in the bases) and 811 iterator (IEnumerator)
+        # at the metadata level.  A machine proving neither keeps the
+        # neutral note.
+        kind = None
+        try:
+            for k in range(getattr(td, 'interfaces_count', 0)):
+                ii = self.meta.interfaces[td.interfaces_start + k]
+                tup = self.il.types[ii] if 0 <= ii < len(self.il.types) else None
+                if tup is None:
+                    continue
+                n = self.il.type_name(tup)
+                if n.endswith('IAsyncStateMachine'):
+                    kind = 'async'
+                    break
+                if 'IEnumerator' in n and kind is None:
+                    kind = 'iterator'
+        except Exception:
+            kind = None
+        if kind:
+            return ('// %s state machine for %s (compiler-generated; '
+                    'MoveNext drives the inlined original body)'
+                    % (kind, mm.group(1)))
         return ('// state machine for %s (compiler-generated; MoveNext '
                 'drives the inlined original body)' % (mm.group(1),))
 
