@@ -1,0 +1,26 @@
+{
+ "kind": "gate v2 single-invocation",
+ "tree": "out/limbus/v39b20",
+ "files": 36603,
+ "wall_s": 52.1,
+ "returncode": 1,
+ "dupes_CS0101": 0,
+ "total": 65939,
+ "syntax": 52775,
+ "binding": 13164,
+ "codes": {
+  "CS8641": 13164,
+  "CS1003": 13185,
+  "CS1525": 13185,
+  "CS1026": 13175,
+  "CS1002": 13181,
+  "CS1524": 5,
+  "CS1514": 6,
+  "CS1513": 11,
+  "CS1001": 1,
+  "CS1519": 7,
+  "CS1022": 1,
+  "CS1056": 5,
+  "CS1040": 13
+ }
+}

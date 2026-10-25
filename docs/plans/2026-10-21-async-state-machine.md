@@ -79,13 +79,28 @@ private async Task LoadSprite(string path)
 | `MoveNext` 方法 | **2,169** |
 | `<>c__DisplayClass*` 闭包（已支持） | 4,012 |
 
-待补测：
+**2026-10-25 补测完成（v39b20 产物树全文普查，class+struct 双形态）——
+async/iterator 的 attribute 解码问题被绕过**：产物的声明行就携带
+诚实证据（接口列表 + 字段形状），1,949 个状态机声明全部可分类、
+0 个 decline：
 
-- [ ] 1,950 个里，多少带 `AsyncStateMachineAttribute`，多少带
-      `IteratorStateMachineAttribute`，多少两者都无（拿不出证明的必须 decline）
-- [ ] `MoveNext` 的 `<>1__state` 字段在产物树里的实际拼写
-      （metadata 里搜不到 `__state`，说明 emitter 清洗过 —— 要确认清洗规则）
-- [ ] state 字段的取值域：`0` 首入 / `-1` 完成 / `-2` 异常 是否成立
+| 判据 | 形态 | 数量 | 占比 |
+| --- | --- | --- | --- |
+| `IAsyncStateMachine` 基接口或 `__t__builder` 字段（`AsyncVoidMethodBuilder` 等） | **async**（struct 形态 1,093 + class 形态 3） | **1,096** | 56% |
+| 基接口含 `IEnumerator`（配 `__2__current` 字段） | **iterator** | **853** | 44% |
+
+工程注记：泛型状态机的产物名带数量后缀（`_M_d__5_1<T>`），普查正则
+必须写 `_d__\d+(?:_\d+)?`；只查 class 会漏掉全部 async-void 机器
+（它们以 struct 形态产出）——第一次普查（856 class）得到的"99.6%
+iterator"是偏差样本，上面这张表才是全量结论。
+
+意义：(a) Stage 1 的注释可以诚实地写出种类（"iterator state machine
+for X" / "async state machine for X"），"不宣称种类"的限制可移除；
+(b) 阶段 3 的还原本体是 1,096 个 async 机器（builder.Start /
+AwaitUnsafeOnCompleted 形态）+ 853 个迭代器（yield 状态形态），
+两条线分立；(c) 原计划"拿不出证明的必须 decline"的担忧没有发生。
+
+### 2.1b 待补测（原清单剩余项）
 
 ### 2.2 探针 B：现在的输出到底多难读
 

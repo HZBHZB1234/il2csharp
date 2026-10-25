@@ -240,19 +240,21 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
 
 计划文档：`docs/plans/2026-10-21-async-state-machine.md`。
 Stage 1 已交付（`3c6ef10`：`Emitter._state_machine_note`，两道门，
-1,863 识别 / 0 误报，只加注释）。剩余按原计划门控：
+1,863 识别 / 0 误报，只加注释）。
 
-1. **探针 C（可证明性）**：对 3 个真实样本证明 `builder.Start` /
-   `yield return` / `SetResult` 形态。**这是分叉点**：
-   - 大面积可证明 → 进入阶段 2（MoveNext 结构化，中风险）；
-   - 大面积不可证明 → 按计划 §2.3 降级为"只做识别+命名"，C9 关闭为
-     已交付（识别+标注），阶段 2/3 永久 decline 并记录证据。
-2. **attribute 解码（独立可交付，低风险）**：custom attribute 表的
-   AsyncStateMachineAttribute / IteratorStateMachineAttribute 解码，
-   让 Stage 1 注释能诚实区分 async/iterator（当前刻意不宣称）。
-   与探针 C 同批做：探针结论也依赖它。
-3. **阶段 3（re-sugar）**：仅当阶段 2 交付且探针 C 全绿，需单独审批
-   （计划原文），且 golden 逐个读。
+**探针 A 已完成（2026-10-25，见计划文档 §2.1）**：1,949 个状态机
+声明在产物树里 100% 可分类——1,096 async（struct `IAsyncStateMachine`
++ `__t__builder`）+ 853 iterator（class `IEnumerator`）+ 0 decline；
+分类判据来自声明本身，attribute 解码不再需要。剩余按原计划门控：
+
+1. **Stage 1.5（新分叉点，低风险可独立交付）**：`_state_machine_note`
+   写出诚实的种类（iterator/async），判据 = 声明段的接口/字段形状。
+   post-b21 落地（会动 1,949 个注释，golden 需配对重建评估）。
+2. **探针 C（可证明性）**：对真实样本证明 async 侧 `builder.Start` /
+   `AwaitUnsafeOnCompleted`、iterator 侧 yield 状态形态。大面积可证明
+   → 阶段 2（MoveNext 结构化）；否则按计划降级关闭，C9 定格为
+   "识别+标注"。
+3. **阶段 3（re-sugar）**：仅当阶段 2 交付且探针 C 全绿，需单独审批。
 
 ---
 
