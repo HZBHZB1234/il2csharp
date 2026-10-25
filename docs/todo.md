@@ -7,6 +7,47 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: b20-local gate + fix 143 — the else-if peephole was parse-broken on v39 (2026-10-25, on `main`)
+
+The b20-local baseline (`out/limbus/v39b20`, source `3f1a1f5`,
+`--strict --publicize --raw-addr`, 162 images / 36,765 files /
+297,975 bodies / 0 failed / 0 fallbacks, 23,617 s wall; per-image csc
+census in `validation_reports/limbus/b20local.roslyn.json`, driver
+written for the session, 61 s gate) found **52,785 syntax errors** —
+a tier the whole b1-b20 chain had held at zero. Four codes at ~13.18k
+each (CS1002/CS1003/CS1026/CS1525) + CS8641 x13,164 (else-cannot-start-
+a-block, classified binding by the 1000-2000 rule): ~13.2k broken
+lines from `_elseif_flatten_multi` (`c99e579`, the local else-if-chain
+peephole, landed 2026-10-21 AFTER the last Roslyn gate, invisible to
+the brace audit because the broken shape stays brace-balanced, and
+invisible to tree-sitter because that gate segfaults on this box for
+whole-image parses). Probe at mi 317598 (`MaterialBehaviour.
+ApplyToMaterial`) reproduced it: the fold minted `if (c) { else if
+(...) ... }` — an orphan else head INSIDE a block, with a dropped
+closing brace.
+
+Two holes in `_chunk_is_liftable` (`il2cpp/dec/flow.py`): the depth
+tracker only updated while depth==0 (a chunk never closed in the
+tracker, so an else tail inside a chunk was never seen), and a
+statement between two ifs of the else-block (`bool flag1 = target ==
+null;` sat between the first and second if) silently joined the
+preceding chunk. The tracker now updates on every line and any
+non-brace line at depth 0 after the head declines the chunk. Paired
+material-timeline rebuild: csc syntax 56 -> 0; diffs read (the
+scrambled region returns to its honest nesting). Portable 1,387
+passed (+4 tests in `tests/test_peephole_version_independent.py`
+pinning the decline shapes and the intended lift); game recount in
+flight. Commit `765adb8`.
+
+Binding tier (63,221) is methodology-noisy so far: CS0518 x45,345 is
+"no mscorlib referenced" — the per-image census compiles each image
+standalone (tools/compile_gate.py semantics, documented
+"unresolved externals are expected noise"), while the b1-b20 chain
+compiled 10 reference-closed groups. A gate v2 with group/reference
+closure is the next session's first item, then the post-143 full
+rebuild + re-gate for the REAL b20-local number (projected: syntax ~0,
+binding ~50k before the else-fix's cascades).
+
 ## Current work: fix 142a — the v39 interface-resolve helper is named, ifaceprune wakes up (2026-10-25, on `main`)
 
 Root cause found while probing the fix-138 "interface-offset-table scan"

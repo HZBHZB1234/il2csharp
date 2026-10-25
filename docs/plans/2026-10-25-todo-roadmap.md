@@ -1,5 +1,13 @@
 # 计划：TODO 推进路线图（2026-10-25）
 
+> **进展注记（同日晚些）**：P0-1 的 b20-local 基线已测（pre-143：
+> syntax 52,785 / binding 63,221，详见 `docs/todo.md` 顶部）并立刻
+> 抓到两个真问题——(1) 本地 else-if peephole（c99e579）在 v39 上
+> 产出 ~13.2k 语法坏行（**fix 143 已修**，765adb8）；(2) 逐 image
+> 无引用编译的 CS0518×45k 方法论伪影（门禁 v2 需要分组/引用闭包，
+> 下个 session）。fix 142a 已落地（0eb7ed1）。post-143 全量重建
+> + 重测门禁是下一个 session 的第一件事。
+
 > 依据 2026-10-25 的全量盘点写成：上游 `mynamescrax/il2csharp` 自分叉点
 > `5291b7c` 后仅发布 `c3195dc`（fix 141，本地已手同步且 `analyze.py`
 > 逐字节一致）；本地领先 36 个提交（perf 程序、peephole P0/P1、GC
