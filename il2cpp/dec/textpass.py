@@ -849,7 +849,13 @@ class _TextPassMixin:
                             # inlined call conds relied on the old guard refusing them).
                             # The no-else DROP arm is the one that must stay pure-guarded:
                             # dropping `if (call()) { }` would erase the side effect.
-                            if j < len(cleaned) and cleaned[j].strip() == 'else':
+                            # fix 144: an `else if ...` chain head is NOT the bare-else
+                            # case -- dropping the empty head there orphans the chain's
+                            # `else` heads inside the enclosing block (`if (c)
+                            # { else if (a) ... }`, 40 sites tree-wide).  Keep the
+                            # construct for any else continuation.
+                            nxt = cleaned[j].strip() if j < len(cleaned) else ''
+                            if nxt == 'else':
                                 j += 1
                                 out = out[:k]
                                 inner = head[4:-1]
@@ -860,6 +866,8 @@ class _TextPassMixin:
                                         break
                                 out.append('    ' * depth
                                            + _fix_cond_line('if (!(%s))' % inner, self))
+                            elif nxt.startswith('else'):
+                                pass
                             elif not self._IMPURE.search(head[4:-1]):
                                 out = out[:k]
                             continue
