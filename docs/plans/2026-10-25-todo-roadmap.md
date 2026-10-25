@@ -210,10 +210,14 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
   （`addr_candidates` 全是 `('generic', spec)`）。配对 `--only
   DOTween`：纯 delta 2 文件（PurgeAll 41→18 行 + stub 删除），
   套件绿、零 pin 移动。
-- **Step 2（下一片）**：Assembly-CSharp 侧配对重建覆盖 225 直接
-  站点 + ctor-as-value 族（~5,520 行，`.ctor` 出现于调用实参位）
-  → `: base(...)` / 真实 ctor 命名。
-- **Step 3**：无 spray 身份的共享站点（receiver/type 臂加强）。
+- **Slice 2 已落地（fix 146，2026-10-25）**：ctor-as-value 入册普查
+  分解为三族——(a) 213 站点 `Type.GetType(string)` 原生帮手
+  `sub_18078cf40`（51 字节模板全 .text 唯一命中，arity 1 渲染
+  `System.Type.GetType(name)`，局部盖真实 System.Type 类型）；
+  (b) 2,636 行 `[mi+0x20]→+0xc0` 类初始化/委托内联走读 → 归
+  C5 族；(c) 其余为已解析的 this/base..ctor 调用（良性）。
+- **Step 3（下一片）**：无 spray 身份的共享站点（receiver/type
+  臂加强）+ C5 的内联类初始化走读解码器（2,636 行）。
 - **与 fix 141 的边界**：141 处理 guard-join phi 喷射（join 后的
   all-unknown phi），C1 处理共享体 methodinfo 形状（body 级 spray），
   互补不重叠。

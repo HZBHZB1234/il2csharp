@@ -343,6 +343,29 @@ class _CallsMixin:
             return None
         return exc
 
+    def _system_type_ty(self):
+        """Type tuple for System.Type, cached; None when unresolvable.
+
+        Stamps the `System.Type.GetType(...)` helper result so its
+        local declares `Type` (not the stale `object`/`string` lane
+        the surrounding spray carried). One pass over typedefs and
+        one over the type table, memoized for the process.
+        """
+        cached = self.__dict__.get('_system_type_ty_cache')
+        if cached is not None:
+            return cached[0]
+        td = next((i for i, t in enumerate(self.meta.typedefs)
+                   if t.name == 'Type' and t.namespace == 'System'), None)
+        ty = None
+        if td is not None:
+            for row in self.il.types:
+                if row is not None and row[0] == td \
+                        and ((row[1] >> 16) & 0xFF) == 0x12:
+                    ty = row
+                    break
+        self.__dict__['_system_type_ty_cache'] = (ty,)
+        return ty
+
     def _caller_is_void(self):
         """True when the method being lifted returns void.
 
@@ -3146,6 +3169,21 @@ class _CallsMixin:
                 if self.asm_comments and asm:
                     self.emit(ins.ip, '', asm)
                 return
+
+        # --- Type.GetType(string) helper: sub_x(name, stale, MethodRef)
+        # -> System.Type.GetType(name). The hidden MethodInfo context (R8)
+        # and the dead RDX slot are plumbing the source never wrote; the
+        # 51-byte body template proved the helper, so the ABI's RCX is
+        # the assembly-qualified type name and the result is a Type.
+        if target is not None and target in getattr(self, 'rt_type_gettype', ()) \
+                and arg_exprs and arg_exprs[0] is not None \
+                and arg_exprs[0].text and not arg_exprs[0]._unk:
+            _e = self._mk('System.Type.GetType(%s)' % arg_exprs[0].text,
+                          self._system_type_ty(), 'obj')
+            self.regs['RAX'] = _e
+            if self.asm_comments and asm:
+                self.emit(ins.ip, '', asm)
+            return
 
         # --- IsInst intrinsic: sub_x(obj, typeof(T)) -> obj as T
         if target is not None and target in getattr(self, 'rt_isinst', ()) \

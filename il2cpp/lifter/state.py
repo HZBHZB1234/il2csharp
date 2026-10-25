@@ -312,6 +312,36 @@ class _StateMixin:
             pos += len(b) + tail
         return True
 
+    def _is_type_gettype_helper(self, target):
+        """Recognize the Type.GetType(string) native helper.
+
+        Ground truth: 0x18078cf40 (213 tree-wide sites, no metadata
+        candidates, not exported). Sites call it as (RCX=assembly-
+        qualified type name, RDX=stale spray, R8=the caller's
+        MethodInfo context -- the hidden MethodRef slot), result cast
+        to `Type`. The body saves RCX/RDX, loads a cached resolver
+        delegate, `mov rdx,r8` re-points the context into the resolve
+        call, then DynamicInvoke-shaped pairs (`lea r9,[rsp+38h];
+        mov qword [rsp+38h],0; lea r8,[rsp+48h]; mov [rsp+48h],rax;
+        xor edx,edx; call ...`). Only the RIP displacement and the
+        call rel32 vary; the 51-byte head template is unique in the
+        fixture's whole .text (programmatically derived, never hand-
+        transcribed). RDX's slot is overwritten by the exception-out
+        zero-store before any read, so the managed arity is one.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        code = self.bin.read(target, 51)
+        if code is None or len(code) < 51:
+            return False
+        head = bytes.fromhex('48895c24084889542410574883ec20488b3d')
+        mid = bytes.fromhex('498bd0488bd9e8')
+        tail = bytes.fromhex('4c8d4c243848c7442438000000004c8d4424')
+        return code[:18] == head and code[22:29] == mid and code[33:] == tail
+
+
     def _is_iface_resolve_helper(self, target):
         """Recognize the interface slow-path resolve helper.
 
@@ -1320,6 +1350,19 @@ class _StateMixin:
                 self.rt_names[_t] = 'il2cpp_runtime_class_init'
                 if _fin:
                     self.rt_names[_fin] = 'il2cpp_runtime_class_init'
+        # Type.GetType(string) helper (213 tree-wide sites): the render
+        # and the one-argument arity are owned by `_call`'s special case
+        # on `rt_type_gettype`; the name only marks it non-`sub_`.
+        self.rt_type_gettype = set()
+        for _t in sorted(set(cnt) | set(stats)):
+            _fin = self._thunk_final(_t)
+            if self._is_type_gettype_helper(_t) or (
+                    _fin and _fin != _t and self._is_type_gettype_helper(_fin)):
+                self.rt_type_gettype.add(_t)
+                self.rt_names[_t] = 'System.Type.GetType'
+                if _fin:
+                    self.rt_type_gettype.add(_fin)
+                    self.rt_names[_fin] = 'System.Type.GetType'
         # Interface slow-path resolve helper (0x18043dc60, 2,446 sites):
         # the miss-path of the inlined fast-path loop. (obj, iface,
         # slot) in RCX/RDX/R8; R9 residue is spray. Name + arity 3

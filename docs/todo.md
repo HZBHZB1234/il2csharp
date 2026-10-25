@@ -7,6 +7,52 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 146 landed — the Type.GetType(string) helper, C1's ctor-family decomposition (2026-10-25, on `main`)
+
+**The ctor-as-value census decomposed (probe, no build).** The C1 entry
+census's "~5,520 ctor-as-value lines" split under a paren-matched tree
+scan into three very different families: (a) **213 sites of the
+Type.GetType(string) native helper** `sub_18078cf40` — no metadata
+candidates, not exported — called as (RCX=assembly-qualified type
+name, RDX=dead slot, R8=caller's MethodRef context), result
+user-cast to `Type`; the `.ctor`/`EnablePostProcessing` context args
+that named the census are these sites' R8 plumbing; (b) **2,636
+mi-pointer-walk lines** (1,649 files): `[mi+0x20]→+0xc0→+0x10→
++0x135` chains — the inlined generic delegate-creation + class-init
+walk through a MethodRef cell value, which is C5's inlined
+class-init family, not callee naming; (c) the rest are already-
+resolved `this..ctor(...)`/`base..ctor(...)` calls (benign).
+
+**fix 146 (landing-9 style).** `_is_type_gettype_helper`: a 51-byte
+head template with two wildcards (RIP displacement + call rel32),
+programmatically derived from the real body (the hand-transcribed
+first attempt had two byte errors — 4C vs 49 REX — the recurring
+lesson: never transcribe, always dump). The template is UNIQUE in the
+fixture's whole .text (one hit). `rt_type_gettype` + `rt_names` mark
+it; `_call`'s special case renders `System.Type.GetType(arg0)` —
+arity one: the ABI's RCX is the name, RDX is overwritten by the
+exception-out zero-store before any read (dead), R8 is the hidden
+context. The result is stamped with the real `System.Type` type tuple
+(`_system_type_ty`, memoized one-pass lookup), so the local declares
+`System.Type type1 = System.Type.GetType(text2);` instead of
+inheriting the stale string/object lane.
+
+**Validation.** `--mi` lifts of both ground truths: AcquiredEgoGift
+ctor (mi 98337, 5 params) renders `System.Type.GetType(text2)` /
+`System.Type.GetType("EGOGiftAbility_Normal")`; DemoCamera.
+EnablePostProcessingForURP (mi 314868) renders the literal
+assembly-qualified name. Portable 1,404 (+5 template tests incl.
+wildcard and decline-registered-body proofs); game suite green with
+2 new ground-truth tests. Paired-build proof deferred to the next
+Assembly-CSharp paired rebuild (the 213 sites live mostly there;
+a 40+ min pair is not proportionate per the build policy — the
+failure-SET gate plus the pinned --mi proofs carry this slice).
+
+**C1 after 145+146.** Remaining addressable: the 2,636-line inlined
+class-init/delegate walk (C5 family, needs the walk-shape decoder),
+and the ~38k no-identity shared markers (receiver/type arms, C1
+step 3).
+
 ## Current work: fix 145 landed — C1's first slice, hidden-MethodInfo tail slots (2026-10-25, on `main`)
 
 **C1 step-0 census corrections (probe, no build).** The roadmap's C1
