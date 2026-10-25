@@ -48,6 +48,21 @@ honest kind labels; stages 2/3 declined with the probe-C evidence
 machine-specific residual (666 bodies with an unclosed `TAwaiter`
 generic declaration) is tracked in the C8 family.
 
+**fix 144 landed (`1ab0b84`).** The drop arm in `_render`'s empty-block
+walk now declines for ANY else continuation (the bare-else invert arm
+is unchanged). mi 119627 fresh lift: zero orphans, the chain intact
+inside the promoted arm. Paired System.Data rebuild: orphans 3 → 0,
+else quintet gone (syntax 16 → 1 — the 1 is a pre-existing CS1750
+`int`-default-for-`DataRowAction` declaration item, a C-family
+residual). Portable 1,395 (+5); game 1,417 / 2 env / 1 xfailed,
+failure SET byte-identical, zero pin moves. **Methodology caveat
+(correction to the 648 figure below): csc suppresses binding
+diagnostics while syntax errors exist, so the b21-partial 648 was a
+parse-tier LOWER BOUND — the true binding tier needs a syntax-clean
+tree (promotion-milestone item).** With fix 144 landed, the parse
+tier's else-family floor is gone from the source side; the next full
+rebuild (promotion time) will measure the real tier-0 baseline.
+
 ## Current work: b20-local gate + fix 143 — the else-if peephole was parse-broken on v39 (2026-10-25, on `main`)
 
 The b20-local baseline (`out/limbus/v39b20`, source `3f1a1f5`,
