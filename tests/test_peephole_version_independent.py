@@ -215,3 +215,93 @@ def test_eh_helper_accepts_an_early_int3_noreturn():
     code += b'\xc3'                       # a ret AFTER the int3 (padding)
     dec = _eh_decompiler({va: bytes(code)})
     assert dec._eh_helper_returns(va) is False
+
+
+# ------------------------------------------------------------------
+# fix 143: `_elseif_flatten_multi` must lift only PURE if-construct
+# chunks. Two holes shipped with the pass and were parse-silent until
+# the v39 Roslyn gate: the depth tracker only updated while depth==0
+# (a chunk never closed in the tracker, so an `else` tail inside a
+# chunk was never seen), and a statement between two ifs of the
+# else-block silently joined the preceding chunk -- mi 317598
+# ApplyToMaterial printed `if (...) { else if (...) ... }` with an
+# orphan else head and a dropped closing brace.
+
+
+def _bare_flow():
+    dec = Decompiler.__new__(Decompiler)
+    return dec
+
+
+def _chain_lines():
+    return [
+        'if (a)',
+        '{',
+        '    X();',
+        '}',
+        'else',
+        '{',
+        '    if (b)',
+        '    {',
+        '        Y();',
+        '    }',
+        '    if (c)',
+        '    {',
+        '        Z();',
+        '    }',
+        '}',
+    ]
+
+
+def test_multi_if_chain_still_lifts():
+    out = _bare_flow()._elseif_flatten_multi(_chain_lines())
+    assert out == [
+        'if (a)',
+        '{',
+        '    X();',
+        '}',
+        'else if (b)',
+        '    {',
+        '        Y();',
+        '    }',
+        'else if (c)',
+        '    {',
+        '        Z();',
+        '    }',
+    ]
+
+
+def test_multi_if_declines_a_statement_between_the_ifs():
+    lines = _chain_lines()
+    lines[10:10] = ['    bool flag1 = target == null;']
+    assert _bare_flow()._elseif_flatten_multi(lines) == lines
+
+
+def test_multi_if_declines_an_else_tail_inside_a_chunk():
+    lines = [
+        'if (a)',
+        '{',
+        '    X();',
+        '}',
+        'else',
+        '{',
+        '    if (b)',
+        '    {',
+        '        Y();',
+        '    }',
+        '    if (c)',
+        '    {',
+        '    }',
+        '    else',
+        '    {',
+        '        Z();',
+        '    }',
+        '}',
+    ]
+    assert _bare_flow()._elseif_flatten_multi(lines) == lines
+
+
+def test_multi_if_declines_a_trailing_statement():
+    lines = _chain_lines()
+    lines.insert(len(lines) - 1, '    cleanup();')
+    assert _bare_flow()._elseif_flatten_multi(lines) == lines

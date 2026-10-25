@@ -289,19 +289,32 @@ class _FlowMixin:
 
     @staticmethod
     def _chunk_is_liftable(chunk):
-        """A chunk must be one if with no else and no nested control."""
+        """A chunk must be ONE lone if-construct: the `if (` head, its
+        braced body, and nothing else.
+
+        The v39 tree taught two holes (fix 143): the old tracker only
+        updated `depth` while depth==0, so a chunk's construct never
+        closed in the tracker at all -- and a statement between two ifs
+        of the else-block (mi 317598 `ApplyToMaterial`: `bool flag1 =
+        target == null;` sat between the first and second if) silently
+        joined the preceding chunk, so the lift minted an orphan
+        `else if` head (a statement separates it from its chain) and
+        dropped the else-block's closing brace: parse-broken output the
+        brace audit cannot see. Any non-brace line at depth 0 after the
+        head declines."""
         depth = 0
-        for x in chunk:
+        for idx, x in enumerate(chunk):
             t = x.strip()
-            if depth == 0:
-                if t == 'else':
-                    return False
-                if t.startswith(_FlowMixin._MULTI_IF_CTRL):
-                    return False
-                if t.endswith(':') and not t.startswith(
-                        ('case ', 'default', 'L_')):
-                    return False
-                depth += x.count('{') - x.count('}')
+            if depth == 0 and idx > 0 and t and t not in ('{', '}'):
+                return False
+            if t == 'else':
+                return False
+            if t.startswith(_FlowMixin._MULTI_IF_CTRL):
+                return False
+            if t.endswith(':') and not t.startswith(
+                    ('case ', 'default', 'L_')):
+                return False
+            depth += x.count('{') - x.count('}')
         return True
 
     def _elseif_flatten_multi(self, lines):
