@@ -208,6 +208,10 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
   互补不重叠；落地前先跑一次联合 census 确认残余 population 分层。
 - 上游当年指出 fixture 内单实例渲染诚实的路径疑似绕过 candidates
   检查（dec direct-tail `_emit_tail`，cf. slice 2b）——探针先验证。
+- **进入测量（2026-10-25，b20 锚树）**：`/*shared body, N candidates*/`
+  站点 = **38,085**；ctor-as-value 族 ≈ **5,520 行**（`.ctor` 出现于
+  调用实参位的行）。v39 的人口比上游外部语料的估计（~10.2k spray）
+  大一个量级——C1 是 v39 世界最大的单项可读性/编译性收益。
 
 ### P2-2 C2：原始偏移的字段解析
 
