@@ -326,7 +326,8 @@ class _StateMixin:
         (only displacements vary); zero jmp refs. R9 is never read --
         the printed 4th arg is spray residue from the fast-path loop.
         Naming routes through `il2cpp_interface_get_method` with arity
-        3 (obj, iface, slot). A different runtime keeps `sub_`.
+        3 (obj, iface, slot). A different runtime tries the v39
+        template below and otherwise keeps `sub_`.
         """
         if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
             return False
@@ -338,15 +339,46 @@ class _StateMixin:
         code = self.bin.read(target, finish - target)
         if not code:
             return False
-        if not code.startswith(bytes.fromhex(
+        if code.startswith(bytes.fromhex(
                 '48895c240848896c24104889742418574883ec20488b39488bd9488bcf410fb7f0')):
+            return (code.count(bytes.fromhex('488beae867000000')) == 1
+                    and code.count(b'\xe8') == 4
+                    and bytes.fromhex('f6873601000010') in code
+                    and bytes.fromhex('48394310') in code
+                    and b'\xc3' in code
+                    and code.endswith(b'\xcc'))
+        return self._is_iface_resolve_helper_v39(code)
+
+    def _is_iface_resolve_helper_v39(self, code):
+        """v39-runtime template of the same helper.
+
+        Ground truth: 0x180789290 (limbus v39 archive, Unity
+        6000.3.12f1), extent 0x1aa, 13 internal calls, fail-path int3.
+        The 2022 template's pinned bytes do not occur here (different
+        codegen: eight pushes, no rbx/rbp/rsi spill slots, the slot in
+        r14d). Same (RCX=obj, RDX=iface, R8=slot) ABI; R9 is never read
+        (proven by full-body disassembly), so the printed 4th arg is
+        still fast-path spray. Pinned: the 30-byte prologue (the eight
+        pushes + frame + slot movzx + iface/object saves + klass
+        deref), the initialized-flag test `test byte [klass+0x136],0x10`
+        (the 2022 body's flag byte at the same displacement), the hit
+        compare `cmp [obj+0x10],rax`, and the (klass, iface, slot)
+        resolver tail `movzx r8d,r14w; mov rdx,rbp; mov rcx,r13;
+        call rel32; int3`. A different runtime keeps `sub_`.
+        """
+        P = bytes.fromhex
+        if not code.startswith(P(
+                '405355565741544155415641574883ec28450fb7f0'
+                '488bea488bf94c8b29450fb7c6498bcd')):
             return False
-        return (code.count(bytes.fromhex('488beae867000000')) == 1
-                and code.count(b'\xe8') == 4
-                and bytes.fromhex('f6873601000010') in code
-                and bytes.fromhex('48394310') in code
-                and b'\xc3' in code
-                and code.endswith(b'\xcc'))
+        if P('41f6853601000010') not in code:
+            return False
+        if P('48394710') not in code:
+            return False
+        return (len(code) >= 0x100
+                and code[-16:-6] == P('450fb7c6488bd5498bcd')
+                and code[-6] == 0xe8
+                and code[-1] == 0xcc)
 
     def _is_array_addr_helper(self, target):
         """Stride of the bounds-checked element-address helper, else None.

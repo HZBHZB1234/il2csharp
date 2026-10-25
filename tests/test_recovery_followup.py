@@ -1186,3 +1186,50 @@ def test_iface_resolve_helper_rejects_a_mutated_body():
     bad2[IFACE_RESOLVE_BODY.find(bytes.fromhex('f6873601000010'))] ^= 0xFF
     lift2, target2 = isinst_helper_lifter(bytes(bad2))
     assert not lift2._is_iface_resolve_helper(target2)
+
+
+# Fix 142: the v39 runtime's resolve helper (limbus v39 archive,
+# 0x180789290, Unity 6000.3.12f1; extent 0x1aa, 13 internal calls,
+# fail-path int3). Same (RCX=obj, RDX=iface, R8=slot) ABI; R9 is never
+# read. The 2022 template's bytes do not occur in this body.
+IFACE_RESOLVE_V39_BODY = bytes.fromhex(
+    '405355565741544155415641574883ec28450fb7f0488bea488bf94c8b29450f'
+    'b7c6498bcde806feffff4885c00f853701000041f68536010000100f84590100'
+    '00483947100f844f010000440fb7a52a01000066453bf47323488b45704885c0'
+    '741a488b50284885d27411488bcfe80d4a00004885c00f85cb000000f6853601'
+    '0000100f851101000048897c2470baffffffff488bcfe8a51a010090448bbfa0'
+    '00000033db4585ff7e3c660f1f4400008bcb4803c9488b4ccf18e87186060048'
+    '85c0741b450fb7c6488bd5488bc8e84de20100488bf04885c00f859c000000ff'
+    'c3413bdf7cca448bbfa400000033db4585ff7e440f1f40000f1f840000000000'
+    '8bc34803c0488b8f98000000488b0cc1e81b8606004885c07417450fb7c6488b'
+    'd5488bc8e8f7e10100488bf04885c07555ffc3413bdf7cc866453bf47353488b'
+    'cfe8da1c010090498bc648c1e004488db5380100004803f07440488b4e08488b'
+    '4920e8195a0600488bc64883c428415f415e415d415c5f5e5d5bc3488bcfe89d'
+    '1c010090ebd4488bcfe8921c010090ebc9488bcfe8871c010090450fb7c6488b'
+    'd5498bcde807fbffffcc')
+
+
+def test_iface_resolve_helper_v39_template_recognized():
+    lift, target = isinst_helper_lifter(IFACE_RESOLVE_V39_BODY)
+    assert lift._is_iface_resolve_helper(target)
+
+
+def test_iface_resolve_helper_v39_template_rejects_a_mutated_body():
+    bad = bytearray(IFACE_RESOLVE_V39_BODY)
+    bad[0] ^= 0xFF                        # the prologue is the proof
+    lift, target = isinst_helper_lifter(bytes(bad))
+    assert not lift._is_iface_resolve_helper(target)
+    bad2 = bytearray(IFACE_RESOLVE_V39_BODY)
+    bad2[-16] ^= 0xFF                     # the movzx-r8d resolver tail
+    lift2, target2 = isinst_helper_lifter(bytes(bad2))
+    assert not lift2._is_iface_resolve_helper(target2)
+    bad3 = bytearray(IFACE_RESOLVE_V39_BODY)
+    bad3[IFACE_RESOLVE_V39_BODY.find(bytes.fromhex('41f6853601000010'))] ^= 0xFF
+    lift3, target3 = isinst_helper_lifter(bytes(bad3))
+    assert not lift3._is_iface_resolve_helper(target3)
+
+
+def test_iface_resolve_helper_2022_body_still_recognized():
+    # the v39 template must not shadow the 2022 one (tried in order)
+    lift, target = isinst_helper_lifter(IFACE_RESOLVE_BODY)
+    assert lift._is_iface_resolve_helper(target)

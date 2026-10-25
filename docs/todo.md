@@ -7,6 +7,69 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 142a — the v39 interface-resolve helper is named, ifaceprune wakes up (2026-10-25, on `main`)
+
+Root cause found while probing the fix-138 "interface-offset-table scan"
+next-slice candidate (`docs/plans/2026-10-25-todo-roadmap.md` P1-1): fix
+139's `ifaceprune` gates on the miss-call helper being NAMED
+(`names.get(target) == 'il2cpp_interface_get_method'`), and the name comes
+from `_is_iface_resolve_helper` (`lifter/state.py`) — a byte template
+pinned to the 2022-fixture helper (exact prologue, exactly 4 `call rel32`,
+0x89 extent). The v39 runtime's helper at 0x180789290 (Unity
+6000.3.12f1) is a different codegen entirely (eight pushes, 0x1aa extent,
+13 internal calls), so the template failed, the name never fired, and
+**ifaceprune was blind on every v39 build**: 3,240 for-head scan lines in
+1,146 files, 3,434 unnamed `sub_180789290` calls, 0 named. The landing:
+
+- `il2cpp/lifter/state.py`: `_is_iface_resolve_helper` tries the 2022
+  template first, then `_is_iface_resolve_helper_v39` — ground truth
+  0x180789290, pinned 30-byte prologue (pushes + frame + slot movzx +
+  iface/object saves + klass deref), the `test byte [klass+0x136],0x10`
+  initialized-flag invariant (same displacement as 2022), the
+  `cmp [obj+0x10],rax` hit compare, and the
+  `movzx r8d,r14w; mov rdx,rbp; mov rcx,r13; call rel32; int3` resolver
+  tail. R9 never read in the v39 body (full disassembly), so the 4th
+  arg is still fast-path spray and arity-3 naming carries over.
+- Naming lights three systems at once: the arity trim (spray 4th arg
+  dropped), fix 139's ifaceprune (scans pruned), and the landing-8
+  managed dispatch fold (`Expr._ifm` → `recv.I_Member`).
+
+Native-verified renders (post-fix `--mi` re-lifts): mi 290837
+`BuildHashes.PrintToConsole` renders `enumerator12.MoveNext()` and
+`FileHash fileHash1 = enumerator12.Current;` — slot 0 and slot 1 both
+named correctly with the `FileHash` element type closed from
+`IEnumerator_1<FileHash>`, which is also the empirical proof that the
+R8 argument is the method slot on v39 (the roadmap's 142b question —
+resolved affirmatively; MoveNext/Current would swap if R8 were read
+wrong). mi 1816 `AbilityBase.SetKeywords` renders
+GetEnumerator/MoveNext and `obj42?.Dispose();` with no scan residue.
+
+Paired image rebuild (`--only ACTk.Runtime`, pre = `out/limbus/v39b20`
+vs post = `out/limbus/v39b20-post142`, same gate flags, brace 0
+unbalanced both sides): 6 files changed, net -281 lines, every changed
+file a scan-bearing file; post census has **0** for-head scan lines and
+**0** `sub_180789290` calls (pre: 3,240 / 3,434 tree-wide). Diff read
+line by line on ProgressExtensionMethods (33 lines of count read +
+count test + helper call + for-head scan + 0x138 fold + indirect
+`call [entry]` collapses to 3 lines ending `progress.Report(filesProgress1);`)
+and spot-checked on PrefsSerialization (`IObscuredFilePrefsSerializer`
+typed var + named Serialize/DeserializePrefsDictionary). Known nit, on
+a degenerate site only: a null-receiver dispatch (receiver literal 0,
+pre: `sub_180789290(0, typeof(IDisposable), 0, ...)`) now renders
+`IDisposable.Dispose(0);` — the receiver demoted into the argument
+list; both spellings are uncompilable, the post one reads better.
+Filed as a 142b follow-up nit.
+
+Tests: `tests/test_recovery_followup.py` +3 (v39 template recognized,
+three mutation rejections, 2022 template unshadowed — 89 in the file);
+`tests/test_game_fix142_iface_resolve.py` +2 (mi 290837 managed
+renders with no residue, mi 1816 no residue). Suites: portable 1,383
+passed (+3); game recount in flight. b20-local gate tree rebuilt
+(`out/limbus/v39b20`, source `3f1a1f5`, `--strict --publicize
+--raw-addr`, 36,765 files / 297,975 bodies / 0 failed / 0 fallbacks /
+0 emit-failed, 23,617 s wall): the pre-142 baseline the Roslyn gate
+runs against next.
+
 ## Current work: fix 141 hand-synced from upstream — all-unknown join phis are `_unk` (2026-10-24, on `main`)
 
 Upstream `mynamescrax/il2csharp` `c3195dc` (fix 141, 2026-10-23) applied to
@@ -197,6 +260,10 @@ ASN1.GetBytes cast receiver, mi 104143 `this.GetFeetPosition()`, mi
 portable 1,322 passed; game 261 passed / 10 failed = the 8 fix 137/139
 pin moves + 2 golden improvements (`mi-11974-ReadSpan`,
 `mi-104428-GetBounds`) -- re-pin of all 10 pending user approval.
+(Status 2026-10-25: superseded -- the v39 fixture migration (`d1ea2d2`)
+rebuilt the golden corpus, and on it the post-141 game suite shows zero
+pin moves; the old-fixture re-pin list no longer exists. See the fix 141
+section and `docs/plans/2026-10-25-todo-roadmap.md` P0-2.)
 Remaining: 381 unresolved vtable sites (simple 219 = receiver type has
 no slot and no klass-load object / narrowing; slot None 112), 90 fix 139
 d_tail ifaceprune declines, `!(x.MoveNext())` paren cosmetic.**
@@ -307,6 +374,11 @@ for-header reads `num10` with no declaration in the body (rename /
 decl-drop interaction exposed by the sugar, repro mi 516 FixupPath).
 Full game suite with final code not yet re-run (game138 ran pre-marker
 code). NOT landed, NOT pushed, NOT re-pinned (all need user call).**
+(Status correction 2026-10-25: the line above was written mid-flight and
+never updated. The markers ARE landed on `main` -- commit `2e440fe`,
+with its RegistryKey blocker closed by fix 138 `e1d9803`; gate b13
+numbers below are post-marker. The 4 pin moves were dissolved by the
+v39 fixture migration: zero pin moves post-141.)
 
 **Fix 135 (CS0019 slice, 2026-10-06): `_numeric_obj_retype` in
 `il2cpp/dec/highlevel.py` (end of `_rename_locals`) retypes an untracked
@@ -636,6 +708,12 @@ Follow-ups seen while landing: CS0019 `object op int` (untyped integer
 temps, 82k); CS0165 phi arms minted under different names; `unknown`
 SIMD lane placeholders (`unpcklps` + `movsd` into Vector3 fields);
 indirect calls `X[0]() /*indirect*/(args)` (CS0149 9.4k).
+(Status 2026-10-25: CS0019 object-op-int landed as fixes 135/136; the
+indirect-call item is largely covered by fixes 139/140 (CS0149 -486 at
+b19, 381 vtable sites left) and the SIMD item by F1 lane modeling
+(SHUFPS half still open, co-land with MOVSS merge). Still fully open:
+CS0165 phi-arm naming, embedded-struct stores, the CS0214 unsafe-cover
+keying. Live tracking: `docs/plans/2026-10-25-todo-roadmap.md`.)
 
 ## Current work: fix 125 compile-gate first slice (2026-10-05, branch `fix125-compile-gate-scope`)
 
