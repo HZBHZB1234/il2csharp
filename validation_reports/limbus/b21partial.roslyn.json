@@ -1,0 +1,25 @@
+{
+ "kind": "tree-level roslyn census",
+ "tree": "out/limbus/v39b21",
+ "files": 36330,
+ "wall_s": 28.1,
+ "total": 648,
+ "syntax": 541,
+ "binding": 107,
+ "dupes_CS0101": 0,
+ "codes": {
+  "CS8641": 107,
+  "CS1524": 5,
+  "CS1056": 5,
+  "CS1003": 126,
+  "CS1002": 124,
+  "CS1525": 124,
+  "CS1026": 118,
+  "CS1514": 6,
+  "CS1513": 11,
+  "CS1040": 13,
+  "CS1001": 1,
+  "CS1519": 7,
+  "CS1022": 1
+ }
+}

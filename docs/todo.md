@@ -7,6 +7,47 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: b21 salvage + Stage 1.5 landed + fix 144 found (2026-10-25, on `main`)
+
+**v39b21 postmortem.** The full rebuild (source `88e2373`) HUNG at the
+final pool-consumption phase: the mid-session software restart lost one
+pool task — workers idle at the task queue, parent waiting forever on
+the future at `cli.py:332` (py-spy dump, 2026-10-25). Killed at ~7 h.
+Salvage: the 36,330-file partial tree (99% of type files, 0 of the
+per-assembly stub tails) gated with `tools/gate_tree.py`:
+**648 errors (syntax 541 + binding 107)** vs b20's 65,939 — the
+else-family collapse (65,890 → ~599 residual) is fix 143's effect seen
+tree-wide, and the residual is a DIFFERENT, pre-existing defect
+(b20 carries the identical broken shapes).
+
+**fix 144 (found, not yet fixed).** The residual `if (c) { else if ...}`
+shapes: 40 sites / 14 images. Root cause narrowed by pass-trace at
+mi 119627 (`BattleMapSwitchUtility.ResolveMapId`): the multi-if chain
+fold's output is VALID C# (`if (X) {} else if (A) {} else if (B) {}`),
+and a LATER arm-swap pass (condition inversion `< num4` → `>= num4`
+with arm promotion) moves the else-arm's chain into the true arm
+WITHOUT stripping the chain heads' `else` prefix. Pre-existing (b20
+has the same shapes — drowned in the 13k peephole noise until now).
+
+**Build policy (user call 2026-10-25): no more full builds except
+promotion milestones.** Validation = paired `--only` rebuilds (minutes)
++ `--mi` lifts (seconds) + metadata-level probes (no files) +
+`gate_tree` (52 s, needs only a built tree). A fresh full rebuild is
+deferred to the next promotion.
+
+**Stage 1.5 landed (`54480f8`).** The state-machine note claims the
+honest kind from the typedef's own interface list (binary truth — the
+attribute-table decoder the plan assumed necessary is not needed):
+metadata-level census 1,863/1,863 classified, 0 declines (1,052 async
++ 811 iterator). ACTk paired rebuild: 3 async + 7 iterator notes, ZERO
+neutral residue, 0 non-note line changes; brace 0. Portable 1,390
+(+3); game 1,412 / 2 env / 1 xfailed, failure SET byte-identical,
+zero pin moves. C9 is thereby CLOSED as delivered: identification +
+honest kind labels; stages 2/3 declined with the probe-C evidence
+(docs/plans/2026-10-21-async-state-machine.md §2.3/§2.4); the
+machine-specific residual (666 bodies with an unclosed `TAwaiter`
+generic declaration) is tracked in the C8 family.
+
 ## Current work: b20-local gate + fix 143 — the else-if peephole was parse-broken on v39 (2026-10-25, on `main`)
 
 The b20-local baseline (`out/limbus/v39b20`, source `3f1a1f5`,
