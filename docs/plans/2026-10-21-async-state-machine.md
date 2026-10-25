@@ -5,7 +5,12 @@
 > **do not exist in this fork**. Read those names as history, not as commands. The live replacement
 > is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
 
-**状态：待启动（探针未跑，不要先动手改源码）**
+**状态：阶段 1 已交付（简化版：识别+注释，`3c6ef10`，2026-10-21 ——
+`Emitter._state_machine_note` 两道门，v39 上 1,863 识别 / 0 误报，
+只加类注释、不宣称 async/iterator；见 §3 阶段 1 与 round-2 记录）。
+阶段 2/3 待探针 C 分叉；attribute 解码（区分 async/iterator）为独立
+低风险交付。分叉决策见 `docs/plans/2026-10-25-todo-roadmap.md` §5。
+（2026-10-25 更新；原文"待启动"已过时。）**
 **上游依据：`docs/research-2026-10-21-urengine.md` §4**
 **优先级：P1**（P0 是 `sub_` 失败原因，见 §9）
 

@@ -192,9 +192,10 @@ unproven shape keeps today's spelling; raw is always honest.
   build -> gate -> delta review -> suites -> docs/commit) and e-MCP
   session mechanics: `docs/handoff-2026-10-06.md`.
 
-- Fix 124 (wide raw stores byte-address their displacement) is complete
-  on branch `fix124-wide-store-byte-offsets`, not merged or promoted:
-  paired Assembly-CSharp + whole 91-image tree gates clean, 9,339 changed
+- Fix 124 (wide raw stores byte-address their displacement) is merged
+  on `main` (`d97dd15`, verified ancestor of HEAD 2026-10-25; the
+  "on branch, not merged" wording above was stale — the branch no
+  longer exists): paired Assembly-CSharp + whole 91-image tree gates clean, 9,339 changed
   bodies proven pure fix-124, 5 goldens re-pinned, suite 1,463/1,465.
   The 2 failures were this sandbox's named-pipe denial in
   `tests/test_game_parallel_build.py` (a bare `ProcessPoolExecutor(2)`
