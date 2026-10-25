@@ -216,24 +216,26 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
   `System.Type.GetType(name)`，局部盖真实 System.Type 类型）；
   (b) 2,636 行 `[mi+0x20]→+0xc0` 类初始化/委托内联走读 → 归
   C5 族；(c) 其余为已解析的 this/base..ctor 调用（良性）。
-- **Step 3（下一片，探针已备 2026-10-25）**：无 spray 身份的共享站点
-  分层抽样表明其主体是**共享 generic BCL 方法体**，三族：
-  (a) 委托构造 `(delegate, this, X.Y_handler, 0)`（3 参站点数千，
-  R8 是 kind-3 MethodRef 的**绑定方法**——不是 callee 身份；现有
-  delegate 臂要求 recv.ty→delegate-invoke，这些站点的 receiver
-  无类型 → 需要绑定方法属主臂）；
-  (b) List/Dictionary 实例方法（1-2 参站点 ~18k：`sub_x(list11)`、
-  `sub_x(dictionary21, key)`）——候选全 `('generic', spec)`，
-  receiver 链臂只匹配 `'method'` 行 → 需把 spec 的 class
-  instantiation 参数与 receiver 的闭型参数匹配；
-  (c) `Array.Sort` 族 4 参（2,700 站点 @35+ 候选）。
-  **关键探针事实（sub_1842e7380, 40 候选）**：35×
-  `List`1.ICollection<T>.get_IsReadOnly`（不同 class-inst）+
-  3×`IEnumerable<T>.GetEnumerator` + 1×`ListElementProperty.get_Name`
-  —— ICF 把**不同方法**折叠进一体；receiver 匹配必须在
-  class-inst 命中者中要求方法名全一致，分歧即 decline。
-  匹配用 `il.generic_insts_list[ci]` + `_argv_names`（探针已验），
-  渲染显式接口实现走 `((ICollection<T>)recv).Prop` 形。
+- **Step 3 已定案：receiver 匹配臂判不成立，改为身份走链
+  （fix 147，2026-10-26）**。实现 + 实测推翻了本步的前提：本
+  fixture 的注册表把**错误的方法名**配到共享体上——0x183c23bc0
+  （21 行 Remove spec，K=object）与 0x1857f89d0（6 行 Remove，
+  K=int）的本体经全量反汇编证实是**纯搜索 FindEntry 码**（全路径
+  `mov eax,ebx; ret`，零变异），调用方按 int 语义用返回值
+  （`jns`/`shr eax,1fh`）；0x1808cda40 上 4 种方法×204 实例化共用
+  一个 `xor eax,eax; ret` 体。带全部计划守卫（每声明类型名字+参数
+  数全一致、精确 class-inst 键匹配、渲染名唯一）的臂在 1,727 个
+  站点持有方法上开火 470 次，**~445 次可证错**（全部
+  Dictionary.Remove 族）——整体回退。**规则：本 fixture 上注册候选
+  名永远不是共享体的身份证明。** 正确机制（已落地）：这些站点把
+  源方法核心内联后调共享帮手体，身份 MethodInfo* 经
+  `[cell]→[+0x20]→[+0xC0]→[+0x70]` 走链传入，根 cell 是 kind-6
+  MethodRef、`decode_slot` 直接解码出**源级调用名**（实测
+  TryGetValue/ContainsKey/Add）；`Expr._usg_root` 沿解引用传播 +
+  `_usg_walk_identity` 在 `_call` 消费。1,727 调用方批量重提升：
+  3,876 次走链开火、名字全部为 receiver 实例化对应的源级调用，
+  12 个受跟踪 VA 的诚实回退降到 14 行。Step 3 的 (a) 委托构造族
+  与 (c) Array.Sort 族未动——同样必须走运行时身份，不走候选名。
 - **C5 插片候选**：内联类初始化/委托 mi-pointer-walk 解码器
   （2,636 行，`[mi+0x20]→+0xc0→+0x10→+0x135` 链）。
 - **与 fix 141 的边界**：141 处理 guard-join phi 喷射（join 后的

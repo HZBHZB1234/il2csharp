@@ -47,9 +47,14 @@ class Expr:
                   # `il2cpp_interface_get_method` result resolves; `_call`
                   # renders `call [rax]` through it as a managed call
                   '_ifm',
-                  # fix 140: the object a `K.typeHierarchy` read came from
-                  # (record-only: `recv` would change binding behaviour)
-                  '_hobj')
+                 # fix 140: the object a `K.typeHierarchy` read came from
+                 # (record-only: `recv` would change binding behaviour)
+                 '_hobj',
+                  # fix 147: the lazy MethodRef usage slot a pointer walk
+                  # is rooted at -- the runtime identity the walk derives
+                  # from, propagated through each `[base+off]` deref so
+                  # `_call` can seat it at a shared-body call site
+                  '_usg_root')
 
     def __init__(self, text, ty=None, kind='?', recv=None):
         self.text = text      # rendered C# expression
@@ -80,6 +85,8 @@ class Expr:
         if name == '_dry_proof':
             return None
         if name == '_tile_proof':
+            return None
+        if name == '_usg_root':
             return None
         raise AttributeError(name)
 

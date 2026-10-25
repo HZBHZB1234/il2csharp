@@ -387,6 +387,35 @@ class _CallsMixin:
             return False
         return enum == 0x01
 
+    def _usg_walk_identity(self, cands, arg_exprs):
+        """Shared-body identity carried as a lazy-MethodRef pointer walk.
+
+        The site inlines the source method's core and calls the shared
+        helper body, passing the identity MethodInfo* through a short
+        pointer walk rooted at a lazy MethodRef cell (`[cell] -> [+0x20]
+        -> [+0xC0] -> [+0x70]`). The registered candidates then carry
+        whatever names the toolchain folded onto the address -- names
+        this fixture demonstrably mispairs (pure-search FindEntry bodies
+        registered under Remove specs at 0x183c23bc0/0x1857f89d0), so a
+        receiver-type or candidate-name match would buy a wrong method.
+        The walk's root cell is the runtime's own identity -- the
+        SOURCE-level call (TryGetValue/ContainsKey/Add) -- and outranks
+        every registered name. `_read_mem_raw` propagates the root onto
+        each deref as `_usg_root`; exactly one distinct root may sit in
+        the argument spray. Returns ``(arg_index, usage_idx)`` or None.
+        -- fix 147
+        """
+        root = None
+        hit_i = None
+        for i, ae in enumerate(arg_exprs):
+            r = getattr(ae, '_usg_root', None) if ae is not None else None
+            if r is None:
+                continue
+            if root is not None and r != root:
+                return None
+            root, hit_i = r, i
+        return (hit_i, root) if root is not None else None
+
     def _accessor_prop(self, mi):
         """fix 137: the property row a MethodDef accessor belongs to.
 
@@ -2905,6 +2934,20 @@ class _CallsMixin:
                     if i < len(args):
                         args = args[:i] + args[i + 1:]
                     break
+        # fix 147: the identity can also arrive as a POINTER WALK rooted
+        # at the same kind of lazy MethodRef cell -- see
+        # `_usg_walk_identity`. The walk's root cell is the runtime's
+        # own identity and outranks every registered name.
+        if info is None and cands and len(cands) > 1:
+            walked = self._usg_walk_identity(cands, arg_exprs)
+            if walked is not None:
+                hit_i, root = walked
+                nm6 = self.il.generic_method_name(root)
+                info = ('generic', root)
+                name = nm6
+                arg_exprs = arg_exprs[:hit_i] + arg_exprs[hit_i + 1:]
+                if hit_i < len(args):
+                    args = args[:hit_i] + args[hit_i + 1:]
         # A fresh delegate plus its metadata method pointer proves the ctor,
         # even when the native body is shared with Invoke specializations.
         delegate_target = None

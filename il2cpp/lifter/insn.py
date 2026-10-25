@@ -1782,6 +1782,22 @@ class _InsnMixin:
         if be is None:
             return Expr('mem_%x' % disp, None, 'ptr')
         fe = self._field_expr(be, disp, size, elem_fold=True)
+        # fix 147: a plain `[base+off]` deref of a lazy MethodRef cell
+        # value (or of an expr already derived from one) carries the
+        # walk's root identity forward. Source code never derefs a
+        # method-group value, so every such deref is compiler identity
+        # plumbing; `_call` seats the root at the shared-body call that
+        # consumes the walk. Indexed reads and frame slots are not walk
+        # shapes and keep today's behavior.
+        if idxr is None and fe is not None:
+            root = getattr(be, '_usg_root', None)
+            if root is None:
+                root = getattr(be, '_usg_idx', None)
+            if root is not None:
+                try:
+                    fe._usg_root = root
+                except AttributeError:
+                    pass
         # fix 134: field-form raw reads spell their native width; arrays
         # and strings keep the raw text later passes fold (`.Length`)
         if be.kind not in ('arr', 'str') and _W134_BASE_RX.match(be.text or '') and not (

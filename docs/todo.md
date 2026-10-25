@@ -7,6 +7,74 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 147 — shared-body identity from the MethodRef pointer walk; C1 step 3 closed as unsound (2026-10-26, on `main`)
+
+**The registration-name hazard (probe, decisive).** C1 step 3 planned
+to resolve shared generic bodies by matching the receiver's closed type
+against candidate class instantiations. Implementation + live census
+DISPROVED the premise: this fixture's registration pairs wrong method
+names onto shared bodies. Ground truth (full disassembly): the bodies
+at 0x183c23bc0 (21 Remove specs, K=object) and 0x1857f89d0 (6 Remove
+specs, K=int) are **pure-search FindEntry code** — every path converges
+on `mov eax,ebx; ret` (entry index, zero mutation) — while the callers
+use the result with int semantics (`test eax,eax; jns`,
+`shr eax,1fh`). 0x1808cda40 hosts 4 different methods × 204
+instantiations on one `xor eax,eax; ret` body. A receiver-matching arm
+built with every planned guard (per-declaring-TypeDef name+arity
+unanimity, exact class-inst key match, unanimous render) fired 470
+times across 1,727 site-owning callers and **~445 of those were
+provably wrong** (all Dictionary.Remove-family). The arm was reverted
+whole; the exact-inst guard only excludes the mismatched
+instantiations (string/enum receivers vs K=object canonical rows), and
+this game does have `Dictionary<object,X>` receivers. Rule going
+forward: a registered candidate name is NEVER identity proof for a
+shared body on this fixture; only the runtime's own identity is.
+
+**fix 147: the identity pointer walk (C5-lite).** At these sites the
+caller inlines the SOURCE method's core (ContainsKey/TryGetValue
+inlining FindEntry; Add inlining its grow path) and calls the shared
+helper body, passing the identity MethodInfo* through a short walk
+rooted at a lazy MethodRef cell: `mov rax,[rel cell]; mov rcx,[rax+
+0x20]; mov r8,[rcx+0xC0]; mov r8,[r8+0x70]`. The existing
+`decode_slot` decodes the root cells (kind 6) to the SOURCE-level
+call — verified: `0x1890771c8` → `Dictionary`2<string,bool>.
+TryGetValue`, `0x1890771e8` → ContainsKey, `0x1890a81d0` →
+`List`1<ObscuredInt>.Add` (the ActionSlotDetail Add-slow-path site
+whose callee spec is a registry-missed sharer). Implementation:
+`Expr._usg_root` (new slot) — `_read_mem_raw` propagates a base
+expr's `_usg_idx`/`_usg_root` onto every plain `[base+off]` deref
+(source code never derefs a method-group value, so any such deref is
+identity plumbing); `_usg_walk_identity` + a `_call` arm seat the root
+at any shared-body call whose spray carries exactly one distinct root,
+dropping the plumbing argument. The root outranks every registered
+name — it is what the runtime itself receives.
+
+**Validation.** Ground-truth `--mi` lifts: DestroyPart (110185)
+renders `this.parts_Breakable.ContainsKey(text1)` /
+`TryGetValue(text1, _)`; HasKeyword (1817) renders
+`this._keywordDic.TryGetValue(keyword, _)`; ActionSlotDetail ctor
+(104984) recovers the nine-element `list11.Add(...)` chain (b21:
+`object objN = sub_1842e7380(list11)` ×9). Batch re-lift of all 1,727
+site-owning callers: **3,876 walk fires**, every rendered name the
+expected source-level call for its receiver's instantiation
+(TryGetValue/ContainsKey/Add/get_Item across ~300 instantiations),
+remaining honest `sub_` markers on the 12 tracked VAs down to 14
+lines. Portable 1,410 (+6: slot default, walk-identity
+resolve/decline×2, E2E call, no-candidates fallback); game 1,439
+passed / 2 known env failures / 1 xfailed — failure SET byte-identical
+to fix-141, **zero pin moves**. Paired `--only Unity.ProBuilder`
+(c5pre/c5post, stash-proven): 30 files changed, 219 `sub_/*shared
+body*/` lines removed vs 221 resolved-call lines added (the rest of
+the 5,178-line delta is temp renumbering), brace 0 unbalanced,
+compile gate **9,774 → 9,750 (-24, syntax flat at 8)**. Known shape
+changes, both honest: unused pure `get_Item` reads drop as dead code
+(EdgeLookup: the pre-render's `bool flagN = (bool)sub_...(lookup,
+cur)` captures were fake-bool lies over an inlined-ctor indexer read),
+and the delegate-construction raw-store sequence
+(`func23+0x10/0x20/0x28 = methodPtr/target/methodInfo`) becomes
+visible where the phi-collapse used to eat it — that family's sugar
+is C1 step 3d.
+
 ## Current work: fix 146 landed — the Type.GetType(string) helper, C1's ctor-family decomposition (2026-10-25, on `main`)
 
 **The ctor-as-value census decomposed (probe, no build).** The C1 entry
