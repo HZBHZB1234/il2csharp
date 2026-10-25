@@ -7,6 +7,70 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 145 landed — C1's first slice, hidden-MethodInfo tail slots (2026-10-25, on `main`)
+
+**C1 step-0 census corrections (probe, no build).** The roadmap's C1
+entry guess ("hidden `MethodInfo*` names the true callee at RDX/last")
+needed three ground-truth corrections on the v39 corpus. (1) The
+`data_NNN` cells at shared-body call sites are NOT metadata cells —
+`va2off` is None (BSS, runtime-filled); the actual metadata cells are
+the **named MethodRef slots** the project already decodes
+(`Dictionary_2<Type, ITweenPlugin>.Clear`, `Enumerable.Where<Type>` —
+tree-wide census: only 4 sites carry a `data_` arg, ~225 carry a
+named `Type<...>.Member` identity arg). (2) The 38,085-site
+population is dominated by **generic shared bodies**: `addr_candidates`
+rows are `('generic', spec)` pairs from `generic_method_pointers`
+(e.g. 0x183c16050 = 205 specs), so the `_call` identity arms were
+never the bottleneck for them. (3) The upstream "dec direct-tail
+bypass" hypothesis is CONFIRMED: tail jumps assemble their own spray
+in `insn.py` and resolve through `_tail_hidden_generic`, which used to
+require the identity to be TRAILING — dead GPRs after the identity
+declined it.
+
+**fix 145 (the ABI-slot proof).** IL2CPP passes a shared generic
+body's callee identity (the method's own MethodInfo, from a lazy
+MethodRef usage slot) at a FIXED ABI position: one GPR slot past the
+declared argument slots (hidden sret buffer + receiver + non-float
+params; floats ride XMM and take no GPR slot — the same
+classification `_shared_slot_classes` uses). New
+`_methodinfo_slot(spec)` computes the slot; `_tail_hidden_generic`
+accepts an identity sitting exactly there even when stale written
+spray follows it (a stale cell landing on that precise slot would be
+a coincidence the ABI forbids; slots ≥ 4 are stack homes the GPR
+spray can never show, and decline). The resolved spec then flows the
+existing fix-94 machinery: `_tail_generic_call` → `_tail_method_args`
+positional rebuild → signature trim → receiver fold.
+
+**Validation (paired partial builds, per the build policy).** Paired
+`--only DOTween` rebuilds (stash/pop, otherwise identical): the pure
+fix-145 delta is **2 files**. `PluginsManager.PurgeAll` (mi 294568)
+tails `Dictionary`2<Type,ITweenPlugin>.Clear` with two dead GPRs
+behind the MethodRef: now `PluginsManager._customPlugins.Clear();
+return;` — and the entire phi spray chain that fed the old unresolved
+call (tweenPlugin1..13 + the GC write-barrier residue
+`&PluginsManager._xPlugin >> 12 & 63` guards) dies with it, 41 lines
+→ 18; `__SharedBodyStubs.cs` drops the 0x183c16050 stub (its only
+reference in the image resolved). `RenderPipelineChecker.GetTypesSafe`
+(mi 314901, Assembly-CSharp side) resolves its `Enumerable.Where<Type>`
+tail (`--mi` lift proof). Zero regressions: every changed line in the
+paired diff is the PurgeAll simplification or the stub deletion.
+Portable 1,399 (+4 tail tests); game 1,423 / 2 env / 1 xfailed (after
+fixing my new GetTypesSafe test's own params bug — its first run
+matched 0 rows because GetTypesSafe takes 1 param, not 0), failure
+SET byte-identical to the fix-141 state, **zero pin moves**. Two new
+game tests (`tests/test_game_fix145_tail_methodinfo.py`) pin the two
+ground truths.
+
+**C1 residual (next slices).** The 225 direct-identity sites beyond
+DOTween (mostly Assembly-CSharp: `List_1<T>.RemoveAll`,
+`Enumerable.Any/Where` tails) are validated but not yet in a build —
+the paired DOTween probe only covers its own image; the Assembly-
+CSharp side gets its paired rebuild in the next C1 slice together
+with the ctor-as-value family (~5,520 lines). The ~38k remaining
+shared markers are dominated by shapes whose identity is NOT in the
+spray (all-candidate registry rows with no MethodRef argument) —
+those need the receiver/type arms, which is C1's step 2.
+
 ## Current work: b21 salvage + Stage 1.5 landed + fix 144 found (2026-10-25, on `main`)
 
 **v39b21 postmortem.** The full rebuild (source `88e2373`) HUNG at the

@@ -181,6 +181,66 @@ def test_hidden_generic_declines_single_owner_tails():
         [("method", 0)], ["t8", ADD], exprs) is None
 
 
+def test_hidden_generic_accepts_identity_at_abi_slot_despite_later_args():
+    # fix 145: the trailing rule is sufficient, not necessary -- the ABI
+    # puts the hidden MethodInfo* exactly one slot past the declared GPR
+    # slots, and an identity sitting there is the callee no matter what
+    # stale spray follows it (PluginsManager.PurgeAll tails
+    # Dictionary`2<Type,ITweenPlugin>.Clear with two dead GPRs behind).
+    lift = make_tail_lifter()
+    slot = Expr(ADD, None, "obj")
+    slot._usg_idx = 0
+    exprs = [Expr("t8", None, "obj"), Expr("t9", None, "int"), slot,
+             Expr("v7", None, "int")]
+    # AddListener: instance + one int param -> hidden slot 2 (R8)
+    assert lift._methodinfo_slot(0) == 2
+    assert lift._tail_hidden_generic(
+        [("generic", 0), ("generic", 1)], ["t8", "t9", ADD, "v7"], exprs) \
+        == (ADD, 0, 2)
+
+
+def test_hidden_generic_declines_identity_off_the_abi_slot():
+    # an identity BELOW the hidden slot with written arguments after it
+    # is a value somebody passed earlier, not the callee
+    lift = make_tail_lifter()
+    slot = Expr(ADD, None, "obj")
+    slot._usg_idx = 0
+    exprs = [Expr("t8", None, "obj"), slot, Expr("t9", None, "int"),
+             Expr("v7", None, "int")]
+    assert lift._tail_hidden_generic(
+        [("generic", 0), ("generic", 1)], ["t8", ADD, "t9", "v7"], exprs) \
+        is None
+
+
+def test_methodinfo_slot_skips_float_params():
+    # a float parameter travels in XMM and occupies no GPR slot, so the
+    # hidden MethodInfo* lands one slot earlier than the parameter count
+    # suggests
+    meta = NS(
+        methods=[MethodDef(0, "SetX", 0, 1, 0, -1, 1, 0, 0, 0, 1)],
+        typedefs=[NS(name="F", namespace="", is_valuetype=False)],
+        method_params=lambda m: [ParamDef("x", 0, 2)],
+    )
+    il = NS(meta=meta, types=[VOID, INT, (0, 0x0C << 16)],
+            method_specs=[(0, 0, -1)], returns_sret=lambda ty: False)
+    lift = Lifter.__new__(Lifter)
+    lift.il, lift.meta = il, meta
+    assert lift._methodinfo_slot(0) == 1
+
+
+def test_shared_tail_trims_spray_after_slot_proven_identity():
+    # R9 carries a real (written) stale var, so the trailing rule
+    # declines; the ABI-slot proof rescues the identity and the resolved
+    # signature rebuild trims both it and the trailing spray.
+    lift = make_tail_lifter(caller_void=True)
+    slot = Expr(ADD, None, "obj")
+    slot._usg_idx = 0
+    lift.regs["R8"] = slot
+    lift.regs["R9"] = Expr("v7", None, "int")
+    lift._insn(jmp_insn(), [jmp_insn()], 0, None, 0x1010)
+    assert lift.out == [(0x1000, "t8.AddListener(t9); return;", None)]
+
+
 def test_caller_void_gate():
     assert make_tail_lifter(caller_void=True)._caller_is_void() is True
     assert make_tail_lifter(caller_void=False)._caller_is_void() is False

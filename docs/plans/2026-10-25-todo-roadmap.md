@@ -200,18 +200,26 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
 
 ### P2-1 C1：共享/ICF 调用命名（最大单项）
 
-- CS0103 最大驱动：~10.2k trailing-spray + ~4.0k `.ctor`-as-value。
-  隐藏 `MethodInfo*` 参数（RDX/末参）命名真实 callee，随后按解析出的
-  arity 截断 spray；base-ctor 尾跳 → `: base(...)`。
+- **Slice 1 已落地（fix 145，2026-10-25）**：上游的 dec direct-tail
+  旁路假设证实——尾跳自己组装 spray 并经 `_tail_hidden_generic`
+  解析，旧规则要求身份必须收尾，尾随死 GPR 即 decline。新
+  `_methodinfo_slot` 按声明 ABI 槽位（sret+receiver+非 float 参数）
+  接受身份。探针同时修正了入口认知：`data_NNN` 实参不是 metadata
+  单元（BSS 运行时填充，全树仅 4 站点）；真正的身份是已命名的
+  MethodRef 槽（~225 直接站点）；38k 站点大头是 generic 共享体
+  （`addr_candidates` 全是 `('generic', spec)`）。配对 `--only
+  DOTween`：纯 delta 2 文件（PurgeAll 41→18 行 + stub 删除），
+  套件绿、零 pin 移动。
+- **Step 2（下一片）**：Assembly-CSharp 侧配对重建覆盖 225 直接
+  站点 + ctor-as-value 族（~5,520 行，`.ctor` 出现于调用实参位）
+  → `: base(...)` / 真实 ctor 命名。
+- **Step 3**：无 spray 身份的共享站点（receiver/type 臂加强）。
 - **与 fix 141 的边界**：141 处理 guard-join phi 喷射（join 后的
   all-unknown phi），C1 处理共享体 methodinfo 形状（body 级 spray），
-  互补不重叠；落地前先跑一次联合 census 确认残余 population 分层。
-- 上游当年指出 fixture 内单实例渲染诚实的路径疑似绕过 candidates
-  检查（dec direct-tail `_emit_tail`，cf. slice 2b）——探针先验证。
+  互补不重叠。
 - **进入测量（2026-10-25，b20 锚树）**：`/*shared body, N candidates*/`
-  站点 = **38,085**；ctor-as-value 族 ≈ **5,520 行**（`.ctor` 出现于
-  调用实参位的行）。v39 的人口比上游外部语料的估计（~10.2k spray）
-  大一个量级——C1 是 v39 世界最大的单项可读性/编译性收益。
+  站点 = **38,085**；ctor-as-value 族 ≈ **5,520 行**。v39 的人口比
+  上游外部语料的估计（~10.2k spray）大一个量级。
 
 ### P2-2 C2：原始偏移的字段解析
 

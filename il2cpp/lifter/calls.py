@@ -577,8 +577,53 @@ class _CallsMixin:
         valid = [mm for mm in matches
                  if not any(_written(j) for j in range(mm[0] + 1, len(exprs)))]
         if not valid:
+            # The trailing rule is sufficient but not necessary: stale
+            # spray can follow the real identity (PluginsManager.PurgeAll
+            # tails Dictionary`2<Type,ITweenPlugin>.Clear with two dead
+            # GPRs after the MethodRef). The ABI fixes where the hidden
+            # MethodInfo* belongs -- one slot past the last declared GPR
+            # slot of the named method. An identity sitting exactly there
+            # cannot be a leftover: the value a call passes in its hidden
+            # slot IS the callee's own MethodInfo, and a stale cell load
+            # would have to land on that precise slot by coincidence.
+            # Positions at or past the four argument registers decline in
+            # the helper (stack homes never appear in the GPR spray).
+            for mm in matches:
+                if self._methodinfo_slot(mm[1]) == mm[0]:
+                    valid.append(mm)
+        if not valid:
             return None
         return (valid[0][2], self._spec_md(valid[0][1]), valid[0][0])
+
+    def _methodinfo_slot(self, spec_index):
+        """GPR slot index where the hidden MethodInfo* argument belongs.
+
+        The hidden argument travels after the last declared GPR slot:
+        the hidden sret buffer, then the instance receiver, then every
+        by-value non-float parameter (floats travel in XMM and occupy no
+        GPR slot -- same classification `_shared_slot_classes` uses). A
+        slot at or beyond the four argument registers is a stack home the
+        GPR spray can never show, and an unreadable row declines.
+        """
+        md = self._spec_md(spec_index)
+        if md is None:
+            return None
+        m2 = self.meta.methods[md]
+        rt3 = self.il.types[m2.return_type] \
+            if 0 <= m2.return_type < len(self.il.types) else None
+        try:
+            slot = int(self.il.returns_sret(rt3)) + (0 if m2.is_static else 1)
+            for p in self.meta.method_params(m2):
+                if not 0 <= p.type < len(self.il.types):
+                    return None
+                bits = self.il.types[p.type][1]
+                te = (bits >> 16) & 0xFF
+                is_float = te in (0x0c, 0x0d) and not ((bits >> 29) & 1)
+                if not is_float:
+                    slot += 1
+        except Exception:
+            return None
+        return slot if slot < len(ARG_REGS) else None
 
     def _tail_trim_stale(self, args, arg_exprs):
         """Drop trailing placeholder/stale tail arguments (fix-58 mirror).
