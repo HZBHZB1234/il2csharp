@@ -113,19 +113,38 @@ AwaitUnsafeOnCompleted 形态）+ 853 个迭代器（yield 状态形态），
 每个记录：行数、`switch` 个数、`goto` 个数、`sub_` 个数、`unknown` 个数。
 **这组数字就是验收时的对照基线。**
 
-### 2.3 探针 C：能恢复多少
+### 2.3 探针 C：能恢复多少 —— 已完成（2026-10-25，全量文本形状分析）
 
-对样本 B 的 3 个类型，尝试证明：
+对 v39b20 树上全部 1,949 个 MoveNext 体做形状普查：
 
-- [ ] `MoveNext` 的 `switch` 判别式是否就是 state 字段
-- [ ] case 0 是否可证明是"首次进入"分支
-- [ ] 是否存在 `builder.Start(ref stateMachine)` → 可证 async
-- [ ] 是否存在 `yield return` 形态 → 可证迭代器
-- [ ] 是否存在 `SetResult` / `SetException` → 可证 `Task` 完成路径
+| 形状 | 体数 | 占比 | 解读 |
+| --- | --- | --- | --- |
+| `__1__state == 0` 入口测试 | 1,084 | 56% | async 入口已在渲染里 |
+| 负状态写入（`state = -1/-2`） | 1,873 | 96% | 终态语义已在渲染里 |
+| `__2__current =` yield 存储 | 794 | 41% | 迭代器 yield 点可见 |
+| `GetAwaiter()` | 123 | 6% | await 点可见 |
+| **`switch` on state** | **77** | **4%** | **阶段 2 的目标形状只剩 4%** |
+| **`TAwaiter` 未闭合泛型声明** | **666** | **34%** | 最大的状态机专属残缺 |
 
-**若 C 的答案大面积为"否"，本计划降级为"只做识别 + 命名"**
-（即把 `<LoadSprite>d__1` 标注为 `LoadSprite 的异步状态机`），
-不做控制流重建。**不要为做而做。**
+结构 pass（if/else 链、恢复标签 L_xxx）早已把绝大多数状态分发化成
+线性可读形态——**计划 §3 阶段 2（MoveNext 结构化）的目标人口只剩
+4%，不构成一个 pass**。最大的状态机专属残缺是 666 个体里的
+`TAwaiter`/`TaskAwaiter` 未闭合泛型声明——那是 C8 泛型拼写族的
+成员（roadmap P2-5），不是状态机专属问题。
+
+### 2.4 分叉决策（按计划 §2.3 与 §8 的纪律）
+
+**降级交付：C9 定格为"识别 + 种类标注"（Stage 1 + Stage 1.5），
+阶段 2/3 decline**，理由：阶段 2 人口 4%；阶段 3（re-sugar）的
+builder.Start/yield 证明点在 1,096 个 async 体里只剩 3 个直接
+builder 调用（builder 调用大多被 IL2CPP 内联进 m_coreState 突变），
+re-sugar 的控制流重建投入与收益不成比例；且 §8 明文"宁可留下诚实
+的 switch (state)，也不要输出自信错误的 async"。残余可读性缺口
+（TAwaiter 666 体、awaiter 状态原始读）归 C8 与 fix-134 家族跟踪。
+
+**Stage 1.5（待 post-b21 落地）**：`_state_machine_note` 依据声明段
+判据写出诚实种类（§2.1 表格），影响 1,949 个注释行，需配对重建
+评估 golden。
 
 ---
 

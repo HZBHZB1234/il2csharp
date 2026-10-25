@@ -242,19 +242,18 @@ mi 290837（MoveNext@0 / Current@1，`FileHash` 类型闭合）经验证实，
 Stage 1 已交付（`3c6ef10`：`Emitter._state_machine_note`，两道门，
 1,863 识别 / 0 误报，只加注释）。
 
-**探针 A 已完成（2026-10-25，见计划文档 §2.1）**：1,949 个状态机
-声明在产物树里 100% 可分类——1,096 async（struct `IAsyncStateMachine`
-+ `__t__builder`）+ 853 iterator（class `IEnumerator`）+ 0 decline；
-分类判据来自声明本身，attribute 解码不再需要。剩余按原计划门控：
+**探针 A + 探针 C 均已完成（2026-10-25，见计划文档 §2.1/§2.3）**：
+1,949 个状态机声明 100% 可分类（1,096 async + 853 iterator，
+判据来自声明本身）；MoveNext 形状普查显示阶段 2 的 switch 分发目标
+人口只剩 4%（77 体），阶段 3 的 builder 调用只剩 3 个直接调用
+（其余被 IL2CPP 内联）。**分叉决策：降级交付——C9 定格为
+"识别 + 种类标注"，阶段 2/3 decline**，残余（TAwaiter 未闭合泛型
+666 体）归 C8。剩余按原计划门控：
 
-1. **Stage 1.5（新分叉点，低风险可独立交付）**：`_state_machine_note`
+1. **Stage 1.5（唯一剩余交付，低风险）**：`_state_machine_note`
    写出诚实的种类（iterator/async），判据 = 声明段的接口/字段形状。
    post-b21 落地（会动 1,949 个注释，golden 需配对重建评估）。
-2. **探针 C（可证明性）**：对真实样本证明 async 侧 `builder.Start` /
-   `AwaitUnsafeOnCompleted`、iterator 侧 yield 状态形态。大面积可证明
-   → 阶段 2（MoveNext 结构化）；否则按计划降级关闭，C9 定格为
-   "识别+标注"。
-3. **阶段 3（re-sugar）**：仅当阶段 2 交付且探针 C 全绿，需单独审批。
+2. C9 的收尾即 Stage 1.5 验收 + 计划文档状态行更新。
 
 ---
 
