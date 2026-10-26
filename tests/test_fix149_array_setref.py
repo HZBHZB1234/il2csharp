@@ -223,3 +223,11 @@ def test_value_box_body_bytes_are_41():
     assert len(body) == 41
     assert body[0:22] == bytes.fromhex(
         '48895c2410574883ec2083792800488bfa488bd97c0e')
+
+
+def test_alloc_fastpath_body_bytes():
+    """fix 154: `cmp [rcx+E4h],0; je <alloc>; ret` is the init fast path."""
+    body = bytes.fromhex('83b9e4000000000f84e3057900c3')
+    assert len(body) == 14
+    assert body[0:9] == bytes.fromhex('83b9e4000000000f84')
+    assert body[13] == 0xC3

@@ -7,6 +7,32 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 154 — the class-init fast path onto the allocator (2026-10-26, on `main`)
+
+**`0x180002de0` is the class-init fast path** (14 bytes, **1,543
+sites**): `cmp dword [rcx+0xE4],0; je <alloc>; ret` -- an
+already-initialized klass returns immediately, otherwise the
+allocator runs. The `je` target is 0x1807933d0, the `il2cpp_object_new`
+the census already names, so naming this entry the same routes its
+sites through the existing fold: `new Func_1<Delegate>()` instead of
+`sub_180002de0(...)`.
+
+**Two guards beyond the byte template.** `function_extent` is chunked
+in this fixture (4,096-byte blocks), so the proof is the 9-byte prefix
+through the `je` opcode plus the trailing `ret`, decoded as exactly
+`cmp` / `je rel32` / `ret`. The same bytes also occur once INSIDE a
+jump-table body (off a function boundary, not 16-aligned, preceded by
+table data), so a second gate requires the entry to be 16-aligned or
+to directly follow `ret`/`int3`/`nop`. The `je` must also land on a
+known allocator (`rt_alloc` or the `rt_allocs` family).
+
+**Validation.** Portable 1,428 (+1: the 14-byte body); paired
+`--only UnityEngine.UI` against the fix-153 tree (fastpathpost, 981
+files / 12,249 bodies both sides): **3 files, 514 `sub_180002de0`
+lines removed**, 2,454 added (typed `new Func_1<Delegate>()`
+allocations and their temp renumbering), brace 0, compile gate
+**50,532 -> 50,529 (syntax flat at 17)**.
+
 ## Current work: fix 153 — value-type boxing, found by structure because the symbol is absent (2026-10-26, on `main`)
 
 **`0x1807e3960` is the value-type BOX helper** (41 bytes, **8,554

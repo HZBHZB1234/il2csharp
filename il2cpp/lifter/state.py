@@ -481,6 +481,57 @@ class _StateMixin:
             return None
         return stride
 
+    def _is_alloc_fastpath_helper(self, target):
+        """Recognize the class-init fast path onto the allocator.
+
+        Ground truth: 0x180002de0 (14 bytes, 1,543 call sites).
+        `cmp dword [rcx+0xE4],0; je <alloc>; ret` -- an already-
+        initialized klass returns immediately, otherwise the allocator
+        runs (the `je` target is 0x1807933d0, the `il2cpp_object_new`
+        the census already names). The managed shape is the same
+        `new T()` allocation; naming it `il2cpp_object_new` routes the
+        sites through the existing fold. The template also occurs once
+        off a function boundary; `function_extent` excludes that.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        # `function_extent` is chunked in this fixture, so the byte
+        # template plus a decode of the three instructions is the proof:
+        # `cmp dword [rcx+E4h],0` (7) / `je rel32` (6) / `ret` (1).
+        code = self.bin.read(target, 14)
+        if not code or len(code) != 14:
+            return False
+        if not (code[0:9] == bytes.fromhex('83b9e4000000000f84')
+                and code[13] == 0xC3):
+            return False
+        try:
+            dec = Decoder(64, code, DecoderOptions.NONE)
+            dec.ip = target
+            ins = [next(iter(dec)) for _ in range(3)]
+        except Exception:
+            return False
+        if not (ins[0].mnemonic == Mnemonic.CMP
+                and ins[1].mnemonic == Mnemonic.JE
+                and ins[2].mnemonic == Mnemonic.RET
+                and ins[1].op0_kind == OpKind.NEAR_BRANCH64
+                and ins[1].near_branch_target != 0):
+            return False
+        # The `je` must land on the allocator itself -- either the
+        # census address or another member of the klass-argument family.
+        tgt = ins[1].near_branch_target
+        if not (tgt == getattr(self, 'rt_alloc', None)
+                or tgt in (getattr(self, 'rt_allocs', None) or ())):
+            return False
+        # The same bytes also occur INSIDE a jump-table body (off a
+        # function boundary, not 16-aligned, preceded by table data).
+        # A real entry is 16-aligned or directly follows padding/ret.
+        if target % 16 == 0:
+            return True
+        prev = self.bin.read(target - 1, 1)
+        return prev is not None and prev[0] in (0xC3, 0xCC, 0x90)
+
     def _is_value_box_helper(self, target):
         """Recognize the value-type BOX helper.
 
@@ -667,6 +718,9 @@ class _StateMixin:
                     elif self._is_array_getref_helper(target):
                         self.rt_names[target] = 'il2cpp_array_getref'
                         name = 'il2cpp_array_getref'
+                    elif self._is_alloc_fastpath_helper(target):
+                        self.rt_names[target] = 'il2cpp_object_new'
+                        name = 'il2cpp_object_new'
                     elif self._is_value_box_helper(target):
                         self.rt_names[target] = 'il2cpp_value_box'
                         name = 'il2cpp_value_box'
