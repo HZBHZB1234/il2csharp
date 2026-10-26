@@ -7,6 +7,32 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 153 — value-type boxing, found by structure because the symbol is absent (2026-10-26, on `main`)
+
+**`0x1807e3960` is the value-type BOX helper** (41 bytes, **8,554
+sites**). `cmp dword [rcx+0x28],0` tests the klass's valuetype flag,
+`jl` returns the reference path as-is, otherwise the body falls
+through to the box slow path. The managed shape is
+`(object)(value)` for a `(klass, &value)` call -- exactly what the
+existing `rt_value_box` fold already rendered.
+
+**Why it was never found: the fold looked only at exports.**
+`rt_value_box` was `next(va for va, nm in b.exports.items() if nm ==
+'il2cpp_value_box')`, and this fixture exports no such symbol, so the
+fold's `target == rt_box` gate could never match. Recognition is now
+structural (byte-exact 41-byte template, unique in .text), and the
+fold accepts `name == 'il2cpp_value_box'` as well as the export.
+
+**Validation.** Portable 1,427 (+2: the `(object)(num4)` fold and the
+41-byte body); ground truth (EGOGiftAbility, mi 98334) renders
+`string.Format("EGOGiftAbility_{0}", (object)(num4))` -- the source
+shape. Paired `--only UnityEngine.UI` against the fix-152 tree
+(boxpost, 981 files / 12,249 bodies both sides): 71 files changed,
+**182 `sub_1807e3960` lines removed**, 289 `(object)(...)` casts
+added, brace 0, compile gate **50,539 -> 50,532 (syntax flat at 17)**.
+Every changed line is a target shape (`string.Format(..., (object)(x))`,
+`((object)(color1)).GetHashCode()`, `((object)(num1)).getClass()`).
+
 ## Current work: fix 152 — the parameterless init wrapper, and why it must NOT reuse the census name (2026-10-26, on `main`)
 
 **`0x18078c0b0` is the no-argument entry of the runtime-metadata

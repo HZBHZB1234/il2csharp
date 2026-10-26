@@ -2877,7 +2877,7 @@ class _CallsMixin:
         # the box is an allocation, so a standalone box statement is dead code
         # and dropped; only the value travels on
         rt_box = getattr(self, 'rt_value_box', None)
-        if target is not None and rt_box is not None and target == rt_box and len(args) >= 2:
+        if target is not None and len(args) >= 2                 and (target == rt_box or name == 'il2cpp_value_box'):
             v = args[1]
             if v.startswith('&'):
                 v = v[1:]

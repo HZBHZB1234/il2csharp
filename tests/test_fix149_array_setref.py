@@ -203,3 +203,23 @@ def test_init_meta_wrapper_bytes_are_the_19_byte_body():
     assert len(body) == 19
     assert body[0:5] == bytes.fromhex('4883ec28e8')
     assert body[9:19] == bytes.fromhex('f0830c24004883c428c3')
+
+
+def test_value_box_folds_to_an_object_cast():
+    """fix 153: il2cpp_value_box(klass, &value) -> (object)(value)."""
+    lift = make_lifter(Expr('typeof(int)', (7, 0x12 << 16), 'klass'))
+    lift.regs['RDX'] = Expr('&num4', None, 'ptr')
+    lift.rt_names[TARGET] = 'il2cpp_value_box'
+    lift.rt_value_box = None
+    ins = call_insn()
+    lift._insn(ins, [ins], 0, None, ins.next_ip)
+    assert lift.regs['RAX'].text == '(object)(num4)'
+
+
+def test_value_box_body_bytes_are_41():
+    body = bytes.fromhex(
+        '48895c2410574883ec2083792800488bfa488bd97c0e'
+        '488b02488b5c24384883c4205fc34883796000')
+    assert len(body) == 41
+    assert body[0:22] == bytes.fromhex(
+        '48895c2410574883ec2083792800488bfa488bd97c0e')

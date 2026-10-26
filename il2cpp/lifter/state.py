@@ -481,6 +481,33 @@ class _StateMixin:
             return None
         return stride
 
+    def _is_value_box_helper(self, target):
+        """Recognize the value-type BOX helper.
+
+        Ground truth: 0x1807e3960 (41 bytes, 8,554 call sites).
+        `cmp dword [rcx+0x28],0` tests the klass's valuetype flag,
+        `jl` takes the reference path (return [rdx] as-is), otherwise
+        the body falls through to the box slow path. Managed shape is
+        `(object)(value)` for a `(klass, &value)` call -- exactly what
+        the existing `rt_value_box` fold renders. This fixture exports
+        no `il2cpp_value_box` symbol, so the export lookup alone never
+        found it. Template byte-exact; verified UNIQUE in .text.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        start, finish = self.il.function_extent(target)
+        if start != target or finish is None or finish - target != 41:
+            return False
+        code = self.bin.read(target, 41)
+        if not code or len(code) != 41:
+            return False
+        return (code[0:22] == bytes.fromhex(
+                    '48895c2410574883ec2083792800488bfa488bd97c0e')
+                and code[22:41] == bytes.fromhex(
+                    '488b02488b5c24384883c4205fc34883796000'))
+
     def _is_init_meta_wrapper(self, target):
         """Recognize the parameterless runtime-metadata init wrapper.
 
@@ -640,6 +667,9 @@ class _StateMixin:
                     elif self._is_array_getref_helper(target):
                         self.rt_names[target] = 'il2cpp_array_getref'
                         name = 'il2cpp_array_getref'
+                    elif self._is_value_box_helper(target):
+                        self.rt_names[target] = 'il2cpp_value_box'
+                        name = 'il2cpp_value_box'
                     elif self._is_init_meta_wrapper(target):
                         # Distinct from the census name on purpose: the
                         # census entry elides the call AND propagates the
