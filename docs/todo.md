@@ -7,6 +7,88 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 150 — the null-check helper; 10,136 guard statements vanish (2026-10-26, on `main`)
+
+**`0x180002df0` is `il2cpp_null_check`** (20 bytes, **10,136 call
+sites**). The entire body is `sub rsp,28h; test rcx,rcx; je +5;
+add rsp,28h; ret; call NullReference; int3` -- an argument guard with
+no other effect, and **C# has no spelling for it** (null checks are
+implicit). The correct render is therefore to DROP the statement and
+leave the registers flowing; the checked value is untouched.
+
+Recognition is the 15-byte prefix through the call opcode plus the
+trailing `int3`, with the NullReference rel32 as the only wildcard.
+The same 20 bytes occur once at a real method entry (0x185f461e0) and
+the `addr_candidates` guard excludes it, leaving 0x180002df0.
+
+**Naming had to become lazy.** The first wiring put the check in the
+`_init_runtime_ids` census loop, which only walks the hot-target
+sample (Assembly-CSharp) -- and this helper serves other images. The
+site census caught it: StaticDataManager.LoadStaticDataFromJsonFile
+still had 151 null-check lines after that change. `_array_addr_name`
+(the existing memoized lazy prober that `_call_name` consults for
+every otherwise-unresolved target) now also proves the element-store
+and null-check helpers, so coverage no longer depends on which image
+was sampled.
+
+**Validation.** Portable 1,419 (+2: the exact body bytes and the two
+RT_ARITY rows, plus the drop leaving no statement); ground truth:
+StaticDataManager.LoadStaticDataFromJsonFile (mi 118470) goes from
+**151 null-check lines to 0**. Paired `--only UnityEngine.UI` against
+the fix-149 tree (nullpost, 981 files / 12,249 bodies both sides):
+5 files changed, **340 null-check lines removed** (339 call sites + 3
+stub-file lines; the helper's `__SharedBodyStubs` entry disappears
+entirely), brace 0, compile gate **50,552 -> 50,549 (syntax flat at
+17)**. Two side effects, both improvements: 32 declarations whose
+`object` was a stale lane now carry the real struct type
+(`Length obj158`, `BackgroundRepeat obj207`, `MaterialDefinition`,
+`Ratio`) because dropping the guard restores the phi merge's type
+proof, and the rest of the 1,127 added lines is temp renumbering
+(declaration blocks shift once the guards are gone).
+
+## Current work: fix 149 — the element-store helper; collection initializers recover (2026-10-26, on `main`)
+
+**`0x180002950` is `il2cpp_array_setref`** (102 bytes, **15,453
+call sites** tree-wide): unsigned `cmp edx,[rcx+0x18]; jae` OOB guard
+(Il2CppArray SZARRAY layout -- length at +0x18, vector at +0x20), then
+`mov [rcx+rdx*8+0x20],r8`, then the GC write-barrier cmpxchg loop over
+the bitmap cell, returning a bitmap word. Recognition is a byte-exact
+template with the two RIP displacements and the barrier call rel32 as
+wildcards, derived programmatically from the real body and verified
+**unique across the fixture's whole .text**; `RT_ARITY` trims it to 3.
+
+**Two source shapes, and the dominant one was being destroyed.** A
+sampled census of 8,110 sites: **8,104 are expressions**
+`il2cpp_array_setref(new T[n], <literal i>, v)` and only 6 are plain
+statements. That ratio is the signature of a **collection
+initializer**: `new T[] { v0, v1, ... }` compiles to one allocation
+plus constant-index stores, then the array is consumed as a value.
+Rendering each store as its own `object objN = sub_...(...)` (the old
+shape) re-allocated the array once per element and invented a value
+from the barrier word. Now:
+- an inline `new T[n]` accumulates its literal-index stores on the
+  array Expr (`_arr_inits`) and `_materialize` renders the whole thing
+  as `new string[6] { "...", obj23, "\n", ... }` -- one allocation,
+  source-level shape;
+- a store on an already-hoisted array (`_array_allocation` gave the
+  `new T[n]` its own temp) still renders `arr[i] = v;` as a statement;
+- a variable index or an unreadable receiver declines to today's
+  honest call shape.
+
+**Validation.** Portable 1,417 (+6: statement fold, bitmap return goes
+unknown, no per-element re-allocation, unreadable receiver declines,
+initializer accumulation across two stores, variable index invents
+nothing); game +2 ground truths (OnGotHash renders
+`new string[6] { "Code hash differs...", ... }` with no
+`sub_180002950`; Clone has none left). Sampled re-lift of 120
+site-owning callers: **0 still contain `sub_180002950`**, 331 array
+stores/initializers rendered. Paired `--only UnityEngine.UI`
+(setrefpre/setrefpost, stash-proven, 981 files / 12,249 bodies both
+sides): 99 files changed, **648 `sub_180002950` lines removed**, 82
+collection initializers + 272 element-store statements added, brace 0,
+compile gate **50,559 -> 50,552 (syntax flat at 17)**. Every changed
+line is a target shape -- no renumbering-only or unrelated edits.
+
 ## Current work: fix 148 — the alloc-helper family; the 5,845-site delegate族 collapses (2026-10-26, on `main`)
 
 **Root cause: a single-slot classifier on a multi-entry helper.** The

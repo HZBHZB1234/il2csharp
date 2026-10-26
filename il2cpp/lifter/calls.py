@@ -2778,6 +2778,66 @@ class _CallsMixin:
                 self.emit(ins.ip, '', asm)
             return
 
+        # --- null check: il2cpp_null_check(obj) has no managed spelling.
+        # The helper's whole body guards its argument and returns; C#
+        # null checks are implicit, so the statement is dropped and the
+        # registers keep flowing (the checked value is untouched by the
+        # helper). -- fix 150
+        if name == 'il2cpp_null_check':
+            if self.asm_comments and asm:
+                self.emit(ins.ip, '', asm)
+            return
+
+        # --- element store: il2cpp_array_setref(arr, i, v) -> arr[i] = v;
+        # The helper returns a GC bitmap word, never a value source code
+        # reads, so the managed shape is a statement and RAX goes
+        # unknown afterwards. Receiver and index must both be readable
+        # (an unshaped text would print as raw pointer arithmetic and
+        # is better left honest). -- fix 149
+        if name == 'il2cpp_array_setref' and len(args) >= 3:
+            # Two source shapes share this helper:
+            #  (a) `arr[i] = v;` -- a statement on an existing array;
+            #  (b) `new T[n] { v0, v1, ... }` -- a COLLECTION INITIALIZER,
+            #      which compiles to one allocation followed by constant-
+            #      index stores, then the array is used as a value. That
+            #      is the dominant shape here (8,104 of 8,110 sampled
+            #      sites), and rendering it per-element would allocate
+            #      the array once per element.
+            # The array argument's Expr already went through
+            # `_array_allocation`, so a hoisted `new T[n]` reads as its
+            # own temp (shape (a)); an inline `new T[n]` means the
+            # array's value is consumed afterwards (shape (b)). -- fix 149
+            _ae = arg_exprs[0] if arg_exprs else None
+            _arr = (_ae.text if _ae is not None and _ae.text else args[0])
+            _idx, _val = args[1], args[2]
+            _inline_new = 'new ' in _arr or _arr.startswith('(')
+            if _arr and _arr != '_' and _idx and _idx != '_':
+                if _inline_new:
+                    # shape (b): accumulate the initializer on the array
+                    # expression so the consumer renders `new T[n]{...}`.
+                    _inits = getattr(_ae, '_arr_inits', None)
+                    if _inits is None:
+                        _inits = {}
+                        try:
+                            _ae._arr_inits = _inits
+                        except AttributeError:
+                            _inits = None
+                    if _inits is not None and re.fullmatch(r'\d+', _idx.strip()):
+                        _inits[int(_idx)] = _val or 'default'
+                        self.regs['RAX'] = _ae
+                        if self.asm_comments and asm:
+                            self.emit(ins.ip, '', asm)
+                        return
+                else:
+                    self.emit(ins.ip, '%s[%s] = %s;' % (
+                        _recv_fold(_arr), _idx, _val or 'default'), asm)
+                    for r in VOLATILE:
+                        self.regs.pop(r, None)
+                    for i in range(6):
+                        self.regs.pop('XMM%d' % i, None)
+                    self._fresh_unknowns()
+                    return
+
         # --- value boxing: il2cpp_value_box(klass, &value) -> (object)(value)
         # the box is an allocation, so a standalone box statement is dead code
         # and dropped; only the value travels on

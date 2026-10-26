@@ -38,6 +38,18 @@ class _ValuesMixin:
     def _materialize(self, expr: Optional[Expr], limit=100) -> str:
         if expr is None:
             return '???'
+        # fix 149: a `new T[n]` whose elements arrived as constant-index
+        # stores is a C# collection initializer -- render it whole here,
+        # so the consumer sees one allocation carrying its values and
+        # the length limit applies to the expanded text.
+        _inits = getattr(expr, '_arr_inits', None)
+        if _inits:
+            _base = expr.text
+            _items = ', '.join(_inits[k] for k in sorted(_inits))
+            _txt = (_base[:-1] + ' { ' + _items + ' })'
+                    if _base.endswith(')')
+                    else _base + ' { ' + _items + ' }')
+            expr = Expr(_txt, expr.ty, expr.kind)
         if len(expr.text) > limit:
             v = self.new_var()
             if expr.ty is not None and expr.kind != 'ptr' and not expr.text.startswith('&'):

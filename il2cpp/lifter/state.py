@@ -30,6 +30,8 @@ class _StateMixin:
         'il2cpp_runtime_class_init': 1,
         'il2cpp_interface_get_method': 3,
         'il2cpp_array_addr': 2,
+        'il2cpp_array_setref': 3,
+        'il2cpp_null_check': 1,
     }
 
     @staticmethod
@@ -463,6 +465,74 @@ class _StateMixin:
             return None
         return stride
 
+    def _is_null_check_helper(self, target):
+        """Recognize the null-check helper (10,136 tree-wide sites).
+
+        Ground truth: 0x180002df0 (20 bytes). The whole body is
+        `sub rsp,28h; test rcx,rcx; je +5; add rsp,28h; ret; call
+        NullReference; int3` -- an argument guard with no other effect.
+        Source code has no counterpart: C# null checks are implicit, so
+        the correct render DROPS the call. Only the NullReference
+        helper's rel32 varies; the same 20 bytes also occur at one real
+        method entry (0x185f461e0), which the `addr_candidates` guard
+        excludes. Never hardcodes an address.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        start, finish = self.il.function_extent(target)
+        if start != target or finish is None or finish - target != 20:
+            return False
+        code = self.bin.read(target, 20)
+        if not code or len(code) != 20:
+            return False
+        return (code[0:15] == bytes.fromhex('4883ec284885c974054883c428c3e8')
+                and code[19] == 0xCC)
+
+    def _is_array_setref_helper(self, target):
+        """Recognize the bounds-checked element-STORE helper.
+
+        Ground truth: 0x180002950 (102 bytes, 15,453 call sites). The
+        body mirrors `_is_array_addr_helper`: an unsigned
+        `cmp edx,[rcx+0x18]; jae fail` OOB guard (Il2CppArray SZARRAY
+        layout -- length at +0x18, vector at +0x20), then
+        `mov [rcx+rdx*8+0x20],r8` (store the reference), then the GC
+        write-barrier cmpxchg loop over the bitmap cell, returning the
+        bitmap word -- a value the source never reads, because the
+        managed statement is `arr[i] = v`. Template pinned byte-exact
+        apart from the two RIP displacements and the write-barrier
+        call rel32, and verified UNIQUE across the fixture's whole
+        .text. Never hardcodes an address.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        start, finish = self.il.function_extent(target)
+        if start != target or finish is None or finish - target != 102:
+            return False
+        code = self.bin.read(target, 102)
+        if not code or len(code) != 102:
+            return False
+        head = bytes.fromhex('4883ec283b51187357'      # guard + jae
+                             '833d')                   # cmp [rel],0
+        mid1 = bytes.fromhex('004c8944d1207444'        # je + store [rcx+rdx*8+20h]
+                             '4883c2044c8d0d')         # add rdx,4; lea r9,[rel]
+        mid2 = bytes.fromhex('4c8d04d1498bd049c1e80c'  # lea r8,[rcx+rdx*8]; mov rdx,r8
+                             '48c1ea1281e2ff7f00004183e03f'
+                             '0f1f440000')             # shr/and; nop
+        body = bytes.fromhex('498b84d1e0620400'        # mov rax,[r9+rdx*8+462e0h]
+                             '488bc84c0fabc1f0'        # mov rcx,rax; bts rcx,r8
+                             '490fb18cd1e0620400'      # lock cmpxchg [...]
+                             '75e54883c428c3')         # jne loop; add rsp; ret
+        return (code[0:11] == head
+                and code[15:30] == mid1
+                and code[34:64] == mid2
+                and code[64:96] == body
+                and code[96] == 0xE8
+                and code[101] == 0xCC)
+
     def _array_addr_name(self, target):
         """Memoized lazy name for the element-address helper.
 
@@ -471,7 +541,9 @@ class _StateMixin:
         TextCore -- so `_call_name` consults this on every otherwise
         unresolved target (the class-init-twin precedent): one
         structural proof per address, cached per instance (VAs are
-        binary-local). Never raises.
+        binary-local). The same laziness carries the element-STORE and
+        null-check helpers (fixes 149/150), which likewise serve images
+        outside the hot-target sample. Never raises.
         """
         try:
             cache = self.__dict__.setdefault('_array_addr_cache', {})
@@ -488,6 +560,12 @@ class _StateMixin:
                         self.rt_names[target] = 'il2cpp_array_addr'
                         self.__dict__.setdefault('rt_array_addr', {})[target] = _st
                         name = 'il2cpp_array_addr'
+                    elif self._is_array_setref_helper(target):
+                        self.rt_names[target] = 'il2cpp_array_setref'
+                        name = 'il2cpp_array_setref'
+                    elif self._is_null_check_helper(target):
+                        self.rt_names[target] = 'il2cpp_null_check'
+                        name = 'il2cpp_null_check'
             except Exception:
                 name = None
             cache[target] = name
@@ -1402,6 +1480,33 @@ class _StateMixin:
                 if _st:
                     self.rt_names[_c] = 'il2cpp_array_addr'
                     self.__dict__.setdefault('rt_array_addr', {})[_c] = _st
+        # Bounds-checked element-STORE helper (0x180002950, 15,453
+        # tree-wide sites): `(array, index, value)`, and the managed
+        # statement is `array[index] = value` -- the native return (a
+        # GC bitmap word) is never read by source. Naming it routes the
+        # sites through the `il2cpp_array_setref` arity trim and the
+        # statement fold in `_call`.
+        for _t in sorted(set(cnt) | set(stats)):
+            _fin = self._thunk_final(_t)
+            for _c in (_t,) if _fin in (None, _t) else (_t, _fin):
+                try:
+                    _hit = self._is_array_setref_helper(_c)
+                except Exception:
+                    _hit = False
+                if _hit:
+                    self.rt_names[_c] = 'il2cpp_array_setref'
+        # Null-check helper (0x180002df0, 10,136 tree-wide sites): the
+        # body only guards its argument, and C# has no spelling for it,
+        # so `_call` DROPS the statement entirely.
+        for _t in sorted(set(cnt) | set(stats)):
+            _fin = self._thunk_final(_t)
+            for _c in (_t,) if _fin in (None, _t) else (_t, _fin):
+                try:
+                    _hit = self._is_null_check_helper(_c)
+                except Exception:
+                    _hit = False
+                if _hit:
+                    self.rt_names[_c] = 'il2cpp_null_check'
         self._cls_init_export = next(
             (va for va, nm0 in b.exports.items()
              if nm0 == 'il2cpp_runtime_class_init'), None)

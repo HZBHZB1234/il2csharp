@@ -54,7 +54,11 @@ class Expr:
                   # is rooted at -- the runtime identity the walk derives
                   # from, propagated through each `[base+off]` deref so
                   # `_call` can seat it at a shared-body call site
-                  '_usg_root')
+                  '_usg_root',
+                  # fix 149: constant-index element stores accumulated on
+                  # an inline `new T[n]` -- the collection initializer
+                  # `_materialize` renders as `new T[n] { v0, v1, ... }`
+                  '_arr_inits')
 
     def __init__(self, text, ty=None, kind='?', recv=None):
         self.text = text      # rendered C# expression
@@ -87,6 +91,8 @@ class Expr:
         if name == '_tile_proof':
             return None
         if name == '_usg_root':
+            return None
+        if name == '_arr_inits':
             return None
         raise AttributeError(name)
 
