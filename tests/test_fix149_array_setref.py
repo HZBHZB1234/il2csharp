@@ -171,3 +171,27 @@ def test_null_check_is_dropped_from_the_body():
     ins = call_insn()
     lift._insn(ins, [ins], 0, None, ins.next_ip)
     assert lift.out == []
+
+
+def test_array_getref_folds_to_an_index_expression():
+    """fix 151: the bounds-checked element LOAD is `array[index]`."""
+    lift = make_lifter(Expr('list12._items', STR_ARR, 'arr'))
+    lift.rt_names[TARGET] = 'il2cpp_array_getref'
+    ins = call_insn()
+    lift._insn(ins, [ins], 0, None, ins.next_ip)
+    assert lift.regs['RAX'].text == 'list12._items[num2]'
+
+
+def test_getref_declines_an_unreadable_array():
+    lift = make_lifter(Expr('_', None, '?'))
+    lift.rt_names[TARGET] = 'il2cpp_array_getref'
+    ins = call_insn()
+    lift._insn(ins, [ins], 0, None, ins.next_ip)
+    assert '[' not in (lift.regs['RAX'].text or '')
+
+
+def test_helper_recognizers_are_mutually_exclusive():
+    """The three array/guard helpers must not claim each other's body."""
+    assert Lifter.RT_ARITY['il2cpp_array_getref'] == 2
+    assert Lifter.RT_ARITY['il2cpp_array_setref'] == 3
+    assert Lifter.RT_ARITY['il2cpp_null_check'] == 1

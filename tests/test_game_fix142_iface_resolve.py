@@ -49,4 +49,9 @@ def test_set_keywords_has_no_scan_residue(baseline_game_decompiler):
     residue = _scan_residue(body)
     assert not residue, residue[:4]
     assert 'enumerator2.MoveNext()' in body
-    assert 'obj42?.Dispose();' in body
+    # fix 151 resolves the IDisposable probe into `enumerator2 as
+    # System.IDisposable`, which is the C# shape the compiler emits for
+    # a foreach's finally block -- the receiver is that local now, not
+    # an opaque objN.
+    assert ' as System.IDisposable;' in body
+    assert '?.Dispose();' in body

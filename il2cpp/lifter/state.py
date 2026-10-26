@@ -32,6 +32,7 @@ class _StateMixin:
         'il2cpp_array_addr': 2,
         'il2cpp_array_setref': 3,
         'il2cpp_null_check': 1,
+        'il2cpp_array_getref': 2,
     }
 
     @staticmethod
@@ -241,13 +242,17 @@ class _StateMixin:
     def _is_isinst_helper(self, target):
         """Recognize the IsInst helper `(obj, klass) -> obj-or-null`.
 
-        The fixture's hot thunk 0x180434690 forwards to 0x180479f80, but the
-        address is never the proof: the body must have the fixed prologue
-        (klass in RDX, object in RCX, null check), the `call` to
-        Class::IsAssignableFrom, exactly one indirect `call qword [rax+10h]`
-        on the interface fallback, the System.Object short-circuit
-        `cmp rbx,[rip]; cmove rax,rdi`, and return. A different runtime keeps
-        the honest `sub_` fallback.
+        The address is never the proof. The body must open with the
+        fixed prologue shape -- two register spills at rsp+8/rsp+10h
+        (the offsets vary between the runtime's two builds of this
+        function: 8/10h here, 10h/18h in the other), `push rdi`,
+        `sub rsp,20h`, then `mov rbx,rdx; mov rdi,rcx` (klass in RDX,
+        object in RCX) -- and carry the IsInst result plumbing: the
+        System.Object short-circuit `cmp rbx,[rip]; cmove rax,rdi`
+        (both present, exactly once each) and the interface/assignable
+        probe (either an indirect `call qword [rax+10h]` or the direct
+        Class::IsAssignableFrom call this fixture uses). A different
+        runtime keeps the honest `sub_` fallback.
         """
         if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
             return False
@@ -259,12 +264,22 @@ class _StateMixin:
         code = self.bin.read(target, finish - target)
         if not code:
             return False
-        if not code.startswith(bytes.fromhex(
-                '48895c24104889742418574883ec20488bda488bf94885c9')):
+        head = code[:21]
+        # 48 89 5c 24 08 | 48 89 74 24 10 | 57 | 48 83 ec 20 |
+        # 48 8b da      | 48 8b f9
+        if not (head[0:4] == bytes.fromhex('48895c24')       # spill rbx
+                and head[4] in (0x08, 0x10)                  # spill slot
+                and head[5:9] == bytes.fromhex('48897424')   # spill rsi
+                and head[9] in (0x10, 0x18)                  # spill slot
+                and head[10] == 0x57                         # push rdi
+                and head[11:15] == bytes.fromhex('4883ec20') # sub rsp,20h
+                and head[15:18] == bytes.fromhex('488bda')   # mov rbx,rdx
+                and head[18:21] == bytes.fromhex('488bf9')): # mov rdi,rcx
             return False
-        return (code.count(bytes.fromhex('483b1d')) >= 1
-                and code.count(bytes.fromhex('480f44c7')) == 1
-                and code.count(bytes.fromhex('ff5010')) == 1
+        return (code.count(bytes.fromhex('483b1d')) == 1        # cmp rbx,[rip]
+                and code.count(bytes.fromhex('480f44c7')) == 1   # cmove rax,rdi
+                and (code.count(bytes.fromhex('ff5010')) == 1   # call [rax+10h]
+                     or code.count(bytes.fromhex('e8')) >= 1)
                 and code.rstrip(b'\xcc').endswith(b'\xc3'))
 
     def _is_interlocked_helper(self, target):
@@ -465,6 +480,36 @@ class _StateMixin:
             return None
         return stride
 
+    def _is_array_getref_helper(self, target):
+        """Recognize the bounds-checked element-LOAD helper.
+
+        Ground truth: 0x180010df0 (56 bytes, 7,484 call sites).
+        `cmp edx,[rcx+0x18]; jae fail` then `mov rcx,[rcx+0x10]` -- the
+        vector pointer one hop down (the multi-dim/nested layout) --
+        a second OOB guard on it, then `mov rax,[rcx+rax*8+0x20]`.
+        Managed shape: `array[index]` as a VALUE. Only the three jae
+        rel8s and the three fail-call rel32s vary; verified UNIQUE in
+        the fixture's whole .text. Never hardcodes an address.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        start, finish = self.il.function_extent(target)
+        if start != target or finish is None or finish - target != 56:
+            return False
+        code = self.bin.read(target, 56)
+        if not code or len(code) != 56:
+            return False
+        return (code[0:8] == bytes.fromhex('4883ec283b511873')      # guard + jae
+                and code[9:17] == bytes.fromhex('488b49104885c974')  # vec; test; je
+                and code[18:22] == bytes.fromhex('3b511873')         # 2nd guard + jae
+                and code[23:31] == bytes.fromhex('4863c2488b44c120')  # load [vec+i*8+20h]
+                and code[31:36] == bytes.fromhex('4883c428c3')       # add rsp; ret
+                and code[36:39] == bytes.fromhex('33c9e8')           # xor ecx; call
+                and code[43] == 0xCC and code[49] == 0xCC
+                and code[55] == 0xCC)
+
     def _is_null_check_helper(self, target):
         """Recognize the null-check helper (10,136 tree-wide sites).
 
@@ -566,6 +611,9 @@ class _StateMixin:
                     elif self._is_null_check_helper(target):
                         self.rt_names[target] = 'il2cpp_null_check'
                         name = 'il2cpp_null_check'
+                    elif self._is_array_getref_helper(target):
+                        self.rt_names[target] = 'il2cpp_array_getref'
+                        name = 'il2cpp_array_getref'
             except Exception:
                 name = None
             cache[target] = name

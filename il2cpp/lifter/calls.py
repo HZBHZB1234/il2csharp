@@ -2778,6 +2778,24 @@ class _CallsMixin:
                 self.emit(ins.ip, '', asm)
             return
 
+        # --- element load: il2cpp_array_getref(arr, i) -> arr[i]
+        # The helper bounds-checks and returns the reference itself, so
+        # the managed value is the indexed element. Renders in place so
+        # the result keeps flowing through the ordinary value path.
+        # -- fix 151
+        if name == 'il2cpp_array_getref' and len(args) >= 2:
+            _ae = arg_exprs[0] if arg_exprs else None
+            _arr = (_ae.text if _ae is not None and _ae.text else args[0])
+            _idx = args[1]
+            if _arr and _arr != '_' and _idx and _idx != '_' \
+                    and not _arr.startswith('new '):
+                e = Expr('%s[%s]' % (_recv_fold(_arr), _idx),
+                         None, 'obj')
+                self.regs['RAX'] = e
+                if self.asm_comments and asm:
+                    self.emit(ins.ip, '', asm)
+                return
+
         # --- null check: il2cpp_null_check(obj) has no managed spelling.
         # The helper's whole body guards its argument and returns; C#
         # null checks are implicit, so the statement is dropped and the

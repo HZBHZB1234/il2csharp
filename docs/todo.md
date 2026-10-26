@@ -7,6 +7,46 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 151 — element LOAD + the isinst family's second build (2026-10-26, on `main`)
+
+**`0x180010df0` is `il2cpp_array_getref`** (56 bytes, 7,484 sites):
+`cmp edx,[rcx+0x18]; jae` then `mov rcx,[rcx+0x10]` (the vector one
+hop down -- the multi-dim/nested layout), a second OOB guard on it,
+then `mov rax,[rcx+rax*8+0x20]`. Managed shape: `array[index]` as a
+VALUE, rendered in place so the result keeps flowing through the
+ordinary value path. Byte-exact template with the three jae rel8s and
+the three fail-call rel32s as wildcards; verified UNIQUE in the
+fixture's whole .text.
+
+**The isinst recognizer was pinned to one build.** `_is_isinst_helper`
+required a 21-byte literal prefix with the register spills at
+`rsp+10h`/`rsp+18h`, and **none of the fixture's three isinst-family
+addresses matched it** -- including 0x180479f80, which the docstring
+called ground truth. `0x1807e3c60` (177 bytes, **10,696 sites**) is
+the same function compiled with the spills at `rsp+8`/`rsp+10h`. The
+recognizer now checks the prologue SHAPE (two spills, `push rdi`,
+`sub rsp,20h`, `mov rbx,rdx; mov rdi,rcx`) with the spill slots as a
+two-value alternation, plus the result plumbing (`cmp rbx,[rip]` and
+`cmove rax,rdi` exactly once each, and the assignable probe -- the
+indirect `call [rax+10h]` or the direct call this build uses). The
+existing `as` fold in `_call` then renders
+`System.IDisposable disposable1 = enumerator2 as System.IDisposable;`
+with no new naming logic.
+
+**Validation.** Portable 1,424 (+3: getref index fold, getref decline,
+the three helpers' arities are distinct); per-caller re-lift across
+the UI image: **32 of 35 isinst callers fold to `as`**, 3 keep the
+honest call (4-arg spray / non-typeof klass shapes). Paired
+`--only UnityEngine.UI` against the fix-150 tree (getrefpost, 981
+files / 12,249 bodies both sides): 29 files changed, **65
+`sub_180010df0` + 7 `sub_1807e3c60` lines removed**, 118 indexed
+element reads added, brace 0, compile gate **50,549 -> 50,542
+(syntax flat at 17)**. Bonus shapes in the same delta: raw
+`((byte*)((byte*)obj + 0x0)[0] + 0x1c8)[0]()(...)` vtable calls become
+`list13[num1].getClass()` / `/*vtable slot 9*/ list13[num1](...)`,
+and a store helper's `sub_180010df0(list11, num4, ...)` becomes
+`if (list11[num4] != null)`.
+
 ## Current work: fix 150 — the null-check helper; 10,136 guard statements vanish (2026-10-26, on `main`)
 
 **`0x180002df0` is `il2cpp_null_check`** (20 bytes, **10,136 call
