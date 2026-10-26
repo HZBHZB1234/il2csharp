@@ -111,13 +111,51 @@ name is stored **UTF-16** in the literal pool (a plain `cstr` reads
 only `'f'` — that is why the lifter rendered `&"fmodstudio"`: its
 wide-string decode already handles it), entrypoint names follow as
 ASCII, and **no data-section pointer references the literals** — the
-descriptors are built per call site and the resolver resolves live,
-so the codegen pinvoke tables are not the mapping path. The managed
-render therefore needs the metadata side: decode each candidate
-method's `DllImport` custom attribute (module + EntryPoint) and match
-the pair — a metadata-attribute decode the package does not have yet
-(zero pinvoke support anywhere in `il2cpp/` today), plus the
-descriptor decode at the site. That is fix 158's opening move. `0x1807e3c60` (10,696
+descriptors are built per call site and the resolver resolves live.
+
+**fix 158 probe, round 2 — the custom-attribute blob decoder is
+built, and it cannot supply the mapping.** The v39 metadata header
+already parses `attributeData` (byte blob) and `attributeDataRange`
+(8-byte entries = `(ownerToken u32, blobStart u32)`, 94,709 rows;
+owner tokens are ECMA tags — 0x02 TypeDef, 0x04 Field, 0x06 MethodDef
+(31,075), 0x08 Param, 0x17 Property, 0x20 Assembly). The blob format
+(per Il2CppDumper's CustomAttributeDataReader, verified byte-exact
+against this fixture): `CompressedUInt32 count`, then `count × int32
+ctorIndex` (4-byte fixed, global MethodDef row), then per attribute in
+ctor order: `CompressedUInt32 argumentCount, fieldCount,
+propertyCount`; each value self-describing — one tag byte (the
+Il2CppType enum; 0x0E string, 0x55 enum + CompressedInt32 type index,
+0x1D array), strings `CompressedInt32 byteLength` (sign bit) + UTF-8
+(`52` = 82 = 41 << 1), I4/U4 compressed in v29+, named arguments value
+FIRST then `CompressedInt32` member index (negative = -(i+1) followed
+by a CompressedUInt32 declaring-type index). The compressed-uint has
+NO 3-byte form: 1/2/4 bytes, plus 0xF0 (5-byte), 0xFE (Int32.Max),
+0xFF (0xFFFFFFFF). The probe decodes **16,728 of 16,744 method blobs
+cleanly** (the 16 are genuine edge shapes) and the ctor histogram
+names real attributes (CompilerGenerated 5,551, DebuggerHidden 4,350,
+FreeFunction 525 — blob 0x6000002 decodes to
+`FreeFunctionAttribute("UnityEngine_Identifiers_GetInstallationId")`,
+ctor 317,555, exact). **DllImportAttribute appears ZERO times** —
+il2cpp consumes it at codegen time and strips it from the runtime
+blob, so the attribute table cannot map (module, EntryPoint) → method.
+
+**The working mapping path is the pinvoke stub scan.** 2,032 methods
+carry `flags & 0x2000` (pinvokeimpl): Facepunch.Steamworks.Win64
+1,024, FMODUnity 583, Firebase 198+46, System 112, mscorlib 48. Their
+metadata NAME is the entrypoint (`FMOD.Factory.FMOD5_System_Create`),
+and their codegen fnptr (module.method_pointers[(token & 0xFFFFFF)-1])
+is the descriptor-builder stub — `FMOD5_System_Create`'s stub at
+0x18358e670 leas the SAME literals as the SetBgmStartPos call site
+(0x187532488 = "fmodstudio" UTF-16). Fix 158 is therefore: (1) a scan
+enumerating pinvokeimpl methods → fnptr stub → decode the two
+descriptor literals → `pinvoke_map[(module, entrypoint)] = mi`; (2) a
+`_call` fold for the resolver shape (the descriptor's two leas from
+the stack-store state → map lookup → the resolve+cell+invoke collapses
+to the managed call `M(args)`, the same machinery fix 156 uses). The
+twins `0x180013b50`/`0x180016f40` (2,778 sites) scan a klass's
+interface-offset table and return an adjusted slot pointer — interface
+dispatch for shared generics, needs the slot-call fold to be worth
+naming. `0x1807e3c60` (10,696
 sites) is the **isinst family's generic-variable build** — the relaxed
 fix-151 recognizer already matches it (prologue + one `cmove` + the
 System.Object short-circuit); it only needs the lazy prober extended,
