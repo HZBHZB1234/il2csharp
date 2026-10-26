@@ -70,10 +70,14 @@ class _FieldsMixin:
 
     def scan_icall_cache(self):
         """icall thunk caches: BSS cells caching native function pointers
-        resolved from signature strings. The fill site is the fixed shape
-        `lea rcx,[rel SIG]; call resolve_icall; mov [rel CELL],rax`, so a
-        byte-scan over the code sections maps every CELL to its signature
-        and the cell reads render the managed method instead of data_NNN.
+        resolved from signature strings. The fill site is
+        `lea rcx,[rel SIG]; call resolve_icall; ...; mov [rel CELL],rax`
+        where the tail between the call and the store may carry a spill
+        and the null guard (`test rax,rax; je +N`) -- the v39 fixture
+        always has the guard, older fixtures have the bare store, so the
+        scan walks the tail instead of pinning one layout. A byte-scan
+        over the code sections maps every CELL to its signature and the
+        cell reads render the managed method instead of data_NNN.
         (The usage-slot swallow then hides the lazy-fill guard.)"""
         b = self.bin
         pat = b'\x48\x8d\x0d'      # lea rcx,[rip+disp32]
@@ -94,21 +98,50 @@ class _FieldsMixin:
                 pos = p + 1
                 # lea rcx,[rel SIG]  (7 bytes)
                 # call rel32        (5 bytes, at p+7)
-                # mov [rel CELL],rax (7 bytes, at p+12)
-                if p + 19 > len(data) or data[p + 7] != 0xE8 \
-                        or data[p + 12:p + 15] != b'\x48\x89\x05':
+                # then the cached store `mov [rel CELL],rax` -- which this
+                # fixture (v39) never emits bare: the null guard
+                # `test rax,rax; je +N` always sits between the call and
+                # the store, and an optional spill (`mov r10/rax,rax`)
+                # sometimes precedes the guard. Walk the tail:
+                # spill?, guard?, store.
+                if p + 12 > len(data) or data[p + 7] != 0xE8:
                     continue
                 sig_va = sec.addr + p + 7 + int.from_bytes(
                     data[p + 3:p + 7], 'little', signed=True)
                 call_tgt = sec.addr + p + 12 + int.from_bytes(
                     data[p + 8:p + 12], 'little', signed=True)
-                cell = sec.addr + p + 19 + int.from_bytes(
-                    data[p + 15:p + 19], 'little', signed=True)
+                off = p + 12
+                tail = data[off:off + 16]
+                if tail[0:3] in (b'\x4c\x8b\xd0', b'\x48\x8b\xd0'):
+                    off += 3                    # mov r10/rax,rax spill
+                    tail = data[off:off + 16]
+                if tail[0:3] == b'\x48\x85\xc0':
+                    off += 3                    # test rax,rax
+                    tail = data[off:off + 16]
+                    if tail[0:1] == b'\x74':
+                        off += 2                # je rel8
+                    elif tail[0:2] == b'\x0f\x84':
+                        off += 6                # je rel32
+                    else:
+                        continue
+                    tail = data[off:off + 16]
+                if tail[0:3] != b'\x48\x89\x05':
+                    continue
+                cell = sec.addr + off + 7 + int.from_bytes(
+                    tail[3:7], 'little', signed=True)
                 raw_hits.append((sig_va, call_tgt, cell))
-                cnt[call_tgt] += 1
-        if not raw_hits:
+                s = b.cstr(sig_va, 512)
+                if s and '::' in s and len(s) >= 5:
+                    cnt[call_tgt] += 1
+        if not raw_hits or not cnt:
             self.icall_cells = {}
             return
+        # The helper is the call target with the most signature-valid
+        # fills. Voting on valid sigs only: same-shaped lazy caches whose
+        # first argument is a bare name (the class-name lookup caches the
+        # class-cache scan owns) share the guard+store tail but carry no
+        # `::`, so they can win a raw-count vote on a fixture where the
+        # icall fills are all guarded.
         helper = cnt.most_common(1)[0][0]
         self.rt_icall_resolve = helper
         cells = {}

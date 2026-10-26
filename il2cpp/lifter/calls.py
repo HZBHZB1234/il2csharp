@@ -2709,6 +2709,62 @@ class _CallsMixin:
                     self.emit(ins.ip, '', asm)
                 return
 
+        # --- il2cpp_codegen_resolve_icall(sig), EARLY arm: read the
+        # signature UNCOUNTED (before the argument build below use-binds
+        # it) so the `lea rcx,[sig]` that feeds RCX never materializes
+        # as a temp statement. The resolve itself is runtime plumbing:
+        # its only render is the annotated fptr in RAX, which the
+        # following `call rax` (the guarded invoke) renders as the
+        # managed call. An unresolved signature declines to the normal
+        # call path below (the honest `sub_` render).
+        icall_helper = getattr(self.il, 'rt_icall_resolve', None)
+        if target is not None and icall_helper is not None \
+                and target == icall_helper:
+            a0 = dict.get(self.regs, 'RCX')
+            s = None
+            if a0 is not None and isinstance(a0.text, str):
+                m = re.match(r'&data_([0-9a-f]+)', a0.text)
+                if m:
+                    s = self.bin.cstr(int(m.group(1), 16), 512)
+                else:
+                    m = re.match(r'&"([^"]*)"', a0.text)
+                    if m:
+                        s = m.group(1)
+            ann = None
+            ann_mi = None
+            if s and '::' in s:
+                r = self.il._icall_annotation(s)
+                if isinstance(r, dict):
+                    ann = r.get('text')
+                    ann_mi = r.get('method')
+            if ann:
+                # The guard load already put the cell's annotated fptr in
+                # RAX (`mov rax,[cell]; test; jne; lea; call resolve`) --
+                # the resolve returns that same pointer, so KEEP it: the
+                # merge lanes then hold one Expr and the guarded invoke
+                # folds to the direct managed call. A different shape
+                # (the r10 spill guard) gets a fresh annotated fptr.
+                # The clobber pops go FIRST -- VOLATILE includes RAX.
+                cur = dict.get(self.regs, 'RAX')
+                for _vr in VOLATILE:
+                    self.regs.pop(_vr, None)
+                for i in range(1, 6):
+                    self.regs.pop('XMM%d' % i, None)
+                self._fresh_unknowns()
+                if not (cur is not None and cur.kind == 'fptr'
+                        and getattr(cur, '_mi', None) is not None):
+                    ex = Expr(ann, None, 'fptr')
+                    # fix 66: the eager-resolve twin of the cached-cell
+                    # read -- same identity, so the call through it trims
+                    # the same way
+                    ex._mi = ann_mi
+                    self.regs['RAX'] = ex
+                else:
+                    self.regs['RAX'] = cur
+                if self.asm_comments and asm:
+                    self.emit(ins.ip, '', asm)
+                return
+
         # build arg list
         args = []
         arg_exprs = []
@@ -2908,37 +2964,6 @@ class _CallsMixin:
             if self.asm_comments and asm:
                 self.emit(ins.ip, '', asm)
             return
-
-        icall_helper = getattr(self.il, 'rt_icall_resolve', None)
-        if target is not None and icall_helper is not None and target == icall_helper:
-            # il2cpp_codegen_resolve_icall(sig): the result is the native
-            # function pointer; render the managed method it names so the
-            # cached-cell store and the indirect call through it read right
-            ann = None
-            a0 = args[0] if args else ''
-            s = None
-            m = re.match(r'&data_([0-9a-f]+)', a0)
-            if m:
-                s = self.bin.cstr(int(m.group(1), 16), 512)
-            else:
-                m = re.match(r'&"([^"]*)"', a0)
-                if m:
-                    s = m.group(1)
-            ann_mi = None
-            if s and '::' in s:
-                r = self.il._icall_annotation(s)
-                if isinstance(r, dict):
-                    ann = r.get('text')
-                    ann_mi = r.get('method')
-            if ann:
-                ex = Expr(ann, None, 'fptr')
-                # fix 66: the eager-resolve twin of the cached-cell read --
-                # same identity, so the call through it trims the same way
-                ex._mi = ann_mi
-                self.regs['RAX'] = ex
-                if self.asm_comments and asm:
-                    self.emit(ins.ip, '', asm)
-                return
 
         info = self.il.addr_to_method.get(target) if target else None
         recv = arg_exprs[0] if arg_exprs else None

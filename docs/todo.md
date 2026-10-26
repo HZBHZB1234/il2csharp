@@ -7,6 +7,82 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 156 — the icall resolver found again; every eager resolve site renders the managed call (2026-10-26, on `main`)
+
+**`scan_icall_cache` was silent on this fixture.** The icall thunk
+caches are BSS cells filled by
+`lea rcx,[sig]; call resolve_icall; mov [rel CELL],rax` — and the scan
+pinned that layout. The v39 fixture never emits it bare: the null guard
+`test rax,rax; je +N` always sits between the call and the store, and
+an optional spill (`mov r10,rax`) sometimes precedes the guard, so the
+scan found nothing, `rt_icall_resolve` stayed unset, and every eager
+resolve site rendered as an unannotated
+`sub_1807a5bf0(&"UnityEngine.X::M(sig)", <invoke args merged>)` with
+the invoke's arguments sprayed in. Cell reads stayed annotated (they
+flow through the class-cache scan's `::` fallback), so the whole fill
+dance printed five junk lines around one indirect call.
+
+**The scan now walks the tail: spill?, guard?, store** (rel8 and rel32
+`je` accepted), and the helper vote counts signature-valid fills only —
+the same-shaped class-name caches whose first argument is a bare name
+share the tail and would win a raw-count vote. Result: the helper is
+`0x1807a5bf0`, **29,126 signature-valid fills, 4,197 distinct cache
+cells**, a single vote candidate (no pinvoke-resolver ambiguity — a
+pinvoke variant with `::` signatures could poison the vote; none
+exists here).
+
+**The resolve call itself renders nothing.** `_call`'s early arm (moved
+before the argument build so the feeding `lea` never use-binds into a
+temp — the post-argument arm leaked a dead
+`object objN = &"sig"` CS0214 operand at every jmp-detour site) reads
+the signature from RCX uncounted and seats the annotated fptr in RAX.
+The clobber pops go FIRST — `VOLATILE` includes RAX, and stamping
+before the pop lost the fptr to a fresh `vN`. When the guard load
+already put the cell's fptr in RAX the arm keeps that Expr, so the
+merge lanes hold one value. The guarded invoke then renders the
+managed call: `UnityEngine.Transform.SetPositionAndRotation_Injected(num1,
+ref vector32, ref quaternion2)` — hidden-arg trimming and `ref` typing
+from the ordinary resolved-call path.
+
+**Honest remains.** At jmp-detour fills (the store sits behind
+interleaved code) the guard branch is structural — the same guard is
+the loop's re-check when the thunk sits in a `while` — and the
+structure pass renders a degenerate merge: `object objN = <icall>;
+objM = objN(args)`. That is no worse than the pre-fix render (which
+added the `sub_` line and the leaked operand), and swallowing the
+guard branch there once collapsed a whole loop body — so the detour
+shape stays honest junk in the C-family backlog.
+
+**Validation.** Portable 1,437 (+8: guarded/tight/spill+rel32 fill
+shapes, the sig-validity vote, non-winner cells unmapped, the early
+arm's no-render + fptr seating + RAX keep + unresolved decline); game
+3 new tests (resolver detected, the NoirNailAlly site renders the
+managed call, the detour site leaks no operand). Paired
+`--only UnityEngine.UI` (icalpost3 vs the fix-155 tree, 981 files /
+12,249 bodies both sides): 59 files changed, **0 `sub_1807a5bf0`
+lines and 0 `= &"` operands remain** (defaultpost3: 27 / 0), brace 0,
+compile gate **50,529 → 50,513 binding (−16), syntax flat at 17**.
+Full suite: **1,473 passed / 2 known env failures / 1 xfailed** —
+failure SET byte-identical to fix-155, zero pin moves.
+
+**Remaining C5 population, probed this session.** `0x18078d570`
+(5,000 sites) is the **P/Invoke resolver**: the caller builds a
+0x30-byte descriptor `{module_chars@0, module_len@8,
+entrypoint_chars@0x10, entrypoint_len@0x18, ...}` from two literals
+(`"fmodstudio"`, `FMOD_Studio_EventInstance_SetTimelinePosition`),
+caches the native fnptr in a data cell, and invokes it — the managed
+render needs the CodeGenModule pinvoke tables (undecoded today) to map
+(module, entrypoint) → the DllImport method. `0x1807e3c60` (10,696
+sites) is the **isinst family's generic-variable build** — the relaxed
+fix-151 recognizer already matches it (prologue + one `cmove` + the
+System.Object short-circuit); it only needs the lazy prober extended,
+but most of its sites take the target klass from the rgctx
+(`[klass+0x40]`), which no `typeof()` argument renders. The
+`0x180013b50`/`0x180016f40` twins (2,778 sites) scan a klass's
+interface-offset table and return an adjusted slot pointer — interface
+dispatch for shared generics, needs the slot-call fold to be worth
+naming.
+
 ## Current work: fix 155 — the `_` placeholder becomes `default` at render time (2026-10-26, on `main`)
 
 **`_` is CS0103 in an ordinary argument list.** The lifter uses `_` as
