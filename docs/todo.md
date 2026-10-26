@@ -106,9 +106,18 @@ failure SET byte-identical to fix-155, zero pin moves.
 0x30-byte descriptor `{module_chars@0, module_len@8,
 entrypoint_chars@0x10, entrypoint_len@0x18, ...}` from two literals
 (`"fmodstudio"`, `FMOD_Studio_EventInstance_SetTimelinePosition`),
-caches the native fnptr in a data cell, and invokes it — the managed
-render needs the CodeGenModule pinvoke tables (undecoded today) to map
-(module, entrypoint) → the DllImport method. `0x1807e3c60` (10,696
+caches the native fnptr in a data cell, and invokes it. The module
+name is stored **UTF-16** in the literal pool (a plain `cstr` reads
+only `'f'` — that is why the lifter rendered `&"fmodstudio"`: its
+wide-string decode already handles it), entrypoint names follow as
+ASCII, and **no data-section pointer references the literals** — the
+descriptors are built per call site and the resolver resolves live,
+so the codegen pinvoke tables are not the mapping path. The managed
+render therefore needs the metadata side: decode each candidate
+method's `DllImport` custom attribute (module + EntryPoint) and match
+the pair — a metadata-attribute decode the package does not have yet
+(zero pinvoke support anywhere in `il2cpp/` today), plus the
+descriptor decode at the site. That is fix 158's opening move. `0x1807e3c60` (10,696
 sites) is the **isinst family's generic-variable build** — the relaxed
 fix-151 recognizer already matches it (prologue + one `cmove` + the
 System.Object short-circuit); it only needs the lazy prober extended,
