@@ -7,6 +7,72 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 158 — the P/Invoke resolver folds to the managed DllImport call (2026-10-26, on `main`)
+
+**The attribute blob decoder proved DllImport is stripped.** The v39
+custom-attribute blob format was decoded byte-exact this session
+(`CompressedUInt32 count`, `count × int32 ctorIndex` (4-byte fixed,
+global MethodDef row), then per attribute `CompressedUInt32
+argumentCount/fieldCount/propertyCount` with self-describing values —
+one tag byte (0x0E string, 0x55 enum + CompressedInt32 type index,
+0x1D array), strings `CompressedInt32` byte length + UTF-8, named
+arguments value-first then a `CompressedInt32` member index; the
+compressed uint has no 3-byte form). The probe decodes 16,728 of
+16,744 method blobs and names real attributes —
+`FreeFunctionAttribute("UnityEngine_Identifiers_GetInstallationId")`
+exact — and **DllImportAttribute appears zero times**: il2cpp consumes
+it at codegen time. The (module, EntryPoint) → method mapping cannot
+come from the attribute table.
+
+**What survives is the stub.** 2,032 methods carry `flags & 0x2000`
+(pinvokeimpl): Facepunch.Steamworks.Win64 1,024, FMODUnity 583,
+Firebase 244, System 112, mscorlib 48. Their codegen fnptr
+(`module.method_pointers[(token & 0xFFFFFF)-1]`) is the resolver stub
+whose descriptor stages the same two literals the inlined call sites
+build — the module name UTF-16, the entrypoint ASCII. The method's
+metadata name is the entrypoint (`FMOD.Factory.FMOD5_System_Create`),
+and an explicit EntryPoint override is only visible in the stub, so
+the stub decode is the source of truth.
+
+**The scan and the fold.** `scan_pinvoke_stubs` (wired next to
+`scan_icall_cache`) votes the shared resolver from the stubs' call
+targets (`0x18078d570` — the same helper every site uses), decodes
+1,999/2,032 stubs into `pinvoke_map[(module, entrypoint)] = mi`, and
+maps 2,018 inlined fill sites' cache cells into `pinvoke_cells`
+(cell → mi) by decoding each call site's window — the two rip-leas
+name the pair, the post-call store names the cell; only pairs that
+resolve in the map are taken. `decode_slot` serves those cells with
+the fix-66 fptr annotation, and `_call`'s early arm (beside the icall
+arm) collects the `&"literal"` texts the site staged — registers
+uncounted plus the tracked stack slots — and pair-matches them against
+`pinvoke_map`; the resolve renders nothing and the guarded invoke
+collapses to the direct managed call with hidden-arg trimming:
+
+    FMOD.Studio.EventInstance.FMOD_Studio_EventInstance_SetTimelinePosition(
+        BattleSoundGenerator._currentInstance, millisec);
+
+**Validation.** Portable 1,437 (no regressions); game +3 (the map and
+resolver detected, the SetBgmStartPos site renders both managed calls,
+cell reads render names not `data_NNN`). Paired `--only FMODUnity`
+(pinvpre/pinvpost, 305 files both sides): 29 files changed,
+**net −11,048 lines**, `sub_18078d570` **1,251 → 2** (the remaining
+two are the shared-stub declaration), brace 0, compile gate
+**binding 12,628 → 12,624, syntax flat at 6** — the removed junk was
+`data_`-cell assignments, which the emitter declares, so the compile
+gate barely sees this win; readability is the metric (the diff shape:
+eight fill-dance lines plus a `/*indirect*/` phi-invoke become one
+typed `return`). Tree-wide the fold covers 4,392 sites (Steamworks
+2,359, FMODUnity 1,248, Assembly-CSharp 414, System 264, mscorlib 103).
+Full suite: **1,478 passed / 2 known env failures / 1 xfailed** —
+the failure SET moved by exactly two fix-141 shape pins whose sites the
+fold improved past their pinned spellings
+(`FMOD.Channel.setFrequency` now renders
+`return FMOD.Channel.FMOD5_Channel_SetFrequency(this.handle, frequency);`
+and `ISteamMusicRemote.GetUserInterfacePointer`
+`return Steamworks.ISteamMusicRemote.SteamAPI_SteamMusicRemote_v001();`)
+— both test assertions updated to the new (better) shape per the
+established precedent; no golden or pin moved.
+
 ## Current work: fix 157 — the isinst family's generic-variable build, lazily named (2026-10-26, on `main`)
 
 **`0x1807e3c60` (10,696 sites) is the isinst helper's second body.**

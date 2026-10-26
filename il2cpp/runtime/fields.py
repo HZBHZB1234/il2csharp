@@ -65,6 +65,16 @@ class _FieldsMixin:
                         # `method` index, not only the rendered text
                         r = dict(ann)
                         r['icall'] = True
+            if r is None:
+                pv = getattr(self, 'pinvoke_cells', None)
+                mi = pv.get(slot_va) if pv else None
+                if mi is not None:
+                    pm = self.meta.methods[mi]
+                    ptd = self.meta.typedefs[pm.declaring]
+                    pns = (ptd.namespace + '.') if ptd.namespace else ''
+                    r = {'kind': 3, 'method': mi, 'icall': True,
+                         'text': '%s%s.%s' % (pns, ptd.name,
+                                              pm.name.lstrip('.'))}
         cache[slot_va] = r
         return r
 
@@ -153,6 +163,225 @@ class _FieldsMixin:
                 continue
             cells[cell] = s
         self.icall_cells = cells
+
+    def scan_pinvoke_stubs(self):
+        """(module, entrypoint) -> MethodDef for every DllImport method.
+
+        il2cpp strips DllImportAttribute from the runtime attribute blobs
+        (the probe: 16,728 method blobs decode cleanly, zero DllImport
+        rows), so the metadata side of a pinvoke call cannot come from
+        the attribute table. What survives: each `pinvokeimpl` method's
+        codegen fnptr (module.method_pointers[(token & 0xFFFFFF)-1]) is
+        the resolver stub whose descriptor carries the same two literals
+        the inlined call sites build -- the module name as UTF-16 and
+        the entrypoint as ASCII. The method's own metadata name is
+        usually the entrypoint (`FMOD.Factory.FMOD5_System_Create`), but
+        an explicit EntryPoint override is only visible in the stub, so
+        the stub decode is the source of truth. Never raises.
+        """
+        self.pinvoke_map = {}
+        self.rt_pinvoke_resolve = None
+        try:
+            b = self.bin
+            meta = self.meta
+            from collections import Counter
+            votes = Counter()
+            for i, m in enumerate(meta.methods):
+                if not (m.flags & 0x2000) or m.image < 0:
+                    continue
+                img = meta.images[m.image]
+                mod = self.modules.get(img.name)
+                if mod is None or not mod.method_pointers:
+                    continue
+                slot = (m.token & 0xFFFFFF) - 1
+                if slot < 0:
+                    continue
+                fnptr = b.qword(mod.method_pointers + slot * 8)
+                if not fnptr or not b.is_exec_va(fnptr):
+                    continue
+                code = b.read(fnptr, 0x90)
+                if not code:
+                    continue
+                # the stub's resolve call votes for the shared resolver
+                pos = code.find(b'\xe8')
+                while 0 <= pos <= len(code) - 5:
+                    tgt = fnptr + pos + 5 + int.from_bytes(
+                        code[pos + 1:pos + 5], 'little', signed=True)
+                    votes[tgt] += 1
+                    pos = code.find(b'\xe8', pos + 1)
+            if not votes:
+                return
+            helper = votes.most_common(1)[0][0]
+            self.rt_pinvoke_resolve = helper
+            for i, m in enumerate(meta.methods):
+                if not (m.flags & 0x2000) or m.image < 0:
+                    continue
+                img = meta.images[m.image]
+                mod = self.modules.get(img.name)
+                if mod is None or not mod.method_pointers:
+                    continue
+                slot = (m.token & 0xFFFFFF) - 1
+                if slot < 0:
+                    continue
+                fnptr = b.qword(mod.method_pointers + slot * 8)
+                if not fnptr or not b.is_exec_va(fnptr):
+                    continue
+                pair = self._pinvoke_stub_pair(fnptr, helper)
+                if pair is not None:
+                    module, entry = pair
+                    self.pinvoke_map[(module, entry)] = i
+            self.pinvoke_cells = self._scan_pinvoke_fill_cells(helper)
+        except Exception:
+            self.pinvoke_map = {}
+            self.pinvoke_cells = {}
+
+    def _scan_pinvoke_fill_cells(self, helper):
+        """Cache cell -> mi for every inlined resolver fill.
+
+        The inlined stub shape is the stub's own body: two rip-leas stage
+        the descriptor literals, `call resolve`, a null guard, then
+        `mov [rel CELL],rax`. Decode each call site's window -- the two
+        leas name (module, entrypoint), the store names the cell -- and
+        map the cell to the DllImport method so cell reads render the
+        managed name (the icall_cells precedent). Only cells whose
+        literal pair resolves in pinvoke_map are mapped."""
+        b = self.bin
+        cells = {}
+        if not helper:
+            return cells
+        from iced_x86 import Decoder, DecoderOptions
+        pat = b'\xe8'
+        for sec in b.sections:
+            if not sec.is_exec or sec.is_bss or sec.rawsize < 32:
+                continue
+            data = b.read(sec.addr, sec.rawsize)
+            if not data:
+                continue
+            pos = 0
+            while True:
+                p = data.find(pat, pos)
+                if p < 0:
+                    break
+                pos = p + 1
+                tgt = sec.addr + p + 5 + int.from_bytes(
+                    data[p + 1:p + 5], 'little', signed=True)
+                if tgt != helper:
+                    continue
+                site = sec.addr + p
+                # decode back ~0x60 for the descriptor leas, forward ~0x20
+                # for the cached store
+                win = b.read(site - 0x60, 0x60 + 0x20)
+                if not win:
+                    continue
+                dec = Decoder(64, win, DecoderOptions.NONE)
+                dec.ip = site - 0x60
+                wide_va = narrow_va = None
+                cell = None
+                for ins in dec:
+                    if ins.ip >= site:
+                        if ins.mnemonic == Mnemonic.MOV and \
+                                ins.op0_kind == OpKind.MEMORY and \
+                                ins.memory_base == IReg.RIP:
+                            cell = ins.ip_rel_memory_address
+                            break
+                    if ins.mnemonic == Mnemonic.LEA and \
+                            ins.memory_base == IReg.RIP:
+                        va = ins.ip_rel_memory_address
+                        raw = b.read(va, 96)
+                        if raw and len(raw) >= 8 and raw[1] == 0 \
+                                and raw[3] == 0 and raw[0] >= 0x20:
+                            wide_va = va
+                        elif raw and raw[0] >= 0x20:
+                            narrow_va = va
+                if cell is None or wide_va is None or narrow_va is None:
+                    continue
+                module = self._pinvoke_wide(wide_va)
+                entry = b.cstr(narrow_va, 128)
+                if not module or not entry:
+                    continue
+                mi = self.pinvoke_map.get((module, entry))
+                if mi is not None:
+                    cells[cell] = mi
+        return cells
+
+    def _pinvoke_wide(self, va):
+        raw = self.bin.read(va, 128)
+        if not raw:
+            return None
+        n = 0
+        while n + 1 < len(raw) and raw[n + 1] == 0 and raw[n] >= 0x20:
+            n += 2
+        if n < 4 or n >= 120:
+            return None
+        try:
+            s = raw[:n].decode('utf-16-le')
+        except Exception:
+            return None
+        return s if s.isprintable() else None
+
+    def _pinvoke_stub_pair(self, fnptr, helper):
+        """The (module, entrypoint) literals in one resolver stub, or None.
+
+        The stub's head stages the descriptor:
+            lea rax,[rel MOD]  ; mov qword [rsp+28h],len ; mov [rsp+20h],rax
+            lea rax,[rel EP]   ; mov qword [rsp+38h],len ; mov [rsp+30h],rax
+        The module is UTF-16 (every other byte NUL for ASCII names), the
+        entrypoint ASCII; both literals are read directly and the order
+        is the descriptor's field order (module at +0, entrypoint at
+        +0x10). The resolve call must sit in the head.
+        """
+        b = self.bin
+        code = b.read(fnptr, 0x90)
+        if not code:
+            return None
+        leas = []
+        has_call = False
+        dec = Decoder(64, code, DecoderOptions.NONE)
+        dec.ip = fnptr
+        for ins in dec:
+            if ins.mnemonic == Mnemonic.CALL:
+                has_call = True
+                break
+            if ins.mnemonic == Mnemonic.LEA and ins.memory_base == IReg.RIP:
+                leas.append(ins.ip_rel_memory_address)
+        if not has_call or len(leas) < 2:
+            return None
+
+        def wide(va):
+            raw = b.read(va, 128)
+            if not raw:
+                return None
+            n = 0
+            while n + 1 < len(raw) and raw[n + 1] == 0 and raw[n] >= 0x20:
+                n += 2
+            if n < 4 or n >= 120:
+                return None
+            try:
+                s = raw[:n].decode('utf-16-le')
+            except Exception:
+                return None
+            return s if s.isprintable() else None
+
+        def narrow(va):
+            s = b.cstr(va, 128)
+            if not s or len(s) < 4 or not s.isprintable():
+                return None
+            return s
+
+        pairs = []
+        for va in leas[:4]:
+            w = wide(va)
+            if w:
+                pairs.append(('w', w))
+                continue
+            nr = narrow(va)
+            if nr:
+                pairs.append(('a', nr))
+        wide_vals = [v for k, v in pairs if k == 'w']
+        narrow_vals = [v for k, v in pairs if k == 'a']
+        if len(wide_vals) != 1 or len(narrow_vals) < 1:
+            return None
+        return (wide_vals[0], narrow_vals[0])
 
     def scan_runtime_class_cache(self):
         """The il2cpp runtime caches well-known Il2CppClass pointers

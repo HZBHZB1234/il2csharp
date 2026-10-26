@@ -163,6 +163,11 @@ class _RegistrationMixin:
             self.scan_icall_cache()
         except Exception:
             self.icall_cells = {}
+        try:
+            self.scan_pinvoke_stubs()
+        except Exception:
+            self.pinvoke_map = {}
+            self.rt_pinvoke_resolve = None
 
     # ---------------------------------------------------------------
     # Android / pre-Unity-6 ARM64 registration support (Chiki's Chase
@@ -380,6 +385,11 @@ class _RegistrationMixin:
             self.scan_icall_cache()
         except Exception:
             self.icall_cells = {}
+        try:
+            self.scan_pinvoke_stubs()
+        except Exception:
+            self.pinvoke_map = {}
+            self.rt_pinvoke_resolve = None
 
     def _apply_metareg2022_map(self, q):
         """Unity 2022.3 (v31.1) metareg map: same pair order as the

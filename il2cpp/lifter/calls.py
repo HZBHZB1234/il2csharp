@@ -2765,6 +2765,64 @@ class _CallsMixin:
                     self.emit(ins.ip, '', asm)
                 return
 
+        # --- P/Invoke resolver: il2cpp_codegen_resolve_pinvoke(descriptor)
+        # The caller builds a stack descriptor {module_chars@0, module_len@8,
+        # entrypoint_chars@0x10, entrypoint_len@0x18, ...} from two literals,
+        # the resolver returns the native fnptr, and the caller caches and
+        # invokes it. il2cpp strips DllImportAttribute from the attribute
+        # blobs, so the managed identity comes from scan_pinvoke_stubs:
+        # (module, entrypoint) -> mi. Collect the `&"literal"` texts the
+        # site staged (registers uncounted + the tracked stack slots) and
+        # pair-match against the map -- the map keys are exact, so the
+        # match is the proof. The resolve renders nothing; the guarded
+        # invoke folds to the managed DllImport call via _mi.
+        pinv_helper = getattr(self.il, 'rt_pinvoke_resolve', None)
+        if target is not None and pinv_helper is not None \
+                and target == pinv_helper:
+            pmap = getattr(self.il, 'pinvoke_map', None) or {}
+            if pmap:
+                lits = []
+                for _r in ('RCX', 'RDX', 'R8', 'R9', 'RAX', 'R10', 'R11'):
+                    e = dict.get(self.regs, _r)
+                    t = getattr(e, 'text', None)
+                    if isinstance(t, str) and t.startswith('&"') \
+                            and t.endswith('"'):
+                        lits.append(t[2:-1])
+                for sv in (getattr(self, 'stack_values', None) or {}).values():
+                    t = getattr(sv, 'text', None)
+                    if isinstance(t, str) and t.startswith('&"') \
+                            and t.endswith('"'):
+                        lits.append(t[2:-1])
+                ann = None
+                ann_mi = None
+                for a in lits:
+                    for bb in lits:
+                        mi = pmap.get((a, bb))
+                        if mi is not None:
+                            m = self.meta.methods[mi]
+                            tdo = self.meta.typedefs[m.declaring]
+                            ns = (tdo.namespace + '.') if tdo.namespace else ''
+                            ann = '%s%s.%s' % (ns, tdo.name, m.name.lstrip('.'))
+                            ann_mi = mi
+                            break
+                    if ann is not None:
+                        break
+            else:
+                ann = None
+                ann_mi = None
+            if ann:
+                for _vr in VOLATILE:
+                    self.regs.pop(_vr, None)
+                for i in range(1, 6):
+                    self.regs.pop('XMM%d' % i, None)
+                self._fresh_unknowns()
+                ex = Expr(ann, None, 'fptr')
+                ex._mi = ann_mi
+                self.regs['RAX'] = ex
+                if self.asm_comments and asm:
+                    self.emit(ins.ip, '', asm)
+                return
+
         # build arg list
         args = []
         arg_exprs = []
