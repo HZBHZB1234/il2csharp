@@ -387,6 +387,18 @@ class _CallsMixin:
             return False
         return enum == 0x01
 
+    @staticmethod
+    def _render_args(args):
+        """fix 155: the `_` placeholder becomes `default` at render time.
+
+        `_` is the internal "this slot rendered to nothing" sentinel --
+        every trim and tail path compares against it, so it must survive
+        until the decisions are made. C# 8 discards cover out-arguments
+        and declarations only, so a bare `_` in an ordinary argument
+        list is CS0103; `default` is legal anywhere and says the same.
+        """
+        return ', '.join('default' if a == '_' else a for a in args)
+
     def _usg_walk_identity(self, cands, arg_exprs):
         """Shared-body identity carried as a lazy-MethodRef pointer walk.
 
@@ -3772,7 +3784,7 @@ class _CallsMixin:
                         self.regs.pop(rr, None)
                     return
                 else:
-                    cand = '%s.%s(%s)' % (_recv_fold(recv_txt), mdot, ', '.join(rest))
+                    cand = '%s.%s(%s)' % (_recv_fold(recv_txt), mdot, self._render_args(rest))
                     if len(cand) < 150:
                         short = cand
         if short is None and mi is not None and 0 <= mi < len(self.meta.methods):
@@ -3806,7 +3818,7 @@ class _CallsMixin:
                     or _BARE_TOKEN_RX.match(a0) \
                     or re.match(r'^s_[0-9a-fA-F]+$', a0):
                 args[0] = a0
-                cand = '%s.%s(%s)' % (_recv_fold(args[0]), mdot, ', '.join(args[1:]))
+                cand = '%s.%s(%s)' % (_recv_fold(args[0]), mdot, self._render_args(args[1:]))
                 # fix 137: proved accessor rows use member syntax
                 _sg = self._accessor_sugar(mi, a0, list(args[1:])) \
                     if '.' not in m2.name else None
@@ -3828,7 +3840,7 @@ class _CallsMixin:
                 # (`GameObject.SetActive(obj22[num2], 0)` ->
                 # `obj22[num2].SetActive(0)`). ctor names keep their
                 # dedicated paths; unshaped texts stay static-style.
-                cand = '%s.%s(%s)' % (_recv_fold(a0), mdot, ', '.join(args[1:]))
+                cand = '%s.%s(%s)' % (_recv_fold(a0), mdot, self._render_args(args[1:]))
                 # fix 137: proved accessor rows use member syntax
                 _sg = self._accessor_sugar(mi, a0, list(args[1:])) \
                     if '.' not in m2.name else None
@@ -3891,7 +3903,15 @@ class _CallsMixin:
             if mx2 is not None and len(args) > mx2:
                 args = args[:mx2]
             self.ind_slot = None
-        call = short if short is not None else '%s(%s)' % (name, ', '.join(args))
+        # fix 155: `_` is the internal "this slot rendered to nothing"
+        # sentinel -- the trims above and the tail paths compare against
+        # it, so it must stay `_` until every decision is made. At the
+        # RENDER point it becomes `default`: C# 8 discards cover
+        # out-arguments and declarations only, so a bare `_` in an
+        # ordinary argument list is CS0103 (235 sites tree-wide). A
+        # `default` literal is legal anywhere and states the same thing.
+        call = short if short is not None else '%s(%s)' % (
+            name, self._render_args(args))
         # conversion-operator twins (Decimal.op_Explicit x4...): decls
         # render as `explicit/implicit operator`, so a `T.op_X(a)` call
         # names a member that no longer exists. Recast `(R)(a)` for the
@@ -3925,7 +3945,7 @@ class _CallsMixin:
                 if mx is not None and len(args) > mx:
                     args = args[:mx]
             call = '/*vtable slot %s*/ %s(%s)' % (
-                vt_slot, recv0.text if recv0 else '?', ', '.join(args))
+                vt_slot, recv0.text if recv0 else '?', self._render_args(args))
         self.vt_recv_slot = None
         self.vt_recv = None
 

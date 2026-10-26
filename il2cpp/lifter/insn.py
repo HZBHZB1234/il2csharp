@@ -213,7 +213,8 @@ class _InsnMixin:
                             nm2 = m2.name[1:] if m2.name.startswith('.') else m2.name
                             call = '%s.%s(%s)' % (_recv_fold(args[0]), nm2, ', '.join(args[1:]))
                         else:
-                            call = '%s(%s)' % (self._info_name(info), ', '.join(args))
+                            call = '%s(%s)' % (
+                                self._info_name(info), self._render_args(args))
                         _sg137 = self._tail_accessor(info[1], args)  # fix 137
                         if _sg137 is not None:
                             call = _sg137
@@ -300,7 +301,8 @@ class _InsnMixin:
                         args = args[:self.RT_ARITY[_eff_nm]]
                     elif tail_nm is None and re.fullmatch(r'sub_[0-9a-f]+', nm) and len(args) > 4:
                         args = args[:4]
-                    self._emit_tail(ip, '%s(%s)' % (_eff_nm, ', '.join(args)), asm)
+                    self._emit_tail(ip, '%s(%s)' % (
+                        _eff_nm, self._render_args(args)), asm)
                     for r in VOLATILE:
                         self.regs.pop(r, None)
                     return

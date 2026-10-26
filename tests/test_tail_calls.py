@@ -127,7 +127,9 @@ def test_unknown_float_register_does_not_reuse_gpr_or_old_pending():
     text = " ".join(code for _, code, _ in lift.out)
     assert "stale" not in text
     assert "previous_call_value" not in text
-    assert "v91" in text or "_" in text
+    # fix 155 renders the "nothing here" placeholder as `default`; the
+    # point of the test is that no STALE value fills the slot.
+    assert "v91" in text or "default" in text
 
 
 def test_zero_arg_method_does_not_receive_xmm_residue():

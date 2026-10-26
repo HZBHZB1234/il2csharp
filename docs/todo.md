@@ -7,6 +7,37 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 155 — the `_` placeholder becomes `default` at render time (2026-10-26, on `main`)
+
+**`_` is CS0103 in an ordinary argument list.** The lifter uses `_` as
+its internal "this slot rendered to nothing" sentinel, and it is the
+right tool internally: every trim (`while out[-1] == '_'`), every tail
+path and every shared-body arity proof compares against it. But it
+reached the OUTPUT too, where C# 8 discards cover only out-arguments
+and declarations -- `FixedString.Format(..., _)`,
+`obj5.SetProperty<int>(_, _)`, `GetComponentsInParent(_, _)` are all
+compile errors. 235 such lines in the UI image alone.
+
+**The fix is placement, not the sentinel.** `Lifter._render_args`
+maps `_` to `default` and every render point uses it: `_call`'s final
+`call =` line and its vtable fallback, the three `cand =` receiver-fold
+sites, `insn.py`'s resolved-call and tail emit, and `analyze.py`'s four
+mirror sites. `default` is legal anywhere and states the same thing
+honestly. An earlier attempt that changed the sentinel itself was
+reverted: it broke the trims.
+
+**Validation.** Portable 1,428 (+1: the helper's mapping, including
+the empty list); game **1,462 passed / 2 known env failures / 1
+xfailed, failure SET byte-identical to fix-154, zero pin moves** --
+after two test assertions that had pinned the old spelling were
+updated (`test_tail_calls` expecting `_`, and fix 147's two
+`TryGetValue(x, _)` ground truths, which now read
+`TryGetValue(x, default)`). Paired `--only UnityEngine.UI`
+(defaultpost3 vs the fix-154 tree, 981 files / 12,249 bodies both
+sides): illegal `_` argument lines **235 -> 0**, brace 0, compile gate
+flat at 50,529 (the placeholder was a binding error, not a syntax one,
+so the syntax tier cannot move).
+
 ## Current work: fix 154 — the class-init fast path onto the allocator (2026-10-26, on `main`)
 
 **`0x180002de0` is the class-init fast path** (14 bytes, **1,543

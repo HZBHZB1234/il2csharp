@@ -361,7 +361,7 @@ class _AnalyzeMixin:
                                         nm2 = m2.name.lstrip('.').replace('|', '_').replace('@', '_')
                                         call = '%s.%s(%s)' % (_recv_fold(rc), nm2, ', '.join(args[1:]))
                                     else:
-                                        call = '%s(%s)' % (L._info_name(info), ', '.join(args))
+                                        call = '%s(%s)' % (L._info_name(info), L._render_args(args))
                                     _sg137 = L._tail_accessor(info[1], args)  # fix 137
                                     if _sg137 is not None:
                                         call = _sg137
@@ -420,7 +420,7 @@ class _AnalyzeMixin:
                                             args = args[:L.RT_ARITY[_eff_nm]]
                                         elif tail_nm is None and re.fullmatch(r'sub_[0-9a-f]+', nm) and len(args) > 4:
                                             args = args[:4]
-                                        L._emit_tail(ins.ip, '%s(%s)' % (_eff_nm, ', '.join(args)), None,
+                                        L._emit_tail(ins.ip, '%s(%s)' % (_eff_nm, L._render_args(args)), None,
                                                        marker=False)
                                     else:
                                         _tr_rti = _tr_m.return_type
@@ -445,7 +445,7 @@ class _AnalyzeMixin:
                                             m0.group(1), ']['.join(dims) if dims else '0'), None,
                                             marker=False)
                                     else:
-                                        L._emit_tail(ins.ip, '%s(%s)' % (nm, ', '.join(args)), None,
+                                        L._emit_tail(ins.ip, '%s(%s)' % (nm, L._render_args(args)), None,
                                                        marker=False)
                                 else:
                                     _eff_nm = tail_nm or nm
@@ -459,7 +459,7 @@ class _AnalyzeMixin:
                                         args = args[:L.RT_ARITY[_eff_nm]]
                                     elif tail_nm is None and re.fullmatch(r'sub_[0-9a-f]+', nm) and len(args) > 4:
                                         args = args[:4]
-                                    L._emit_tail(ins.ip, '%s(%s)' % (_eff_nm, ', '.join(args)), None,
+                                    L._emit_tail(ins.ip, '%s(%s)' % (_eff_nm, L._render_args(args)), None,
                                                    marker=False)
                     continue
                 L._insn(ins, b.insns, 0, None, self.last_ip)

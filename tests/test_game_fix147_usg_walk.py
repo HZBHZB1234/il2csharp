@@ -13,7 +13,7 @@ onto every deref (`_usg_root`) and `_call` seats it at the site.
 
 Ground truths: AbnormalityParts_8008.DestroyPart (mi 110185) renders
 `this.parts_Breakable.ContainsKey(text1)` /
-`this.parts_Breakable.TryGetValue(text1, _)`; AbilityBase.HasKeyword
+`this.parts_Breakable.TryGetValue(text1, default)`; AbilityBase.HasKeyword
 (mi 1817) renders `this._keywordDic.TryGetValue(keyword, _)`;
 ActionSlotDetail..ctor (mi 104984) renders its nine-element Add chain
 `list11.Add(...)` where b21 printed nine
@@ -34,7 +34,9 @@ def test_destroy_part_resolves_containskey_and_trygetvalue(
     body = lift_text(il, dec, mi)
     assert 'sub_183c23bc0' not in body
     assert 'this.parts_Breakable.ContainsKey(' in body
-    assert 'this.parts_Breakable.TryGetValue(text1, _)' in body
+    # fix 155 renders the "no value here" placeholder as `default`; a
+    # bare `_` in an ordinary argument list is CS0103.
+    assert 'this.parts_Breakable.TryGetValue(text1, default)' in body
 
 
 def test_has_keyword_resolves_trygetvalue(baseline_game_decompiler):
@@ -42,7 +44,7 @@ def test_has_keyword_resolves_trygetvalue(baseline_game_decompiler):
     mi, _, _ = find_method(il, 'AbilityBase', 'HasKeyword', 1)
     body = lift_text(il, dec, mi)
     assert 'sub_18587c8b0' not in body
-    assert 'this._keywordDic.TryGetValue(keyword, _)' in body
+    assert 'this._keywordDic.TryGetValue(keyword, default)' in body
 
 
 def test_action_slot_ctor_recovers_the_add_chain(baseline_game_decompiler):

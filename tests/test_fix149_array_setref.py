@@ -231,3 +231,12 @@ def test_alloc_fastpath_body_bytes():
     assert len(body) == 14
     assert body[0:9] == bytes.fromhex('83b9e4000000000f84')
     assert body[13] == 0xC3
+
+
+def test_render_args_turns_the_placeholder_into_default():
+    """fix 155: the `_` sentinel is CS0103 in an ordinary argument list;
+    it becomes `default` at the render point and stays `_` internally."""
+    assert Lifter._render_args(['a', '_', 'b']) == 'a, default, b'
+    assert Lifter._render_args(['_', '_']) == 'default, default'
+    assert Lifter._render_args([]) == ''
+    assert Lifter._render_args(['a', 'b']) == 'a, b'
