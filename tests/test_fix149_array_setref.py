@@ -195,3 +195,11 @@ def test_helper_recognizers_are_mutually_exclusive():
     assert Lifter.RT_ARITY['il2cpp_array_getref'] == 2
     assert Lifter.RT_ARITY['il2cpp_array_setref'] == 3
     assert Lifter.RT_ARITY['il2cpp_null_check'] == 1
+
+
+def test_init_meta_wrapper_bytes_are_the_19_byte_body():
+    """fix 152: the parameterless init wrapper is a pure plumbing call."""
+    body = bytes.fromhex('4883ec28e867bf0000f0830c24004883c428c3')
+    assert len(body) == 19
+    assert body[0:5] == bytes.fromhex('4883ec28e8')
+    assert body[9:19] == bytes.fromhex('f0830c24004883c428c3')

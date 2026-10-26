@@ -7,6 +7,38 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 152 — the parameterless init wrapper, and why it must NOT reuse the census name (2026-10-26, on `main`)
+
+**`0x18078c0b0` is the no-argument entry of the runtime-metadata
+initializer** (19 bytes, 2,849 sites): `sub rsp,28h; call <init>;
+lock or dword [rsp],0; add rsp,28h; ret`. Template byte-exact with the
+call rel32 as the only wildcard; unique in .text.
+
+**First attempt was wrong and the paired diff caught it.** Naming it
+`il2cpp_codegen_initialize_runtime_metadata` (the census name) routed
+the sites through the existing elision, which *propagates the RCX slot
+value into RAX* -- correct for the one-argument entry that reads a
+metadata slot, **wrong here**: this wrapper takes no argument, so RCX
+is register residue. The first build leaked that residue into
+downstream expressions (4,195 added lines with shapes like
+`float real3 = real2` appearing near the changed sites). It got its
+own name, `il2cpp_runtime_init_meta_void`, with a drop-only arm in
+`_call`: registers are cleared and RAX goes unknown, nothing travels.
+
+**Validation.** Portable 1,425 (+1: the 19-byte body). Paired
+`--only UnityEngine.UI` against the fix-151 tree (initpost2, 981 files
+/ 12,249 bodies both sides): 70 files changed, **242
+`sub_18078c0b0` lines removed**, brace 0, compile gate **50,542 ->
+50,539 (syntax flat at 17)**. The normalized net change is all
+positive: the stale `object objN = sub_1807e3c60(x, typeof(Type))`
+probes (results unused) and their `if (x != null)` wrappers disappear,
+while `as` folds land (`Action_2<int,float> action23 = delegate1 as
+Action_2<int,float>`, `INotifyBindablePropertyChanged`,
+`ICanvasRaycastFilter`) and a stale `x = x.layoutPriority` reads
+`layoutElement1.layoutPriority`. Checked and cleared as pre-existing,
+not caused here: the 49 `real3 = real2` lines exist identically in the
+fix-151 baseline tree.
+
 ## Current work: fix 151 — element LOAD + the isinst family's second build (2026-10-26, on `main`)
 
 **`0x180010df0` is `il2cpp_array_getref`** (56 bytes, 7,484 sites):

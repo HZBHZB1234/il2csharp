@@ -2796,6 +2796,23 @@ class _CallsMixin:
                     self.emit(ins.ip, '', asm)
                 return
 
+        # --- parameterless runtime-metadata init: pure plumbing, and it
+        # reads NO argument -- the register residue must not travel. The
+        # census name (`..._initialize_runtime_metadata`) elides and
+        # propagates RCX, which is correct for its one-argument entry;
+        # doing that here leaked stale values into RAX (a float lane
+        # picked up a pointer). Drop the call and let RAX go unknown.
+        # -- fix 152
+        if name == 'il2cpp_runtime_init_meta_void':
+            for r in VOLATILE:
+                self.regs.pop(r, None)
+            for i in range(6):
+                self.regs.pop('XMM%d' % i, None)
+            self._fresh_unknowns()
+            if self.asm_comments and asm:
+                self.emit(ins.ip, '', asm)
+            return
+
         # --- null check: il2cpp_null_check(obj) has no managed spelling.
         # The helper's whole body guards its argument and returns; C#
         # null checks are implicit, so the statement is dropped and the

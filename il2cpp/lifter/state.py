@@ -33,6 +33,7 @@ class _StateMixin:
         'il2cpp_array_setref': 3,
         'il2cpp_null_check': 1,
         'il2cpp_array_getref': 2,
+        'il2cpp_runtime_init_meta_void': 0,
     }
 
     @staticmethod
@@ -480,6 +481,31 @@ class _StateMixin:
             return None
         return stride
 
+    def _is_init_meta_wrapper(self, target):
+        """Recognize the parameterless runtime-metadata init wrapper.
+
+        Ground truth: 0x18078c0b0 (19 bytes, 2,849 call sites). The
+        body is `sub rsp,28h; call <init>; lock or dword [rsp],0;
+        add rsp,28h; ret` -- the same lazy-init routine the census
+        already names `il2cpp_codegen_initialize_runtime_metadata`, in
+        its no-argument entry. Naming it routes the sites through the
+        existing elision in `_call` (runtime plumbing, no managed
+        spelling). Only the call rel32 varies; verified UNIQUE in the
+        fixture's whole .text. Never hardcodes an address.
+        """
+        if not HAVE_ICED or not target or not self.bin.is_exec_va(target):
+            return False
+        if self.il.addr_candidates.get(target) or target in self.bin.exports:
+            return False
+        start, finish = self.il.function_extent(target)
+        if start != target or finish is None or finish - target != 19:
+            return False
+        code = self.bin.read(target, 19)
+        if not code or len(code) != 19:
+            return False
+        return (code[0:5] == bytes.fromhex('4883ec28e8')
+                and code[9:19] == bytes.fromhex('f0830c24004883c428c3'))
+
     def _is_array_getref_helper(self, target):
         """Recognize the bounds-checked element-LOAD helper.
 
@@ -614,6 +640,14 @@ class _StateMixin:
                     elif self._is_array_getref_helper(target):
                         self.rt_names[target] = 'il2cpp_array_getref'
                         name = 'il2cpp_array_getref'
+                    elif self._is_init_meta_wrapper(target):
+                        # Distinct from the census name on purpose: the
+                        # census entry elides the call AND propagates the
+                        # RCX slot value into RAX, which is right for the
+                        # one-argument entry and WRONG here (this wrapper
+                        # takes no argument, so RCX is register residue).
+                        self.rt_names[target] = 'il2cpp_runtime_init_meta_void'
+                        name = 'il2cpp_runtime_init_meta_void'
             except Exception:
                 name = None
             cache[target] = name
