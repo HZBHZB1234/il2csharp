@@ -709,6 +709,18 @@ class _StateMixin:
                         self.rt_names[target] = 'il2cpp_array_addr'
                         self.__dict__.setdefault('rt_array_addr', {})[target] = _st
                         name = 'il2cpp_array_addr'
+                    elif self._is_isinst_helper(target):
+                        # The isinst family's generic-variable build
+                        # (0x1807e3c60, 10,696 sites): the same prologue,
+                        # the System.Object short-circuit, and the VAR/MVAR
+                        # target handling. The census sample never reaches
+                        # it, so the lazy prober is its only shot; naming
+                        # it routes the sites through the fix-151
+                        # `obj as T` fold whenever the klass argument
+                        # renders as typeof(T).
+                        self.rt_isinst.add(target)
+                        self.rt_names[target] = 'il2cpp_object_isinst'
+                        name = 'il2cpp_object_isinst'
                     elif self._is_array_setref_helper(target):
                         self.rt_names[target] = 'il2cpp_array_setref'
                         name = 'il2cpp_array_setref'

@@ -7,6 +7,42 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 157 — the isinst family's generic-variable build, lazily named (2026-10-26, on `main`)
+
+**`0x1807e3c60` (10,696 sites) is the isinst helper's second body.**
+Same prologue as the census-named `0x180479f80`
+(`mov [rsp+8],rbx; mov [rsp+10h],rsi; push rdi; sub rsp,20h;
+mov rbx,rdx; mov rdi,rcx; test rcx,rcx`), the
+IsAssignableFrom-shaped predicate call, the VAR/MVAR (0x13/0x1E) type-
+kind checks, the interface-offset fallback, and the same
+`cmp rbx,[rip]; cmove rax,rdi` System.Object short-circuit. The
+relaxed fix-151 recognizer already matches it (`_is_isinst_helper`
+returns True) — it was never probed because the census sample is
+Assembly-CSharp-only and the lazy prober did not carry the isinst
+check. The hot-target census can never reach this body: its sites are
+shared-generic code living outside the sample.
+
+**The lazy prober now carries it.** `_array_addr_name` extends with the
+isinst arm: the recognizer's structural proof registers the address in
+`rt_isinst` and names it `il2cpp_object_isinst`. Sites whose klass
+argument renders `typeof(T)` route through the fix-151 `obj as T`
+fold; on this fixture the common shape takes the target klass from the
+rgctx (`[klass+0x40]` — a startup-initialized constant the bytes do
+not carry), so the fold declines there and the honest named call
+remains. Propagating those rgctx constants is the follow-up that would
+flip ~9.5k tree-wide sites to `obj as T`; it needs the
+Il2CppClass-rgctx slot decode, not a recognizer.
+
+**Validation.** Portable 1,437 (no new tests needed — the recognizer
+is fix-151's, already covered); game +2 (the lazy naming plus a
+declines-without-typeof ground truth on StencilMaterial.Add). Paired
+`--only UnityEngine.UI` (isinstpost vs the fix-156 tree, 981 files /
+12,249 bodies both sides): 28 files changed, 96 renders renamed,
+**0 `sub_1807e3c60` lines remain**, brace 0, compile gate
+**50,513 → 50,506 binding (−7), syntax flat at 17**. Full suite:
+**1,475 passed / 2 known env failures / 1 xfailed** — failure SET
+byte-identical to fix-156, zero pin moves.
+
 ## Current work: fix 156 — the icall resolver found again; every eager resolve site renders the managed call (2026-10-26, on `main`)
 
 **`scan_icall_cache` was silent on this fixture.** The icall thunk
