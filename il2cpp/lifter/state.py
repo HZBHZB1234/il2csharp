@@ -1267,6 +1267,7 @@ class _StateMixin:
             if budget <= 0:
                 break
         self.rt_alloc = None
+        self.rt_allocs = set()
         self.rt_arrnew = set()
         self.rt_wbarrier = set()
         self.rt_names = {}
@@ -1298,9 +1299,19 @@ class _StateMixin:
                     self.rt_arrnew.add(t)
                     self.rt_names[t] = 'il2cpp_array_new'
                 else:
+                    # Every klass-argument helper of this shape allocates
+                    # (the fixture carries a second, hotter one --
+                    # 0x1807e3d20, 1,226 klass sites -- that is the
+                    # class-init wrapper around the same allocator; the
+                    # old single-slot rule kept only whichever sorted
+                    # first and left the other rendering as `sub_`).
+                    # `rt_alloc` stays the first-seen address for the
+                    # consumers that only need one; `rt_allocs` is the
+                    # complete family the fold tests against.
+                    self.rt_allocs.add(t)
                     if self.rt_alloc is None:
                         self.rt_alloc = t
-                        self.rt_names[t] = 'il2cpp_object_new'
+                    self.rt_names[t] = 'il2cpp_object_new'
             elif naddr >= total * 0.6:
                 self.rt_wbarrier.add(t)
                 self.rt_names[t] = 'il2cpp_codegen_write_barrier'

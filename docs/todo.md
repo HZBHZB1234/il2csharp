@@ -7,6 +7,70 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 148 — the alloc-helper family; the 5,845-site delegate族 collapses (2026-10-26, on `main`)
+
+**Root cause: a single-slot classifier on a multi-entry helper.** The
+helper census (`state.py`, klass-argument call shapes) kept exactly ONE
+address in `rt_alloc` (`if self.rt_alloc is None`), so the fixture's
+second klass-argument allocator -- `0x1807e3d20`, the class-init
+wrapper around the same allocator (1,226 klass sites, 99.7% klass
+ratio) -- never entered the fold. Its sites rendered
+`object objN = sub_1807e3d20(typeof(T))`: an UNTYPED `object`, which
+then blocked every downstream proof.
+
+**The blocked population was the tree's largest single family.** The
+5,845 sites at `0x1811cce50` are 30 delegate `.ctor/2` candidates
+(Action/UnityAction/DelegateEvent/ThreadStart...), and every one is
+built as `sub_1811cce50(obj, target, X.Y_handler)` where `obj` came
+from that untyped alloc. With the alloc typed, the EXISTING delegate
+arm (`recv.ty` -> delegate `Invoke` -> `.ctor/2` -> bound-method owner)
+completes on its own -- no new naming logic was needed. Ground truth
+(ObscuredFilePrefsExamples.Start, mi 311171):
+
+    object obj21 = sub_1807e3d20(typeof(Action));
+    sub_1811cce50/*shared body, 30 candidates*/(obj21, this, ...OnNotGenuine...);
+
+becomes
+
+    System.Action action1 = new System.Action(this.OnNotGenuineDataDetected);
+
+Second, independent unlock: an inlined `List<T>.Add` fast path reads
+its fields through the now-typed receiver, so
+`((byte*)__addr(list11) + 0x1c)[0]` becomes `list11._version` /
+`list11._size` / `list11._items` (the C2 field-resolution shape,
+arriving for free). The remaining `sub_180002950(list11._items, ...)`
+is that family's own next slice.
+
+**Implementation.** `rt_allocs` (the complete klass-argument family;
+`rt_alloc` keeps first-seen for consumers that only need one) and the
+`_call` fold tests membership. Three lines of classification change,
+zero new naming machinery.
+
+**Validation.** Portable 1,413 (+3: both family members fold to
+`new System.Action()`, a non-family helper keeps the honest fallback);
+game **1,444 passed / 2 known env failures / 1 xfailed — failure SET
+byte-identical to fix-147, zero pin moves**. Ground truths: delegate
+ctor renders `new System.Action(...)` twice with no
+`sub_1811cce50`/`sub_1807e3d20` left (mi 311171); the typed allocation
+unlocks `list11._size`/`_items` (DeserializeProductDescriptions). One
+test needed loosening, not re-pinning: `test_dungeon_progress_clone_
+copies_every_list` asserted hard-coded temp numbers (`list11`,
+`list17`, `list112`); the body there went **79 lines -> 28** as every
+`(List<T>)sub_1807e3d20(typeof(...), this, obj2, obj3)` +
+`listN.ctor(src)` + `&__ret.X >> 12 & 63` barrier residue collapsed
+into one `new List<T>(src)` per field, so the assertions now name that
+shape and the fields, never temp numbers. Paired
+`--only UnityEngine.Purchasing.Stores` (allocpre/allocpost,
+stash-proven): 76 files changed, **640 `sub_` lines removed**, 110
+`new <DelegateType>(...)` lines added, brace 0, compile gate
+**6,366 -> 6,326 (-40, syntax flat at 0)**.
+
+**Not a regression (checked).** A full-suite run under load reported
+10 failed + 7 errors; the 7 errors were child-process/temp-tree
+contention in `test_missing_method_bodies.py` / `test_validation.py`
+(both pass standalone: 15/15), and the 10 included the temp-number
+test above plus the 2 env failures. The clean re-run is the record.
+
 ## Current work: fix 147 — shared-body identity from the MethodRef pointer walk; C1 step 3 closed as unsound (2026-10-26, on `main`)
 
 **The registration-name hazard (probe, decisive).** C1 step 3 planned

@@ -3261,7 +3261,9 @@ class _CallsMixin:
                 return
 
         # --- object allocation helper: sub_x(typeof(T)) -> new T()
-        if target is not None and target == self.rt_alloc and recv is not None                 and recv.kind == 'klass':
+        if target is not None and (target == self.rt_alloc
+                                   or target in getattr(self, 'rt_allocs', ())) \
+                and recv is not None and recv.kind == 'klass':
             tn = self.il.type_name(recv.ty)
             allocation = Expr('new %s()' % tn, recv.ty, 'obj')
             allocation._alloc = allocation.text

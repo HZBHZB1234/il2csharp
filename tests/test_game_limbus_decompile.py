@@ -18,15 +18,26 @@ def test_dungeon_progress_is_empty(baseline_game_decompiler):
 
 
 def test_dungeon_progress_clone_copies_every_list(baseline_game_decompiler):
+    """fix 148: the typed allocation makes this a copy-construction.
+
+    Before the alloc-helper family was recognized, each field copy went
+    through an untyped `sub_1807e3d20(typeof(List<T>), ...)` plus a
+    separate `.ctor(...)` and a `&__ret.X >> 12 & 63` write-barrier
+    residue -- 79 lines of pointer arithmetic. With the allocation
+    typed, the inlined copy-constructor reads as one `new List<T>(src)`
+    per field. Assertions stay on that shape, not on temp numbers.
+    """
     il, dec = baseline_game_decompiler
     mi, _, _ = find_method(il, 'Dungeon.DungeonProgress', 'Clone', 0)
     body = lift_text(il, dec, mi)
     assert '__ret.units = null;' in body
-    assert '__ret.AcquiredEgoGiftList = list11;' in body
-    assert '__ret.passingRoute = list17;' in body
-    assert '__ret.unlockedNodeIDList = list112;' in body
-    assert '__ret.clearedNodeList = list117;' in body
+    for field in ('AcquiredEgoGiftList', 'passingRoute',
+                  'unlockedNodeIDList', 'clearedNodeList'):
+        assert 'this.%s' % field in body
+        assert '__ret.%s = list' % field in body
+    assert 'new System.Collections.Generic.List_1<' in body
     assert 'return __ret;' in body
+    assert 'sub_1807e3d20' not in body
 
 
 def test_inventory_get_item_walks_the_backing_list(baseline_game_decompiler):
