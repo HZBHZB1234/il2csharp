@@ -7,6 +7,23 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 161 probe — C3's lane merge, sized and re-scoped (2026-10-26, probe only, no source change)
+
+**The roadmap's C3 repro is already fixed; the real population is the
+whole SIMD-store surface.** `mi 24267`
+(`EGOGiftAbility_98416.GetExpectedAttackDmgMultiplier`) now renders
+`return this._dmgMul;` — the split-store case the roadmap pinned as
+C3's repro was closed by later field/return work, so it is no longer
+evidence of an open gap. Measured directly over both executable
+sections: **109,339 `movsd`/`movss` memory stores** (13,407 in
+`.text`, 95,932 in `il2cpp`) plus **6,945 `shufps`**. That is the
+honest C3 scope, and it is exactly why the roadmap binds it to the
+SHUFPS destination-invalidation model as one slice: merging a split
+store into a struct assignment without modelling SHUFPS's destination
+clobber would let a stale lane survive across the merge. Per the
+decline-by-default rule and the build policy, this stays deferred as
+a single paired slice rather than a partial landing.
+
 ## Current work: fix 160 probe — C2's raw-offset field resolution, measured (2026-10-26, probe only, no source change)
 
 **The gap is recursive inner offsets, not receiver typing.** The
