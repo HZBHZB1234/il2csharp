@@ -45,11 +45,32 @@ Decoding it would give the third parties' exact versions and an
 automatic engine/third-party/game split; that stays open, with the
 table layout above as the starting evidence.
 
-**Validation.** Portable suite + **9 new tests** (engine/third-party/
-game prefixes, unknown-defaults-to-game, order preservation, keep/drop
-by role, name-substring filtering, empty-keep-means-everything). The
-game-only build (`--roles game-original --workers 6`) schedules
-**14 images / 211 type-tasks** against the full build's 162 / 2,011.
+**Validation — the game-only milestone build (`gameonly`, commit
+`9ae22f5`, 6 workers):**
+
+| | value |
+| --- | --- |
+| images | **14** (vs the full build's 162) |
+| type files | 24,971 |
+| bodies lifted | **178,025** |
+| failed / fallbacks / type-emit failures | **0 / 0 / 0** |
+| wall | 4,645 s (77 min, vs 3 h+ for the full build) |
+| brace | **0 unbalanced** / 24,957 files |
+| parse (per image, see the note below) | 24,957 files, **28 with errors, 298 ERROR/MISSING nodes** |
+| Roslyn compile, `Assembly-CSharp` | **syntax 75 / binding 12** (24,739 files) |
+
+**The 12 binding errors are the headline.** The whole-tree figure of
+~455k Roslyn errors was overwhelmingly the engine and plugin images --
+exactly the assemblies that already ship as real managed DLLs. On the
+game's own code the binding tier is nearly clean, and the parse errors
+concentrate in one place (26 of 28 files, 294 of 298 nodes, all in
+`Assembly-CSharp`; RpgSystemCore and ServiceAssembly contribute one
+each). That is now the concrete target list.
+
+**Environment note (P0-1's known issue, reproduced).** A whole-tree
+`gate.py parse` run segfaults on this box; per-image runs are clean, so
+the parse number above comes from a per-image sweep (same grammar, one
+process per image). Portable suite green; 9 role tests.
 
 ## Current work: fix 163 probe — P2-5 small families, three of four already closed (2026-10-27, probe only)
 
