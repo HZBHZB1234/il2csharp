@@ -578,7 +578,8 @@ class _ValuesMixin:
         td_idx = self._td_of(ty)
         return td_idx is not None and self.meta.typedefs[td_idx].is_valuetype
 
-    def _field_expr(self, base: Expr, disp: int, size: int, elem_fold=False) -> Expr:
+    def _field_expr(self, base: Expr, disp: int, size: int, elem_fold=False,
+                    load=False) -> Expr:
         _ifm = getattr(base, '_ifm', None)
         if _ifm is not None and len(_ifm) == 4 and disp in (0, 8) and size == 8:
             # fix 139: VirtualInvokeData.{methodPtr, method} of a resolved
@@ -771,6 +772,63 @@ class _ValuesMixin:
                     elif _ptr_base and fte == 0x0e:
                         fkind = 'str'
                     return Expr('%s%s%s' % (_recv_fold(text), _sep, fname), fty, fkind)
+                # C2: an offset INSIDE an embedded value-type field (the
+                # roadmap's `0x18` inside a field at `0x10` -> `.field.z`).
+                # The flat chain stops at each field, so resolve the path
+                # recursively. Both branches above must have MISSED for
+                # this to run -- a value-type receiver whose chain already
+                # answers `disp + 0x10` is the flat case, not a nested one
+                # (running the walk there rendered `m_Node = 0f`: the
+                # nested lookup returned the field itself while the type
+                # came back a scalar).
+                #
+                # The resolved field's type is the INNER field's own type
+                # and is used verbatim: `_recv_member_ty` substitutes the
+                # OUTER receiver's generic arguments, which is wrong for a
+                # member of a nested struct. A nested path whose type
+                # cannot be stated exactly declines to the raw deref.
+                _nest = getattr(self.il, 'nested_field_path', None)
+                if _nest is not None:
+                    _target = disp + 0x10 if _vt else disp
+                    _flat_hit = (_vt and (disp + 0x10) in chain) \
+                        or ((not _vt) and disp in chain)
+                    got = None
+                    # The nested walk is a LOAD-path proof only. The
+                    # store path derives its own scalar RHS type, so a
+                    # nested struct member there rendered a mismatched
+                    # value (`m_HierarchyFlattened = real1`, `= null`):
+                    # those sites keep the raw deref, which is honest.
+                    if load and _target > 0 and not _flat_hit:
+                        got = _nest(td_idx, _target)
+                    if got is not None:
+                        _path, ftype_idx = got
+                        fty = self.il.types[ftype_idx] \
+                            if 0 <= ftype_idx < len(self.il.types) else None
+                        if fty is None:
+                            got = None
+                        else:
+                            fte = self.il._type_enum(fty)
+                            # A value-type member is not one scalar lane:
+                            # the access must be at least the field's own
+                            # size (a 4-byte store into an 8-byte struct
+                            # field is a raw slice, not that field). This
+                            # is the guard that keeps `m_Node = 0f` out of
+                            # the store path.
+                            if fte in (0x11, 0x12, 0x15):
+                                _sub = self.il.td_of_ty(fty)
+                                if _sub is not None \
+                                        and 0 <= _sub < len(self.meta.typedefs) \
+                                        and self.meta.typedefs[_sub].is_valuetype:
+                                    _sz = self.il.value_type_size(_sub)
+                                    if _sz is None or size < _sz:
+                                        got = None
+                    if got is not None:
+                        fkind = 'arr' if fte in (0x1d, 0x14) else (
+                            'str' if fte == 0x0e else (
+                                'float' if fte in (0x0c, 0x0d) else (
+                                    'obj' if fte >= 0x10 else 'int')))
+                        return Expr('%s%s%s' % (_recv_fold(text), _sep, _path),
+                                    fty, fkind)
         if elem_fold and disp == KLASS_ELEMENT_CLASS and base.kind == 'ptr':
             # element klass of a newarr-proven array: [arrklass+0x40] is
             # Il2CppClass.element_class. The provenance was captured when

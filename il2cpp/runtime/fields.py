@@ -863,6 +863,60 @@ class _FieldsMixin:
                 out.append(k)
         return out
 
+    def nested_field_path(self, td_index, disp, depth=0):
+        """Resolve `disp` into a dotted field path, following value-type
+        fields one level down at a time.
+
+        `instance_field_chain` merges a CLASS's whole base chain but stops
+        at each field: an offset inside an embedded value type (C2's
+        `0x18` inside a field at `0x10` -> `.field.z`) finds no entry.
+        This walks it: the chain's nearest field at or below `disp` that
+        is a value type, then that struct's own chain for the remainder,
+        recursively (bounded by `depth`). Returns
+        `(path, field_type_idx)` or None.
+
+        Correctness guards: only a value type whose size actually covers
+        the remainder is followed (a union-like or over-approximated
+        layout declines); the object header convention (+0x10) applies to
+        boxed/unboxed value types and is applied by the CALLER, not here;
+        a class-typed field is never followed (its object is a pointer,
+        not inline storage).
+        """
+        if depth > 4 or td_index is None:
+            return None
+        chain = self.instance_field_chain(td_index)
+        if not chain:
+            return None
+        cands = [off for off in chain if off <= disp]
+        if not cands:
+            return None
+        # nearest field at or below the target offset
+        base = max(cands)
+        fname, ftype_idx = chain[base]
+        fty = self.types[ftype_idx] if 0 <= ftype_idx < len(self.types) else None
+        if base == disp:
+            return (fname, ftype_idx)
+        if fty is None:
+            return None
+        te = (fty[1] >> 16) & 0xFF
+        if te not in (0x11, 0x12, 0x15):
+            return None                     # a primitive spans the offset
+        sub_td = self.td_of_ty(fty)
+        if sub_td is None or not (0 <= sub_td < len(self.meta.typedefs)):
+            return None
+        sub = self.meta.typedefs[sub_td]
+        if not sub.is_valuetype:
+            return None                     # a class field holds a pointer
+        size = self.value_type_size(sub_td)
+        if size is None or (disp - base) >= size:
+            return None
+        # the struct's own fields are laid out from 0 (the value-type
+        # chain is built by the same field_offsets pass)
+        deeper = self.nested_field_path(sub_td, disp - base, depth + 1)
+        if deeper is None:
+            return None
+        return ('%s.%s' % (fname, deeper[0]), deeper[1])
+
     def _class_field_size_align(self, ty):
         """(size, align) of an argument-invariant class field type, else None."""
         if ty is None:

@@ -757,7 +757,16 @@ class _InsnMixin:
                     and _reg_size(ins.op0_register) == 8:
                 offset = imm_of(ins, 1) * (1 if mn == Mnemonic.ADD else -1)
                 field = self._field_expr(a, offset, 8)
+                # A field whose type is a value type spans its whole
+                # storage: `&recv.field` is fine, but the store path that
+                # consumes it must not treat it as one scalar lane
+                # (`m_Node = 0f` -- a float literal into an 8-byte struct
+                # field). Take the address only for scalar/class fields.
+                _fte = self.il._type_enum(field.ty) if field.ty is not None else None
+                _vt_field = _fte in (0x11, 0x12) and self._td_of(field.ty) is not None \
+                    and self.meta.typedefs[self._td_of(field.ty)].is_valuetype
                 if field.ty is not None and not field.text.startswith('*') \
+                        and not _vt_field \
                         and (field.text.startswith(_recv_fold(a.text) + '.') or a.kind == 'sfblob'):
                     e = self._mk('&' + field.text, field.ty, 'ptr')
                     self.set_reg(dst, e)
@@ -1783,7 +1792,7 @@ class _InsnMixin:
                 scale, disp_add(disp)), None, 'ptr')
         if be is None:
             return Expr('mem_%x' % disp, None, 'ptr')
-        fe = self._field_expr(be, disp, size, elem_fold=True)
+        fe = self._field_expr(be, disp, size, elem_fold=True, load=True)
         # fix 147: a plain `[base+off]` deref of a lazy MethodRef cell
         # value (or of an expr already derived from one) carries the
         # walk's root identity forward. Source code never derefs a

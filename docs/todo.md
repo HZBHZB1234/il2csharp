@@ -7,6 +7,67 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 162 — C2 lands: recursive inner-offset field resolution (2026-10-27, on `main`)
+
+**The gap was exactly what the roadmap predicted.** `instance_field_chain`
+merges a class's whole base chain but stops at each field: an offset
+INSIDE an embedded value type -- the roadmap's `0x18` inside a field at
+`0x10` → `.field.z` -- finds no entry and renders
+`((byte*)recv + 0x18)[0]`. `Il2Cpp.nested_field_path` walks it: the
+chain's nearest value-typed field at or below the offset, then that
+struct's own chain for the remainder, recursively.
+
+**Four guards, each a decline rather than a guess.** (1) Only a value
+type whose `value_type_size` actually covers the remainder is followed
+-- a union-like or over-approximated layout declines. (2) A
+class-typed field is never followed: its object is a pointer, not
+inline storage. (3) The depth is bounded at 4, so a self-referential
+value type cannot recurse. (4) The offset convention mirrors the flat
+branch EXACTLY -- a value-type receiver maps its read offset into the
+chain at `disp + 0x10` (the boxed header shift), a class receiver at
+`disp`. The first draft used `disp - 0x10` and rendered
+`this.propertyPath.m_Part0.m_Kind` for a `0x40` store; the A/B diff
+caught it before any build (the live ground truth
+`PropertyPath` chain is `0x10 m_Part0 / 0x30 m_Part1 / 0x50 m_Part2`,
+all `PropertyPathPart` value types, and `nested_field_path(0x40)`
+correctly answers `m_Part1.m_Kind`).
+
+**Measured on a 1,500-body random sample (seed 0, in-process A/B, no
+build):** 15 bodies change (1.0%), raw-deref lines **151 → 94
+(−38%)**, net −12 lines. The renders are the point:
+
+    this.m_Enumerator.type = enumerator1.m_Object;         (was ((byte*)this + 0x28)[0])
+    fastGlitchUrpPass1.tempCopy.m_BufferPointer = 0;       (was ((long*)(...) + 0x110))
+    this.m_HighlightState.color = state.highlightState.padding.m_Bottom;
+    animationEvent1.m_AnimatorStateInfo.m_Name = obj37;
+
+**Honest scope note.** A first probe of
+`Unity.Collections.DataStreamWriter.get_Capacity` looked like a C2
+miss (`this + 0xc`), but the typedef has only two fields (`m_Data`@0x10,
+`m_SendHandleData`@0x30) -- that read is a larger enclosing struct's
+offset, not an inner one, so it correctly stays raw. The fold only
+fires where the layout genuinely nests.
+
+**Validation.** Portable 1,445 (+8 unit tests: flat field, the
+roadmap's inner case, three-level nesting, class-field decline,
+past-the-size decline, unknown-size decline, depth bound, no-chain
+decline). Paired `--only UnityEngine.UIElementsModule` (c2pre vs
+c2post7, 851 files both sides): **76 files changed, brace 0
+unbalanced**, compile gate **syntax flat at 17, binding 42,922 →
+42,925 (+3)** — and those 3 are an HONEST GAIN, not a regression: the
+fold now states the real `PropertyPathPartKind` where the pre-render
+laundered it through `int num3 = ....m_Kind.value__`, and that enum
+(`Unity.Properties.PropertyPathPartKind`, metadata td 48479) is simply
+not emitted in this image — the pre-render hid a pre-existing export
+gap behind a type lie. Two bugs the A/B caught before any build is
+accepted, both now guarded: (a) applying `_recv_member_ty` (outer
+generic substitution) to a nested struct's member rendered
+`m_Node = 0f`, (b) running the nested walk on the STORE path rendered
+`m_HierarchyFlattened = real1` / `= null`, so the walk is now
+`load=True`-only and every store site keeps its honest raw deref.
+Full suite: **1,489 passed / 2 known env failures / 1 xfailed** —
+failure SET byte-identical to fix-159, zero pin moves.
+
 ## Current work: fix 161 probe — C3's lane merge, sized and re-scoped (2026-10-26, probe only, no source change)
 
 **The roadmap's C3 repro is already fixed; the real population is the
