@@ -7,6 +7,65 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 159 — the interface dispatch twins, admitted by the landed arity proof (2026-10-26, on `main`)
+
+**The twins were already solved — one register-name comparison away.**
+`0x180013b50`/`0x180016f40` (2,778 call sites) are the SHARED-GENERIC
+interface dispatch thunks: (u16 methodSlot, interfaceTypeIndex, recv,
+<first method arg>) with the stack args forwarded — the body scans the
+receiver klass's interfaceOffsets (count `klass+0x12E`, table
+`klass+0xB0`), computes the vtable slot at
+`klass + 0x138 + 16*(offset + slot)`, tail-jumps `[slot]` with the
+MethodInfo* in R8, and falls back to `il2cpp_interface_get_method` on
+a miss. That is byte-for-byte the shape `_iface_dispatch_arity`
+already recognizes (the landed landing-8 proof: one 0x12E count, one
+0xB0 table, one 0x138 add, one shl 4, an indirect tail jmp, a miss
+call — a read of R9 means one forwarded argument) — and the twins'
+call sites route through the landed `_param_interface_dispatch` fold,
+stack-arg recovery and closed-generic substitution included.
+
+**The bug was `_r9_touch`'s operand compare.** The twins extract the
+forwarded argument as `movzx esi,r9w` / `mov esi,r9d` — SUB-register
+forms whose iced `op1_register` is R9W/R9D, not R9 — so the first
+touch read as None and both thunks sat at arity 0. The fix normalizes
+operand registers through their 64-bit name before comparing; the
+sub-register extractions now read as the forwarded argument they are,
+both twins admit at arity 1, and the landed fold renders the sites as
+the interface's own method (slot = the interface's method-row order,
+verified on IReadOnlyList`1 slot 0 = get_Item and IUniTaskSource
+slot 2 = GetResult):
+
+    if (readOnlyList11[num2] == this._curSkillMotion)
+
+— the fix-158-era render `sub_180016f40(0, typeof(...), recv, num2)`
+becomes the closed-generic indexer call, arguments recovered, no
+residue. A duplicate recognizer + fold arm written during the probe
+was removed whole: the landed machinery (stack-arg tiles, closed
+generics, ABI gates) is strictly stronger than anything the duplicate
+did, and shadowing it would have rendered worse code.
+
+**Validation.** Portable 1,437 (no regressions); the fix-139/142
+interface-fold tests pass unchanged; game +3 (both thunk builds admit
+at arity 1 through the memoized choke, the closed-generic indexer site
+folds, the stack-argument recovery site folds). Paired
+`--only Assembly-CSharp` (ifacepre/ifacepost, 24,789 files /
+176,785 bodies both sides, serial — the 8-worker runs hung twice in
+this box and were killed; the serial run is the honest schedule):
+**474 files changed, net −1,484 lines, the twin `sub_` lines
+2,394 → 915 (−1,479, 62%)**, brace **0 unbalanced across 24,789
+files**. The 915 honest remains split 778 IUniTaskSource (the R9
+argument renders `_` in the surrounding state machine — no provable
+argument, so the fold declines) and 137 opaque-interface expressions.
+Sample folded renders, all correct:
+
+    uniTaskSource2.GetResult(num8);
+    string text3 = retryHandler.GetTurnCountText(turnCount);
+    string text1 = staticDataJson.GetDataByIndex(num4);
+    if (readOnlyList11[num2] == this._curSkillMotion)
+
+Full suite: **1,481 passed / 2 known env failures / 1 xfailed** —
+failure SET byte-identical to fix-158, zero pin moves.
+
 ## Current work: fix 158 — the P/Invoke resolver folds to the managed DllImport call (2026-10-26, on `main`)
 
 **The attribute blob decoder proved DllImport is stripped.** The v39

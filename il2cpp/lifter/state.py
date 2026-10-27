@@ -189,16 +189,22 @@ class _StateMixin:
 
         Memory base/index registers are always read, even in a store.
         CMP/TEST read both sides; JMP/CALL/PUSH/XCHG read their
-        register operand; every other R9 destination writes. Never
-        raises (an unreadable instruction is no touch).
+        register operand; every other R9 destination writes. Operand
+        registers compare through their 64-bit name, so the
+        sub-register extractions count too -- the interface thunks'
+        `movzx esi,r9w` / `mov esi,r9d` READ the forwarded argument
+        (missing them held both thunk builds at arity 0). Never raises
+        (an unreadable instruction is no touch).
         """
         try:
             R9 = IReg.R9
             if getattr(ins, 'memory_base', None) == R9 \
                     or getattr(ins, 'memory_index', None) == R9:
                 return 'read'
-            o0 = ins.op0_kind == OpKind.REGISTER and ins.op0_register == R9
-            o1 = ins.op1_kind == OpKind.REGISTER and ins.op1_register == R9
+            o0 = ins.op0_kind == OpKind.REGISTER \
+                and reg_name(ins.op0_register) == 'R9'
+            o1 = ins.op1_kind == OpKind.REGISTER \
+                and reg_name(ins.op1_register) == 'R9'
             if o0 and o1:
                 # same-register both sides: zeroing idioms (`xor
                 # r9,r9`) manufacture the value, identities read it.
