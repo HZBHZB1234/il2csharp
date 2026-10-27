@@ -386,6 +386,15 @@ def main(argv):
     ap.add_argument('--binary', help='explicit GameAssembly.dll / libil2cpp.so path')
     ap.add_argument('-o', '--out', default='il2csharp_out', help='output directory')
     ap.add_argument('--only', default=None, help='comma-separated assembly name filters (substring match)')
+    ap.add_argument('--exclude', default=None,
+                    help='comma-separated assembly name filters to SKIP (substring match)')
+    ap.add_argument('--roles', default=None,
+                    help='comma-separated image roles to keep: engine / third-party / '
+                         'game-original (see tools/role_classify.py). Engine and '
+                         'third-party assemblies ship as real managed DLLs, so '
+                         'rebuilding their source from IL2CPP is wasted effort.')
+    ap.add_argument('--exclude-roles', default=None,
+                    help='comma-separated image roles to skip: engine / third-party')
     ap.add_argument('--types', default=None, help='case-insensitive full type-name substring; nested matches retain the owner file')
     ap.add_argument('--strict', action='store_true', help='return nonzero on body-lifting fallback or missing backend')
     ap.add_argument('--decls-only', action='store_true', help='skip method body lifting')
@@ -520,10 +529,33 @@ def main(argv):
             say('warning: iced-x86 not installed; x64 bodies disabled (pip install iced-x86)')
 
     only = [t.strip().lower() for t in args.only.split(',')] if args.only else None
+    excl = [t.strip().lower() for t in args.exclude.split(',')] if args.exclude else None
+    keep_roles = ([t.strip() for t in args.roles.split(',')]
+                  if args.roles else None)
+    drop_roles = ([t.strip() for t in args.exclude_roles.split(',')]
+                  if args.exclude_roles else None)
+    if keep_roles or drop_roles:
+        try:
+            from role_classify import role_of
+        except ImportError:
+            import os as _os
+            import sys as _sys
+            _sys.path.insert(0, _os.path.dirname(_os.path.dirname(
+                _os.path.abspath(__file__))))
+            from tools.role_classify import role_of
     images = [img for img in meta.images
-              if not only or any(t in img.name.lower() for t in only)]
+              if (not only or any(t in img.name.lower() for t in only))
+              and (not excl or not any(t in img.name.lower() for t in excl))
+              and (not keep_roles or role_of(img.name) in keep_roles)
+              and (not drop_roles or role_of(img.name) not in drop_roles)]
     if only and not images:
         print('error: --only matched no assembly:', args.only)
+        return 1
+    if excl and not images:
+        print('error: --exclude removed every assembly:', args.exclude)
+        return 1
+    if (keep_roles or drop_roles) and not images:
+        print('error: --roles/--exclude-roles removed every assembly')
         return 1
 
     if args.label and args.out == 'il2csharp_out':

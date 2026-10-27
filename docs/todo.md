@@ -7,6 +7,50 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 164 — image roles: build only the game's own assemblies (2026-10-27, on `main`)
+
+**The engine and the plugins ship as real managed DLLs.** The fixture's
+162 images split three ways (measured, bodies = methods with native
+code):
+
+| role | images | types | bodies | % bodies |
+| --- | --- | --- | --- | --- |
+| engine (`UnityEngine*`, `UnityEditor*`, `mscorlib`, `netstandard`, `System*`, `Mono.*`, `Microsoft.*`) | 77 | 10,149 | 67,139 | 22.4% |
+| third-party (Newtonsoft, UniTask, DOTween, spine, FMOD, Steamworks, Firebase, ProBuilder, TextMeshPro, Cinemachine, RenderPipelines, Burst, Collections, Mathematics, …) | 71 | 7,627 | 54,059 | 18.1% |
+| game-original (`Assembly-CSharp` + 13 ProjectMoon/game assemblies) | 14 | 33,256 | 178,173 | 59.5% |
+
+Lifting the first two reproduces information that already exists —
+worse: a Unity install's `Editor/Data/Managed/UnityEngine/*.dll` (or the
+vendor's NuGet package) has the true names, signatures and XML docs.
+They are also where most of the whole-tree Roslyn error debt lives, so
+the game-vs-engine compile gate (roadmap P5 slice C) is the metric
+that means something.
+
+**`tools/role_classify.py` + `--roles` / `--exclude` / `--exclude-roles`.**
+Classification is by image-name prefix — the roadmap's slice A3 design.
+`--roles game-original` keeps only the 14 game assemblies; `--exclude`
+takes name substrings; `--exclude-roles engine,third-party` is the same
+filter spelled from the other side. An unknown name lands in
+`game-original` on purpose: dropping an image by accident costs more
+than keeping one extra.
+
+**The assemblies tables stay partly undecoded, and that is recorded.**
+The v39 `assemblies` table is 68 bytes/row × 162 (11,016 bytes) with
+the row's `nameIndex` at `+0x14` (verified 162/162 against the image
+names). The `referencedAssemblies` table is 3,860 bytes (965 dwords,
+values 1..160 — assembly row indices). But no candidate start/count
+field is monotone across the 162 rows, so the reference graph is NOT
+reliably decoded and the prefix table is the honest source of truth.
+Decoding it would give the third parties' exact versions and an
+automatic engine/third-party/game split; that stays open, with the
+table layout above as the starting evidence.
+
+**Validation.** Portable suite + **9 new tests** (engine/third-party/
+game prefixes, unknown-defaults-to-game, order preservation, keep/drop
+by role, name-substring filtering, empty-keep-means-everything). The
+game-only build (`--roles game-original --workers 6`) schedules
+**14 images / 211 type-tasks** against the full build's 162 / 2,011.
+
 ## Current work: fix 163 probe — P2-5 small families, three of four already closed (2026-10-27, probe only)
 
 **C6 and C8 were closed by the earlier slices; C4 needs its own
