@@ -7,6 +7,38 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 163 probe — P2-5 small families, three of four already closed (2026-10-27, probe only)
+
+**C6 and C8 were closed by the earlier slices; C4 needs its own
+design; C10 is a user call.** Measured on HEAD, not on the stale v39
+tree:
+
+- **C6 (undeclared stack-arg temps): closed.** CS0103 is no longer in
+  the compile gate's top ten at all (the top is CS0518 35,142 /
+  CS0246 5,570 / CS0234 1,000 / CS0115 628 / CS0656 458 — the
+  runtime-image baseline debt, not this family). fix 155's `_` →
+  `default` and the earlier arity/trim work removed the population
+  that used to print bare `objN` arguments.
+- **C8 (generic spelling): closed in practice.** The v39 tree's 1,558
+  `List_1<T>` / `Dictionary_2<T…>` lines are stale-build artifacts:
+  a fresh lift of the roadmap's own example
+  (`ActionSlotDetail.GetNotSelectedSin_SortedByAscending`) now renders
+  `List_1<UnitSinModel>` — the alloc fold already takes the closed
+  type from the same statement's `typeof(...)`. A 600-method random
+  fresh-lift sample finds **2** unbound-generic occurrences total.
+- **C4 (`Il2CppRaw.Ref<T>` raw fallback helper): needs a design
+  first.** The roadmap itself defers it until the file-header
+  annotation format is settled ("先定文件头注记格式再动"), and no
+  `Il2CppRaw` exists in the package today. Its principle — a degraded
+  product must be DECLARED — is already honoured by every current
+  fallback (the raw `((byte*)x + 0xN)[0]` deref is legal C#, the `_`
+  sentinel renders `default`, `object objN` is a declared local), so
+  the helper would be a readability layer, not a correctness fix.
+  Deferred with that reasoning.
+- **C10 (publicize, opt-in): a user call by definition** — the
+  roadmap marks it opt-in and the standing user-call list keeps
+  emitter-wide spelling changes out of autonomous landings.
+
 ## Current work: fix 162 — C2 lands: recursive inner-offset field resolution (2026-10-27, on `main`)
 
 **The gap was exactly what the roadmap predicted.** `instance_field_chain`
