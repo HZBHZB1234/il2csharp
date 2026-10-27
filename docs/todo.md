@@ -7,7 +7,38 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 159 — the interface dispatch twins, admitted by the landed arity proof (2026-10-26, on `main`)**The twins were already solved — one register-name comparison away.**
+## Current work: fix 160 probe — C2's raw-offset field resolution, measured (2026-10-26, probe only, no source change)
+
+**The gap is recursive inner offsets, not receiver typing.** The
+`(byte*)RECV + 0xN)[0]` raw-deref population splits 152,940 generic
+temps / 74,716 named receivers tree-wide, and `this` alone carries
+9,299 sites over 343 distinct offsets — all real class fields. The
+existing `_field_expr` chain fold DOES resolve a class's own offsets
+(`DataStreamWriter + 0x10 → m_Data`, verified live), so a `this`-based
+miss is not a typing failure: `Unity.Collections.DataStreamWriter` is
+a **value type**, and its `get_Capacity` reads `this + 0xc` — the
+capacity lives INSIDE the `m_Data` (Unity.Collections.DataStream)
+sub-struct at `+0x10`, i.e. the roadmap's exact C2 case (an inner
+offset `0x18` inside a field at `0x10` → `.field.z`). Resolving those
+needs the recursive chain walk with the inner struct's own layout —
+the Expr/lifter-layer work the roadmap already scopes as C2, not a
+template or a recognizer.
+
+**Two measured sub-populations, both blocked on the same walk.**
+(1) The 719 `((byte*)objN + 0x20)[0] = unknown` stores come from
+`0x1807eaf40`'s enum-entry result (declined above for the same
+reason: 97.6% of its sites are these stores). (2) The ~400
+`rectTransform1.anchoredPosition = unknown` / `list11._items[numN*3] =
+unknown` lines are NOT field-resolution failures — the field name and
+the receiver both resolved; the VALUE is what the lifter could not
+prove, and `unknown` is the honest marker for it. Counting them as C2
+would overstate the payoff, so the C2 scope stays: the recursive inner
+offset, with the `this`-sites (9,299) and the enum-entry stores (719)
+as its two provable populations.
+
+## Current work: fix 159 — the interface dispatch twins, admitted by the landed arity proof (2026-10-26, on `main`)
+
+**The twins were already solved — one register-name comparison away.**
 `0x180013b50`/`0x180016f40` (2,778 call sites) are the SHARED-GENERIC
 interface dispatch thunks: (u16 methodSlot, interfaceTypeIndex, recv,
 <first method arg>) with the stack args forwarded — the body scans the
