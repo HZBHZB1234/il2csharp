@@ -39,9 +39,11 @@
 | **P2** | C 族主线（C1 → C2 → C3 → C5 → 小族） | backlog 既定顺序 | promotion / 重钉时 |
 | **P3** | async 状态机探针 C → 分叉决策 | 计划文档已门控 | 阶段 2/3 需单独审批 |
 | **P4** | 搁置区（sidecar、平台、Megabonk…） | 不排期，仅记录 | 已裁定 |
+| **P5** | 打包/编译门轨道（A1+A2 → A3 → B2/B1/B3 → C → E；D 挂起） | **最后做**（2026-10-27 批准并入本计划） | 切片 C 需 Unity 安装路径；A3 翻默认与 D 需重钉预算 |
 
 层间不严格串行：P2 的探针（只读）可以与 P1 的落地并行；
 P3 的探针 C 同理。**落地永远一次一个 slice，直接在 `main`。**
+**P5 排在全部 P0–P4 之后**（用户 2026-10-27 裁定：并入当前计划、放在最后）。
 
 ---
 
@@ -304,12 +306,124 @@ Stage 1 已交付（`3c6ef10`：`Emitter._state_machine_note`，两道门，
 | isinst klass 表达式 ~4,666、bounds slice B、多参分发、untyped-R9、single-field-struct returns | 同上，需 element-class provenance / use->def | sidecar 或 C2 前置就绪 |
 | Cpp2IL side B | 需外部二进制 | 用户提供 Cpp2IL 产物 |
 | Megabonk 46 | 等 method list / binaries | 材料到位 |
-| 平台支持（Linux/macOS/Android 深化） | 用户已裁定 not planned soon（2026-09-28） | 用户翻案；已知低成本切入点：`cli.py` 发现扫描只认 `gameassembly.dll`/`libil2cpp.so` |
-| Dec F5 余项 | latent，0 corpus hits | 出现 corpus 命中再做 |
+| 平台支持（Linux/macOS/Android 深化） | **用户翻案（2026-10-27）：已批准，押后** —— ARM64 lifter + AssetRipper fork + Unity 工程闭环成计划，见 `docs/plans/2026-10-27-arm64-assetripper-unity-program.md`；执行排在 `2026-10-27-packaging-compile-gate-slices.md` 之后 | 打包切片落地后启动 |
+| Dec F5 余项 | latent, 0 corpus hits | 出现 corpus 命中再做 |
 
 ---
 
-## 7. 横切纪律（每个 slice 都适用）
+## 7. P5 — 打包/编译门轨道（2026-10-27 并入；**放在最后做**）
+
+> **来源**：[`2026-10-27-packaging-compile-gate-slices.md`](2026-10-27-packaging-compile-gate-slices.md)
+> 全文并入本路线图，原文件保留为详规。**用户 2026-10-27 裁定：并入
+> 当前计划、放在最后做**（在 P0–P4 全部完成之后）。
+>
+> **定位**：这是**独立的 infra/打包轨道**，正文 codegen 管线零改动；
+> 与 P2 的关系是"组织层补位"，不是 codegen delta。P0-1 的基线只约束
+> codegen delta 计量，不约束 P5 的 Tier-1/2 切片。
+
+**现状自查结论**：反编译正文管线已达标，**组织层缺位**——根层无
+`.sln`/类型索引/工作区文件，91 个镜像平铺无游戏/引擎分层，无 Unity
+工程形态导出，"可编译"叙事缺真实度量。
+
+### 7.1 三档风险分级
+
+| 档 | 切片 | 差异性质 |
+| --- | --- | --- |
+| **Tier 1 零风险纯增益** | A1 `class-index.json`；A2 根 `.sln` + `.code-workspace`；B1 `--profile`；C 游戏/引擎编译门；E `--layout unity`（opt-in） | 不改任何已有文件字节；goldens、MANIFEST、parse/brace 门全不动 |
+| **Tier 2 条件安全** | A3 `--layout grouped`（opt-in）；B2 `--workers` 默认自动；B3 进度行 | 默认零差异或仅行为变化；树内字节不变 |
+| **Tier 3 必然产生差异** | D 裸 `[SerializeField]` | 全 MonoBehaviour 文件字节变 → goldens 成批移动 → 全量失败集重数 + 用户重钉审批；**挂起** |
+
+### 7.2 切片明细
+
+**A1 `class-index.json`（类型→文件索引，Tier 1）**
+- emitter 写每个类型文件处（`_emit_one_top`）已计算 `(td, base, rel)`；
+  worker delta 返回值增加 `(assembly, role, ns, file, typedef_index)` 行，
+  parent 在镜像循环收尾聚合，按 metadata 顺序（镜像序 → TypeDefIndex）
+  写 `<out>/class-index.json`；风格对齐既有 `script.json` /
+  `stringliteral.json`。
+- 触点唯一：worker delta 元组协议 —— 并行一致性测试必须覆盖新根文件。
+
+**A2 根 `.sln` + `.code-workspace`（Tier 1）**
+- 在 `cli.py` 收尾（`MANIFEST.json` 写入点附近）生成；GUID 用
+  `uuid5(NAMESPACE_URL, asm_name)` 确定性派生（与 `PYTHONHASHSEED`
+  无关），两次构建 byte-identical；游戏/引擎两个 solution folder。
+
+**A3 role 分类 + 分层目录（Tier 2，opt-in）**
+- 镜像名前缀分类：`mscorlib/System.*/UnityEngine*/UnityEditor*/
+  netstandard/Microsoft.*/Mono.*` → Engine，其余 → Script。
+- 实现点：`_assembly_dir_name(img.name)` 加 `--layout grouped` 前缀。
+  gates/compare_trees 走树遍历不假设路径（已核）。MANIFEST 路径随布局变
+  —— **先 opt-in，完整重建 + 双门全绿后再议翻默认**（用户 call）。
+
+**B1 `--profile`（Tier 1）**
+- 新 flag，写 `<out>/profile.json`（**不动 MANIFEST**），分相计时
+  metadata 加载 / registration / 每镜像 lift+emit / tail 写入。
+
+**B2 `--workers` 默认自动（Tier 2）**
+- 默认从 1 翻为 0（`_auto_workers()`，半核 cap 8；12 workers 峰值
+  ~8GB，默认 8 安全）。输出 byte-identical 是已证明契约。
+
+**B3 进度行（Tier 2）**
+- pool 路径已保证与串行同日志；加每镜像完成行
+  `N/M images: <asm> (K files)`；落地前 grep 确认无测试断言精确 stdout，
+  否则做成 opt-in `--progress`。
+
+**C 游戏/引擎编译门（Tier 1，北极星指标）**
+- 把"可编译"的度量从全树 45.5 万错误改为**游戏程序集对真实
+  UnityEngine 的错误数**（45.5 万的大头本就在 mscorlib/UnityEngine
+  自身镜像）。
+- 复用 A3 的 role 分类：门只跑游戏程序集 csproj。
+  `tools/compile_gate.py` 加模式 —— gate 侧 shadow 目录放
+  `Directory.Build.props` 注入 `<Reference>` 指向真实 Unity 安装的
+  `Editor/Data/Managed/UnityEngine/*.dll` + netstandard facade；
+  emitter 输出零变化。
+- 产出 `validation_reports/compile_game_<fixture>.json`：每程序集错误数
+  + 按 CS code 分桶。
+- **前置输入（需用户提供）**：Unity Editor 安装路径（Managed 目录），
+  或允许从 `Program Files/Unity/Hub/Editor` 自动探测。
+
+**E `--layout unity` 导出骨架（Tier 1，opt-in）**
+- `<out>/unity/` 下生成：游戏程序集按 `Assets/Scripts/<asm>/<ns>/
+  Type.cs` 映射、最小 `Packages/manifest.json`、`ProjectSettings/
+  ProjectVersion.txt`（**需 `--unity-version` 参数**：global-metadata.dat
+  不携带 Unity 版本，诚实做法是让用户给）、标准 `.gitignore`。
+- csproj 加 UnityEngine 引用（复用切片 C 的注入）。
+- **明确不做**：场景/prefab/GUID 绑定、纹理网格转换 —— decline by
+  default，由 ARM64 计划的 AssetRipper fork 接管；manifest 写清
+  "本产物只含脚本"。
+
+**D 裸 `[SerializeField]`（Tier 3，挂起）**
+- 现状全限定 `[UnityEngine.SerializeField]`。改裸拼写 + 文件头显式补
+  `using UnityEngine.Serialization;`（`UsingTracker` 对裸名不会自动补
+  using，必须显式加）。
+- 代价：所有 MonoBehaviour/ScriptableObject 后代文件字节变 → goldens
+  成批移动 → 全量失败集重数 + 用户重钉。**单独切片、最后做、等预算**；
+  也可以 decline（纯拼写问题，raw is honest）。
+
+### 7.3 执行顺序与验收
+
+```
+A1+A2（纯增益） → A3（opt-in） → B2/B1/B3 → C（等 Unity 路径） → E
+D 挂起（重钉预算到位再动）
+```
+
+每片标准流程沿用 §8 横切纪律：temp 探针 → 补丁 → compileall →
+portable 套件 → 定向 `--mi` 重提 → 配对重建 → 全量失败集重数 →
+docs/commit；LF 无 BOM 断言适用于每个新文件。
+
+**验收**：portable 套件全绿；A1/A2 落地后类型文件零 diff、新根文件在位、
+brace 0、parse 0/0/0/0、串行 vs `--workers 8` 含新根文件 byte-identical；
+B 系列 MANIFEST 字节不变。
+
+### 7.4 与 ARM64 大计划的接口
+
+- 切片 C 的编译率数字 = ARM64 计划 Unity 工程闭环阶段验收目标的基线。
+- 切片 E 的 `Assets/Scripts` 布局 = AssetRipper fork ScriptExport 的落点预演。
+- `--profile` 的小语料固定开销数据 = ARM64 阶段启动事实之一。
+
+---
+
+## 8. 横切纪律（每个 slice 都适用）
 
 1. **上游同步节奏**：每次本地落地后 `git ls-remote
    https://github.com/mynamescrax/il2csharp` 一眼；上游仍停在
@@ -328,7 +442,7 @@ Stage 1 已交付（`3c6ef10`：`Emitter._state_machine_note`，两道门，
    断言 `data.count(b'\r') == 0`；探针脚本放临时目录或
    `docs/probes/`，不进 `tools/`、不落 repo 根。
 
-## 8. 里程碑（建议的检查点，非承诺日期）
+## 9. 里程碑（建议的检查点，非承诺日期）
 
 - **M1**：P0 完成 —— b20-local 数字在案，5 处文档修正落地。
 - **M2**：P1-1 / P1-3 / P1-4 落地 —— for-head CS0019 清零，
