@@ -1725,6 +1725,10 @@ keying. Live tracking: `docs/plans/2026-10-25-todo-roadmap.md`.)
 ## Current work: fix 125 compile-gate first slice (2026-10-05, branch `fix125-compile-gate-scope`)
 
 **Status: on branch, not merged/promoted. Goldens NOT re-pinned (user call).**
+(Status correction 2026-10-27: the branch above no longer exists --
+fix 125's compile-gate work is in `main`'s shared history; the
+goldens/pins were re-pinned at the 2026-10-06 call and the v39
+fixture migration (`d1ea2d2`) rebuilt the corpus afterwards.)
 First use of the P1 Roslyn compile gate as the primary metric.
 
 Gate tooling (all git-ignored scratch in `work/cgate/`):
