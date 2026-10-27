@@ -5,12 +5,12 @@
 > **do not exist in this fork**. Read those names as history, not as commands. The live replacement
 > is `fixtures/` + `out/<id>/<label>/` via `tools/fixtures.py` and `tools/gate.py` — see `docs/fixtures.md`.
 
-**状态：阶段 1 已交付（简化版：识别+注释，`3c6ef10`，2026-10-21 ——
-`Emitter._state_machine_note` 两道门，v39 上 1,863 识别 / 0 误报，
-只加类注释、不宣称 async/iterator；见 §3 阶段 1 与 round-2 记录）。
-阶段 2/3 待探针 C 分叉；attribute 解码（区分 async/iterator）为独立
-低风险交付。分叉决策见 `docs/plans/2026-10-25-todo-roadmap.md` §5。
-（2026-10-25 更新；原文"待启动"已过时。）**
+**状态：阶段 1 + Stage 1.5 均已交付（`3c6ef10` 识别+注释；Stage 1.5
+的种类判据已实现，并经 2026-10-26 实测复核 —— 判据 = typedef 自身接口
+列表（IAsyncStateMachine → async / IEnumerator → iterator），v39 全量
+分类 **1,052 async + 811 iterator + 0 中性残留**，与 §2.1 普查逐项吻合；
+本轮无源码改动）。阶段 2/3 已按探针 C 分叉 decline，见
+`docs/plans/2026-10-25-todo-roadmap.md` §5。**
 **上游依据：`docs/research-2026-10-21-urengine.md` §4**
 **优先级：P1**（P0 是 `sub_` 失败原因，见 §9）
 
@@ -142,9 +142,14 @@ re-sugar 的控制流重建投入与收益不成比例；且 §8 明文"宁可�
 的 switch (state)，也不要输出自信错误的 async"。残余可读性缺口
 （TAwaiter 666 体、awaiter 状态原始读）归 C8 与 fix-134 家族跟踪。
 
-**Stage 1.5（待 post-b21 落地）**：`_state_machine_note` 依据声明段
-判据写出诚实种类（§2.1 表格），影响 1,949 个注释行，需配对重建
-评估 golden。
+**Stage 1.5（已实现，2026-10-26 实测复核）**：`_state_machine_note`
+依据声明段判据写出诚实种类（§2.1 表格）—— 判据是 typedef 自身的
+接口列表（`IAsyncStateMachine` → async，`IEnumerator` → iterator），
+即二进制事实而非属性表。v39 全量实测：**1,052 async + 811 iterator
++ 0 中性残留**，与 §2.1 普查逐项吻合；注释文本形如
+`// async state machine for LoadSprite (compiler-generated; ...)`。
+影响 1,949 个注释行（只动注释，不动 body），golden 需在下一次配对
+重建时评估 —— 本轮按构建政策未跑全量。
 
 ---
 
