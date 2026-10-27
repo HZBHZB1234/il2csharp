@@ -7,9 +7,7 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 159 — the interface dispatch twins, admitted by the landed arity proof (2026-10-26, on `main`)
-
-**The twins were already solved — one register-name comparison away.**
+## Current work: fix 159 — the interface dispatch twins, admitted by the landed arity proof (2026-10-26, on `main`)**The twins were already solved — one register-name comparison away.**
 `0x180013b50`/`0x180016f40` (2,778 call sites) are the SHARED-GENERIC
 interface dispatch thunks: (u16 methodSlot, interfaceTypeIndex, recv,
 <first method arg>) with the stack args forwarded — the body scans the
@@ -277,19 +275,27 @@ descriptor literals → `pinvoke_map[(module, entrypoint)] = mi`; (2) a
 `_call` fold for the resolver shape (the descriptor's two leas from
 the stack-store state → map lookup → the resolve+cell+invoke collapses
 to the managed call `M(args)`, the same machinery fix 156 uses). The
-twins `0x180013b50`/`0x180016f40` (2,778 sites) scan a klass's
-interface-offset table and return an adjusted slot pointer — interface
-dispatch for shared generics, needs the slot-call fold to be worth
-naming. `0x1807e3c60` (10,696
+twins `0x180013b50`/`0x180016f40` (2,778 sites) were LANDED as fix 159
+(see the top section). `0x1807e3c60` (10,696
 sites) is the **isinst family's generic-variable build** — the relaxed
 fix-151 recognizer already matches it (prologue + one `cmove` + the
 System.Object short-circuit); it only needs the lazy prober extended,
 but most of its sites take the target klass from the rgctx
-(`[klass+0x40]`), which no `typeof()` argument renders. The
-`0x180013b50`/`0x180016f40` twins (2,778 sites) scan a klass's
-interface-offset table and return an adjusted slot pointer — interface
-dispatch for shared generics, needs the slot-call fold to be worth
-naming.
+(`[klass+0x40]`), which no `typeof()` argument renders.
+
+**`0x1807eaf40` (3,993 sites) — CLOSED-DECLINED, with the census as the
+evidence.** The body is an enum-keyed dictionary lookup
+(`(typeof(enum), flag, dict, key)` → a cached entry; 292 bytes; a
+16-way jump table over the enum's underlying byte, recursive through
+`[obj]` for nullable wrappers, callees `0x1807eb070` /
+`0x1807eeed0` / `0x1807efe10` all unnamed). Naming it would change
+nothing a reader sees, because **3,647 of its 3,735 site lines
+(97.6%) consume the result as a raw pointer field store** —
+`((byte*)objN + 0x20)[0] = unknown;` — i.e. the gap is C2's raw-offset
+field resolution, not the callee's name; the remaining 88 are 48
+unclear, 38 managed-ish, 2 other-shape. Per the decline-by-default
+rule the address keeps its honest `sub_`, and the payoff is filed
+under C2.
 
 ## Current work: fix 155 — the `_` placeholder becomes `default` at render time (2026-10-26, on `main`)
 
