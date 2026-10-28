@@ -43,7 +43,13 @@ def _rsplit_op(text, op):
 
 def _fix_cond_line(line, dec):
     m = re.match(r'^(if|while) \((.*)\)(;?)$', line)
-    if m and m.group(2).startswith('!(!'):
+    # fix 165: the double-negation arm must see a condition that IS one
+    # `!(!X)` group. `group(2)` is greedy, so a leading `!(!` also matched
+    # when more of the expression followed -- `!(!flag5 ? 1 : 0) | flag1`
+    # became `flag5 ? 1 : 0) | flag1` (stray `)`, unparseable). Require the
+    # outer `!` to span the whole condition before stripping it.
+    if m and m.group(2).startswith('!(!') \
+            and Decompiler._paren_wraps_whole(m.group(2)[1:]):
         inner = m.group(2)[3:-1].strip()
         return '%s (%s)%s' % (m.group(1), inner, m.group(3))
     if m and m.group(2).startswith('!(') :

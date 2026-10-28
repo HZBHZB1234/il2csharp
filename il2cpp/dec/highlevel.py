@@ -566,8 +566,14 @@ class _HighLevelMixin:
         while i < n:
             s = lines[i].strip()
             m = self._null_test_var(s[4:-1].strip()) if s.startswith('if (') and s.endswith(')') else None
+            # fix 165: an `else` after the guard body means the `if` is not
+            # a whole-statement null test -- folding it to `x?.M();` drops
+            # the branch point and orphans the `else` (`mail1?.UpdateData(o)`
+            # then a bare `else {`), which no later pass can re-attach.
+            # Decline whenever the block's follower is an `else`.
             if m and i + 3 < n and lines[i + 1].strip() == '{' \
-                    and lines[i + 3].strip() == '}':
+                    and lines[i + 3].strip() == '}' \
+                    and (i + 4 >= n or lines[i + 4].strip() != 'else'):
                 st = lines[i + 2].strip()
                 if st.startswith(m + '.') and not re.match(
                         r'[\w.\[\]<>]+\s*(?:[+\-*/%&|^]|\?\?)?\s*=', st[len(m) + 1:]):

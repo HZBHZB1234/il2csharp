@@ -1637,7 +1637,16 @@ class _InsnMixin:
         if ins.memory_base == IReg.RIP:
             slot = ins.ip_rel_memory_address
             usg = self.il.decode_slot(slot)
-            if usg:
+            # fix 165: a usage slot is a POINTER-sized cell, so only a
+            # pointer-wide read can be one. Without this gate a 4-byte
+            # float constant-pool load whose bits happen to satisfy the
+            # tag test (`-3.1415927f` == 0xC0490FDB: odd, high dword 0)
+            # decoded as MethodRef #2394093 and rendered the placeholder
+            # `GenericMethod#2394093` as a float operand -- 8 parse ERROR
+            # nodes in BattleDuelViewer_BeatDuel (`GenericMethod#2394093
+            # > real4 - num4`). Narrow reads fall through to the constant
+            # pool below, which is what they are.
+            if usg and (MemorySizeExt.size(ins.memory_size) or 8) >= 8:
                 ty = usg.get('type')
                 k = usg['kind']
                 if k == 5:
@@ -1681,8 +1690,14 @@ class _InsnMixin:
             # so the old `in (4, 8)` check matched nothing and every pool
             # constant rendered as data_NNN
             msz = ins.memory_size
+            # fix 165: the tag-shaped exclusion below only protects a
+            # POINTER-wide cell (a real usage slot); a narrow read that
+            # happens to look tag-shaped is a constant, so it must not be
+            # excluded -- see the width gate on the `decode_slot` arm
+            # above (`data_188808e90` was the -3.1415927f pool constant).
+            _taggy = q and (q & 1) and (q >> 32) == 0
             if msz in (3, 5, 29, 30, 74) \
-                    and not (q and (q & 1) and (q >> 32) == 0):
+                    and not (_taggy and (MemorySizeExt.size(msz) or 8) >= 8):
                 o = self.bin.va2off(slot)
                 if o is not None:
                     if msz == 29:

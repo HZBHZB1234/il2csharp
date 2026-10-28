@@ -278,6 +278,19 @@ class _TextPassMixin:
         r'(?<!\*)\*((?:obj|s|t|v)\d+|this)(?:\.[A-Za-z_$][\w$]*)*')
     _NCONST_RX = re.compile(
         r'(?<![\w)])(?<!\w\s)(?<!\)\s)\*(0x[0-9a-fA-F]+|\d+)')
+    # fix 165: the same constant deref after an expression-OPENING keyword
+    # (`return *16 == 3;`, `case *8:`, `throw *4;`). The `(?<!\w\s)`
+    # lookbehind above exists to keep a real multiplication (`a * 16`)
+    # untouched, but a keyword can never be a multiplication operand --
+    # `return * 16` is a deref of the address 16. Without this arm the
+    # line stayed raw `*16 == 3`, which is not C# (`*` is not a prefix
+    # operator there): 8 parse ERROR nodes across 8 files, and the
+    # honest base-less spelling `((byte*)16)[0]` is what `_NCONST_RX`
+    # already produces elsewhere.
+    _NCONST_OPEN_RX = re.compile(
+        r'(?:(?<=\breturn )|(?<=\bcase )|(?<=\bthrow )|(?<=\bdefault )'
+        r'|(?<=\byield )|(?<=\bawait )|(?<=\bin )|(?<=\bis )|(?<=\bas )'
+        r'|(?<=\bout )|(?<=\bref ))\*(0x[0-9a-fA-F]+|\d+)')
     # a cast-prefixed constant deref (`(uint*)*16`, from a folded
     # null-base address) is not a multiplication: the paren group is
     # type-shaped (ends in `*`), so the inner `*` is a redundant
@@ -387,12 +400,23 @@ class _TextPassMixin:
         `((byte*)E + N)[0] = v`. Only the outermost offset is peeled per
         pass; nested derefs re-enter through the loop. `&objN` argument
         residues become `ref objN`."""
-        for _ in range(16):
+        # fix 165: the paren-matched arm below peels exactly ONE `*(EXPR)`
+        # per iteration, so the old fixed 16-iteration bound silently left
+        # raw `*(*(...)...)` behind on any line with more than 16 derefs
+        # (UnitInformationSummaryTabContent.InitContents: 20 on one
+        # ternary chain -> 4 raw remained, and `*(A.B + 0x2a)` is not C#:
+        # 258 parse ERROR nodes from that one statement). Bound by the
+        # text's own deref count instead; each iteration consumes at least
+        # one `*(`, and the rewrite never introduces a new one, so this
+        # always terminates.
+        _bound = 16 + 2 * text.count('*(')
+        for _ in range(_bound):
             m = text
             masked, _ = _mask_line_spans(text, False)
             text = self._sub_outside_literals(self._CAST_NCONST_RX, r'(\1)\2', text, masked)
             text = self._sub_outside_literals(self._DSTAR_RX, r'((byte*)\1)[0]', text, masked)
             text = self._sub_outside_literals(self._NCONST_RX, r'((byte*)\1)[0]', text, masked)
+            text = self._sub_outside_literals(self._NCONST_OPEN_RX, r'((byte*)\1)[0]', text, masked)
             text = self._widen_marked(text)
             if text == m:
                 m2 = self._LVAL_OFF_RX.match(text)
@@ -769,7 +793,15 @@ class _TextPassMixin:
                     # depth: one inside a call's arguments
                     # (`c ? Foo(a, b) : default`) must not forget the `?`.
                     live_q = [qd for qd in live_q if qd < depth]
-                elif c in ';{' or (c == '=' and i > 0 and s[i - 1] not in '!<>'):
+                elif c in ';{' or (c == '=' and i > 0 and s[i - 1] not in '!<='
+                                    and not (i + 1 < n and s[i + 1] == '=')):
+                    # fix 165: `==` is a comparison, not an assignment --
+                    # neither `=` of the pair may clear the live-`?`
+                    # context. A ternary whose CONDITION compares
+                    # (`newSortType == t ? (...) : default`) lost its
+                    # false arm to the strip below and rendered
+                    # `? (cond ? 1 : 0) ;` (MirrorDungeon
+                    # SetSelectedSortingIndex, Service.cs asyncService1).
                     live_q = []
                 if c == ':':
                     m = re.match(r':\s*default\b', s[i:])
