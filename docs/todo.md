@@ -72,6 +72,108 @@ each). That is now the concrete target list.
 the parse number above comes from a per-image sweep (same grammar, one
 process per image). Portable suite green; 9 role tests.
 
+## Current work: fix 165 — five parse-error families, 298 nodes -> 7 (2026-10-27, on `main`)
+
+**The 298 nodes were five independent root causes, not one.** Each was
+reproduced in isolation first (a probe that feeds one line to the pass),
+then fixed at the pass that owns the shape. The order below is by node
+count.
+
+**A — `_unsafify`'s fixed 16-iteration cap (258 nodes, 1 file).** The
+pass's paren-matched arm peels exactly ONE `*(EXPR)` per iteration, so
+`for _ in range(16)` silently left the remainder raw on any line with
+more than 16 derefs. `UnitInformationSummaryTabContent.InitContents`
+has one 20-deep ternary chain, and `*(A.B + 0x2a)` is not C# (`*` is
+not a prefix operator there). The bound is now
+`16 + 2 * text.count('*(')`: each iteration consumes at least one `*(`
+and the rewrite never introduces a new one, so it always terminates.
+That one statement produced 258 of the 298 nodes.
+
+**B — a constant deref after an opening keyword (8 nodes, 8 files).**
+`_NCONST_RX`'s `(?<!\w\s)` lookbehind exists to keep a multiplication
+(`a * 16`) untouched; it also blocked the deref in `return *16 == 3;`,
+which stayed raw. A keyword is never a multiplication operand, so a
+second arm (`_NCONST_OPEN_RX`, anchored on `return`/`case`/`throw`/
+`default`/`yield`/`await`/`in`/`is`/`as`/`out`/`ref`) converts it to
+the same honest `((byte*)16)[0]` the main arm already produces.
+Verified: `a * 16`, `b = a * 3`, `f(a * 2, b)` and `(byte*)a * 2` are
+all untouched.
+
+**C — a float constant colliding with the usage-slot tag (8 nodes, 1
+file).** `-3.1415927f` is `0xC0490FDB` -- odd, high dword 0 -- which is
+exactly `decode_slot`'s tag test, so a 4-byte constant-pool load
+decoded as MethodRef #2394093 and rendered the placeholder
+`GenericMethod#2394093` as a float operand. A usage slot is a
+pointer-sized cell, so only a pointer-wide read can be one; both the
+`decode_slot` arm and the constant-pool exclusion that guards against
+tag-shaped data are now gated on `MemorySizeExt.size(...) >= 8`.
+**This one also improves output**: `GetCurrentWaltzAngle`'s whole
+second half comes back (`-3.1415927f > real2 - referenceAngle`, then a
+`while` loop with `6.2831855f` and `-3.1415927f` as real constants)
+where it used to be a `GenericMethod#N` comparison followed by a
+`real2 + ?` / `+ unknown` spray.
+
+**D — `==` read as an assignment in the dangling-`default` strip (2
+files).** `_strip_dangling_default` clears its live-`?` context on a
+`;`, `{`, or assignment `=`. `==` was not excluded, so a ternary whose
+CONDITION compares lost its false arm:
+`newSortType == t ? (c == 0 ? 1 : 0) : default` rendered
+`newSortType == t ? (c == 0 ? 1 : 0) ;`. Neither `=` of a `==` pair
+clears the context now; a genuine dangling `Foo(a, b) : default;` still
+strips.
+
+**E — the double-negation head (1 node).** `_fix_cond_line`'s
+`!(!` arm stripped the outer negation whenever the condition merely
+STARTED with `!(!`, because `group(2)` is greedy:
+`!(!flag5 ? 1 : 0) | flag1` became `flag5 ? 1 : 0) | flag1` (stray
+`)`, unparseable). The outer `!` must now span the whole condition
+(`Decompiler._paren_wraps_whole`); real `!(!x)` and single negations
+still fold.
+
+**F — the null-conditional fold orphaning an `else` (11 files, the
+largest family).** `_null_conditional` folds
+`if (x != null) { x.M(); }` to `x?.M();` when the body is one statement
+rooted at the tested object -- without checking what follows the block.
+An `else` after it lost its `if` (`mail1?.UpdateData(o)` then a bare
+`else {`), which no later pass can re-attach. The fold now declines
+when the block's follower is `else`.
+
+**Validation.** Per-file re-emit + parse sweep over the 28 error files
+(the game-only tree, current source): **28 files / 298 nodes -> 4 files
+/ 7 nodes**. The 4 remaining files are all one shape and are NOT fixed
+here:
+
+- 3 x an orphaned `finally` (IllustSpineService.FindInstanceByGameObject,
+  StageScript_1345, SkillAbility_ToSuperCoin...): a hoisted try whose
+  close arrives only on the teardown `return`, after its own frame was
+  popped, so `_seh_emit_clause` appends the clause past the ENCLOSING
+  `}`. Splicing it behind the try's own `}` was tried and measured: it
+  fixed the `finally` but produced a different imbalance in the same
+  method (the raw structure has a second mis-associated close), so it
+  was reverted whole. Needs a region-plan change, not a splice.
+- 1 x `RpgArtifactEffect_KillSpawnBlackFluid` (4 nodes): the condition
+  itself is `if (0f >= ? ? 1 : 0) | ((0f < real3) ? flag1 : 1)` at the
+  lifter's select form; a `?` inside an `if` head with a top-level `|`
+  does not fit `_fix_select`'s statement-level rule.
+
+**Blast radius (measured, no full build).** Re-emitting the whole
+`Assembly-CSharp` image with the current source and diffing against
+`out/limbus/gameonly`: **11,781 files, 32 changed, 0 added, +236 /
+-295 lines (net -59)**. Every delta reviewed: 111 `unknown`/`data_`
+operands became real constants, 10 lines moved a constant the other
+way (all in float-lane folds that also collapsed an if/else into a
+ternary), and 4 added `: default` false arms are the D fix. Top files:
+`Ch10_RPG_FakeLightShadowArea` (88), `JointLineEffect3DEasy` (52),
+`BattleDuelViewer_BeatDuel` (50, the C fix).
+
+**Suites.** Portable **1,478 passed** (24 new in
+`tests/test_fix165_parse_error_families.py`, one per family plus the
+guards that must NOT fire). Game suite: failure SET **byte-identical**
+to the triaged list -- the 2 known environment failures
+(`test_game_compile_gate.py::test_small_image_zero_syntax_errors`,
+`test_game_decl_gate.py::test_decl_gate_end_to_end`), both needing the
+`Unity.Burst.Unsafe` image absent from the standing partial tree.
+
 ## Current work: fix 163 probe — P2-5 small families, three of four already closed (2026-10-27, probe only)
 
 **C6 and C8 were closed by the earlier slices; C4 needs its own
