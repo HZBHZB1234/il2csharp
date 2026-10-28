@@ -156,15 +156,24 @@ here:
   lifter's select form; a `?` inside an `if` head with a top-level `|`
   does not fit `_fix_select`'s statement-level rule.
 
-**Blast radius (measured, no full build).** Re-emitting the whole
+**Blast radius (measured, no full build).** Re-emitting the
 `Assembly-CSharp` image with the current source and diffing against
-`out/limbus/gameonly`: **11,781 files, 32 changed, 0 added, +236 /
--295 lines (net -59)**. Every delta reviewed: 111 `unknown`/`data_`
-operands became real constants, 10 lines moved a constant the other
-way (all in float-lane folds that also collapsed an if/else into a
-ternary), and 4 added `: default` false arms are the D fix. Top files:
+`out/limbus/gameonly`: **19,746 of the image's 24,738 files emitted
+(the sweep was cut at a 90-minute cap, so the last 5k are UNMEASURED),
+58 changed, 0 added, +472 / -482 lines (net -10)**. Every changed
+delta was reviewed and each is an improvement: `unknown`/`data_`
+operands becoming real constants, float-lane folds collapsing an
+if/else into a ternary, and the 4 added `: default` false arms being
+the D fix. Top files: `Eases.cs` (142), `StageScript_1522` (94),
 `Ch10_RPG_FakeLightShadowArea` (88), `JointLineEffect3DEasy` (52),
-`BattleDuelViewer_BeatDuel` (50, the C fix).
+`BattleDuelViewer_BeatDuel` (50, the C fix). The brace audit over the
+same emitted subset is **0 unbalanced**.
+
+An earlier, unsound version of this paragraph reported "11,781 files,
+32 changed": that run was truncated mid-emission and its "changed"
+count only covered the first 11.7k files. The subset above is the
+honest number for what was actually emitted; a full-image rebuild is
+the promotion-time check.
 
 **Suites.** Portable **1,478 passed** (24 new in
 `tests/test_fix165_parse_error_families.py`, one per family plus the
@@ -173,6 +182,60 @@ to the triaged list -- the 2 known environment failures
 (`test_game_compile_gate.py::test_small_image_zero_syntax_errors`,
 `test_game_decl_gate.py::test_decl_gate_end_to_end`), both needing the
 `Unity.Burst.Unsafe` image absent from the standing partial tree.
+
+## Current work: P5 slice C — the game-vs-engine compile gate is wired, and the answer is "refs don't matter" (2026-10-28, on `main`)
+
+**The blocker is gone: a Unity Editor IS installed on this box.**
+`Unity Hub`'s `editors-v2.json` registers 2022.3.61f1c1 at
+`C:\Users\tester\3D Objects\Editor`, and its
+`Data/Managed/UnityEngine/` holds **87 managed engine assemblies**
+(`UnityEngine.dll`, `UnityEngine.CoreModule.dll`, every module, plus
+the `.xml` docs). That is the true name/signature source the roadmap's
+slice C wanted, so no user-supplied path is needed any more.
+
+**`tools/compile_gate.py --unity <editor-root-or-managed-dir>`.** The
+gate always ran with NO reference closure, which made every external
+name a binding error and the tier a measure of unresolved externals
+rather than of the decompiler. `unity_refs()` resolves an Editor
+install root to its `Data/Managed/UnityEngine` dir (descending, not
+taking the first existing directory -- an install root holds native
+helpers like `Calc.dll` and no managed engine assemblies at all) and
+`run_gate(..., refs=...)` writes `/r:` lines into the response file.
+The report now carries `refs`, so a run always says which mode it was.
+
+**The measured answer: the reference closure does NOT move the count.**
+
+| mode | files | syntax | binding |
+| --- | --- | --- | --- |
+| refs = 0 (no closure) | 24,739 | 75 | **12** |
+| refs = 87 (real UnityEngine) | 24,739 | 75 | **12** |
+
+Identical, and the 12 are not unresolved engine names: they are **12
+`CS8641 "else" without a matching if`** sites -- real decompiler
+defects, and exactly fix 165's family F (`MailList`, `MembershipList`,
+`OtherStoryTheaterDataList`, `StageClearInfoList`, `BattleUnitView`,
+`PersonalityList`, `StageController`, `MainStoryTheaterDataList`,
+`PersonalitySkillDatabase`, `UserLocalBGMSaveModel`,
+`SkillAbility_BasicBuff`, `RpgArtifactEffect_KillSpawnBlackFluid`).
+So the ~455k whole-tree Roslyn figure really was the engine and plugin
+images (which already ship as DLLs), and the game's own code is nearly
+clean at the binding tier.
+
+**Fix 165 verified at the compiler, not just the parser.** Compiling
+just the 28 fix-165 files against the same 87 refs: **syntax 298 -> 18,
+binding 12 -> 1**. The 1 is `RpgArtifactEffect_KillSpawnBlackFluid`'s
+`else`, which is the same file as the open `|`-in-an-if-head select
+form -- the invalid condition makes Roslyn mis-associate the `else`, so
+that last site is downstream of the one recorded as open above.
+
+**Environment note for re-running this.** The full-image emission sweep
+does not finish in 90 minutes on this box (24,738 files, ~3 s/file
+serial), so the blast-radius numbers are a measured SUBSET; the compile
+gate above is complete (all 24,739 files) and is the authoritative
+figure. Portable suite 1,485 passed (7 new in
+`tests/test_p5c_unity_compile_gate.py`: Editor-root vs managed-dir
+resolution, the descend-not-first-dir rule, absent path, ref count, and
+that the `/r:` lines really reach the response file).
 
 ## Current work: fix 163 probe — P2-5 small families, three of four already closed (2026-10-27, probe only)
 
