@@ -41,17 +41,56 @@ def _rsplit_op(text, op):
     return None
 
 
+def _top_level_logic_op(text):
+    """True when `text` carries a `&`/`|`/`^`/`&&`/`||` outside any
+    paren group. Used by `_fix_cond_line`'s double-negation arm: an outer
+    `!` distributes over exactly those operators (De Morgan), so unwrapping
+    `!(!X op Y)` as `X op Y` would invert half the condition."""
+    depth = 0
+    i = 0
+    n = len(text)
+    while i < n:
+        ch = text[i]
+        if ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            for op in ('&&', '||'):
+                if text.startswith(op, i):
+                    return True
+            if ch in '&|^':
+                # a bitwise op inside an identifier-ish run is not a
+                # logical operator (there is none in C# text we emit)
+                return True
+        i += 1
+    return False
+
+
 def _fix_cond_line(line, dec):
     m = re.match(r'^(if|while) \((.*)\)(;?)$', line)
     # fix 165: the double-negation arm must see a condition that IS one
     # `!(!X)` group. `group(2)` is greedy, so a leading `!(!` also matched
     # when more of the expression followed -- `!(!flag5 ? 1 : 0) | flag1`
-    # became `flag5 ? 1 : 0) | flag1` (stray `)`, unparseable). Require the
-    # outer `!` to span the whole condition before stripping it.
-    if m and m.group(2).startswith('!(!') \
-            and Decompiler._paren_wraps_whole(m.group(2)[1:]):
-        inner = m.group(2)[3:-1].strip()
-        return '%s (%s)%s' % (m.group(1), inner, m.group(3))
+    # became `flag5 ? 1 : 0) | flag1` (stray `)`, unparseable).
+    #
+    # The whole-span test is necessary but NOT sufficient: `!(!(A) | (B))`
+    # also starts with `!(!` and also has its outer `!` spanning the whole
+    # condition, yet by De Morgan it is `(A) & !(B)`, not `(A) | (B)`.
+    # Folding it silently INVERTS half the condition. The rule: peel the
+    # outer `!(`...`)`, then the inner text must be a negation whose own
+    # operand carries no top-level `&`/`|`/`&&`/`||` -- those are exactly
+    # the operators the outer `!` distributes over. A ternary, a call or
+    # an atom after the inner `!` is safe to unwrap.
+    _c = m.group(2) if m else None
+    if _c is not None and _c.startswith('!(') \
+            and Decompiler._paren_wraps_whole(_c) \
+            and _c[2:-1].startswith('!'):
+        _operand = _c[3:]
+        if not _top_level_logic_op(_operand[:-1] if _operand.endswith(')')
+                                   else _operand):
+            inner = _c[3:-1].strip()
+            return '%s (%s)%s' % (m.group(1), inner, m.group(3))
     if m and m.group(2).startswith('!(') :
         return '%s (%s)%s' % (m.group(1), dec._simplify_cond(m.group(2)), m.group(3))
     if m:

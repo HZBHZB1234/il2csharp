@@ -172,3 +172,32 @@ def _dec():
         from il2cpp.dec import Decompiler
         _DEC = Decompiler.__new__(Decompiler)
     return _DEC
+
+
+# -- E': De Morgan must not be applied by a "strip the !" shortcut ---------
+
+def test_double_negation_declines_when_the_operand_is_a_disjunction():
+    """`!(!(A) | (B))` is De Morgan's `(A) & !(B)`, NOT `(A) | (B)`.
+    The whole-span test alone accepted it and silently inverted half the
+    condition."""
+    dec = _dec()
+    for src in ('if (!(!(A) | (B)))',
+                'if (!(!(a == b) | (c == d)))',
+                'if (!(!a && !b))'):
+        out = dec._render([src])[0]
+        assert out == src, (src, out)
+
+
+def test_double_negation_still_folds_a_pure_negation():
+    dec = _dec()
+    assert dec._render(['if (!(!a))'])[0] == 'if (a)'
+    assert dec._render(['while (!(!a))'])[0] == 'while (a)'
+    assert dec._render(['if (!(!(a)))'])[0] == 'if ((a))'
+
+
+def test_top_level_logic_op_detector():
+    from il2cpp.stmt_text import _top_level_logic_op
+    for s in ('(A) | (B)', '(A) & (B)', 'A && B', 'A || B', 'a & 0xFF'):
+        assert _top_level_logic_op(s) is True, s
+    for s in ('(A | B)', 'f(a | b)', 'flag5 ? 1 : 0', '(a == b)', 'x'):
+        assert _top_level_logic_op(s) is False, s
