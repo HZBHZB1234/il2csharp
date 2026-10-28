@@ -183,6 +183,57 @@ to the triaged list -- the 2 known environment failures
 `test_game_decl_gate.py::test_decl_gate_end_to_end`), both needing the
 `Unity.Burst.Unsafe` image absent from the standing partial tree.
 
+## Current work: C3 probe — sized, and it is a VALUE bug, not a spelling one (2026-10-28, probe only, no source change)
+
+**The roadmap's mi-24267 repro is already clean** (`GetExpectedAttackDmgMultiplier`
+now renders `if (this.CheckCondition(action)) { return this._dmuMul; }`).
+So the C3 population had to be measured directly on the tree.
+
+**The real shape is a dropped lane, not a split store.** `movsd
+[rbx],xmm0` copies EIGHT bytes; the lifter renders it as a single
+`.x` lane:
+
+```
+0x1815736d9 movsd xmm0,qword ptr [rax]
+0x1815736e5 movsd qword ptr [rbx],xmm0      ; 8 bytes
+0x1815736e9 mov [rbx+8],eax                 ; the .z tail
+```
+renders as
+```
+((byte*)&__ret + 0x0)[0] = obj6.x;   <- the 8-byte copy, spelled as .x
+__ret.z = obj6.z;
+return __ret;
+```
+i.e. `obj6.y` is silently absent. Merging the pair into
+`__ret = obj6;` is the correct fix and is what C3 asks for.
+
+**Measured population (game-only tree, `Assembly-CSharp`):**
+
+| shape | sites |
+| --- | --- |
+| `((byte*)&BASE + 0x0)[0] = SRC.lane;` followed by more lane writes to BASE (the movsd split) | **39**, of which all 39 are the exact `.x` + `.z` pair reading one source struct |
+| `((byte*)&BASE + 0x0)[0] = <anything>` with NO lane tail (a whole-struct store already) | 1,768 |
+| the same with 1 lane tail | 372 |
+| raw lane stores at `+0x4`/`+0x8` | 66 |
+
+So the provable merge set is **39 sites**, and the merge is sound only
+when every tail lane reads the SAME source struct and the lanes
+partition the struct -- the census shows all 39 do.
+
+**SHUFPS's co-required half is measured too.** The per-lane map is
+generic over any imm8 (not the three immediates the comment names), and
+its gate is whether `_lane_value` resolves each lane: an instrumented
+400-method lift resolves **108 lanes and declines 30 (78% accept)**. The
+28,810 SHUFPS sites tree-wide are therefore mostly modeled; the open
+half remains DESTINATION INVALIDATION (an unproven lane keeps the
+pre-shift register value live), which is what must co-land.
+
+**Why this is still a probe and not a slice:** the merge changes 39
+struct returns' VALUES, so it needs the paired partial build and a
+delta review that the current measurement budget does not cover
+alongside the SHUFPS invalidation work. Recorded here with the shape,
+the population and the exact sites so the slice can be taken whole.
+
 ## Current work: P5 slice C — the game-vs-engine compile gate is wired, and the answer is "refs don't matter" (2026-10-28, on `main`)
 
 **The blocker is gone: a Unity Editor IS installed on this box.**
