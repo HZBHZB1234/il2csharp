@@ -1,0 +1,11 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\post167",
+  "files": 24957,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0,
+  "details": {},
+  "elapsed_seconds": 68.531
+}

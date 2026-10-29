@@ -7,6 +7,79 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: real-dependency compile test of the fix-167 tree — parse is clean, and the binding debt is now finally VISIBLE (2026-10-29, measurement only, no source change)
+
+**Goal this session:** rebuild the game's own assemblies from HEAD
+(`380076e`, fix 165+166+167) and compile them against the REAL engine +
+REAL BCL from `D:\unity_editor_6000`, then read the result.
+
+**Fresh build `out/limbus/post167`** (`--roles game-original`,
+byte-matches the fix-164 counts): 24,971 type files / 178,025 bodies /
+0 failed / 0 fallbacks / 0 type-emit failures. tree-sitter parse gate on
+the WHOLE fresh tree: **24,957 files, 0 bad / 0 errors / 0 missing / 0
+recovery nodes** — fix 165–167 hold on a from-scratch build, not just the
+28-file sweep.
+
+**Per-image compile with 139 engine + 121 BCL refs** (report
+`validation_reports/limbus/post167.realcompile.summary.json`,
+per-image `post167.unity.compile.json`):
+
+| image | files | real parse errors | CS1xxx band (all CS1750) | binding |
+| --- | --- | --- | --- | --- |
+| Assembly-CSharp | 24,739 | **0** | 287 | 58,410 |
+| Assembly-CSharp-firstpass | 50 | 0 | 19 | 416 |
+| CommonAssembly | 44 | 0 | 18 | 697 |
+| ServiceAssembly | 8 | 0 | 0 | 138 |
+| (9 others) | 108 | 0 | 0 | 176 |
+
+**Key fact this exposes (the old gate number was a Roslyn artifact).**
+The fix-164 `gameonly` tree also reports `syntax=75 / binding=12` — but
+that 12 is NOT a real binding figure: **a file with parse errors makes
+Roslyn skip the entire binding phase**. With 75 real parse errors present
+the compiler never got past parsing, so "binding=12" was a floor, not a
+measurement. fix 167 drives those 75 to **0**, the binding phase runs for
+the first time, and the true debt appears: **58,410** for Assembly-CSharp
+(287 "syntax" are all CS1750, an int→enum default-arg, i.e. binding-class
+misfiled into the CS1xxx band; real parser errors = **0**).
+
+**The binding debt decomposes into three honestly-named families:**
+
+1. **C8 generic spelling — the biggest real defect (28,361 CS0246).** The
+   emitter renders a metadata arity backtick as an `_N` suffix everywhere
+   (`List\`1` → `List_1<T>`, `Dictionary\`2` → `Dictionary_2<K,V>`,
+   `Nullable\`1`, `Func\`2`, `Action\`1`, …). That is a deliberate
+   self-hosting choice (`common.py:csharp_type_name` comment: references
+   spell the same identifier the declaration does) — but against REAL
+   BCL/engine DLLs every framework generic then fails to bind. **Prototype
+   measured** (strip `_N` before `<`, text-level, compiled): AC binding
+   **58,410 → 28,697 (−29,713)**, CS0246 47,843 → 20,333, and **CS0101
+   duplicate-type = 0** (C# allows `Foo`/`Foo<T>`/`Foo<T,U>` to coexist;
+   same-arity stripped collisions do not exist in metadata). The proto's
+   122 CS1520 came from its blunt regex eating ctor names — a real fix at
+   the emit sites (`_type_generic_params`, `class_hdr`, `ctor_sig`, and
+   `csharp_type_name`) will not, because names are sanitized there without
+   an arity suffix. The doc's earlier "C8 closed in practice" note
+   (fix-163 probe) was wrong: its own example `List_1<UnitSinModel>` is
+   itself the bad spelling.
+2. **Enum literals (6,034 CS0266 + 287 CS1750).** A field/const initialised
+   with a bare int, or an enum-typed parameter default, prints without a
+   cast (`private const E _KEYWORD = 287` → needs `(E)287`).
+3. **External names — NOT decompiler defects (14,144 CS0246 + 3,769
+   CS0234).** Third-party plugin types (CodeStage, FMOD, UniTask/Cysharp,
+   TextMeshPro, Spine, DOTween, Newtonsoft, Timeline, …) and engine UI
+   types absent from the `game-original` role set. A further **5,338**
+   are cross-game-assembly refs (`ATTRIBUTE_TYPE` lives in
+   `InterfacesLibraryAssembly`, so AC alone can't see it) — resolved by
+   compiling with sibling game DLLs as refs.
+
+**Conclusion for this goal.** The "remaining unfinished work" that the
+real compile test was asked to verify splits cleanly: the PARSE-error
+program is finished (0/0/0/0 on a fresh build); the remaining debt is
+(1) C8 generic spelling and (2) enum literal casts — both real and both
+sized, and C8 is now the single largest lever (−29.7k on one image). These
+are codegen changes with a large golden blast radius, so they are staged
+next rather than folded into this measurement pass.
+
 ## Current work: fix 167 — the LAST parse-error families: 28 files / 298 nodes -> 0 / 0 (2026-10-29, on `main`)
 
 **Both remaining families were structural, and both were caught by
@@ -327,31 +400,36 @@ no managed engine assemblies at all); `unity_framework_refs()` adds the
 Editor's own BCL set. `run_gate(..., refs=...)` writes `/r:` lines into
 the response file and reports `refs=N engine + M bcl`.
 
-**The measured answer: the reference closure does NOT move the count.**
+**The first "refs don't matter" answer was a Roslyn artifact — corrected
+2026-10-29.** The original measurement (below, kept for the record) read
+`syntax 75 / binding 12` under all three ref closures and concluded the
+closure was irrelevant. The `binding=12` was fake: **a file with parse
+errors aborts Roslyn's binding phase entirely**, so with 75 real parse
+errors still present the compiler never reached binding and 12 was a
+floor. Once fix 167 drove those 75 to 0 (see the top section), the
+binding phase runs and the true debt on the game's own `Assembly-CSharp`
+is **58,410** — dominated by C8 generic spelling (28,361) and enum
+literals (6,321), with 14,144 genuinely-external third-party names and
+5,338 cross-game-assembly names. So the closure DOES matter the moment
+the parse tier is clean; the earlier "nearly clean at the binding tier"
+conclusion was wrong for exactly that reason.
+
+**Original (superseded) 2026-10-28 measurement:**
 
 | mode | files | syntax | binding |
 | --- | --- | --- | --- |
-| refs = 0 (no closure) | 24,739 | 75 | **12** |
-| refs = 87 (2022.3 UnityEngine only) | 24,739 | 75 | **12** |
-| refs = 139 engine + 121 bcl (Unity 6000) | 24,739 | 75 | **12** |
+| refs = 0 (no closure) | 24,739 | 75 | 12 |
+| refs = 87 (2022.3 UnityEngine only) | 24,739 | 75 | 12 |
+| refs = 139 engine + 121 bcl (Unity 6000) | 24,739 | 75 | 12 |
 
-Identical all three ways, and the 12 are not unresolved engine names: they are **12
-`CS8641 "else" without a matching if`** sites -- real decompiler
-defects, and exactly fix 165's family F (`MailList`, `MembershipList`,
-`OtherStoryTheaterDataList`, `StageClearInfoList`, `BattleUnitView`,
-`PersonalityList`, `StageController`, `MainStoryTheaterDataList`,
-`PersonalitySkillDatabase`, `UserLocalBGMSaveModel`,
-`SkillAbility_BasicBuff`, `RpgArtifactEffect_KillSpawnBlackFluid`).
-So the ~455k whole-tree Roslyn figure really was the engine and plugin
-images (which already ship as DLLs), and the game's own code is nearly
-clean at the binding tier.
+The 12 were **12 `CS8641 "else" without a matching if`** sites -- real
+decompiler defects, exactly fix 165's family F (and the same file as the
+`|`-in-an-if-head select form). Those are fixed now. The `binding=12`
+floor is the artifact described above: parsing had already failed.
 
 **Fix 165 verified at the compiler, not just the parser.** Compiling
 just the 28 fix-165 files against the same 87 refs: **syntax 298 -> 18,
-binding 12 -> 1**. The 1 is `RpgArtifactEffect_KillSpawnBlackFluid`'s
-`else`, which is the same file as the open `|`-in-an-if-head select
-form -- the invalid condition makes Roslyn mis-associate the `else`, so
-that last site is downstream of the one recorded as open above.
+binding 12 -> 1** (the last `else` downstream of the open `|` head).
 
 **Environment note for re-running this.** The full-image emission sweep
 does not finish in 90 minutes on this box (24,738 files, ~3 s/file

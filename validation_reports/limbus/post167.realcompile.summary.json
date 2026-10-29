@@ -1,0 +1,113 @@
+{
+ "kind": "real-dependency per-image compile (P5 slice C), fresh fix-167 build",
+ "date": "2026-10-29",
+ "unity_editor": "D:\\unity_editor_6000",
+ "engine_refs": 139,
+ "bcl_refs": 121,
+ "total_refs": 260,
+ "tree": "out/limbus/post167 (src HEAD 380076e, fix 165+166+167)",
+ "build": {
+  "files": 24971,
+  "bodies": 178025,
+  "failed": 0,
+  "fallbacks": 0,
+  "emit_failed": 0
+ },
+ "tree_sitter_parse": {
+  "files": 24957,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0
+ },
+ "per_image": {
+  "Assembly-CSharp": {
+   "files": 24739,
+   "cs1xxx": 287,
+   "binding": 58410
+  },
+  "Assembly-CSharp-firstpass": {
+   "files": 50,
+   "cs1xxx": 19,
+   "binding": 416
+  },
+  "CommonAssembly": {
+   "files": 44,
+   "cs1xxx": 18,
+   "binding": 697
+  },
+  "InterfacesLibraryAssembly": {
+   "files": 10,
+   "cs1xxx": 0,
+   "binding": 2
+  },
+  "LimbusCompany.AddressableConstants": {
+   "files": 3,
+   "cs1xxx": 0,
+   "binding": 4
+  },
+  "ProjectMoon.BaseStructures": {
+   "files": 37,
+   "cs1xxx": 0,
+   "binding": 29
+  },
+  "ProjectMoon.Battle.Effect.RevolvedSurface": {
+   "files": 8,
+   "cs1xxx": 0,
+   "binding": 19
+  },
+  "ProjectMoon.DelegateCollection": {
+   "files": 13,
+   "cs1xxx": 0,
+   "binding": 1
+  },
+  "ProjectMoon.SyncObject": {
+   "files": 9,
+   "cs1xxx": 0,
+   "binding": 12
+  },
+  "ProjectMoonUnity.Utils": {
+   "files": 9,
+   "cs1xxx": 0,
+   "binding": 24
+  },
+  "RpgSystemCore": {
+   "files": 16,
+   "cs1xxx": 0,
+   "binding": 74
+  },
+  "ServiceAssembly": {
+   "files": 8,
+   "cs1xxx": 0,
+   "binding": 138
+  },
+  "SkillViewMarker": {
+   "files": 5,
+   "cs1xxx": 0,
+   "binding": 10
+  },
+  "__Generated": {
+   "files": 6,
+   "cs1xxx": 0,
+   "binding": 1
+  }
+ },
+ "assembly_csharp_decomposition": {
+  "cs1xxx_band_all_CS1750": 287,
+  "real_parser_errors": 0,
+  "CS0246_lifted_generic_shaped": 28361,
+  "CS0246_other": 19482,
+  "  of_which_cross_game_assembly": 5338,
+  "  of_which_external_third_party_or_engine": 14144,
+  "CS0266_int_to_enum": 6034,
+  "CS0234_missing_namespace": 3769,
+  "CS0538_iface_not_interface": 730
+ },
+ "notes": [
+  "The old gate reported binding=12 for this image; that is a Roslyn artifact: a file with parse errors aborts the binding phase entirely. With fix-167's 0 parse errors the binding phase actually runs for the first time.",
+  "CS1750 (int->enum default arg) is CS1xxx-band but is a binding error, not a parser error; real parser errors = 0.",
+  "C8 generic spelling: the backtick-arity mangling (`List`1`->`List_1<T>`) is a self-hosting choice; against real BCL/engine DLLs every framework generic fails to bind. Prototype (strip `_N` before `<`) cuts AC binding 58410->28697 (-29713), CS0101 collisions = 0.",
+  "Enum literals: `_KEYWORD = 287` for an enum field/const/param-default must be `(E)287`.",
+  "Cross-game-assembly refs (e.g. ATTRIBUTE_TYPE from InterfacesLibraryAssembly) resolve only when compiling the referenced image too; external third-party (CodeStage/FMOD/UniTask/TMP/Spine/DOTween) is absent from the gameonly role set."
+ ]
+}
