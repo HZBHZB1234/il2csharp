@@ -2408,7 +2408,7 @@ class _InsnMixin:
             etd = self._td_of(ty)
             em = self.il.enum_members(etd) if etd is not None else None
             if em and v in em:
-                return '%s.%s' % (csharp_type_name(self.meta.typedefs[etd].name),
+                return '%s.%s' % (csharp_type_name(self.meta.typedefs[etd].name, strip_arity=True),
                                   em[v])
         try:
             if te == 0x0c:

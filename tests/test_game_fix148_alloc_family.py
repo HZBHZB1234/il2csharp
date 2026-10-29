@@ -46,5 +46,6 @@ def test_typed_allocation_unlocks_named_list_fields(baseline_game_decompiler):
         il, 'Stores.Util.JsonProductDescriptionsDeserializer',
         'DeserializeProductDescriptions', 1)
     body = lift_text(il, dec, mi)
-    assert 'new System.Collections.Generic.List_1<' in body
-    assert 'list11._size' in body and 'list11._items' in body
+    # fix 169 (C8): natural generic spelling; the stem un-doubles too.
+    assert 'new System.Collections.Generic.List<' in body
+    assert 'list1._size' in body and 'list1._items' in body

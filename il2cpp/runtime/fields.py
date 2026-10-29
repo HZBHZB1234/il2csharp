@@ -472,12 +472,22 @@ class _FieldsMixin:
                 td_idx = tds[0]
             td = self.meta.typedefs[td_idx]
             full = ('%s.%s' % (td.namespace, td.name)) if td.namespace else td.name
+            # fix 169 (C8): stripping the arity backtick is right for a
+            # DECLARATION and for a reference that carries its closed
+            # arguments, but this site is a bare `typeof(<name>)` with no
+            # arguments at all. For a generic DEFINITION that would print
+            # `typeof(KeyValuePair)`, which is not valid C# -- the type
+            # has no such closed form. Keep the metadata `_N` spelling
+            # there, which at least identifies the definition and is the
+            # shape this cell has always carried.
+            _strip = not (getattr(td, 'generic_container', -1) not in (-1, None))
             # 71c: ty_of_td can miss this type entirely (System.String
             # has no CLASS/VALUETYPE row -- its rows are STRING/
             # SZARRAY forms), which is how typeof(string) arrived with
             # ty=None and every static read off it fell to __static_N.
             # td_idx is known HERE; carry it for the Expr stamp.
-            return {'kind': 2, 'text': 'typeof(%s)' % csharp_type_name(full),
+            return {'kind': 2,
+                    'text': 'typeof(%s)' % csharp_type_name(full, strip_arity=_strip),
                     'type': ty_of_td.get(td_idx), 'td': td_idx}
         return None
 
@@ -544,7 +554,7 @@ class _FieldsMixin:
                         # the text) to trim arguments and hint types.
                         return {'kind': 3, 'method': mi, 'icall': True,
                                 'text': '%s.%s' % (
-                                    csharp_type_name(ns2 + t2.name),
+                                    csharp_type_name(ns2 + t2.name, strip_arity=True),
                                     m.name.lstrip('.'))}
         # Unresolved: keep the best-effort name, but spell the separator
         # with `.`. This text is not a comment -- it lands in
@@ -555,7 +565,7 @@ class _FieldsMixin:
         # syntax error; `.` costs no honesty (the name is best-effort
         # either way) and parses.
         return {'kind': 3, 'icall': True,
-                'text': '%s.%s' % (csharp_type_name(tpart),
+                'text': '%s.%s' % (csharp_type_name(tpart, strip_arity=True),
                                    safe_ident(mname.lstrip('.')))}
 
     _ICALL_PRIM = {

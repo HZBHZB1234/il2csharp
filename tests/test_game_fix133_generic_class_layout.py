@@ -37,16 +37,18 @@ def test_list_count_reads_size(baseline_game_decompiler):
     mi, m, td = find_method(il, 'RPGSystem.RpgInventoryManager', 'AddItem', 3)
     assert m.name == 'AddItem'
     body = lift_text(il, dec, mi)
-    assert 'for (int num9 = 0; num9 < list12._size; num9++)' in body
-    assert '__addr(list12) + 0x18' not in body
-    assert '(list12 + 0x18)' not in body
+    # fix 169 (C8): the arity strip also un-doubles the local's stem
+    # (`List_1` used to lex as ['List','1'] -> stem `list1` -> `list12`).
+    assert 'for (int num9 = 0; num9 < list2._size; num9++)' in body
+    assert '__addr(list2) + 0x18' not in body
+    assert '(list2 + 0x18)' not in body
 
 
 def test_items_type_closes_through_the_receiver(baseline_game_decompiler):
     il, dec = baseline_game_decompiler
     mi, m, td = find_method(il, 'RPGSystem.RpgInventoryManager', 'GetItem', 1)
     body = lift_text(il, dec, mi)
-    assert ('System.Collections.Generic.List_1<RPGSystem.RpgItemStack> '
-            'list11 = this._items;') in body
-    assert 'list11._items[num1]' in body
+    assert ('System.Collections.Generic.List<RPGSystem.RpgItemStack> '
+            'list1 = this._items;') in body
+    assert 'list1._items[num1]' in body
     assert 'T[] ' not in body

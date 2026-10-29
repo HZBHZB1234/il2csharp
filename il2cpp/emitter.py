@@ -75,6 +75,20 @@ class Emitter:
 
     _arity_qualifier_cache = None
 
+    @staticmethod
+    def _type_ident(name):
+        """The C# identifier a TYPE declaration is spelled with (fix 169).
+
+        Metadata spells a generic type `List`1`; C# spells it `List`. The
+        declaration and every reference must agree, so both go through
+        `csharp_type_name(..., strip_arity=True)` -- the emitter's own
+        `sanitize()` path turns the backtick into `_1` instead, which only
+        ever bound against our own re-emitted tree (fix 117 chose that on
+        purpose). `sanitize()` is also used for member names, so it must
+        NOT change; this helper is the type-only path."""
+        from il2cpp.common import csharp_type_name
+        return sanitize(csharp_type_name(name or '', strip_arity=True))
+
     def _arity_qualifier(self, dotted, td=None):
         """Append the metadata arity suffix to an explicit-interface qualifier
         (`NS.IFoo<T>` -> `NS.IFoo_1<T>`) so it spells the same identifier the
@@ -148,7 +162,7 @@ class Emitter:
                 path = '.'.join(segs[k:])
                 cands = [a for a in cache.get((ns, path), []) if a == argc]
                 if len(cands) == 1:
-                    proofs.append('%s%s_%d%s' % (ns + '.' if ns else '', path, argc, args))
+                    proofs.append('%s%s%s' % (ns + '.' if ns else '', path, args))
             if len(proofs) != 1:
                 return dotted
             return proofs[0]
@@ -417,7 +431,7 @@ class Emitter:
                     base.append(self.il.type_name(t))
         if td.is_valuetype and not td.is_enum and not base:
             pass
-        hdr = '%s %s%s%s' % (kw, safe_ident(sanitize(name)), gparams, ebase if td.is_enum else '')
+        hdr = '%s %s%s%s' % (kw, self._type_ident(name), gparams, ebase if td.is_enum else '')
         if base:
             hdr += ' : ' + ', '.join(base)
         lines.append(hdr)
@@ -657,7 +671,7 @@ class Emitter:
             if not self.meta.method_params(m):
                 rt = self.il.types[m.return_type] if 0 <= m.return_type < len(self.il.types) else None
                 if rt is not None and self.il.type_name(rt) == 'void':
-                    return '~%s()' % safe_ident(sanitize(td.name))
+                    return '~%s()' % self._type_ident(td.name)
         f = m.flags
         vis = self._pub(METH_VIS.get(f & 7, ''))
         # CLI MethodAttributes: Final=0x20, Virtual=0x40,
@@ -867,7 +881,7 @@ class Emitter:
                 byref = (pt[1] >> 29) & 1 if pt else 0
                 ps.append('%s%s %s' % ('ref ' if byref else '', tn,
                                        safe_ident(p.name)))
-            nm = safe_ident(sanitize(td.name)) + \
+            nm = self._type_ident(td.name) + \
                 self._type_generic_params(td)
             unsafe = 'unsafe ' if '*' in rtname or any(
                 '*' in p for p in ps) else ''
@@ -1034,7 +1048,7 @@ class Emitter:
         static ClassName() -- no return type, no .ctor name."""
         # Match the emitted type identifier, including its arity suffix.
         # C# constructors omit <T>, but must retain Box_1 in Box_1<T>.
-        cname = safe_ident(sanitize(td.name))
+        cname = self._type_ident(td.name)
         if m.name == '.cctor':
             return 'static %s()' % cname
         vis = self._pub(METH_VIS.get((m.flags >> 0) & 7, 'public '))

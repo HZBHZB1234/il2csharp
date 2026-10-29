@@ -85,7 +85,7 @@ class _TypesMixin:
                     # `<PrivateImplementationDetails>{guid}` must spell the
                     # same identifier its declaration does, or references
                     # never bind to it.
-                    nm = sanitize_qualifier(csharp_type_name(self.typedef_full(data)))
+                    nm = sanitize_qualifier(csharp_type_name(self.typedef_full(data), strip_arity=True))
                 # IL2CPP spells these compiler-generated size types with
                 # `=N` (and Mono `$ArrayType=N`); the decls are emitted
                 # sanitized as `_N`, so match. Blob structs nest under
@@ -130,7 +130,7 @@ class _TypesMixin:
             dd = base_tup[0] if base_tup else 0
             full = None
             if te in (0x11, 0x12) and 0 <= dd < len(self.meta.typedefs):
-                full = sanitize_qualifier(csharp_type_name(self.typedef_full(dd)))
+                full = sanitize_qualifier(csharp_type_name(self.typedef_full(dd), strip_arity=True))
                 if full.startswith('__StaticArrayInitTypeSize='):
                     full = '__StaticArrayInitTypeSize_' + full[len('__StaticArrayInitTypeSize='):]
                 base = full
@@ -152,7 +152,7 @@ class _TypesMixin:
         d = t[0] if t else 0
         full = None
         if te in (0x11, 0x12) and 0 <= d < len(self.meta.typedefs):
-            full = sanitize_qualifier(csharp_type_name(self.typedef_full(d)))
+            full = sanitize_qualifier(csharp_type_name(self.typedef_full(d), strip_arity=True))
             if full.startswith('__StaticArrayInitTypeSize='):
                 full = '__StaticArrayInitTypeSize_' + full[len('__StaticArrayInitTypeSize='):]
             # Full paths at every depth: a last-segment-only generic
@@ -629,7 +629,7 @@ class _TypesMixin:
             base = ns + td.name
         if margs:
             name += '<%s>' % ', '.join(margs)
-        r = '%s.%s' % (csharp_type_name(base), name)
+        r = '%s.%s' % (csharp_type_name(base, strip_arity=True), name)
         cache[ck] = r
         return r
 

@@ -1,0 +1,342 @@
+{
+ "Assembly-CSharp": {
+  "files": 24739,
+  "syntax": 0,
+  "binding": 23075,
+  "top": [
+   [
+    "CS0246",
+    20745
+   ],
+   [
+    "CS0234",
+    2246
+   ],
+   [
+    "CS0538",
+    53
+   ],
+   [
+    "CS0051",
+    14
+   ],
+   [
+    "CS0118",
+    7
+   ],
+   [
+    "CS0452",
+    2
+   ],
+   [
+    "CS0535",
+    2
+   ],
+   [
+    "CS0539",
+    2
+   ],
+   [
+    "CS0540",
+    2
+   ],
+   [
+    "CS0100",
+    1
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "Assembly-CSharp-firstpass": {
+  "files": 50,
+  "syntax": 0,
+  "binding": 408,
+  "top": [
+   [
+    "CS0246",
+    366
+   ],
+   [
+    "CS0234",
+    42
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "CommonAssembly": {
+  "files": 44,
+  "syntax": 0,
+  "binding": 49,
+  "top": [
+   [
+    "CS0246",
+    22
+   ],
+   [
+    "CS0535",
+    6
+   ],
+   [
+    "CS0539",
+    6
+   ],
+   [
+    "CS0540",
+    6
+   ],
+   [
+    "CS0234",
+    3
+   ],
+   [
+    "CS0453",
+    3
+   ],
+   [
+    "CS0723",
+    3
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "InterfacesLibraryAssembly": {
+  "files": 10,
+  "syntax": 0,
+  "binding": 4,
+  "top": [
+   [
+    "CS0103",
+    2
+   ],
+   [
+    "CS0208",
+    2
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "LimbusCompany.AddressableConstants": {
+  "files": 3,
+  "syntax": 0,
+  "binding": 4,
+  "top": [
+   [
+    "CS0103",
+    2
+   ],
+   [
+    "CS0208",
+    2
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ProjectMoon.BaseStructures": {
+  "files": 37,
+  "syntax": 0,
+  "binding": 10,
+  "top": [
+   [
+    "CS0246",
+    7
+   ],
+   [
+    "CS0234",
+    3
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ProjectMoon.Battle.Effect.RevolvedSurface": {
+  "files": 8,
+  "syntax": 215,
+  "binding": 2511,
+  "top": [
+   [
+    "CS0019",
+    764
+   ],
+   [
+    "CS0103",
+    484
+   ],
+   [
+    "CS0165",
+    358
+   ],
+   [
+    "CS0030",
+    228
+   ],
+   [
+    "CS1061",
+    164
+   ],
+   [
+    "CS0021",
+    148
+   ],
+   [
+    "CS0117",
+    133
+   ],
+   [
+    "CS0029",
+    123
+   ],
+   [
+    "CS0266",
+    83
+   ],
+   [
+    "CS0122",
+    62
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ProjectMoon.DelegateCollection": {
+  "files": 13,
+  "syntax": 0,
+  "binding": 3,
+  "top": [
+   [
+    "CS0208",
+    3
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ProjectMoon.SyncObject": {
+  "files": 9,
+  "syntax": 10,
+  "binding": 10,
+  "top": [
+   [
+    "CS1061",
+    10
+   ],
+   [
+    "CS0208",
+    4
+   ],
+   [
+    "CS0029",
+    2
+   ],
+   [
+    "CS0103",
+    2
+   ],
+   [
+    "CS0030",
+    1
+   ],
+   [
+    "CS0117",
+    1
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ProjectMoonUnity.Utils": {
+  "files": 9,
+  "syntax": 0,
+  "binding": 23,
+  "top": [
+   [
+    "CS0246",
+    23
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "RpgSystemCore": {
+  "files": 16,
+  "syntax": 0,
+  "binding": 15,
+  "top": [
+   [
+    "CS0246",
+    14
+   ],
+   [
+    "CS0234",
+    1
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "ServiceAssembly": {
+  "files": 8,
+  "syntax": 0,
+  "binding": 4,
+  "top": [
+   [
+    "CS0246",
+    4
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "SkillViewMarker": {
+  "files": 5,
+  "syntax": 0,
+  "binding": 10,
+  "top": [
+   [
+    "CS0246",
+    6
+   ],
+   [
+    "CS0234",
+    3
+   ],
+   [
+    "CS0538",
+    1
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ },
+ "__Generated": {
+  "files": 6,
+  "syntax": 0,
+  "binding": 1,
+  "top": [
+   [
+    "CS0644",
+    1
+   ]
+  ],
+  "tool_error": null,
+  "refs": 260,
+  "returncode": 1
+ }
+}

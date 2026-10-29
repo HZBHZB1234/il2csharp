@@ -37,9 +37,11 @@ def test_print_to_console_dispatches_managed(baseline_game_decompiler):
     body = lift_text(il, dec, mi)
     residue = _scan_residue(body)
     assert not residue, residue[:4]
-    assert 'enumerator12.MoveNext()' in body
+    # fix 169 (C8): `IEnumerator_1` -> `IEnumerator`, so the stem is
+    # `enumerator` and the counter no longer doubles the arity digit.
+    assert 'enumerator2.MoveNext()' in body
     assert ('CodeStage.AntiCheat.Genuine.CodeHash.FileHash fileHash1 '
-            '= enumerator12.Current;') in body
+            '= enumerator2.Current;') in body
 
 
 def test_set_keywords_has_no_scan_residue(baseline_game_decompiler):

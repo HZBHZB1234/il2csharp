@@ -154,7 +154,7 @@ class _AnalyzeMixin:
                         em = L.il.enum_members(etd) if etd is not None else None
                         if em is not None and int(rt) in em:
                             rt = '%s.%s' % (
-                                csharp_type_name(L.meta.typedefs[etd].name),
+                                csharp_type_name(L.meta.typedefs[etd].name, strip_arity=True),
                                 em[int(rt)])
                     if op is None:
                         # the rare flag-specific jumps (JS/JNS/JO/JNO/JP/JNP --

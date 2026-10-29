@@ -91,8 +91,11 @@ def test_emitter_qualifier_index_uses_owner_map():
     e.meta.typedefs[2] = _td(2, "Inner`1", ns="")
     e.meta.nested_types = [2]
     e.il._nested_owner = lambda ti: {2: 0}.get(ti)
+    # fix 169 (C8): the qualifier keeps the NATURAL identifier, so the
+    # arity proof still runs (it proves the name resolves) but adds no
+    # `_1` suffix.
     assert e._arity_qualifier("N.Outer.Inner<object>") == \
-        "N.Outer.Inner_1<object>"
+        "N.Outer.Inner<object>"
 
 
 class _DistMixin:

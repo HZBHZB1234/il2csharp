@@ -82,17 +82,26 @@ _BACKTICK_RX = re.compile(r'`\d+')
 _MIDAT_RX = re.compile(r'(?<=[A-Za-z0-9_])@')
 
 
-def csharp_type_name(full: str) -> str:
+def csharp_type_name(full: str, strip_arity: bool = False) -> str:
     """Render a dotted type name the way C# source spells it: System.Int32
     -> int (keywords map inside generic arguments and array suffixes too),
-    reflection-style nested names Outer+Inner / Outer/Inner -> Outer.Inner."""
+    reflection-style nested names Outer+Inner / Outer/Inner -> Outer.Inner.
+
+    `strip_arity=True` (fix 169, C8) drops the metadata arity backtick
+    instead of turning it into an `_N` suffix, so a reference spells the
+    NATURAL C# identifier (`List<T>`, `Dictionary<K, V>`, `Nullable<T>`).
+    That is what a real BCL/engine assembly declares; the `_N` form only
+    ever bound against our own re-emitted tree. Every caller that renders a
+    TYPE IDENTIFIER (declaration header, base list, interface qualifier,
+    typeof/alloc/callee text) must pass the same value or declarations and
+    references diverge -- see `Emitter._type_ident`."""
     if not full:
         return full
     if '<' in full or '[' in full or ',' in full:
         parts = _GEN_SPLIT_RX.split(full)
         for k, p in enumerate(parts):
             if p and p.strip('<>[],'):
-                parts[k] = csharp_type_name(p)
+                parts[k] = csharp_type_name(p, strip_arity)
         full = ''.join(parts)
     key = full.strip()
     if key in _SYS_CSHARP:
@@ -103,7 +112,11 @@ def csharp_type_name(full: str) -> str:
     # `@` is a verbatim-identifier PREFIX in C# and illegal mid-token, so
     # only a segment-leading one survives (`ReaderWriter@Fusion_NetworkString`
     # is a codegen name, not `@class`)
-    out = _BACKTICK_RX.sub(lambda m: '_' + m.group(0)[1:], full).replace('+', '.').replace('/', '.')
+    if strip_arity:
+        out = _BACKTICK_RX.sub('', full)
+    else:
+        out = _BACKTICK_RX.sub(lambda m: '_' + m.group(0)[1:], full)
+    out = out.replace('+', '.').replace('/', '.')
     if '@' in out:
         out = _MIDAT_RX.sub('_', out)
     return out

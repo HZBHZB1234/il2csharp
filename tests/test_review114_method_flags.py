@@ -80,7 +80,7 @@ def test_generated_dispatch_declarations_compile(tmp_path):
         "public class Leaf : Middle {",
         sig(6 | 0x40 | 0x20) + " {}",
         sig(6 | 0x40, "Other") + " {} }",
-        "public class Box_1<T> {",
+        "public class Box<T> {",
         e.ctor_sig(method(6, ".ctor"), td_base(name="Box`1")) + " {}",
         e.ctor_sig(method(0x10, ".cctor"), td_base(name="Box`1")) + " {} }",
         "public interface IFoo { void Run(); }",
@@ -98,7 +98,7 @@ def test_generated_dispatch_declarations_compile(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-@pytest.mark.parametrize("name, expected", [("Box`1", "Box_1"), ("Pair`2", "Pair_2"), ("Plain", "Plain")])
+@pytest.mark.parametrize("name, expected", [("Box`1", "Box"), ("Pair`2", "Pair"), ("Plain", "Plain")])
 def test_constructor_matches_emitted_type_identifier(name, expected):
     e = make_emitter()
     td = td_base(name=name)

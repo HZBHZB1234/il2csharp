@@ -239,7 +239,7 @@ class _ValuesMixin:
                     em = self.il.enum_members(etd) if etd is not None else None
                     if em and ev in em:
                         args[ai] = '%s.%s' % (
-                            csharp_type_name(self.meta.typedefs[etd].name),
+                            csharp_type_name(self.meta.typedefs[etd].name, strip_arity=True),
                             em[ev])
                         continue
                 # A typed integer expression is not implicitly convertible to

@@ -52,4 +52,4 @@ def test_action_slot_ctor_recovers_the_add_chain(baseline_game_decompiler):
     mi, _, _ = find_method(il, 'ActionSlotDetail', '.ctor', 1)
     body = lift_text(il, dec, mi)
     assert 'sub_1842e7380' not in body
-    assert body.count('list11.Add(') == 9
+    assert body.count('list1.Add(') == 9

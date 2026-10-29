@@ -35,7 +35,7 @@ def test_dungeon_progress_clone_copies_every_list(baseline_game_decompiler):
                   'unlockedNodeIDList', 'clearedNodeList'):
         assert 'this.%s' % field in body
         assert '__ret.%s = list' % field in body
-    assert 'new System.Collections.Generic.List_1<' in body
+    assert 'new System.Collections.Generic.List<' in body
     assert 'return __ret;' in body
     assert 'sub_1807e3d20' not in body
 
@@ -44,9 +44,9 @@ def test_inventory_get_item_walks_the_backing_list(baseline_game_decompiler):
     il, dec = baseline_game_decompiler
     mi, _, _ = find_method(il, 'RPGSystem.RpgInventoryManager', 'GetItem', 1)
     body = lift_text(il, dec, mi)
-    assert 'for (num1 = 0; num1 < list11._size; num1++)' in body
+    assert 'for (num1 = 0; num1 < list1._size; num1++)' in body
     assert '== itemId' in body
-    assert 'list11._items[num1]' in body
+    assert 'list1._items[num1]' in body
 
 
 def test_inventory_add_item_uses_stack_room(baseline_game_decompiler):

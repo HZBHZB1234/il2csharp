@@ -7,6 +7,86 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 169 (C8) — generic type identifiers spell the natural C# name; binding debt halved (2026-10-30, on `main`)
+
+**This is fix 117 inverted.** fix 117 deliberately rendered a metadata
+arity backtick as an `_N` suffix (`List`1` → `List_1`) so references
+spelled the same identifier as our own re-emitted declarations. That is
+self-consistent but binds to NOTHING real: a genuine BCL/engine assembly
+declares `List<T>`. Against the real Unity 6000 closure the `_N` form was
+the single largest error source on the game's own code.
+
+**The change is a PARAMETER, not a default flip.**
+`csharp_type_name(..., strip_arity=True)` drops the backtick instead of
+turning it into `_N`, and every TYPE-IDENTIFIER site passes it: the
+declaration header, the constructor signature, the finalizer, the delegate
+name, `type_name`/`_generic_inst_name` (so base lists, parameters, locals,
+typeof/alloc text and callee receivers all follow), the interface
+qualifier proof, and the enum-member fold. `sanitize()` is shared with
+MEMBER names, so it was left alone; the type-only path is
+`Emitter._type_ident`. Method names keep the default (they carry no arity).
+
+**A real regression this exposed, and its fix.** `typeof(<name>)` cells
+carry NO closed arguments, so stripping arity printed
+`typeof(KeyValuePair)` — invalid C#, since a generic definition has no
+such closed form. `test_game_bss_ties` caught it. The typeof site now
+keeps the `_N` spelling when the typedef HAS a generic container, and
+strips only otherwise.
+
+**A second, welcome consequence found by A/B.** `_semantic_type_prefix`
+derives a local's readable stem from its declared type TEXT, so `List_1`
+lexed as `['List','1']` → stem `list1` → the local printed `list11` (the
+arity digit doubled into the counter). With the strip the stem is `list`
+and locals read `list1`. Every such local's number therefore moves — that
+is the bulk of the tree delta, and it is a naming improvement.
+
+**Measured, per-image, against the real Unity 6000 closure (139 engine +
+121 BCL refs), fix-168 tree `post167` vs fix-169 tree `f169`:**
+
+| image | post167 binding | f169 binding |
+| --- | --- | --- |
+| Assembly-CSharp | 58,697 | **23,075** |
+| CommonAssembly | 715 | **49** |
+| ServiceAssembly | 138 | **4** |
+| RpgSystemCore | 74 | **15** |
+| ProjectMoon.BaseStructures | 29 | **10** |
+| (6 more) | 400 | 289 |
+| ProjectMoon.Battle.Effect.RevolvedSurface | 19 | 2,726 |
+| **TOTAL** | **60,161** | **26,352 (−56%)** |
+
+**Real parse errors: 0 on both trees.** The tree-sitter gate on `f169`
+reads 24,957 files / **0 bad / 0 errors / 0 missing / 0 recovery**. The
+one image that got WORSE (RevolvedSurface 19 → 2,726) is the SAME masking
+effect already documented twice: while its types were unresolvable, Roslyn
+suppressed every downstream semantic error, so 19 was a floor. The 2,726
+are pre-existing decompiler defects in that image (`unknown` /
+`data_18943c730` unresolved statics, arithmetic on `object`) that only
+become visible once the types bind — the `unknown` token count is
+byte-identical between the two trees.
+
+**`tools/compile_gate.py:classify()` corrected.** It treated the whole
+CS1xxx band as syntax, so 215 CS1061/CS1501/CS1503/CS1620 (all genuine
+BINDING errors) made a clean tree look broken and contradicted the
+tree-sitter gate. Those four codes plus CS1750 are now classified as
+binding, with the reasoning recorded in the docstring.
+
+**A/B (the new fast loop)**: 112 methods, 24 changed, **+169/−169 lines,
+zero insert/delete opcodes** — a pure spelling change. Full build `f169`:
+24,971 files / 178,025 bodies / 0 failed / 0 fallbacks / 0 emit failures.
+
+**Eight test files pinned the old `_N` spelling and were reversed**
+(`test_review117_arity_spellings`, `test_review120_nested_paths`,
+`test_review114_method_flags`, `test_game_fix133_generic_class_layout`,
+`test_game_fix148_alloc_family`, `test_game_fix142_iface_resolve`,
+`test_game_fix147_usg_walk`, `test_game_limbus_decompile`); 9 new tests in
+`tests/test_fix169_generic_arity_strip.py` cover the strip, the keyword
+mapping, the declaration/ctor/header agreement, and the typeof guard.
+
+**Not done here (needs the user's re-pin call):** goldens and pins are NOT
+re-pinned, and `f169` is NOT promoted. The tree delta is large by design
+(every generic local renumber), so re-pinning is a separate approved
+action.
+
 ## Current work: fix 168 — the enum tables were EMPTY for the whole game, and a fast A/B loop replaces the full rebuild (2026-10-29, on `main`)
 
 **The root cause was metadata-shape, not codegen.** The v39 Limbus

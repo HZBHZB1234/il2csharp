@@ -60,10 +60,24 @@ def iter_sources(root):
 def classify(output):
     """(syntax, binding, top) from csc output text.
 
-    Syntax = CS1xxx (parse/declaration level); everything else with
-    a CS code counts as binding. Lines that do not parse as csc
-    diagnostics are ignored. top lists (code, count) most common.
+    Syntax = CS1xxx (parse/declaration level); everything else with a CS
+    code counts as binding. Lines that do not parse as csc diagnostics are
+    ignored. top lists (code, count) most common.
+
+    The CS1xxx band is a HEURISTIC, not a truth: a handful of codes in it
+    are genuine BINDING errors, and counting them as syntax makes a clean
+    parse look broken. `CS1750` (a default parameter value that does not
+    convert) and `CS1061`/`CS1501`/`CS1503`/`CS1620` (no such member /
+    wrong arg count / wrong arg type) all live in that band and all
+    describe a resolved-but-mismatched program, never a parse failure. The
+    authoritative parse number is the tree-sitter gate; this tier must not
+    contradict it. Measured 2026-10-30 on the fix-169 tree: 215 "syntax"
+    errors in one image were ALL CS1061/CS1503/CS1501/CS1620, while
+    tree-sitter reported 0/0/0/0 on the same tree.
     """
+    BINDING_BAND = frozenset((
+        "CS1061", "CS1501", "CS1503", "CS1620", "CS1750",
+    ))
     syntax = 0
     binding = 0
     counts = {}
@@ -76,7 +90,7 @@ def classify(output):
         except Exception:
             continue
         counts[m.group(5)] = counts.get(m.group(5), 0) + 1
-        if 1000 <= num < 2000:
+        if 1000 <= num < 2000 and m.group(5) not in BINDING_BAND:
             syntax += 1
         else:
             binding += 1

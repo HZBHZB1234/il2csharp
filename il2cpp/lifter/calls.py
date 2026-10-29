@@ -35,7 +35,7 @@ class _CallsMixin:
             m = self.meta.methods[payload]
             td = self.meta.typedefs[m.declaring] if 0 <= m.declaring < len(self.meta.typedefs) else None
             ns = td.namespace + '.' if td and td.namespace else ''
-            tpart = csharp_type_name(ns + td.name if td else '?')
+            tpart = csharp_type_name(ns + td.name if td else '?', strip_arity=True)
             nm = m.name.lstrip('.')
             nm = nm.replace('|', '_')
             nm = nm.replace('@', '_')
@@ -464,7 +464,7 @@ class _CallsMixin:
                     if raw and '.' not in raw and nidx >= 0 \
                             and m.name == kind + '_' + raw:
                         from il2cpp.names import safe_ident, sanitize
-                        res = (kind, safe_ident(sanitize(csharp_type_name(raw))), nidx)
+                        res = (kind, safe_ident(sanitize(csharp_type_name(raw, strip_arity=True))), nidx)
                     break
         except Exception:
             res = None

@@ -1,10 +1,16 @@
-"""Fix 117: generic references spell the declaration's _N identifier.
-Declarations say `EqualityComparer_1<T>` while references said
-`EqualityComparer<byte>`, so overrides bound against the reference
-assembly's base (CS0115) and locals against framework types (CS0246).
-`csharp_type_name` now keeps the arity suffix everywhere, and explicit
-interface qualifiers (which come from arity-less metadata name strings)
-recover it through a (namespace, path, arg-count) typedef proof.
+"""Fix 169 (C8): the arity backtick is STRIPPED, not turned into `_N`.
+
+Fix 117 originally did the opposite -- it kept the metadata arity as an
+`_N` suffix so references spelled the same identifier as our own re-emitted
+declarations. That is self-consistent but binds to nothing real: a genuine
+BCL/engine assembly declares `List<T>`, not `List_1<T>`. Measured against
+the real Unity 6000 reference closure, the `_N` spelling accounted for
+28,361 CS0246 on the game's own Assembly-CSharp. fix 169 flips
+`csharp_type_name(..., strip_arity=True)` for every TYPE IDENTIFIER
+(declaration header, base list, interface qualifier, typeof/alloc text),
+so declarations and references both spell the natural C# name. The
+`strip_arity=False` default is retained for callers that still want the
+legacy form.
 """
 from types import SimpleNamespace as NS
 
@@ -14,12 +20,21 @@ from il2cpp.common import csharp_type_name
 from test_review113_type_decls import make_emitter, td_base, TYPES, SPELL
 
 
-def test_reference_spelling_keeps_arity():
+def test_reference_spelling_strips_arity():
+    assert csharp_type_name("System.Collections.Generic.List`1",
+                            strip_arity=True) == \
+        "System.Collections.Generic.List"
+    assert csharp_type_name("System.Collections.Generic.Dictionary`2",
+                            strip_arity=True) == \
+        "System.Collections.Generic.Dictionary"
+    assert csharp_type_name("Outer+Inner`2", strip_arity=True) == "Outer.Inner"
+
+
+def test_legacy_suffix_spelling_is_still_available():
+    """The pre-fix-169 `_N` form remains the DEFAULT, so callers outside
+    the type-identifier path do not change behaviour by accident."""
     assert csharp_type_name("System.Collections.Generic.List`1") == \
         "System.Collections.Generic.List_1"
-    assert csharp_type_name("System.Collections.Generic.Dictionary`2") == \
-        "System.Collections.Generic.Dictionary_2"
-    assert csharp_type_name("Outer+Inner`2") == "Outer.Inner_2"
 
 
 def test_non_generic_spellings_unchanged():
@@ -41,11 +56,11 @@ def _emitter_with_ifaces():
     return e
 
 
-def test_qualifier_gains_suffix_on_exact_proof():
+def test_qualifier_keeps_the_natural_identifier():
     e = _emitter_with_ifaces()
     assert e._arity_qualifier(
         "System.Collections.Generic.IEnumerator<object>") == \
-        "System.Collections.Generic.IEnumerator_1<object>"
+        "System.Collections.Generic.IEnumerator<object>"
 
 
 def test_qualifier_declines_without_args():
@@ -67,13 +82,13 @@ def test_qualifier_declines_on_arity_mismatch():
         "System.Collections.Generic.IEnumerable<object, object>"
 
 
-def test_explicit_method_sig_suffixes_qualifier():
+def test_explicit_method_sig_uses_natural_qualifier():
     from test_review114_method_flags import method
     e = _emitter_with_ifaces()
     m = method(1 | 0x40 | 0x20 | 0x100,
                "System.Collections.Generic.IEnumerator<System.Object>.get_Current")
     assert e.method_sig(m, td_base()).endswith(
-        "System.Collections.Generic.IEnumerator_1<object>.get_Current()")
+        "System.Collections.Generic.IEnumerator<object>.get_Current()")
 
 
 def test_explicit_method_keeps_multi_arg_commas():
@@ -82,7 +97,7 @@ def test_explicit_method_keeps_multi_arg_commas():
     m = method(1 | 0x40 | 0x20 | 0x100,
                "System.Collections.Generic.IDictionary<TKey,TValue>.Add")
     assert e.method_sig(m, td_base()).endswith(
-        "System.Collections.Generic.IDictionary_2<TKey, TValue>.Add()")
+        "System.Collections.Generic.IDictionary<TKey, TValue>.Add()")
 
 
 def _emitter_with_tuple_ifaces():
