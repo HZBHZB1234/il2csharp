@@ -365,6 +365,20 @@ class Emitter:
             try:
                 _et = self.il.types[td.element] \
                     if 0 <= td.element < len(self.il.types) else None
+                if _et is None:
+                    # fix 168: this metadata records NO `td.element` for any
+                    # enum (all 3,227 rows are -1 on the v39 fixture), so a
+                    # `long` enum printed a bare `enum E` and its 64-bit
+                    # members failed to convert (7 CS0266 on
+                    # BattleEventBit). The `value__` instance field carries
+                    # the same underlying type `enum_members` now reads.
+                    for _fr in self.meta.type_fields(td):
+                        _f = self.meta.fields[_fr]
+                        if _f.name != 'value__':
+                            continue
+                        _et = self.il.types[_f.type] \
+                            if 0 <= _f.type < len(self.il.types) else None
+                        break
                 _ukw = {0x04: 'sbyte', 0x05: 'byte', 0x06: 'short',
                         0x07: 'ushort', 0x09: 'uint', 0x0a: 'long',
                         0x0b: 'ulong'}.get(self.il._type_enum(_et) if _et is not None else 0x08)

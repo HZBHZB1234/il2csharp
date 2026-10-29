@@ -420,6 +420,23 @@ class _TypesMixin:
         te_u = None
         if 0 <= td.element < len(self.types):
             te_u = self._type_enum(self.types[td.element])
+        else:
+            # fix 168: this metadata records NO `td.element` for any enum
+            # (all 3,227 rows are -1 on the v39 fixture), so the branch
+            # above never fired and every member `continue`d -- the whole
+            # table returned None and no enum cast or member name ever
+            # rendered. The enum's OWN `value__` instance field carries
+            # the underlying type and is the authoritative source: it is
+            # the first instance slot, declared `System.Int32` for an int
+            # enum. Read it only when `element` is absent, so a metadata
+            # that does record `element` keeps using it unchanged.
+            for r in rows:
+                if r.name != 'value__':
+                    continue
+                vt = self.types[r.type] if 0 <= r.type < len(self.types) else None
+                if vt is not None:
+                    te_u = self._type_enum(vt)
+                break
         for i2, r in zip(fidx, rows):
             a = field_attrs(self, r)
             if not (a & FA_STATIC and a & FA_LITERAL):

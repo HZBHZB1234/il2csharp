@@ -7,6 +7,69 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 168 — the enum tables were EMPTY for the whole game, and a fast A/B loop replaces the full rebuild (2026-10-29, on `main`)
+
+**The root cause was metadata-shape, not codegen.** The v39 Limbus
+metadata records `element == -1` on **every one of its 3,227 enum
+typedefs**. `enum_members` gated its per-member decode on
+`0 <= td.element < len(self.types)` and so `continue`d every member,
+returning **None for every enum in the game**. The whole enum machinery
+(fix 86's blob decoder, the argument/compare/store folds, the
+`parse_default` cast) was running against an empty table: no enum ever
+rendered a member name or a cast.
+
+**A — `enum_members` reads the underlying type from `value__`.** An enum's
+own `value__` instance field carries the same underlying type, and it is
+authoritative (first instance slot, `System.Int32` for an int enum). The
+fallback fires **only** when `element` is absent, so a metadata that does
+record `element` is untouched. Result on `Assembly-CSharp`: **CS0266
+6,034 → 7**, **CS1750 287 → 0**.
+
+**B — the enum HEADER had the same hole.** `emit_type` derived `enum E :
+uint` from the same `td.element`, so 150 enums with a non-int underlying
+printed a bare `enum E` and their members failed to convert (the 7
+remaining CS0266 were all `BattleEventBit`, a `long` enum). Same
+`value__` fallback. Census of the underlying types actually present:
+int 3,077 / byte 69 / uint 48 / ushort 18 / long 5 / short 5 / sbyte 3 /
+ulong 2 — i.e. **150 enums were silently missing their base clause**.
+
+**Measured on a fresh full build (`out/limbus/f168`, then discarded after
+the A/B below):** 24,971 files / 178,025 bodies / 0 failed / 0 fallbacks /
+0 emit failures; tree-sitter parse **0 bad / 0 errors / 0 missing / 0
+recovery**; per-image compile vs the real Unity 6000 closure (139 engine
++ 121 BCL): **CS1xxx 324 → 0**, binding 59,837 → 54,241. The 7 leftover
+CS0266 are a DIFFERENT family (`uint`/`long` → `int`, not enums) and stay
+open. The +412 CS0246 are newly-spelled cross-assembly enum type names
+(e.g. `ATTRIBUTE_TYPE`, which lives in `InterfacesLibraryAssembly`), not
+defects.
+
+**Quality, proven by A/B rather than by reading:** 176 methods lifted
+from the same source both ways, **20 changed, +41/−41 lines, zero
+insert/delete opcodes** — a pure spelling change, every one of them a
+bare int becoming a named member (`95 → StringSplitOptions.None`,
+`1597 → BUFF_UNIQUE_KEYWORD.Inspire`, `41 → BUFF_UNIQUE_KEYWORD.Burst`,
+`2 → VIEW_TYPE.BATTLE`, `7 → NumberStyles.Integer`).
+
+**NEW TOOL — `tools/ab_lift.py`: the per-slice loop no longer needs a full
+rebuild.** User call 2026-10-29: a full 14-image build costs 65–101
+minutes and is a MILESTONE tool, not a per-slice one. `ab_lift.py snap`
+lifts N methods (default 60, ~1 s each) from the current source;
+`ab_lift.py diff --ref <snap>` re-lifts the same rows and reports
+opcode-level counts. `--strict` exits nonzero when any method's LINE COUNT
+changed (the shape a structural regression takes; a spelling change is
+always a balanced `replace`). **1–3 minutes instead of 60–100.** The
+fix-168 slice above is its first use.
+
+Suites: portable **1,505 passed** (6 new in
+`tests/test_fix168_enum_underlying.py`: the `value__` fallback, the
+recorded-`element` path, the decline when neither is knowable, and the
+three header shapes). Game **1,548 passed / 4 skipped / 0 failed** — the 4
+skips were the partial `f168` tree being newest-by-mtime with no
+MANIFEST; after removing it they fall back to `post167` and 2 of them fail
+on the KNOWN environment gap (`Unity.Burst.Unsafe` absent from the
+`game-original` role set), i.e. the same 2 failures the docs already
+record, zero regression.
+
 ## Current work: real-dependency compile test of the fix-167 tree — parse is clean, and the binding debt is now finally VISIBLE (2026-10-29, measurement only, no source change)
 
 **Goal this session:** rebuild the game's own assemblies from HEAD
