@@ -7,6 +7,70 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 167 — the LAST parse-error families: 28 files / 298 nodes -> 0 / 0 (2026-10-29, on `main`)
+
+**Both remaining families were structural, and both were caught by
+bisecting which pass changed the culprit line.**
+
+**A — `_elseif_flatten.negate` sliced `!(...)` blindly (1 file, and it
+was the SAME file as the pipe-condition node).** `negate` peeled
+`!(` ... `)` by `cond[2:-1]` whenever the text merely STARTED with `!(`
+and ENDED with `)`. For a condition `!(A) | (B)` that cut from the `!`
+to the LAST `)`, leaving the stray tail `A) | (B`, which rendered the
+unparseable `if (A) | (B)` head in
+`RpgArtifactEffect_KillSpawnBlackFluid.ProcessBursting`. The arm now
+requires `_paren_wraps_whole(cond[1:])` -- the paren opened right after
+the `!` must close at the end -- which is exactly the `!(X)` shape.
+`!(A == B)` and plain conditions keep their old behaviour.
+
+**B — `_seh_emit_clause` orphaned the clause of a HOISTED region (3
+files).** A hoisted try whose close block sits past the join reaches its
+close on the teardown `return`. By then an enclosing `_brace_pop` has
+popped the try frame, and because `_seh_close_top_try` deliberately
+SKIPS a hoisted region, the try's own `}` was never written. The `}`
+that was in the buffer belonged to the ENCLOSING block (the `else` arm),
+so the old `out.append('}'); ... clause` put the finally AFTER it:
+
+```
+try { ... goto L; } } finally { }      <- finally has no matching try
+```
+
+The fix inserts the MISSING `}` plus the clause immediately BEFORE the
+brace that balances the try's `{` (`_seh_matching_brace`, literal-aware,
+walking from the recorded `try_idx`), and shifts every recorded
+`try_idx` / `body_idx` / `clause_end` at or after the insertion point.
+The discriminator is the FRAME STATE (`len(_bstack) < brace_pos`), NOT
+the last line's text: an earlier attempt keyed on `out[-1] == '}'`
+matched the normal path too and regressed 3 nodes into 580 across 16
+files (measured, reverted). Emitting the `}` at the end at all was
+wrong -- it closes the enclosing block.
+
+**Result: the game-only tree's parse errors are GONE.** The 28-file
+re-emit + tree-sitter sweep goes **28 files / 298 nodes -> 0 files / 0
+nodes**, and a whole-image tree-sitter pass is also clean. Roslyn, whose
+`classify` heuristically counts every `CS1xxx` as "syntax", agrees once
+the non-parse `CS1750` (a default-argument `int -> enum` conversion,
+which is BINDING, miscounted into the `CS1xxx` band) is separated out:
+**75 -> 0** genuine parse errors on the whole `Assembly-CSharp` image.
+
+**Real-dependency compile gate extended.** `tools/compile_gate.py` now:
+- resolves a Unity install root, its `Editor` dir, OR the managed dir
+  (`unity_refs`, descending to `Editor/Data/Managed/UnityEngine`);
+- adds the Editor's own BCL reference set (`unity_framework_refs`: the
+  `netstandard.dll` ref plus the 17 netfx + 103 netstandard shims, which
+  is where `mscorlib` lives), since engine modules alone leave every
+  `System.*` name unresolved;
+- reports `refs=N engine + M bcl` and has `--no-framework`.
+
+Measured on this box with `D:\unity_editor_6000` (Unity 6000, the same
+generation as the fixture's 6000.3.12f1): **139 engine + 121 BCL = 260
+references**.
+
+**Suites.** Portable **1,495 passed** (7 new in
+`tests/test_fix167_structural_families.py`: the negate slice on a pipe
+condition vs a simple comparison, the brace-matcher on literal/comment
+inputs, and its decline paths).
+
 ## Current work: fix 164 — image roles: build only the game's own assemblies (2026-10-27, on `main`)
 
 **The engine and the plugins ship as real managed DLLs.** The fixture's
@@ -234,34 +298,44 @@ delta review that the current measurement budget does not cover
 alongside the SHUFPS invalidation work. Recorded here with the shape,
 the population and the exact sites so the slice can be taken whole.
 
-## Current work: P5 slice C — the game-vs-engine compile gate is wired, and the answer is "refs don't matter" (2026-10-28, on `main`)
+## Current work: P5 slice C — the game-vs-engine compile gate is wired, and the answer is "refs don't matter" (2026-10-28, on `main`; engine upgraded to Unity 6000 on 2026-10-29)
 
-**The blocker is gone: a Unity Editor IS installed on this box.**
-`Unity Hub`'s `editors-v2.json` registers 2022.3.61f1c1 at
+**Superseded 2026-10-29 by a newer, matching install.** The user then
+pointed at `D:\unity_editor_6000` — Unity **6000**, the same generation
+as the fixture's own `6000.3.12f1` — whose
+`Editor/Data/Managed/UnityEngine/` holds **139 managed engine
+assemblies**, and whose `Editor/Data/NetStandard/` carries the matching
+**121 mscorlib/netstandard reference shims**. That is the install all
+the numbers in the fix-167 section were measured with; the 2022 install
+below is kept only as the historical record of the first wiring.
+
+**The first blocker (2026-10-28): a Unity Editor IS installed here.**
+`Unity Hub`'s `editors-v2.json` registered 2022.3.61f1c1 at
 `C:\Users\tester\3D Objects\Editor`, and its
-`Data/Managed/UnityEngine/` holds **87 managed engine assemblies**
+`Data/Managed/UnityEngine/` held **87 managed engine assemblies**
 (`UnityEngine.dll`, `UnityEngine.CoreModule.dll`, every module, plus
-the `.xml` docs). That is the true name/signature source the roadmap's
-slice C wanted, so no user-supplied path is needed any more.
+the `.xml` docs).
 
 **`tools/compile_gate.py --unity <editor-root-or-managed-dir>`.** The
 gate always ran with NO reference closure, which made every external
 name a binding error and the tier a measure of unresolved externals
 rather than of the decompiler. `unity_refs()` resolves an Editor
-install root to its `Data/Managed/UnityEngine` dir (descending, not
-taking the first existing directory -- an install root holds native
-helpers like `Calc.dll` and no managed engine assemblies at all) and
-`run_gate(..., refs=...)` writes `/r:` lines into the response file.
-The report now carries `refs`, so a run always says which mode it was.
+install root, its `Editor` dir, or the managed dir directly (descending
+to `Editor/Data/Managed/UnityEngine`, not taking the first existing
+directory -- an install root holds native helpers like `Calc.dll` and
+no managed engine assemblies at all); `unity_framework_refs()` adds the
+Editor's own BCL set. `run_gate(..., refs=...)` writes `/r:` lines into
+the response file and reports `refs=N engine + M bcl`.
 
 **The measured answer: the reference closure does NOT move the count.**
 
 | mode | files | syntax | binding |
 | --- | --- | --- | --- |
 | refs = 0 (no closure) | 24,739 | 75 | **12** |
-| refs = 87 (real UnityEngine) | 24,739 | 75 | **12** |
+| refs = 87 (2022.3 UnityEngine only) | 24,739 | 75 | **12** |
+| refs = 139 engine + 121 bcl (Unity 6000) | 24,739 | 75 | **12** |
 
-Identical, and the 12 are not unresolved engine names: they are **12
+Identical all three ways, and the 12 are not unresolved engine names: they are **12
 `CS8641 "else" without a matching if`** sites -- real decompiler
 defects, and exactly fix 165's family F (`MailList`, `MembershipList`,
 `OtherStoryTheaterDataList`, `StageClearInfoList`, `BattleUnitView`,

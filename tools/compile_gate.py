@@ -162,24 +162,65 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None):
 def unity_refs(root=None):
     """Engine assemblies to reference, from an installed Unity Editor.
 
-    `root` is the Editor's `Data/Managed/UnityEngine` directory (or an
-    Editor install root, in which case that subdirectory is used). A
-    Unity install's own copies of UnityEngine/UnityEditor are the TRUE
-    names and signatures, so referencing them turns the binding tier
-    into a measure of the decompiler rather than of unresolved
-    externals. Returns [] when the path is absent -- the gate then runs
-    exactly as before, and the report's `refs` count says which mode ran.
+    `root` may be:
+      * an Editor install root            (`<root>/Editor/Data/Managed/UnityEngine`)
+      * an install root's `Editor` dir    (`<root>/Data/Managed/UnityEngine`)
+      * that `UnityEngine` dir directly
+
+    A Unity install's own copies of UnityEngine/UnityEditor are the TRUE
+    names and signatures, so referencing them turns the binding tier into
+    a measure of the decompiler rather than of unresolved externals.
+    Returns [] when the path is absent -- the gate then runs exactly as
+    before, and the report's `refs` count says which mode ran.
+
+    Measured on this box: `D:\\unity_editor_6000` (Unity 6000, the same
+    generation as the fixture's `6000.3.12f1`) has 139 managed engine
+    assemblies under `Editor/Data/Managed/UnityEngine`.
     """
     if not root:
         return []
-    # an Editor install root must resolve to its MANAGED engine dir, not
-    # the install dir itself (which holds native helpers like Calc.dll and
-    # no managed engine assemblies at all)
-    for cand in (os.path.join(root, 'Data', 'Managed', 'UnityEngine'), root):
+    cands = (
+        os.path.join(root, 'Editor', 'Data', 'Managed', 'UnityEngine'),
+        os.path.join(root, 'Data', 'Managed', 'UnityEngine'),
+        root,
+    )
+    for cand in cands:
         if os.path.isdir(cand):
-            return [os.path.join(cand, f) for f in sorted(os.listdir(cand))
+            refs = [os.path.join(cand, f) for f in sorted(os.listdir(cand))
                     if f.lower().endswith('.dll')]
+            if refs:
+                return refs
     return []
+
+
+def unity_framework_refs(root=None):
+    """BCL reference assemblies from the same Unity Editor.
+
+    The game code uses `System.*`, `mscorlib` and `netstandard` types that
+    the engine modules do not define, so a gate that references ONLY
+    UnityEngine still reports every BCL name as a binding error. These are
+    the Editor's own shim sets:
+      `Data/NetStandard/ref/2.1.0/netstandard.dll`
+      `Data/NetStandard/compat/2.1.0/shims/netfx/*.dll`      (mscorlib, ...)
+      `Data/NetStandard/compat/2.1.0/shims/netstandard/*.dll`
+    Returns [] when the root is not an Editor install.
+    """
+    if not root:
+        return []
+    editors = [os.path.join(root, 'Editor'), root]
+    editor = next((e for e in editors
+                   if os.path.isdir(os.path.join(e, 'Data', 'NetStandard'))), None)
+    if editor is None:
+        return []
+    ns = os.path.join(editor, 'Data', 'NetStandard')
+    out = []
+    for sub in (os.path.join(ns, 'ref', '2.1.0'),
+                os.path.join(ns, 'compat', '2.1.0', 'shims', 'netfx'),
+                os.path.join(ns, 'compat', '2.1.0', 'shims', 'netstandard')):
+        if os.path.isdir(sub):
+            out.extend(os.path.join(sub, f) for f in sorted(os.listdir(sub))
+                       if f.lower().endswith('.dll'))
+    return out
 
 
 def main():
@@ -192,6 +233,9 @@ def main():
                     help="Unity Editor install root or its "
                          "Data/Managed/UnityEngine dir; reference those "
                          "assemblies (game-vs-engine gate)")
+    ap.add_argument("--no-framework", action="store_true",
+                    help="with --unity, reference ONLY the engine modules "
+                         "(skip the Editor's mscorlib/netstandard shims)")
     args = ap.parse_args()
     if not os.path.isdir(args.tree):
         print("no such tree: %s" % args.tree)
@@ -200,13 +244,14 @@ def main():
     if args.unity and not refs:
         print("no engine assemblies under %s" % args.unity)
         return 2
-    rep = run_gate(args.tree, args.csc_dll, args.timeout, refs)
+    fw = [] if args.no_framework else unity_framework_refs(args.unity)
+    rep = run_gate(args.tree, args.csc_dll, args.timeout, refs + fw)
     if rep.get("tool_error"):
         print("tool error: %s" % rep["tool_error"])
         return 2
-    print("%s: %d files, syntax=%d binding=%d (refs=%d)" % (
+    print("%s: %d files, syntax=%d binding=%d (refs=%d engine + %d bcl)" % (
         args.assembly, rep["files"], rep["syntax"], rep["binding"],
-        rep["refs"]))
+        len(refs), len(fw)))
     for code, n in rep["top"]:
         print("  %s x%d" % (code, n))
     return 0 if rep["syntax"] == 0 else 1

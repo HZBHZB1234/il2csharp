@@ -345,21 +345,57 @@ class _SehMixin:
             cleaned.append(s)
         while cleaned and cleaned[-1].startswith('return'):
             cleaned.pop()
+        ct = seh.get('catch_type')
+        if seh['kind'] == 'finally':
+            _head = 'finally'
+        elif ct:
+            _head = 'catch (%s)' % ct
+        else:
+            _head = 'catch'
+        clause = [_head, '{'] + cleaned + ['}']
+        # fix 167: `_seh_close_one` emits immediately only when the try's
+        # own brace is the innermost open frame. A HOISTED region whose
+        # close block sits past the join reaches its close on the teardown
+        # `return`, by which time an enclosing `_brace_pop` has popped the
+        # try frame -- and because `_seh_close_top_try` deliberately skips
+        # a hoisted region, the try's own `}` was never written. The `}`
+        # that IS in the buffer belongs to the enclosing block (the `else`
+        # arm), so appending `}` + clause at the END put the finally AFTER
+        # that enclosing brace, orphaning it:
+        #
+        #   try { ... goto L; } } finally { }      <- finally has no try
+        #
+        # The fix inserts the MISSING `}` plus the clause immediately
+        # BEFORE the brace that balances the try's `{` (in this state that
+        # is the enclosing one). Brace matching from the recorded
+        # `try_idx` finds exactly that brace, and every recorded index at
+        # or after the insertion point shifts by the inserted length.
+        #
+        # The discriminator is the FRAME STATE, not the last line's text:
+        # a broad `out[-1] == '}'` test also matched the normal case and
+        # regressed 3 nodes into 580 across 16 files (measured, reverted).
+        if len(self._bstack) < seh.get('brace_pos', 0):
+            _ti = seh.get('try_idx')
+            _close = self._seh_matching_brace(out, _ti) \
+                if _ti is not None else None
+            if _close is not None:
+                ins = ['}'] + clause
+                out[_close:_close] = ins
+                _n = len(ins)
+                for _r in self._seh_regions:
+                    for _k in ('try_idx', 'body_idx', 'clause_end'):
+                        _v = _r.get(_k)
+                        if _v is not None and _v >= _close:
+                            _r[_k] = _v + _n
+                seh['body_idx'] = _close + 2
+                seh['clause_end'] = _close + _n
+                return
         if self._bstack:
             self._bstack.pop()
         out.append('}')
-        ct = seh.get('catch_type')
-        if seh['kind'] == 'finally':
-            out.append('finally')
-        elif ct:
-            out.append('catch (%s)' % ct)
-        else:
-            out.append('catch')
-        out.append('{')
+        out.extend(clause)
         self._brace_push('catch')
-        seh['body_idx'] = len(out)
-        out.extend(cleaned)
-        out.append('}')
+        seh['body_idx'] = len(out) - len(clause) + 1
         self._brace_pop(blocks, out, depth)
         seh['clause_end'] = len(out)
 
@@ -448,6 +484,45 @@ class _SehMixin:
                     and not seh.get('hoisted'):
                 self._seh_close_one(seh, blocks, out, depth)
                 return
+
+    def _seh_matching_brace(self, out, try_idx):
+        """Index of the `}` that balances the `{` at `try_idx + 1`, or None.
+
+        Used only by the late-close path of `_seh_emit_clause` (fix 167),
+        which must insert the missing try-`}` plus the clause BEFORE that
+        brace. Brace counting is literal-aware so an emitted `"{"` in a
+        string cannot skew the depth.
+        """
+        if try_idx is None or try_idx < 0 or try_idx + 1 >= len(out):
+            return None
+        if out[try_idx].strip() != 'try' or out[try_idx + 1].strip() != '{':
+            return None
+        depth = 0
+        for k in range(try_idx + 1, len(out)):
+            s = out[k]
+            if '//' in s:
+                s = s[:s.index('//')]
+            i = 0
+            while i < len(s):
+                ch = s[i]
+                if ch in '"\'':
+                    q = ch
+                    i += 1
+                    while i < len(s):
+                        if s[i] == '\\':
+                            i += 2
+                            continue
+                        if s[i] == q:
+                            break
+                        i += 1
+                elif ch == '{':
+                    depth += 1
+                elif ch == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return k
+                i += 1
+        return None
 
     def _brace_push(self, tag):
         self._bstack.append(tag)

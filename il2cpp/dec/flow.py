@@ -123,9 +123,18 @@ class _FlowMixin:
                     if lhs.count('(') == lhs.count(')') \
                             and rhs.count('(') == rhs.count(')'):
                         return '%s %s %s' % (lhs.strip(), NEG[op], rhs.strip())
-            if cond.startswith('!(') and cond.endswith(')'):
+            # fix 167: `!(` ... `)` peeling is only the inverse of
+            # `!(X)` when the `!` REALLY spans the whole condition.
+            # `!(A) | (B)` starts with `!(`, ends with `)` and is NOT
+            # `!(...)` -- `cond[2:-1]` then cut from the `!` to the
+            # LAST `)`, leaving the stray tail `A) | (B` (which rendered
+            # an unparseable `if (A) | (B)` head at 1 site tree-wide,
+            # RpgArtifactEffect_KillSpawnBlackFluid.ProcessBursting).
+            # Require the paren opened right after the `!` to close at
+            # the end.
+            if cond.startswith('!(') and self._paren_wraps_whole(cond[1:]):
                 return cond[2:-1].strip()
-            if cond.startswith('!'):
+            if cond.startswith('!') and not cond.startswith('!('):
                 return cond[1:].strip()
             return '!(%s)' % cond
 
