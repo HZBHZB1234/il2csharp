@@ -126,7 +126,7 @@ def _stub_members(text):
 
 def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
                  exclude=(), exclude_images=True, dotnet_refs=True,
-                 timeout=1800):
+                 timeout=1800, exclude_dirs=()):
     dotnet = shutil.which("dotnet")
     if not dotnet:
         raise RuntimeError("A .NET SDK is required")
@@ -140,7 +140,14 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
         raise RuntimeError(".NET reference assemblies are required")
     closure, notes = _closure_refs(tree, refs_dirs, unity_roots, managed_dirs,
                                    exclude, exclude_images)
-    files = sorted(Path(tree).resolve().rglob("*.cs"))
+    files = []
+    root_dir = Path(tree).resolve()
+    skip_dirs = tuple(d for d in exclude_dirs if d)
+    for p in sorted(root_dir.rglob("*.cs")):
+        rel = p.relative_to(root_dir).as_posix()
+        if skip_dirs and rel.split("/", 1)[0] in skip_dirs:
+            continue
+        files.append(p)
     if not files:
         raise ValueError("No C# source files found")
     sources, stub_members = [], []
@@ -219,6 +226,11 @@ if __name__ == "__main__":
                         help="Unity player build dir: its Managed backup folder")
     parser.add_argument("--exclude", action="append", default=[],
                         help="dll names to skip (repeatable)")
+    parser.add_argument("--exclude-dirs", action="append", default=[],
+                        help="image directories whose sources are left out of "
+                             "the diagnostic assembly (repeatable; e.g. "
+                             "mscorlib / System / UnityEngine.CoreModule when "
+                             "those types come from the reference closure)")
     parser.add_argument("--keep-emitted-refs", action="store_true",
                         help="do not auto-exclude the tree's own image dlls")
     parser.add_argument("--dotnet-refs", dest="dotnet_refs",
@@ -237,4 +249,5 @@ if __name__ == "__main__":
                   else not provided_closure)
     raise SystemExit(compile_tree(
         args.tree, args.report, args.refs_dir, args.unity, args.managed_refs,
-        args.exclude, not args.keep_emitted_refs, use_dotnet, args.timeout))
+        args.exclude, not args.keep_emitted_refs, use_dotnet, args.timeout,
+        args.exclude_dirs))

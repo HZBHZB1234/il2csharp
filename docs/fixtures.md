@@ -194,6 +194,12 @@ python tools/compile_corpus.py out/survivors-roguelike-kit/cw3s \
     --managed-refs fixtures/survivors-roguelike-kit/build
 ```
 
+--exclude-dirs NAME (repeatable) leaves whole image directories out of the
+diagnostic assembly -- needed when a full tree re-emits the BCL and the engine
+modules but you want those to come from a reference closure instead
+(\--exclude-dirs mscorlib --exclude-dirs System --exclude-dirs
+UnityEngine.CoreModule\); the report's \source_files\ shows what went in.
+
 It auto-excludes the image dlls the tree emits itself, and drops the SDK pack
 when a closure is supplied (Unity's `mscorlib` plus .NET's leaves
 `System.Object` ambiguous — 40k CS0518). One caveat is structural: two images
