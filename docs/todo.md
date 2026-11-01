@@ -7,7 +7,39 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 179 — a bare `x = 0` under a struct/class declaration compiles (2026-11-02, on `main`)
+## Current work: game-wide measurement of fixes 173-179 (2026-11-02, on `main`)
+
+A full 161-image build of the licensed fixture with every fix from this
+session (`out/limbus/full0`, 24,738-file `Assembly-CSharp`) gives the first
+game-wide numbers for the output-quality work, measured on the same corpus
+the earlier censuses used (`f169`, built 2026-10-30 before these fixes):
+
+| census (Assembly-CSharp) | `f169` | `full0` |
+|---|---|---|
+| `__field_` backing-field noise (fix 177) | 13,966 | **2,648** |
+| bare `unknown` markers (fix 178) | 10,940 | **5,039** |
+| `/*unknown*/ default` markers | 0 | **5,530** |
+| auto-properties emitted `{ get; }` / `{ get; set; }` | 0 | **575 / 94** |
+
+So fix 177 removes **81%** of the backing-field noise on the game and fix 178
+makes **54%** of the unresolved-value markers compile (the rest are in
+expression positions — `x * unknown`, `f(unknown, ...)`, `unknown ? a : b`,
+comparisons — where a target-typed `default` would need a type the tree does
+not carry; the largest of those, a ternary condition, is provably `bool` and
+is the next safe slice).
+
+**Why the whole-tree compile is the only honest game metric.** A
+game-vs-engine compile of the pre-fix tree reported 17,131 errors for 14
+images / 24,948 files, but 14,259 of them are CS0246 and there are **zero**
+CS0103 — Roslyn never binds a body whose signature has an unresolved type, so
+every body defect is invisible until the reference graph closes. `full0`
+closes it for the *game* images (all 161 images are emitted, including the
+Unity packages the editor does not ship), which is what makes the next
+measurement meaningful; `tools/compile_corpus.py --exclude-dirs` (added this
+round) is how the BCL/engine images are kept out of the diagnostic assembly
+so those types come from the editor closure instead.
+
+## Previous work: fix 179 — a bare `x = 0` under a struct/class declaration compiles (2026-11-02, on `main`)
 
 IL2CPP renders stack-slot zeroing as `= 0` under whatever type the slot
 carries. The *declaration* path already respells that (`_bare_rhs_needs_default`,
