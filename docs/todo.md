@@ -7,7 +7,51 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 169 (C8) — generic type identifiers spell the natural C# name; binding debt halved (2026-10-30, on `main`)
+## Current work: fix 170 — v38+ metadata rows are PACKED, not fixed-width (2026-11-01, on `main`)
+
+**Found by registering new open-source fixtures**, not by a gate: the
+decompiler had only ever been calibrated on Limbus's metadata shape.
+
+Every v38+ table row carrying a type index packs it at `type_w`, so the
+stride follows the widths derived in `_parse_tables` (`type_w` itself comes
+from `parametersSize / parametersCount - 8`). The parser hard-coded the
+**Limbus** shape (type_w 4) everywhere:
+
+| table | Limbus (type_w 4) | narrow file (type_w 2) |
+|---|---|---|
+| methods | 32 | **30** |
+| parameters | 12 | **10** |
+| fields | 12 | **10** |
+| events | 24 | **22** |
+| field/parameter defaults | 12 | **10** |
+
+Reading the Limbus constants on a narrow file shifts **every row after the
+first**. On `survivors-roguelike-kit` (v39, Unity 6000.3.12f1, 94,205
+methods) that produced fragmented method names (`arSpacing`, `cted`),
+garbage `rid` (0 / 16711680 / 16777215), and therefore a starved
+method-address map:
+
+- **native code: 11,427 / 94,205 (12.1%) → 83,855 / 94,205 (89.0%)**
+- fields truncated 38,765 / 46,518; the missing tail raised `IndexError`
+  in `source_field_name` during a lift
+- default-value tables lost a fifth of their rows (8,450 / 12,629)
+
+`limbus` (v39, type_w 4) is **byte-identical before and after** — 299,371 /
+319,100 both sides — which is why the bug stayed invisible.
+
+Landed in `fd29fe1`. Verified: survivors lift 120/120, limbus lift 150/150,
+unitask lift 100/100, portable 1517 passed (2 new narrow-row tests in
+`tests/test_metadata_versions.py`, including the field/parameter default
+tables), limbus game suite 407 passed with the single pre-existing
+`Unity.Burst.Unsafe` environment failure (fails identically stashed).
+
+**Implication for the corpus:** metadata calibration now has three
+independent points (unitask v31 / survivors v39 narrow / limbus v39 wide).
+Any future v38+ work must be checked against all three, not Limbus alone.
+See `docs/fixtures.md`; the two new fixtures are local-only and
+git-ignored.
+
+## Previous work: fix 169 (C8) — generic type identifiers spell the natural C# name; binding debt halved (2026-10-30, on `main`)
 
 **This is fix 117 inverted.** fix 117 deliberately rendered a metadata
 arity backtick as an `_N` suffix (`List`1` → `List_1`) so references
