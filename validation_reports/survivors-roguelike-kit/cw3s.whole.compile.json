@@ -1,0 +1,39 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\cw3s",
+  "source_files": 289,
+  "merged_stubs": 61,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "4af8c7e0499a182898c479bd458acd50b250fb7e5f8d13700a57ef8248687610",
+  "log": "validation_reports\\survivors-roguelike-kit\\cw3s.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/survivors-roguelike-kit/build: 72 (excluded 2 tree images)"
+  ],
+  "closure_refs": 72,
+  "exit_code": 1,
+  "files_with_errors": 3,
+  "errors": 9,
+  "errors_by_code": {
+    "CS0102": 5,
+    "CS0535": 2,
+    "CS0111": 2
+  },
+  "first_error_by_code": {
+    "CS0535": {
+      "file": "out\\survivors-roguelike-kit\\cw3s\\Assembly-CSharp\\GameInput.cs",
+      "line": 12,
+      "message": "\u201cGameInput\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIInputActionCollection2.FindBinding(InputBinding, out InputAction)\u201d\r"
+    },
+    "CS0111": {
+      "file": "out\\survivors-roguelike-kit\\cw3s\\Assembly-CSharp-firstpass\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 9,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1\u201d\u5df2\u5b9a\u4e49\u4e86\u4e00\u4e2a\u540d\u4e3a\u201cGet\u201d\u7684\u5177\u6709\u76f8\u540c\u53c2\u6570\u7c7b\u578b\u7684\u6210\u5458\r"
+    },
+    "CS0102": {
+      "file": "out\\survivors-roguelike-kit\\cw3s\\Assembly-CSharp-firstpass\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 35,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d\u5df2\u7ecf\u5305\u542b\u201cFilePathsData\u201d\u7684\u5b9a\u4e49\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}

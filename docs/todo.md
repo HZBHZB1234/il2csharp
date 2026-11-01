@@ -7,7 +7,87 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 175 — the one generated name whose brackets hold a type-argument list (2026-11-02, on `main`)
+## Current work: fix 176 — a whole-tree compile harness, and the next three families sized (2026-11-02, on `main`)
+
+**176a — the corpus compile gate can take a real reference closure.**
+`tools/compile_corpus.py` compiles a whole recovered tree as one diagnostic
+assembly. It only ever referenced the local .NET SDK pack, so any tree that
+does not re-emit mscorlib (`--only` builds) reported every engine name as
+CS0246. It now takes the same three closures the per-image gate has
+(`--managed-refs`, `--unity`, `--refs-dir`), auto-excludes the image dlls the
+tree itself emits, and drops the SDK pack when a closure is supplied (mixing
+Unity's mscorlib with .NET's leaves `System.Object` ambiguous: 40,427 CS0518).
+
+Measured on the two MIT trees, whole tree as one unit:
+
+| tree | files | closure refs | errors | by code |
+|---|---|---|---|---|
+| `out/survivors-roguelike-kit/cw3s` | 289 | 72 | **9** | CS0102 5, CS0535 2, CS0111 2 |
+| `out/unitask/cw3` | 460 | 42 | **43** | CS0102 25, CS0111 10, CS8701 8 |
+
+The CS0102/CS0111 blocks are the harness's own artefact:
+`UnitySourceGeneratedAssemblyMonoScriptTypes_v1` is a *different* type that
+every Unity-generated assembly legitimately declares, and one-assembly mode
+cannot represent that. What remains after removing them is **2 CS0535**
+(survivors: one `ref` that should be `out`, below) and **8 CS8701**
+(unitask: default-interface-methods, which Unity's IL2CPP does support — the
+reference `mscorlib` from the build's `Managed/` folder is what does not
+advertise `RuntimeFeature.DefaultImplementationsOfInterfaces`). So the
+recovered survivors game assembly is **two errors** from compiling as one
+image, one of them a genuine recovery defect.
+
+**176b — the merged shared-stub file was syntactically broken (fixed).**
+`__SharedBodyStubs.cs` members are real methods with bodies now
+(`internal static object sub_<va>(params object[] args) { throw ...; }`), but
+the merge still collected *signature lines* only, producing an unparseable
+temporary file — 91 CS1002 in a compile that should have measured bodies.
+The merge now extracts whole member blocks (deduped by address) and the
+compiler sees valid code. This was invisible while the gate had no reference
+closure: without one, the first error was CS0518 and the stub file was never
+reached.
+
+**176c — the next three families, sized (not yet fixed).**
+* **Backing-field noise, and it breaks cross-assembly references.**
+  `csharp.source_field_name` renames a compiler auto-property backing field
+  `<X>k__BackingField` to `__field_X` so the emitted field declaration cannot
+  collide with the property `X` (CS0102), and every *access* prints
+  `__field_X`. Limbus `f169`: **13,966** accesses (511 address-taken, where a
+  property spelling would be illegal). The real source wrote `X`; the rename
+  also means `tween.active` (an inlined auto-property getter — `Tween.active`
+  IS auto) renders `tween.__field_active`, which cannot bind against the
+  original `DOTween.dll`. The shape of the fix is a **compiler-guaranteed
+  proof**: `<X>k__BackingField` exists only for auto-properties, so the
+  property can be emitted `{ get; set; }`/`{ get; }` and its accesses spelled
+  `X`, with the field kept for the address-taken sites (declines otherwise).
+* **The `unknown` marker is the top CS0103 family.** An unresolved value
+  renders the text `unknown` (from `_rewrite_unknowns`), which is honest and
+  parseable but not compilable: **10,940** occurrences in limbus `f169`, 251
+  in survivors, 17 in unitask (`vector32 = unknown;`,
+  `Vector2 vector21 = unknown;`, `RuntimeHelpers.InitializeArray(a,
+  unknown.nFileSizeLow)`). Any fix must keep the marker visible in the text
+  (a bare `default` would fabricate a zero silently) and must keep
+  `_drop_dead_unknown_store` / `_strip_dangling_default` working, which key
+  on the literal token.
+* **`ref` vs `out` is unrecoverable from metadata.** IL2CPP's parameter row
+  carries no `Il2CppParameterAttributes` word at all — `out` and `ref` are
+  the same byref type — so the survivors `GameInput.FindBinding` (source:
+  `out InputAction`) renders `ref` and that one mismatch is CS0535. A fix
+  needs a body proof (the byref slot is never *read*, and is written on every
+  exit, plus no `ref`-shaped use), not a heuristic on names.
+
+**Harness finding, recorded so nobody repeats it:** a per-image "rebuild the
+solution" gate (each recovered image compiled into its own assembly and used
+as a reference by the images that depend on it) cannot bootstrap. `csc` does
+not write an output assembly that has errors, so an image with any error is
+unavailable to its dependents, and the first reference to it turns into
+thousands of CS0246. A pilot of exactly that (`tools/recompile_tree.py`,
+dependencies derived from the metadata's type→image map) reported 5,829
+errors for unitask's six images — all cascade, none information — and was
+dropped rather than shipped. The per-image gate against the *original*
+sibling assemblies plus the whole-tree single-unit gate above are the two
+modes that measure something today.
+
+## Previous work: fix 175 — the one generated name whose brackets hold a type-argument list (2026-11-02, on `main`)
 
 The file writer mangles IL-only characters out of compiler-generated
 identifiers (`<>c`, `<Foo>d__13`, `<>9__0_0`) so C# can lex them. The pattern

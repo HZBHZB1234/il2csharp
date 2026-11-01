@@ -169,6 +169,32 @@ those use `--unity <Editor install root>`: the Editor's own engine modules
 plus its netstandard shims are the true signatures, which is how the
 game-vs-engine gate runs on the licensed fixture.
 
+### Compiling the whole tree as one unit
+
+`tools/compile_corpus.py` compiles every `.cs` under a tree as a single
+diagnostic assembly (shared `sub_` stubs merged, never executed). It takes the
+same closures, which is what makes the number meaningful for a tree that only
+emits the game's own images:
+
+```text
+python tools/compile_corpus.py out/survivors-roguelike-kit/cw3s \
+    --report validation_reports/survivors-roguelike-kit/cw3s.whole.compile.json \
+    --managed-refs fixtures/survivors-roguelike-kit/build
+```
+
+It auto-excludes the image dlls the tree emits itself, and drops the SDK pack
+when a closure is supplied (Unity's `mscorlib` plus .NET's leaves
+`System.Object` ambiguous — 40k CS0518). One caveat is structural: two images
+that each declare the same type name (Unity's per-assembly
+`UnitySourceGeneratedAssemblyMonoScriptTypes_v1`) read as CS0102/CS0111 —
+that is the harness, not the tree; the per-image gate above is the authority
+for those.
+
+A per-image *solution rebuild* (each recovered image compiled and then
+referenced by its dependents) does **not** work and is not shipped: `csc`
+writes no assembly that has errors, so one failing image turns every
+dependent into thousands of CS0246.
+
 ## 5. Comparing and promoting trees
 
 ```text

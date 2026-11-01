@@ -1,0 +1,39 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\cw3",
+  "source_files": 460,
+  "merged_stubs": 91,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "bdfd101a29ab19f8d7d83ea9f2e50ad347e4bb87f1109e6f60cece11f5bac619",
+  "log": "validation_reports\\unitask\\cw3.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/unitask/build: 42 (excluded 6 tree images)"
+  ],
+  "closure_refs": 42,
+  "exit_code": 1,
+  "files_with_errors": 7,
+  "errors": 43,
+  "errors_by_code": {
+    "CS0102": 25,
+    "CS0111": 10,
+    "CS8701": 8
+  },
+  "first_error_by_code": {
+    "CS8701": {
+      "file": "out\\unitask\\cw3\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+      "line": 18,
+      "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002\r"
+    },
+    "CS0111": {
+      "file": "out\\unitask\\cw3\\UniTask\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 11,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1\u201d\u5df2\u5b9a\u4e49\u4e86\u4e00\u4e2a\u540d\u4e3a\u201cGet\u201d\u7684\u5177\u6709\u76f8\u540c\u53c2\u6570\u7c7b\u578b\u7684\u6210\u5458\r"
+    },
+    "CS0102": {
+      "file": "out\\unitask\\cw3\\UniTask\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 37,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d\u5df2\u7ecf\u5305\u542b\u201cFilePathsData\u201d\u7684\u5b9a\u4e49\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}
