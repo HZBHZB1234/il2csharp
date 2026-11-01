@@ -7,7 +7,42 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 177 — an auto-property reads as its property (2026-11-02, on `main`)
+## Current work: fix 178 — the unresolved-value marker compiles without hiding itself (2026-11-02, on `main`)
+
+An unresolved native value renders the bare text `unknown` (from
+`_rewrite_unknowns`). It is honest and it parses, but it does not compile:
+CS0103, **10,940** sites on the licensed game tree — the largest single
+compiler-error family there, and the class is purely a rendering choice.
+
+At the file boundary, where no type context is left to recover, the marker
+moves into a comment and the expression becomes a target-typed `default`:
+`x = unknown;` → `x = /*unknown*/ default;`. The site compiles and the text
+still says the value was not recovered. Only shapes whose target type is
+certain qualify:
+
+* an assignment RHS (`x = unknown;`) — every recovered declaration spells its
+  type, and neither fixture nor the game tree contains a single `var`;
+* a `return` (`return unknown;`) — the signature's return type is declared;
+* a member access on an unresolved value (`unknown.nFileSizeLow`) — the member
+  name is fabricated, so the whole expression becomes the marker.
+
+`unknown` inside a larger expression (`unknown + 1`, `f(unknown, 2)`, an
+operand of `==`, `unknown[0]`) keeps today's text: `default` there would need
+a type the tree does not have. The scan is literal-aware (NUL-masked lines),
+so a string or comment that spells any of this is untouched, and it runs
+*after* `_drop_dead_unknown_store` / `_strip_dangling_default`, which key on
+the bare token.
+
+Measured: projected onto the licensed `f169` tree (the transform is
+file-boundary, so applying it to an existing tree is what a rebuild would
+produce for those lines) **10,940 → 5,242** bare markers in 2,332 files, and
+the projected tree still parses **0 bad / 0 ERROR / 0 MISSING / 0 recovery**
+over 24,957 files. On the MIT fixtures (which carry few markers) the compile
+gate moves: unitask AC 2,449 → **2,447**, TextMeshPro 269 → **267**,
+survivors firstpass 914 → **900**, everything else unchanged; brace **0**,
+tree-sitter **0/0/0/0**. Portable suite **1,582 passed** (7 new tests).
+
+## Previous work: fix 177 — an auto-property reads as its property (2026-11-02, on `main`)
 
 `<X>k__BackingField` is emitted by the C# compiler for an auto-property and
 for nothing else. That made it a *compiler guarantee*, not a heuristic, and

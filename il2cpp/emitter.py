@@ -8,7 +8,7 @@ from il2cpp.metadata import ImageDef, MethodDef, TypeDef
 from il2cpp.names import repr_f32, repr_f64, safe_ident, sanitize, sanitize_qualifier
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.runtime.meta import meta_lit_repr
-from il2cpp.text import MANGLED_IDENT_RX, reindent
+from il2cpp.text import MANGLED_IDENT_RX, reindent, spell_unresolved_values
 from il2cpp import rawaddr
 
 class Emitter:
@@ -1804,6 +1804,9 @@ class Emitter:
         content = MANGLED_IDENT_RX.sub(
             lambda m: m.group(0).replace('<', '_').replace('>', '_')
             .replace('.', '_').replace('|', '_'), content)
+        # an unresolved native value compiles as a marker plus a
+        # target-typed default; see text.spell_unresolved_values
+        content = spell_unresolved_values(content)
         os.makedirs(dirp, exist_ok=True)
         with open(os.path.join(dirp, base + '.cs'), 'w', encoding='utf-8') as fh:
             fh.write(content)

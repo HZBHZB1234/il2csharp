@@ -131,6 +131,69 @@ MANGLED_IDENT_RX = re.compile(
     r'|(?<![\w`])<[\w.]*(?:<[\w.,\s]*>[\w.]*)*>[\w`]*(?:\|[\w`]+)*')
 
 
+# An unresolved native value renders the bare text `unknown` (from
+# `_rewrite_unknowns` in dec/textpass.py). It is honest and it parses, but it
+# does not COMPILE (CS0103) -- 10,940 occurrences on the licensed game tree,
+# the largest single compiler-error family. At the file boundary, where the
+# value has no type context left to recover, the marker moves into a comment
+# and the expression becomes a target-typed `default`: the site now compiles,
+# and the text still says the value was not recovered.
+#
+# Only shapes whose target type is certain qualify -- an assignment RHS and a
+# `return` (every recovered declaration spells its type; the tree contains no
+# `var`), plus a member access on an unknown value (the member is fabricated,
+# so the whole expression becomes the marker). `unknown` inside a larger
+# expression (`unknown + 1`, `f(unknown, 2)`, an operand of `==`) keeps the
+# old text: `default` there would need a type the tree does not have.
+_UNKNOWN_RHS_RX = re.compile(r'=\s*unknown\s*;')
+_UNKNOWN_RETURN_RX = re.compile(r'\breturn\s+unknown\s*;')
+_UNKNOWN_MEMBER_RX = re.compile(r'(?<![\w.])unknown\.[A-Za-z_]\w*')
+
+
+def spell_unresolved_values(text):
+    """Make the `unknown` marker compile without hiding it.
+
+    ``= unknown;`` and ``return unknown;`` become the marker plus a
+    target-typed ``default``; ``unknown.Member`` (a member access on an
+    unresolved value, whose name is fabricated) becomes the marker alone.
+    Literal-aware: the scans run on the NUL-masked line, so a string or
+    comment that spells any of this is untouched.
+    """
+    out = []
+    in_block = False
+    for line in text.split('\n'):
+        masked, in_block = mask_spans(line, in_block)
+        if 'unknown' not in masked:
+            out.append(line)
+            continue
+        pieces = []
+        last = 0
+        for rx, repl in ((_UNKNOWN_MEMBER_RX, '/*unknown*/ default'),
+                         (_UNKNOWN_RHS_RX, '= /*unknown*/ default;'),
+                         (_UNKNOWN_RETURN_RX, 'return /*unknown*/ default;')):
+            pos = 0
+            while True:
+                m = rx.search(masked, pos)
+                if m is None:
+                    break
+                pieces.append((m.start(), m.end(), repl))
+                pos = m.end()
+        if not pieces:
+            out.append(line)
+            continue
+        pieces.sort()
+        rebuilt = []
+        for start, end, repl in pieces:
+            if start < last:
+                continue          # overlapping match: the earlier one won
+            rebuilt.append(line[last:start])
+            rebuilt.append(repl)
+            last = end
+        rebuilt.append(line[last:])
+        out.append(''.join(rebuilt))
+    return '\n'.join(out)
+
+
 def _brace_scan(line):
     """(leading_closers, opens, closes) for one line, skipping braces that
     live inside string/char literals or a `//` comment tail. `leading_closers`
