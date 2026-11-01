@@ -169,6 +169,18 @@ those use `--unity <Editor install root>`: the Editor's own engine modules
 plus its netstandard shims are the true signatures, which is how the
 game-vs-engine gate runs on the licensed fixture.
 
+**Read the game-vs-engine number as mostly SIGNATURE-level.** Roslyn does not
+bind a method body whose signature carries an unresolved type, so on a tree
+whose sibling images / engine packages are missing (`UnityEngine.UI`,
+`Unity.TextMeshPro`, `Unity.Collections`, ... all live outside the editor's
+`Managed/UnityEngine` folder) the errors are overwhelmingly CS0246/CS0234 and
+*body-level* defects are invisible: a 24,739-file `Assembly-CSharp` reports
+20,745 CS0246 and **zero** CS0103 even though the same tree carries 10,940
+bare `unknown` markers. Close the reference graph first (our own sibling
+images plus the engine packages) before treating a compile count as a
+body-quality measure; the two MIT fixtures have their exact closure, which is
+why their images sit at 2-9 errors.
+
 ### Compiling the whole tree as one unit
 
 `tools/compile_corpus.py` compiles every `.cs` under a tree as a single
