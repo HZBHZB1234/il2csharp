@@ -1,0 +1,94 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\q9\\UniTask.Linq",
+  "assembly": "UniTask.Linq",
+  "files": 142,
+  "syntax": 0,
+  "binding": 20,
+  "top": [
+    [
+      "CS0305",
+      8
+    ],
+    [
+      "CS0122",
+      7
+    ],
+    [
+      "CS0452",
+      3
+    ],
+    [
+      "CS8702",
+      2
+    ]
+  ],
+  "tool_error": null,
+  "refs": 47,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\ToArray.cs",
+        "line": 26,
+        "message": "\u201cArrayPool<T>\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\ToLookup.cs",
+        "line": 258,
+        "message": "\u201cArrayPool<T>\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\ToLookup.cs",
+        "line": 286,
+        "message": "\u201cArrayPool<T>\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0305": [
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\CombineLatest_12.cs",
+        "line": 221,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cCombineLatest<T1, T2, TResult>\u201d\u9700\u8981 3 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\CombineLatest_13.cs",
+        "line": 233,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cCombineLatest<T1, T2, TResult>\u201d\u9700\u8981 3 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\CombineLatest_10.cs",
+        "line": 197,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cCombineLatest<T1, T2, TResult>\u201d\u9700\u8981 3 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      }
+    ],
+    "CS0452": [
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\EveryValueChangedStandardObject.cs",
+        "line": 13,
+        "message": "\u7c7b\u578b\u201cTTarget\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\EveryValueChangedStandardObject.cs",
+        "line": 29,
+        "message": "\u7c7b\u578b\u201cTTarget\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\EveryValueChangedStandardObject.cs",
+        "line": 44,
+        "message": "\u7c7b\u578b\u201cTTarget\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d"
+      }
+    ],
+    "CS8702": [
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\Create.cs",
+        "line": 87,
+        "message": "\u201cIUniTaskSource.IValueTaskSource.GetStatus(short)\u201d\u65e0\u6cd5\u5728\u7c7b\u578b \"Create<T>.AsyncWriter\" \u4e2d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458 \"IValueTaskSource.GetStatus(short)\"\uff0c\u56e0\u4e3a\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask.Linq\\Cysharp\\Threading\\Tasks\\Linq\\Create.cs",
+        "line": 87,
+        "message": "\u201cIUniTaskSource.IValueTaskSource.OnCompleted(Action<object>, object, short, ValueTaskSourceOnCompletedFlags)\u201d\u65e0\u6cd5\u5728\u7c7b\u578b \"Create<T>.AsyncWriter\" \u4e2d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458 \"IValueTaskSource.OnCompleted(Action<object>, object, short, ValueTaskSourceOnCompletedFlags)"
+      }
+    ]
+  },
+  "returncode": 1
+}

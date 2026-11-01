@@ -410,6 +410,29 @@ class Metadata:
         vto, vtc = h['vtableMethodsOffset'], h['vtableMethodsSize']
         self.vtable_methods = [u32(d, vto + i * 4) for i in range(vtc // 4)]
 
+        # Generic parameter constraints: ONE flat TypeIndex array, ranged by
+        # each generic parameter row's (constraintsStart, constraintsCount).
+        # A row is a TypeIndex like every other type index, so v38+ packs it
+        # at the metadata's own width (Limbus type_w 4 -- byte-identical to
+        # the old fixed read; the narrow survivors file 2, where a fixed
+        # 4-byte read would consume two rows per entry and misrange every
+        # parameter). The header's own v38+ Count field decides the width
+        # first, `type_w` second; anything else declines to the v31 layout.
+        gco, gcs = (h['genericParameterConstraintsOffset'],
+                    h['genericParameterConstraintsSize'])
+        _gcc = h.get('genericParameterConstraintsCount')
+        _gcw = 4
+        if _gcc and gcs // _gcc in (1, 2, 4):
+            _gcw = gcs // _gcc
+        elif self.v38 and getattr(self, 'type_w', None) in (1, 2, 4):
+            _gcw = self.type_w
+        if self.v38 and _gcw != 4:
+            _n = _gcc if _gcc else gcs // _gcw
+            self.gp_constraints = [self._read_vw(gco + i * _gcw, _gcw)
+                                   for i in range(_n)]
+        else:
+            self.gp_constraints = [i32(d, gco + i * 4) for i in range(gcs // 4)]
+
         # default values
         #
         # Same packed-row rule as parameters/fields: the default row is
@@ -470,6 +493,37 @@ class Metadata:
 
     def type_methods(self, t: TypeDef) -> List[int]:
         return list(range(t.method_start, t.method_start + t.method_count))
+
+    def generic_param(self, gi: int):
+        """One generic parameter row `(owner, name, cs, cc, num, flags)`.
+
+        `flags` is the CLI GenericParameterAttributes word, so the emitter
+        reads variance (1/2) and the special constraints (4 reference
+        type, 8 not-nullable value type, 16 default constructor) straight
+        from it instead of inferring them from a `System.Object` /
+        `System.ValueType` row.
+        """
+        if not (0 <= gi < len(self.generic_parameters)):
+            return None
+        return self.generic_parameters[gi]
+
+    def generic_param_constraints(self, gi: int) -> List[int]:
+        """Metadata TypeIndex values constrained by generic parameter `gi`."""
+        gp = self.generic_param(gi)
+        if gp is None:
+            return []
+        start, count = gp[2], gp[3]
+        if count <= 0 or start < 0:
+            return []
+        return self.gp_constraints[start:start + count]
+
+    def generic_container_params(self, gc: int) -> List[int]:
+        """The generic parameter rows a container declares, in order."""
+        rows = self.generic_containers
+        if not (0 <= gc < len(rows)):
+            return []
+        row = rows[gc]
+        return list(range(row[3], row[3] + row[1]))
 
 
 # ----------------------------------------------------------------------------

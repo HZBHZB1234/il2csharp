@@ -22,6 +22,30 @@ ERR_RX = re.compile(
     r"^(.*)\((\d+)(?:,(\d+))?\):\s+(error|warning)\s+(CS\d+)\s*:\s*(.*)$")
 
 
+def first_samples(output, limit=3):
+    """One sample diagnostics line per code, for triage.
+
+    A bare count says where the errors are not; the line text and the
+    `file(line,col)` prefix say exactly which recovered statement uses a
+    name the compiler cannot resolve. Kept small (three per code) so the
+    report stays readable and the JSON stays diffable.
+    """
+    seen = {}
+    for ln in (output or "").splitlines():
+        m = ERR_RX.match(ln.strip())
+        if not m or m.group(4) != "error":
+            continue
+        code = m.group(5)
+        bucket = seen.setdefault(code, [])
+        if len(bucket) < limit:
+            bucket.append({
+                "file": m.group(1),
+                "line": int(m.group(2)),
+                "message": m.group(6)[:240],
+            })
+    return seen
+
+
 def find_csc(explicit=None):
     """Locate csc.dll (SDK Roslyn) or a csc executable, else None."""
     if explicit:
@@ -55,6 +79,66 @@ def iter_sources(root):
             if fn.endswith(".cs"):
                 out.append(os.path.join(dp, fn))
     return sorted(out)
+
+
+def managed_refs(build_dir, exclude=()):
+    """Reference assemblies from a Unity build's backup folder.
+
+    An IL2CPP player build keeps the exact managed assemblies it was
+    compiled from under
+    `<build>/<Player>_BackUpThisFolder_ButDontShipItWithYourGame/Managed/`
+    (Unity 2021.2+). Those files are the *true* reference closure for the
+    build -- engine modules, BCL, and every package -- so compiling an
+    emitted image against them measures the decompiler, not unresolved
+    externals: `references=260`-style gaps (the game-vs-engine gate on a
+    shipped game, whose `Managed/` folder IL2CPP builds delete) cannot
+    appear.
+
+    `exclude` drops the images the tree under test emits itself (pass the
+    image's own `<Name>.dll`), because referencing the original would let
+    the compiler resolve the very names that recovery failed to emit.
+
+    Returns [] when the folder is absent -- the gate then runs exactly as
+    before, and the report's `refs` count says which mode ran.
+    """
+    import glob as _glob
+    hits = sorted(_glob.glob(os.path.join(
+        build_dir, '*BackUpThisFolder_ButDontShipItWithYourGame', 'Managed')))
+    if not hits:
+        return []
+    skip = {e.casefold() for e in exclude if e}
+    out = []
+    for name in sorted(os.listdir(hits[0])):
+        if not name.lower().endswith('.dll'):
+            continue
+        if name.casefold() in skip:
+            continue
+        out.append(os.path.join(hits[0], name))
+    return out
+
+
+def _decode(raw):
+    """Decode compiler output bytes as UTF-8, else the console code page.
+
+    Roslyn honours `/utf8output` when asked, but a localized Windows
+    install still writes diagnostic TEXT in the console code page, and a
+    mis-decode is invisible in the counts (they key on `CSxxxx`) while
+    making every sample line unreadable. Try strict UTF-8 first, then the
+    ANSI code page, then a lossy UTF-8 pass.
+    """
+    if not raw:
+        return ""
+    if isinstance(raw, str):
+        return raw
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        pass
+    enc = "mbcs" if os.name == "nt" else (sys.getdefaultencoding() or "utf-8")
+    try:
+        return raw.decode(enc, errors="replace")
+    except Exception:
+        return raw.decode("utf-8", errors="replace")
 
 
 def classify(output):
@@ -145,19 +229,26 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None):
         os.close(fd2)
         if csc.lower().endswith("csc.dll"):
             cmd = ["dotnet", csc, "/t:library", "/nologo", "/unsafe",
-                   "/langversion:latest", "/out:" + out_dll, "@" + rsp]
+                   "/langversion:latest", "/utf8output",
+                   "/out:" + out_dll, "@" + rsp]
         else:
             cmd = [csc, "/t:library", "/nologo", "/unsafe",
-                   "/langversion:latest", "/out:" + out_dll, "@" + rsp]
+                   "/langversion:latest", "/utf8output",
+                   "/out:" + out_dll, "@" + rsp]
         # csc writes UTF-8; on a non-UTF-8 locale the default text=True
         # decoding (e.g. GBK) kills the reader thread and reports a bare
         # returncode with no diagnostics -- pin the encoding explicitly.
-        pr = subprocess.run(cmd, capture_output=True, text=True,
-                            encoding='utf-8', errors='replace',
-                            timeout=timeout)
-        text = (pr.stdout or "") + "\n" + (pr.stderr or "")
+        # `/utf8output` alone does not localize: a non-English Windows
+        # still emits diagnostic TEXT in the console code page, so also
+        # force the compiler's message language (VSLANG 1033 = en-US).
+        # The counts key on `CSxxxx`, which is locale-independent either
+        # way; this only makes the report's sample lines readable.
+        env = dict(os.environ, VSLANG="1033", DOTNET_CLI_UI_LANGUAGE="en")
+        pr = subprocess.run(cmd, capture_output=True, timeout=timeout, env=env)
+        text = _decode(pr.stdout) + "\n" + _decode(pr.stderr)
         s, b, top = classify(text)
         rep["syntax"], rep["binding"], rep["top"] = s, b, top
+        rep["samples"] = first_samples(text)
         rep["returncode"] = pr.returncode
     except subprocess.TimeoutExpired:
         rep["tool_error"] = "compiler timeout"
@@ -250,6 +341,14 @@ def main():
     ap.add_argument("--no-framework", action="store_true",
                     help="with --unity, reference ONLY the engine modules "
                          "(skip the Editor's mscorlib/netstandard shims)")
+    ap.add_argument("--refs-dir", action="append", metavar="DIR",
+                    help="reference every .dll in DIR (repeatable)")
+    ap.add_argument("--managed-refs", default=None, metavar="BUILD_DIR",
+                    help="reference the exact closure of a Unity player "
+                         "build: BUILD_DIR/*BackUpThisFolder*/Managed/*.dll")
+    ap.add_argument("--exclude", action="append", metavar="DLL",
+                    help="with --managed-refs, skip this dll name "
+                         "(the image the tree emits itself)")
     args = ap.parse_args()
     if not os.path.isdir(args.tree):
         print("no such tree: %s" % args.tree)
@@ -259,15 +358,31 @@ def main():
         print("no engine assemblies under %s" % args.unity)
         return 2
     fw = [] if args.no_framework else unity_framework_refs(args.unity)
+    for d in (args.refs_dir or []):
+        if not os.path.isdir(d):
+            print("no such refs dir: %s" % d)
+            return 2
+        refs.extend(os.path.join(d, f) for f in sorted(os.listdir(d))
+                    if f.lower().endswith('.dll'))
+    if args.managed_refs:
+        got = managed_refs(args.managed_refs, args.exclude or ())
+        if not got:
+            print("no Managed backup folder under %s" % args.managed_refs)
+            return 2
+        refs.extend(got)
     rep = run_gate(args.tree, args.csc_dll, args.timeout, refs + fw)
     if rep.get("tool_error"):
         print("tool error: %s" % rep["tool_error"])
         return 2
-    print("%s: %d files, syntax=%d binding=%d (refs=%d engine + %d bcl)" % (
+    print("%s: %d files, syntax=%d binding=%d (refs=%d + %d bcl)" % (
         args.assembly, rep["files"], rep["syntax"], rep["binding"],
         len(refs), len(fw)))
     for code, n in rep["top"]:
         print("  %s x%d" % (code, n))
+    for code, rows in sorted((rep.get("samples") or {}).items()):
+        for row in rows[:1]:
+            print("  %s: %s(%d): %s" % (code, row["file"].split('\\')[-1],
+                                        row["line"], row["message"][:160]))
     return 0 if rep["syntax"] == 0 else 1
 
 

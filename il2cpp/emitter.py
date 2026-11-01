@@ -50,28 +50,157 @@ class Emitter:
         self.bodies = {}
 
     # -- type header ------------------------------------------------------
-    def _type_generic_params(self, td: TypeDef) -> str:
-        """`<T, ...>` from the typedef's generic container, else ''."""
-        # A nested container holds mirrored owner parameters plus its
-        # own trailing ones: declare only the own suffix (possibly none).
-        # Unprovable splits keep the legacy full-container rendering.
+    def _type_param_indices(self, td: TypeDef) -> List[int]:
+        """Generic parameter rows this type's OWN declaration lists.
+
+        A nested container holds the owner's mirrored leading parameters
+        plus its own trailing ones, so the declaration spells only the own
+        suffix (never the mirror). Unprovable splits keep the legacy
+        full-container rendering, exactly as the name list always did.
+        """
+        if td.generic_container == -1 or td.is_enum:
+            return []
+        idx = self.meta.generic_container_params(td.generic_container)
+        if not idx:
+            return []
         try:
             if self.il._nested_owner(td.index) is not None:
                 own = self.il._nested_own_params(td)
                 if own is not None:
-                    return '<%s>' % ', '.join(own) if own else ''
+                    return idx[len(idx) - len(own):] if own else []
         except Exception:
             pass
-        gparams = ''
-        if td.generic_container != -1 and not td.is_enum:
-            gc = self.meta.generic_containers[td.generic_container]
-            gp = []
-            for k in range(gc[1]):
-                gi = gc[3] + k
-                if gi < len(self.meta.generic_parameters):
-                    gp.append(self.meta.generic_parameters[gi][1])
-            gparams = '<%s>' % ', '.join(gp) if gp else ''
-        return gparams
+        return idx
+
+    def _type_generic_params(self, td: TypeDef) -> str:
+        """`<T, ...>` from the typedef's generic container, else ''."""
+        idx = self._type_param_indices(td)
+        if not idx:
+            return ''
+        # CLI variance (GenericParameterAttributes bit 0/1) is only legal on
+        # an interface's own parameters; the metadata word is the proof, not
+        # a guess from the constraint rows.
+        variance_ok = bool(td.flags & 0x20)
+        gp = []
+        for gi in idx:
+            row = self.meta.generic_param(gi)
+            if row is None:
+                continue
+            nm = row[1]
+            flags = row[5] or 0
+            if variance_ok and flags & 3:
+                nm = ('out ' if flags & 1 else 'in ') + nm
+            gp.append(nm)
+        return '<%s>' % ', '.join(gp) if gp else ''
+
+    # Constraint rows that only restate the special-constraint word; the
+    # flags word already carries them (a `where T : struct` row carries
+    # `System.ValueType`, `class` carries `System.Object`).
+    _CONSTRAINT_IMPLIED = frozenset((
+        'System.Object', 'object', 'System.ValueType',
+    ))
+    # C# CS0702: these can never be spelled as a constraint. `Enum` and
+    # `Delegate` are legal since C# 7.3 and are kept.
+    _CONSTRAINT_ILLEGAL = frozenset((
+        'System.Array', 'System.MulticastDelegate',
+    ))
+
+    def _constraint_typedef(self, t):
+        """TypeDef index behind a constraint type tuple, or None."""
+        try:
+            te = self.il._type_enum(t)
+            if te in (0x11, 0x12):
+                d = t[0]
+                return d if 0 <= d < len(self.meta.typedefs) else None
+            if te == 0x15:
+                o = self.il.bin.va2off(t[0])
+                if o is None:
+                    return None
+                tt = self.il.type_from_ptr(u64(self.il.bin.d, o))
+                if tt and self.il._type_enum(tt) in (0x11, 0x12) \
+                        and 0 <= tt[0] < len(self.meta.typedefs):
+                    return tt[0]
+        except Exception:
+            return None
+        return None
+
+    def _where_clause(self, gi_list) -> str:
+        """` where T : class, IFoo<T>, new()` clauses for generic rows.
+
+        Read straight from the CLI semantics the metadata keeps: the
+        GenericParameterAttributes word for `class`/`struct`/`new()` and
+        the constraint TypeIndex array (ranged per parameter) for the
+        base/interface list. Decline-by-default is the contract -- a
+        parameter's clause disappears (today's spelling) if any row is
+        unreadable, any constraint is not a nameable type, or the shape
+        could not compile as written (two class constraints, a pointer /
+        array / unknown constraint, an illegal ordering).
+        """
+        parts = []
+        for gi in gi_list:
+            row = self.meta.generic_param(gi)
+            if row is None or len(row) < 4:
+                continue
+            flags = row[5] if len(row) > 5 else 0
+            primary = 'struct' if flags & 0x8 else (
+                'class' if flags & 0x4 else None)
+            iface, classes, other = [], [], []
+            ok = True
+            for ci in self.meta.generic_param_constraints(gi):
+                if not (0 <= ci < len(self.il.types)):
+                    ok = False
+                    break
+                t = self.il.types[ci]
+                te = self.il._type_enum(t)
+                if te in (0x13, 0x1e):  # T : U (another parameter)
+                    nm = self.il.type_name(t)
+                    if not nm or nm in self._CONSTRAINT_IMPLIED:
+                        ok = False
+                        break
+                    other.append(nm)
+                    continue
+                if te not in (0x11, 0x12, 0x15):
+                    ok = False
+                    break
+                nm = self.il.type_name(t)
+                if not nm or nm in self._CONSTRAINT_IMPLIED:
+                    continue
+                # A declaration-position constraint is a named type or a
+                # constructed generic of named types. Any pointer/array/
+                # byref/unknown spelling is not one: decline rather than
+                # print something the compiler cannot parse.
+                if not re.match(r'^[A-Za-z_@][\w.,<>\[\] ]*$', nm) \
+                        or nm.endswith('[]') or nm.endswith('*') \
+                        or '?' in nm:
+                    ok = False
+                    break
+                if nm in self._CONSTRAINT_ILLEGAL:
+                    ok = False
+                    break
+                td_i = self._constraint_typedef(t)
+                if td_i is None:
+                    ok = False
+                    break
+                ctd = self.meta.typedefs[td_i]
+                if ctd.flags & 0x20:
+                    iface.append(nm)
+                elif primary == 'struct' or len(classes) >= 1:
+                    ok = False   # a base class beside `struct` / a second one
+                    break
+                elif ctd.is_valuetype or (ctd.flags & 0x100):
+                    ok = False   # value type / sealed class: illegal C#
+                    break
+                else:
+                    classes.append(nm)
+            if not ok:
+                continue
+            texts = ([primary] if primary else []) + classes + iface + other
+            if flags & 0x10 and primary != 'struct':
+                texts.append('new()')
+            if not texts:
+                continue
+            parts.append('%s : %s' % (row[1], ', '.join(texts)))
+        return (' where ' + ' where '.join(parts)) if parts else ''
 
     _arity_qualifier_cache = None
 
@@ -434,6 +563,7 @@ class Emitter:
         hdr = '%s %s%s%s' % (kw, self._type_ident(name), gparams, ebase if td.is_enum else '')
         if base:
             hdr += ' : ' + ', '.join(base)
+        hdr += self._where_clause(self._type_param_indices(td))
         lines.append(hdr)
         return lines
 
@@ -716,13 +846,14 @@ class Emitter:
         else:
             name = safe_ident(raw)
         gp = ''
+        gp_idx = []
         if m.generic_container != -1:
-            gc = self.meta.generic_containers[m.generic_container]
+            gp_idx = self.meta.generic_container_params(m.generic_container)
             gplist = []
-            for k in range(gc[1]):
-                gi = gc[3] + k
-                if gi < len(self.meta.generic_parameters):
-                    gplist.append(self.meta.generic_parameters[gi][1])
+            for gi in gp_idx:
+                row = self.meta.generic_param(gi)
+                if row is not None:
+                    gplist.append(row[1])
             gp = '<%s>' % ', '.join(gplist) if gplist else ''
         ps = []
         info = []
@@ -760,7 +891,8 @@ class Emitter:
                 return '%s%s operator %s(%s)' % (_umods, _conv, rtname, ', '.join(_ops))
         if '*' in rtname or any('*' in s for s in ps):
             mods += 'unsafe '
-        return '%s%s %s%s(%s)' % (mods, rtname, name, gp, ', '.join(ps))
+        return '%s%s %s%s(%s)%s' % (mods, rtname, name, gp, ', '.join(ps),
+                                    self._where_clause(gp_idx))
 
     def _unity_serialized(self, td: TypeDef, field_name: str) -> bool:
         """[SerializeField]: a MonoBehaviour / ScriptableObject descendant.
@@ -891,8 +1023,9 @@ class Emitter:
                 # qualified so the using tracker imports System; the file
                 # boundary strips it back when unambiguous.
                 out.append(pre + '[System.Serializable]')
-            out.append('%s%s%sdelegate %s %s(%s);' % (
-                pre, vis, unsafe, rtname, nm, ', '.join(ps)))
+            out.append('%s%s%sdelegate %s %s(%s)%s;' % (
+                pre, vis, unsafe, rtname, nm, ', '.join(ps),
+                self._where_clause(self._type_param_indices(td))))
             return True
         except Exception:
             return False

@@ -323,6 +323,21 @@ fix-123 in `validation_reports/review123_*`.
   proof) over the same line's closed `new` RHS only for the same generic
   definition (same short base, same arity) with argument-position openness
   agreement — qualified names like `TMPro.X` are closed, never params.
+- Generic parameter constraints come from the metadata's own
+  `GenericParameterAttributes` word plus the flat `genericParameterConstraints`
+  TypeIndex array ranged per parameter (fix 173). `_type_param_indices` owns
+  "which rows this declaration lists" (a nested type's own suffix, never the
+  mirrored owner prefix) so `<T>`, the `where` clauses and the interface
+  variance all read one list. `_where_clause` is decline-by-default: one
+  unreadable row, a pointer/array/unknown spelling, `System.Array`/
+  `System.MulticastDelegate` (CS0702), a value-type or sealed class constraint
+  (CS0701), or a second class constraint drops that parameter's whole clause
+  rather than printing an uncompilable shape. `class`/`struct`/`new()` come
+  from the flags word (`System.Object`/`System.ValueType` rows are implied and
+  dropped), the base class prints before interfaces (CS0401), and `new()` is
+  never added beside `struct`. Variance is emitted only on interfaces, where
+  the CLI allows it. The v38+ constraint row is packed at the header's own
+  `genericParameterConstraintsCount` width first, then `type_w`.
 - `_drop_dead_locals` re-runs on post-`_render` lines (fix 99): `_render`
   drops empty pure-cond `if`s and orphans their pure loads, so the second run
   is load-bearing. Never remove it as "redundant" with the pre-render run.

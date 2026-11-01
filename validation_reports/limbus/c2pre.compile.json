@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\c2pre",
+  "assembly": "c2pre",
+  "files": 851,
+  "syntax": 17,
+  "binding": 42922,
+  "top": [
+    [
+      "CS0518",
+      35142
+    ],
+    [
+      "CS0246",
+      5567
+    ],
+    [
+      "CS0234",
+      1000
+    ],
+    [
+      "CS0115",
+      628
+    ],
+    [
+      "CS0656",
+      458
+    ],
+    [
+      "CS0538",
+      92
+    ],
+    [
+      "CS1750",
+      17
+    ],
+    [
+      "CS8701",
+      12
+    ],
+    [
+      "CS0146",
+      5
+    ],
+    [
+      "CS0208",
+      5
+    ]
+  ],
+  "tool_error": null,
+  "returncode": 1
+}

@@ -31,12 +31,35 @@ def make_emitter(methods=(), fields=(), typedefs=(), ifaces=()):
             base_chain_tds=lambda td: (td,))
     meta = NS(methods=list(methods), fields=list(fields),
               typedefs=list(typedefs), interfaces=list(ifaces),
-              generic_containers=[], generic_parameters=[],
+              generic_containers=[], generic_parameters=[], gp_constraints=[],
               param_default_values={},
               getstr=lambda i: "P",
               method_params=lambda m: getattr(m, "ps", []),
               type_methods=lambda td: getattr(td, "mis", []),
               type_fields=lambda td: getattr(td, "fis", []))
+    # The three generic-parameter accessors the real Metadata exposes; a
+    # test double must model them, because the emitter declares `<T>` and
+    # its `where` clauses through them (fix 173).
+    def _generic_container_params(gc):
+        rows = meta.generic_containers
+        if not (0 <= gc < len(rows)):
+            return []
+        row = rows[gc]
+        return list(range(row[3], row[3] + row[1]))
+
+    def _generic_param(gi):
+        rows = meta.generic_parameters
+        return rows[gi] if 0 <= gi < len(rows) else None
+
+    def _generic_param_constraints(gi):
+        row = _generic_param(gi)
+        if row is None or len(row) < 4 or row[3] <= 0:
+            return []
+        return list(meta.gp_constraints[row[2]:row[2] + row[3]])
+
+    meta.generic_container_params = _generic_container_params
+    meta.generic_param = _generic_param
+    meta.generic_param_constraints = _generic_param_constraints
     e.il = il
     e.meta = meta
     il.meta = meta

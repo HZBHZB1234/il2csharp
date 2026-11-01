@@ -1,0 +1,94 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\q9\\UniTask",
+  "assembly": "UniTask",
+  "files": 301,
+  "syntax": 0,
+  "binding": 29,
+  "top": [
+    [
+      "CS0308",
+      14
+    ],
+    [
+      "CS8701",
+      8
+    ],
+    [
+      "CS0314",
+      5
+    ],
+    [
+      "CS0452",
+      2
+    ]
+  ],
+  "tool_error": null,
+  "refs": 47,
+  "samples": {
+    "CS8701": [
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 18,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 23,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 28,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      }
+    ],
+    "CS0314": [
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\AsyncInstantiateOperationExtensions.cs",
+        "line": 52,
+        "message": "\u7c7b\u578b\u201cT\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cAsyncInstantiateOperation<T>\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cT\u201d\u5230\u201cUnityEngine.Object\u201d\u7684\u88c5\u7bb1\u8f6c\u6362\u6216\u7c7b\u578b\u53c2\u6570\u8f6c\u6362\u3002"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\AsyncInstantiateOperationExtensions.cs",
+        "line": 56,
+        "message": "\u7c7b\u578b\u201cT\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cAsyncInstantiateOperation<T>\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cT\u201d\u5230\u201cUnityEngine.Object\u201d\u7684\u88c5\u7bb1\u8f6c\u6362\u6216\u7c7b\u578b\u53c2\u6570\u8f6c\u6362\u3002"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\AsyncInstantiateOperationExtensions.cs",
+        "line": 60,
+        "message": "\u7c7b\u578b\u201cT\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cAsyncInstantiateOperation<T>\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cT\u201d\u5230\u201cUnityEngine.Object\u201d\u7684\u88c5\u7bb1\u8f6c\u6362\u6216\u7c7b\u578b\u53c2\u6570\u8f6c\u6362\u3002"
+      }
+    ],
+    "CS0452": [
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\Internal\\WeakDictionary.cs",
+        "line": 64,
+        "message": "\u7c7b\u578b\u201cTKey\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\UniTask.cs",
+        "line": 4003,
+        "message": "\u7c7b\u578b\u201cT\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d"
+      }
+    ],
+    "CS0308": [
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\UniTask.cs",
+        "line": 5022,
+        "message": "\u975e\u6cdb\u578b \u7c7b\u578b\u201cUniTask.WhenAllPromise.__c\u201d\u4e0d\u80fd\u4e0e\u7c7b\u578b\u53c2\u6570\u4e00\u8d77\u4f7f\u7528"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\UniTask.cs",
+        "line": 5161,
+        "message": "\u975e\u6cdb\u578b \u7c7b\u578b\u201cUniTask.WhenAllPromise.__c\u201d\u4e0d\u80fd\u4e0e\u7c7b\u578b\u53c2\u6570\u4e00\u8d77\u4f7f\u7528"
+      },
+      {
+        "file": "out\\unitask\\q9\\UniTask\\Cysharp\\Threading\\Tasks\\UniTask.cs",
+        "line": 5310,
+        "message": "\u975e\u6cdb\u578b \u7c7b\u578b\u201cUniTask.WhenAllPromise.__c\u201d\u4e0d\u80fd\u4e0e\u7c7b\u578b\u53c2\u6570\u4e00\u8d77\u4f7f\u7528"
+      }
+    ]
+  },
+  "returncode": 1
+}

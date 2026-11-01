@@ -7,7 +7,124 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 172 — source-differential honesty and three output fixes (2026-11-01, on `main`)
+## Current work: fix 174 — a generic instantiation is not 8 arguments long (2026-11-02, on `main`)
+
+The compile gate's arity family (CS0305 `CombineLatest<T1,T2,TResult> requires
+3 type arguments`, CS0308 `UniTask.WhenAllPromise.__c<T1..T8>`) had one root
+cause: `_argv_names` rendered `min(argc, 8)` closed arguments. That cap is
+Win64 ABI vocabulary (four integer + four float argument registers) applied to
+a *metadata* list, and real arities exceed it — `CombineLatest`16` (15 sources
+plus `TResult`), `WhenAllPromise`9..15`, the generated `CombineLatest`
+extension methods.
+
+A truncated list is worse than a short one because `_distribute_nested_args`
+distributes only when a nested type's segment arities sum **exactly** to the
+argument count. With 8 of 12 arguments the proof failed and the legacy
+single-list rendering took over, attaching every argument to the innermost
+segment: `UniTask.WhenAllPromise.<>c<T1..T8>` — CS0308, since the non-generic
+`WhenAllPromise` cannot take type arguments — instead of
+`UniTask.WhenAllPromise<T1..T8>.__c`.
+
+`_argv_names` now reads the whole list under the same 64-entry guard
+`_argv_type_tuples` already used, and returns `None` (unresolvable, legacy
+spelling) rather than a partial tuple when the count is absurd or the argument
+array is missing. Probed against the fixture: `<>c` display classes inside
+`WhenAllPromise`9`..`15` now all render
+`...WhenAllPromise<T1..TN>.<>c`. 7 new tests pin the list length, the 16-arity
+case, the decline shapes, and the distribution/mismatch pair (portable suite
+**1,561 passed**).
+
+## Previous work: fix 173 — generic parameter constraints, and a compile gate with the real build references (2026-11-02, on `main`)
+
+Two things landed: metadata's generic-parameter constraints are now part of
+the emitted declarations, and the compile gate can be pointed at the exact
+managed reference closure of a Unity player build, which turns "does it
+recompile" into a number measured against the *original* assemblies instead
+of against nothing.
+
+**173a — constraints were parsed nowhere.** `global-metadata.dat` keeps one
+flat `genericParameterConstraints` TypeIndex array plus, per generic
+parameter row, a `(constraintsStart, constraintsCount)` range and the CLI
+`GenericParameterAttributes` word. `Metadata` read neither, so every emitted
+generic lost its `where` clause (`WithCancellation<T>(...)` printed without
+`where T : UnityEngine.Object`) and interfaces lost their `out`/`in` variance.
+The row is a TypeIndex, so v38+ packs it at the metadata's own width: the
+header's `genericParameterConstraintsCount` decides first, `type_w` second
+(Limbus 4 — byte-identical to a fixed read; the narrow survivors file 2,
+where a 4-byte read consumes two rows per entry and misranges every
+parameter).
+
+**173b — emission, decline by default.** `Emitter._where_clause` renders
+`class`/`struct`/`new()` from the attributes word, the base class first
+(CS0401), then interfaces in metadata order, then a parameter constraint
+(`where U : T`). It declines the whole parameter's clause for: an
+unreadable index, a pointer/array/unknown spelling, `System.Array` /
+`System.MulticastDelegate` (CS0702), a value-type or sealed class constraint
+(CS0701), and a second class constraint. `System.Object`/`System.ValueType`
+rows are dropped because the flags word already spells them.
+`_type_param_indices` now owns "which rows this type declares" (nested own
+suffix vs full container), so the `<T>` list, the constraints and the
+variance all read one list; variance is emitted only for interfaces, where
+the CLI allows it.
+
+Measured on the two MIT fixtures (6-image unitask tree, 2-image survivors
+tree): **33** `where` clauses + **4** variant interfaces (unitask), **5**
+clauses (survivors). Survivors' own source has exactly four `where` clauses,
+three of which are recovered — the fourth lives in an Editor-only file that
+never reached the IL2CPP build. Tree diff unitask `q9` -> `cw2`: 466 files,
+**20 changed, 446 identical**, 41 added / 37 removed lines, and every changed
+line is a `where` clause or a variance prefix plus the `using` it pulls in
+(zero body changes). Builds: 472 files / 2,238 bodies / 0 failed / 0
+fallbacks (unitask), 293 / 1,936 / 0 / 0 (survivors); brace **0 unbalanced**,
+tree-sitter parse **0/0/0/0** on both.
+
+**173c — the compile gate finally has real references.** An IL2CPP player
+build keeps the exact managed assemblies it compiled from under
+`<Player>_BackUpThisFolder_ButDontShipItWithYourGame/Managed/` (both fixtures
+have it: 47 and 73 assemblies). `tools/compile_gate.py` gained
+`--managed-refs BUILD_DIR --exclude DLL` (plus `--refs-dir`), per-code sample
+diagnostics, `/utf8output`, and locale-safe decoding; `tools/gate.py compile
+--managed-refs --fixture <id>` derives the folder from the fixture and
+excludes the image under test, so the compiler resolves every name the
+decompiler did *not* emit. First census (the tree built before 173a):
+
+| fixture | image | files | syntax | binding |
+|---|---|---|---|---|
+| unitask | Assembly-CSharp | 15 | 2 | 2458 |
+| unitask | UniTask | 301 | 0 | **29** |
+| unitask | UniTask.Linq | 142 | 0 | **20** |
+| unitask | UniTask.TextMeshPro | 4 | 0 | 269 |
+| unitask | UniTask.Addressables / .DOTween | 2 / 2 | 0 | 5 / 5 |
+| survivors | Assembly-CSharp | 280 | 0 | **2** |
+| survivors | Assembly-CSharp-firstpass | 11 | 2 | 932 |
+
+So a 280-file recovered game assembly is **2 errors** away from compiling
+(both `CS0535 GameInput` interface members), and UniTask's own image is 29
+away. That is a much sharper target than a reference-free gate: every
+remaining error is now the decompiler's or a compiler rewrite's, never a
+missing external.
+
+The families, by size (all 8 images): async/iterator **state-machine noise**
+(unitask `Assembly-CSharp` is the demo/test scripts: `_Test3_d__20`,
+`AsyncUniTaskMethodBuilder<int>` misuse, `TStateMachine` unresolved — 2,458
+errors of compiler-rewritten code, not decompiler misses); `objN` receivers
+losing members (`CS1061 object does not contain Start/MoveNext`); raw
+pointer honesty (`CS0030 object -> byte*`, which `--raw-addr` exists to
+address); **nested generic references that put every type argument on the
+inner segment** (`CS0305 CombineLatest<T1,T2,TResult> requires 3 type
+arguments` for an 8-argument instantiation, `CS0308
+UniTask.WhenAllPromise.__c<T1..T8>`); and a handful of one-off shapes
+(CS0571 event accessor as a call, CS0103 `objN` used outside its declaring
+block, CS0159 label scope, CS8917/CS1729 closure ctor).
+
+**173d — what it bought.** Constraint emission alone takes `UniTask`
+**29 -> 22** and `UniTask.Linq` **20 -> 17** with zero new errors anywhere
+(CS0452 2 -> 0 and CS0314 5 -> 0 in UniTask, CS0452 3 -> 0 in Linq); the
+remaining families above are the next slices. Portable suite **1,554
+passed** (12 new tests pin both constraint table layouts, the packing width,
+and the rendered/declined shapes).
+
+## Previous work: fix 172 — source-differential honesty and three output fixes (2026-11-01, on `main`)
 
 Fix 171 made source comparison possible; fix 172 makes the report trustworthy
 and lands the first fixes it exposed. The two MIT fixtures are unchanged

@@ -292,10 +292,32 @@ class _TypesMixin:
         return self._argv_names(argv, argc, depth)
 
     def _argv_names(self, argv, argc, depth):
+        """Rendered names of one Il2CppGenericInst's closed arguments.
+
+        The list is a metadata argument list, not a register file: the
+        8-entry cap here was Win64 ABI vocabulary applied to the wrong
+        thing, and it silently truncated every arity above 8. A truncated
+        list then failed `_distribute_nested_args`'s "arities sum exactly"
+        proof and fell back to the legacy single-list rendering, which put
+        every argument on the INNER segment of a nested type --
+        `UniTask.WhenAllPromise.<>c<T1..T8>` (CS0308: the non-generic
+        `WhenAllPromise` cannot take type arguments) instead of
+        `UniTask.WhenAllPromise<T1..T8>.__c`, and the same shape broke
+        `CombineLatest`12..16` (CS0305). Real arities reach 16 (a
+        15-source closure plus TResult); the guard below matches
+        `_argv_type_tuples`' 64-entry bound and declines beyond it rather
+        than inventing a partial list.
+        """
+        if not isinstance(argc, int) or argc < 0 or argc > 64:
+            return None
+        if argc == 0:
+            return []
+        if not argv:
+            return None
         b = self.bin
         out = []
-        for k in range(min(argc, 8)):
-            tp = b.qword(argv + k * 8) if argv else None
+        for k in range(argc):
+            tp = b.qword(argv + k * 8)
             t = self.type_from_ptr(tp) if tp else None
             out.append(self.type_name(t, depth + 1) if t else 'object')
         return out

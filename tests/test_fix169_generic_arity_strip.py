@@ -85,7 +85,8 @@ def test_header_and_base_list_agree_on_the_stripped_identifier():
     # one to render `<T>`; without it the header is a bare non-generic class
     # and there is no arity to compare.
     e.meta.generic_containers = [(0, 1, 0, 0)]
-    e.meta.generic_parameters = [(0, "T")]
+    # the real 6-field generic parameter row (fix 173 reads `flags`)
+    e.meta.generic_parameters = [(0, "T", 0, 0, 0, 0)]
     td.generic_container = 0
     lines = []
     e.emit_type(td, lines)

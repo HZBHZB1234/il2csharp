@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\isinstpost",
+  "assembly": "isinstpost",
+  "files": 981,
+  "syntax": 17,
+  "binding": 50506,
+  "top": [
+    [
+      "CS0518",
+      40509
+    ],
+    [
+      "CS0246",
+      7404
+    ],
+    [
+      "CS0234",
+      1180
+    ],
+    [
+      "CS0115",
+      632
+    ],
+    [
+      "CS0656",
+      562
+    ],
+    [
+      "CS0538",
+      130
+    ],
+    [
+      "CS0111",
+      38
+    ],
+    [
+      "CS1750",
+      17
+    ],
+    [
+      "CS8701",
+      12
+    ],
+    [
+      "CS0535",
+      7
+    ]
+  ],
+  "tool_error": null,
+  "returncode": 1
+}

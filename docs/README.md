@@ -50,6 +50,18 @@ sources are untouched by the move. All repo paths below are root-relative.
   v39), KLASS-offset calibration (no gate needed: HeaderV35Plus and
   HeaderV29 share the Il2CppClass layout), and the GC write-barrier
   design.
+- `docs/plans/2026-10-27-packaging-compile-gate-slices.md` — **current
+  plan, execute first**: the three-tier (zero-risk / conditionally-safe /
+  byte-changing) packaging & compile-gate slices — class-index.json,
+  root .sln, role-grouped layout (opt-in), `--workers` default,
+  `--profile`, the game-vs-engine Roslyn gate (real UnityEngine
+  references), `--layout unity` skeleton, and the deferred
+  `[SerializeField]` re-spelling.
+- `docs/plans/2026-10-27-arm64-assetripper-unity-program.md` —
+  **approved, deferred**: the ARM64 lifter program (fARM64 decoder,
+  self-built semantics), AssetRipper fork (ScriptExport slot), Unity
+  project closure, and shader recovery; includes the 2026-10-27 decision
+  record (GPL-3.0 switch) and the Cpp2IL / fARM64 experiment evidence.
 - `docs/probes/` — archived scratch probes cited by the documents above
   (not tests; read their printed numbers).
 - `docs/audit-2026-10-21-output-quality.md` — empirical output-quality audit

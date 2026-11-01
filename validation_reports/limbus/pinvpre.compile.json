@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\pinvpre",
+  "assembly": "pinvpre",
+  "files": 305,
+  "syntax": 6,
+  "binding": 12628,
+  "top": [
+    [
+      "CS0518",
+      10921
+    ],
+    [
+      "CS0246",
+      1610
+    ],
+    [
+      "CS0656",
+      51
+    ],
+    [
+      "CS0104",
+      22
+    ],
+    [
+      "CS0538",
+      9
+    ],
+    [
+      "CS0111",
+      6
+    ],
+    [
+      "CS1750",
+      6
+    ],
+    [
+      "CS0102",
+      5
+    ],
+    [
+      "CS0426",
+      2
+    ],
+    [
+      "CS0101",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "returncode": 1
+}

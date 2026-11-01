@@ -1,0 +1,48 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\gameonly\\Assembly-CSharp",
+  "assembly": "Assembly-CSharp",
+  "files": 24739,
+  "syntax": 75,
+  "binding": 12,
+  "top": [
+    [
+      "CS1003",
+      16
+    ],
+    [
+      "CS1026",
+      16
+    ],
+    [
+      "CS1525",
+      15
+    ],
+    [
+      "CS1002",
+      14
+    ],
+    [
+      "CS8641",
+      12
+    ],
+    [
+      "CS1040",
+      4
+    ],
+    [
+      "CS1513",
+      4
+    ],
+    [
+      "CS1514",
+      3
+    ],
+    [
+      "CS1524",
+      3
+    ]
+  ],
+  "tool_error": null,
+  "returncode": 1
+}

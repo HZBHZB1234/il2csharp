@@ -142,6 +142,33 @@ given, and exits non-zero on failure.
 with a clear message if it is missing. `compile` needs a `dotnet`/Roslyn SDK;
 without one the check reports an explicit tool error rather than a false pass.
 
+### Compiling against the build's own references
+
+Without references a compile gate measures unresolved externals, not the
+decompiler. Add `--managed-refs` to compile an image against the exact
+managed closure its Unity player build was made from:
+
+```text
+python tools/gate.py compile --fixture unitask --label q9 \
+    --only UniTask --managed-refs
+python tools/gate.py compile --fixture survivors-roguelike-kit --label q5s \
+    --only Assembly-CSharp --managed-refs
+```
+
+An IL2CPP build keeps those assemblies under
+`<fixture>/build/<Player>_BackUpThisFolder_ButDontShipItWithYourGame/Managed/`
+(Unity 2021.2+); the gate finds that folder from the fixture, references every
+dll in it, and skips the image under test's own `<Name>.dll` — otherwise the
+compiler would resolve the very names recovery missed. `--refs-dir DIR` adds
+an arbitrary reference folder instead (repeatable), and `--exclude DLL` drops
+more names. The report's `refs` count says which mode ran, and its `samples`
+map carries the first diagnostics line per code.
+
+A shipped game usually has no `Managed/` folder (IL2CPP strips it), so for
+those use `--unity <Editor install root>`: the Editor's own engine modules
+plus its netstandard shims are the true signatures, which is how the
+game-vs-engine gate runs on the licensed fixture.
+
 ## 5. Comparing and promoting trees
 
 ```text

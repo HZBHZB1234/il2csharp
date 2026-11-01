@@ -1,0 +1,2149 @@
+{
+ "kind": "b20local roslyn census",
+ "tree": "out/limbus/v39b20",
+ "manifest": {
+  "source_commit": "3f1a1f5d8999cb5fe057baf5e44be990b5ba8480",
+  "flags": {
+   "strict": true,
+   "decls_only": false,
+   "publicize": true,
+   "raw_addr": true,
+   "only": null,
+   "types": null,
+   "workers": 6,
+   "max_methods": null
+  },
+  "files": 36765,
+  "lifted": 297975,
+  "bodies": null
+ },
+ "totals": {
+  "files": 36603,
+  "syntax": 52785,
+  "binding": 63221
+ },
+ "codes": {
+  "CS8641": 13164,
+  "CS1003": 13185,
+  "CS1525": 13185,
+  "CS1026": 13175,
+  "CS1002": 13181,
+  "CS0234": 173,
+  "CS0246": 4020,
+  "CS0518": 45345,
+  "CS0656": 455,
+  "CS0538": 43,
+  "CS8701": 3,
+  "CS1040": 13,
+  "CS1513": 11,
+  "CS1524": 5,
+  "CS1514": 6,
+  "CS0683": 8,
+  "CS0535": 6,
+  "CS1001": 1,
+  "CS1519": 7,
+  "CS1022": 1,
+  "CS1056": 5,
+  "CS1750": 10,
+  "CS0208": 4
+ },
+ "top": [
+  [
+   "CS0518",
+   45345
+  ],
+  [
+   "CS1003",
+   13185
+  ],
+  [
+   "CS1525",
+   13185
+  ],
+  [
+   "CS1002",
+   13181
+  ],
+  [
+   "CS1026",
+   13175
+  ],
+  [
+   "CS8641",
+   13164
+  ],
+  [
+   "CS0246",
+   4020
+  ],
+  [
+   "CS0656",
+   455
+  ],
+  [
+   "CS0234",
+   173
+  ],
+  [
+   "CS0538",
+   43
+  ],
+  [
+   "CS1040",
+   13
+  ],
+  [
+   "CS1513",
+   11
+  ],
+  [
+   "CS1750",
+   10
+  ],
+  [
+   "CS0683",
+   8
+  ],
+  [
+   "CS1519",
+   7
+  ],
+  [
+   "CS0535",
+   6
+  ],
+  [
+   "CS1514",
+   6
+  ],
+  [
+   "CS1056",
+   5
+  ],
+  [
+   "CS1524",
+   5
+  ],
+  [
+   "CS0208",
+   4
+  ],
+  [
+   "CS8701",
+   3
+  ],
+  [
+   "CS1001",
+   1
+  ],
+  [
+   "CS1022",
+   1
+  ]
+ ],
+ "per_image": {
+  "AllIn1SpriteShaderAssembly": {
+   "files": 29,
+   "syntax": 28,
+   "binding": 7,
+   "codes": {
+    "CS8641": 7,
+    "CS1003": 7,
+    "CS1525": 7,
+    "CS1026": 7,
+    "CS1002": 7
+   },
+   "returncode": 1
+  },
+  "ACTk.Examples.Runtime": {
+   "files": 14,
+   "syntax": 16,
+   "binding": 4,
+   "codes": {
+    "CS8641": 4,
+    "CS1003": 4,
+    "CS1525": 4,
+    "CS1026": 4,
+    "CS1002": 4
+   },
+   "returncode": 1
+  },
+  "ACTk.Runtime": {
+   "files": 108,
+   "syntax": 104,
+   "binding": 26,
+   "codes": {
+    "CS8641": 26,
+    "CS1003": 26,
+    "CS1525": 26,
+    "CS1026": 26,
+    "CS1002": 26
+   },
+   "returncode": 1
+  },
+  "ACTk.Examples.Genuine.Runtime": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 106,
+   "codes": {
+    "CS0234": 3,
+    "CS0246": 21,
+    "CS0518": 76,
+    "CS0656": 4,
+    "CS0538": 2
+   },
+   "returncode": 1
+  },
+  "ChainMeshStudio.Runtime": {
+   "files": 10,
+   "syntax": 48,
+   "binding": 12,
+   "codes": {
+    "CS8641": 12,
+    "CS1003": 12,
+    "CS1525": 12,
+    "CS1026": 12,
+    "CS1002": 12
+   },
+   "returncode": 1
+  },
+  "Assembly-CSharp-firstpass": {
+   "files": 51,
+   "syntax": 32,
+   "binding": 8,
+   "codes": {
+    "CS8641": 8,
+    "CS1003": 8,
+    "CS1525": 8,
+    "CS1026": 8,
+    "CS1002": 8
+   },
+   "returncode": 1
+  },
+  "Cinemachine": {
+   "files": 108,
+   "syntax": 460,
+   "binding": 115,
+   "codes": {
+    "CS8641": 115,
+    "CS1003": 115,
+    "CS1525": 115,
+    "CS1026": 115,
+    "CS1002": 115
+   },
+   "returncode": 1
+  },
+  "Coffee.SoftMaskForUGUI": {
+   "files": 10,
+   "syntax": 36,
+   "binding": 9,
+   "codes": {
+    "CS8641": 9,
+    "CS1003": 9,
+    "CS1525": 9,
+    "CS1026": 9,
+    "CS1002": 9
+   },
+   "returncode": 1
+  },
+  "CommonAssembly": {
+   "files": 45,
+   "syntax": 24,
+   "binding": 6,
+   "codes": {
+    "CS8641": 6,
+    "CS1003": 6,
+    "CS1525": 6,
+    "CS1026": 6,
+    "CS1002": 6
+   },
+   "returncode": 1
+  },
+  "DOTweenPro": {
+   "files": 15,
+   "syntax": 80,
+   "binding": 20,
+   "codes": {
+    "CS8641": 20,
+    "CS1003": 20,
+    "CS1525": 20,
+    "CS1026": 20,
+    "CS1002": 20
+   },
+   "returncode": 1
+  },
+  "DOTween": {
+   "files": 102,
+   "syntax": 144,
+   "binding": 36,
+   "codes": {
+    "CS8641": 36,
+    "CS1003": 36,
+    "CS1525": 36,
+    "CS1026": 36,
+    "CS1002": 36
+   },
+   "returncode": 1
+  },
+  "FMODUnity": {
+   "files": 301,
+   "syntax": 84,
+   "binding": 21,
+   "codes": {
+    "CS8641": 21,
+    "CS1003": 21,
+    "CS1525": 21,
+    "CS1026": 21,
+    "CS1002": 21
+   },
+   "returncode": 1
+  },
+  "Facepunch.Steamworks.Win64": {
+   "files": 546,
+   "syntax": 172,
+   "binding": 43,
+   "codes": {
+    "CS8641": 43,
+    "CS1003": 43,
+    "CS1525": 43,
+    "CS1026": 43,
+    "CS1002": 43
+   },
+   "returncode": 1
+  },
+  "FMODUnityResonance": {
+   "files": 6,
+   "syntax": 0,
+   "binding": 188,
+   "codes": {
+    "CS0246": 25,
+    "CS0518": 154,
+    "CS0656": 9
+   },
+   "returncode": 1
+  },
+  "Febucci.TextAnimator.Demo.Runtime": {
+   "files": 9,
+   "syntax": 0,
+   "binding": 108,
+   "codes": {
+    "CS0246": 28,
+    "CS0234": 1,
+    "CS0518": 74,
+    "CS0656": 5
+   },
+   "returncode": 1
+  },
+  "Febucci.TextAnimator.Runtime": {
+   "files": 64,
+   "syntax": 112,
+   "binding": 28,
+   "codes": {
+    "CS8641": 28,
+    "CS1003": 28,
+    "CS1525": 28,
+    "CS1026": 28,
+    "CS1002": 28
+   },
+   "returncode": 1
+  },
+  "Firebase.App": {
+   "files": 32,
+   "syntax": 80,
+   "binding": 20,
+   "codes": {
+    "CS8641": 20,
+    "CS1003": 20,
+    "CS1525": 20,
+    "CS1026": 20,
+    "CS1002": 20
+   },
+   "returncode": 1
+  },
+  "Firebase.Platform": {
+   "files": 26,
+   "syntax": 28,
+   "binding": 7,
+   "codes": {
+    "CS8641": 7,
+    "CS1003": 7,
+    "CS1525": 7,
+    "CS1026": 7,
+    "CS1002": 7
+   },
+   "returncode": 1
+  },
+  "Firebase.Crashlytics": {
+   "files": 16,
+   "syntax": 0,
+   "binding": 869,
+   "codes": {
+    "CS0234": 4,
+    "CS0246": 142,
+    "CS0518": 678,
+    "CS0656": 42,
+    "CS0538": 3
+   },
+   "returncode": 1
+  },
+  "InterfacesLibraryAssembly": {
+   "files": 10,
+   "syntax": 0,
+   "binding": 54,
+   "codes": {
+    "CS0246": 4,
+    "CS0518": 49,
+    "CS8701": 1
+   },
+   "returncode": 1
+  },
+  "LokoSolo.PinchableScrollRect": {
+   "files": 10,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "LimbusCompany.AddressableConstants": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 19,
+   "codes": {
+    "CS0246": 1,
+    "CS0518": 18
+   },
+   "returncode": 1
+  },
+  "Mono.Security": {
+   "files": 65,
+   "syntax": 308,
+   "binding": 77,
+   "codes": {
+    "CS8641": 77,
+    "CS1003": 77,
+    "CS1525": 77,
+    "CS1026": 77,
+    "CS1002": 77
+   },
+   "returncode": 1
+  },
+  "Newtonsoft.Json": {
+   "files": 274,
+   "syntax": 1012,
+   "binding": 253,
+   "codes": {
+    "CS8641": 253,
+    "CS1003": 253,
+    "CS1525": 253,
+    "CS1026": 253,
+    "CS1002": 253
+   },
+   "returncode": 1
+  },
+  "ProjectMoon.BaseStructures": {
+   "files": 38,
+   "syntax": 20,
+   "binding": 5,
+   "codes": {
+    "CS8641": 5,
+    "CS1003": 5,
+    "CS1525": 5,
+    "CS1026": 5,
+    "CS1002": 5
+   },
+   "returncode": 1
+  },
+  "ProjectMoon.Battle.Effect.RevolvedSurface": {
+   "files": 9,
+   "syntax": 40,
+   "binding": 10,
+   "codes": {
+    "CS8641": 10,
+    "CS1003": 10,
+    "CS1525": 10,
+    "CS1026": 10,
+    "CS1002": 10
+   },
+   "returncode": 1
+  },
+  "ProjectMoon.DelegateCollection": {
+   "files": 13,
+   "syntax": 0,
+   "binding": 98,
+   "codes": {
+    "CS0246": 2,
+    "CS0518": 96
+   },
+   "returncode": 1
+  },
+  "ProjectMoon.SyncObject": {
+   "files": 11,
+   "syntax": 0,
+   "binding": 143,
+   "codes": {
+    "CS0246": 25,
+    "CS0518": 116,
+    "CS0656": 2
+   },
+   "returncode": 1
+  },
+  "ProjectMoonUnity.Utils": {
+   "files": 10,
+   "syntax": 68,
+   "binding": 17,
+   "codes": {
+    "CS8641": 17,
+    "CS1003": 17,
+    "CS1525": 17,
+    "CS1026": 17,
+    "CS1002": 17
+   },
+   "returncode": 1
+  },
+  "Purchasing.Common": {
+   "files": 10,
+   "syntax": 16,
+   "binding": 4,
+   "codes": {
+    "CS8641": 4,
+    "CS1003": 4,
+    "CS1525": 4,
+    "CS1026": 4,
+    "CS1002": 4
+   },
+   "returncode": 1
+  },
+  "Assembly-CSharp": {
+   "files": 24740,
+   "syntax": 34561,
+   "binding": 8632,
+   "codes": {
+    "CS8641": 8632,
+    "CS1003": 8638,
+    "CS1525": 8639,
+    "CS1026": 8636,
+    "CS1002": 8634,
+    "CS1040": 4,
+    "CS1513": 4,
+    "CS1524": 3,
+    "CS1514": 3
+   },
+   "returncode": 1
+  },
+  "RpgSystemCore": {
+   "files": 17,
+   "syntax": 24,
+   "binding": 6,
+   "codes": {
+    "CS8641": 6,
+    "CS1003": 6,
+    "CS1525": 6,
+    "CS1026": 6,
+    "CS1002": 6
+   },
+   "returncode": 1
+  },
+  "RubyTextMeshPro": {
+   "files": 9,
+   "syntax": 0,
+   "binding": 300,
+   "codes": {
+    "CS0246": 65,
+    "CS0518": 213,
+    "CS0683": 8,
+    "CS0535": 6,
+    "CS0656": 8
+   },
+   "returncode": 1
+  },
+  "ServiceAssembly": {
+   "files": 9,
+   "syntax": 38,
+   "binding": 8,
+   "codes": {
+    "CS8641": 8,
+    "CS1003": 11,
+    "CS1525": 11,
+    "CS1026": 8,
+    "CS1002": 8
+   },
+   "returncode": 1
+  },
+  "SocketIOUnityAssembly": {
+   "files": 70,
+   "syntax": 32,
+   "binding": 8,
+   "codes": {
+    "CS8641": 8,
+    "CS1003": 8,
+    "CS1525": 8,
+    "CS1026": 8,
+    "CS1002": 8
+   },
+   "returncode": 1
+  },
+  "SkillViewMarker": {
+   "files": 6,
+   "syntax": 0,
+   "binding": 107,
+   "codes": {
+    "CS0246": 42,
+    "CS0518": 64,
+    "CS0538": 1
+   },
+   "returncode": 1
+  },
+  "System": {
+   "files": 599,
+   "syntax": 1388,
+   "binding": 346,
+   "codes": {
+    "CS8641": 346,
+    "CS1003": 347,
+    "CS1525": 346,
+    "CS1026": 346,
+    "CS1002": 346,
+    "CS1524": 1,
+    "CS1514": 1,
+    "CS1513": 1
+   },
+   "returncode": 1
+  },
+  "System.Configuration": {
+   "files": 10,
+   "syntax": 0,
+   "binding": 53,
+   "codes": {
+    "CS0234": 2,
+    "CS0518": 43,
+    "CS0246": 5,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "System.Core": {
+   "files": 370,
+   "syntax": 363,
+   "binding": 87,
+   "codes": {
+    "CS8641": 87,
+    "CS1003": 90,
+    "CS1525": 87,
+    "CS1026": 87,
+    "CS1002": 88,
+    "CS1001": 1,
+    "CS1514": 1,
+    "CS1513": 1,
+    "CS1519": 7,
+    "CS1022": 1
+   },
+   "returncode": 1
+  },
+  "System.Drawing": {
+   "files": 12,
+   "syntax": 8,
+   "binding": 2,
+   "codes": {
+    "CS8641": 2,
+    "CS1003": 2,
+    "CS1525": 2,
+    "CS1026": 2,
+    "CS1002": 2
+   },
+   "returncode": 1
+  },
+  "System.IO.Compression": {
+   "files": 41,
+   "syntax": 56,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 14
+   },
+   "returncode": 1
+  },
+  "System.Data": {
+   "files": 205,
+   "syntax": 1516,
+   "binding": 379,
+   "codes": {
+    "CS8641": 379,
+    "CS1003": 379,
+    "CS1525": 379,
+    "CS1026": 379,
+    "CS1002": 379
+   },
+   "returncode": 1
+  },
+  "System.IO.Compression.FileSystem": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 84,
+   "codes": {
+    "CS0234": 5,
+    "CS0518": 62,
+    "CS0656": 7,
+    "CS0246": 10
+   },
+   "returncode": 1
+  },
+  "System.Net.Http": {
+   "files": 57,
+   "syntax": 196,
+   "binding": 49,
+   "codes": {
+    "CS8641": 49,
+    "CS1003": 49,
+    "CS1525": 49,
+    "CS1026": 49,
+    "CS1002": 49
+   },
+   "returncode": 1
+  },
+  "System.Numerics": {
+   "files": 10,
+   "syntax": 68,
+   "binding": 17,
+   "codes": {
+    "CS8641": 17,
+    "CS1003": 17,
+    "CS1525": 17,
+    "CS1026": 17,
+    "CS1002": 17
+   },
+   "returncode": 1
+  },
+  "System.Runtime.CompilerServices.Unsafe": {
+   "files": 2,
+   "syntax": 0,
+   "binding": 12,
+   "codes": {
+    "CS0518": 9,
+    "CS0246": 3
+   },
+   "returncode": 1
+  },
+  "System.ServiceModel.Internals": {
+   "files": 32,
+   "syntax": 44,
+   "binding": 11,
+   "codes": {
+    "CS8641": 11,
+    "CS1003": 11,
+    "CS1525": 11,
+    "CS1026": 11,
+    "CS1002": 11
+   },
+   "returncode": 1
+  },
+  "System.Runtime.Serialization": {
+   "files": 193,
+   "syntax": 748,
+   "binding": 187,
+   "codes": {
+    "CS8641": 187,
+    "CS1003": 187,
+    "CS1525": 187,
+    "CS1026": 187,
+    "CS1002": 187
+   },
+   "returncode": 1
+  },
+  "System.Text.Encodings.Web": {
+   "files": 32,
+   "syntax": 64,
+   "binding": 16,
+   "codes": {
+    "CS8641": 16,
+    "CS1003": 16,
+    "CS1525": 16,
+    "CS1026": 16,
+    "CS1002": 16
+   },
+   "returncode": 1
+  },
+  "System.Text.Json": {
+   "files": 224,
+   "syntax": 240,
+   "binding": 60,
+   "codes": {
+    "CS8641": 60,
+    "CS1003": 60,
+    "CS1525": 60,
+    "CS1026": 60,
+    "CS1002": 60
+   },
+   "returncode": 1
+  },
+  "System.Xml.Linq": {
+   "files": 32,
+   "syntax": 56,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 14
+   },
+   "returncode": 1
+  },
+  "System.Xml": {
+   "files": 530,
+   "syntax": 1640,
+   "binding": 410,
+   "codes": {
+    "CS8641": 410,
+    "CS1003": 410,
+    "CS1525": 410,
+    "CS1026": 410,
+    "CS1002": 410
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.Annotation": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 39,
+   "codes": {
+    "CS0246": 7,
+    "CS0518": 32
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.Text": {
+   "files": 8,
+   "syntax": 0,
+   "binding": 115,
+   "codes": {
+    "CS0246": 44,
+    "CS0518": 68,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.TimeDilation": {
+   "files": 8,
+   "syntax": 0,
+   "binding": 93,
+   "codes": {
+    "CS0246": 34,
+    "CS0518": 57,
+    "CS0656": 2
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.Tween": {
+   "files": 8,
+   "syntax": 28,
+   "binding": 7,
+   "codes": {
+    "CS8641": 7,
+    "CS1003": 7,
+    "CS1525": 7,
+    "CS1026": 7,
+    "CS1002": 7
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.Video": {
+   "files": 8,
+   "syntax": 28,
+   "binding": 7,
+   "codes": {
+    "CS8641": 7,
+    "CS1003": 7,
+    "CS1525": 7,
+    "CS1026": 7,
+    "CS1002": 7
+   },
+   "returncode": 1
+  },
+  "Timeline.Samples.Utilities": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 51,
+   "codes": {
+    "CS0246": 15,
+    "CS0518": 35,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UIEffect": {
+   "files": 28,
+   "syntax": 36,
+   "binding": 9,
+   "codes": {
+    "CS8641": 9,
+    "CS1003": 9,
+    "CS1525": 9,
+    "CS1026": 9,
+    "CS1002": 9
+   },
+   "returncode": 1
+  },
+  "UniTask": {
+   "files": 299,
+   "syntax": 256,
+   "binding": 64,
+   "codes": {
+    "CS8641": 64,
+    "CS1003": 64,
+    "CS1525": 64,
+    "CS1026": 64,
+    "CS1002": 64
+   },
+   "returncode": 1
+  },
+  "UniTask.Addressables": {
+   "files": 5,
+   "syntax": 20,
+   "binding": 5,
+   "codes": {
+    "CS8641": 5,
+    "CS1003": 5,
+    "CS1525": 5,
+    "CS1026": 5,
+    "CS1002": 5
+   },
+   "returncode": 1
+  },
+  "Unity.2D.Animation.Runtime": {
+   "files": 56,
+   "syntax": 132,
+   "binding": 33,
+   "codes": {
+    "CS8641": 33,
+    "CS1003": 33,
+    "CS1525": 33,
+    "CS1026": 33,
+    "CS1002": 33
+   },
+   "returncode": 1
+  },
+  "UniTask.DOTween": {
+   "files": 7,
+   "syntax": 0,
+   "binding": 266,
+   "codes": {
+    "CS0246": 70,
+    "CS0518": 185,
+    "CS0656": 11
+   },
+   "returncode": 1
+  },
+  "Unity.2D.Common.Runtime": {
+   "files": 36,
+   "syntax": 24,
+   "binding": 6,
+   "codes": {
+    "CS8641": 6,
+    "CS1003": 6,
+    "CS1525": 6,
+    "CS1026": 6,
+    "CS1002": 6
+   },
+   "returncode": 1
+  },
+  "Unity.2D.SpriteShape.Runtime": {
+   "files": 43,
+   "syntax": 124,
+   "binding": 31,
+   "codes": {
+    "CS8641": 31,
+    "CS1003": 31,
+    "CS1525": 31,
+    "CS1026": 31,
+    "CS1002": 31
+   },
+   "returncode": 1
+  },
+  "Unity.2D.Tilemap.Extras": {
+   "files": 16,
+   "syntax": 52,
+   "binding": 13,
+   "codes": {
+    "CS8641": 13,
+    "CS1003": 13,
+    "CS1525": 13,
+    "CS1026": 13,
+    "CS1002": 13
+   },
+   "returncode": 1
+  },
+  "Unity.Addressables": {
+   "files": 42,
+   "syntax": 58,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 15,
+    "CS1056": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Burst": {
+   "files": 43,
+   "syntax": 120,
+   "binding": 30,
+   "codes": {
+    "CS8641": 30,
+    "CS1003": 30,
+    "CS1525": 30,
+    "CS1026": 30,
+    "CS1002": 30
+   },
+   "returncode": 1
+  },
+  "Unity.Burst.Unsafe": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 80,
+   "codes": {
+    "CS0518": 72,
+    "CS0246": 7,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Collections": {
+   "files": 200,
+   "syntax": 56,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 14
+   },
+   "returncode": 1
+  },
+  "Unity.Collections.LowLevel.ILSupport": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 18,
+   "codes": {
+    "CS0246": 2,
+    "CS0518": 16
+   },
+   "returncode": 1
+  },
+  "Unity.InternalAPIEngineBridge.001": {
+   "files": 6,
+   "syntax": 0,
+   "binding": 114,
+   "codes": {
+    "CS0234": 2,
+    "CS0246": 34,
+    "CS0518": 77,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "Unity.InternalAPIEngineBridge.004": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 20,
+   "codes": {
+    "CS0246": 3,
+    "CS0518": 17
+   },
+   "returncode": 1
+  },
+  "Unity.MemoryProfiler": {
+   "files": 7,
+   "syntax": 0,
+   "binding": 72,
+   "codes": {
+    "CS0246": 10,
+    "CS0234": 3,
+    "CS0518": 54,
+    "CS0656": 5
+   },
+   "returncode": 1
+  },
+  "Unity.ProBuilder": {
+   "files": 142,
+   "syntax": 140,
+   "binding": 35,
+   "codes": {
+    "CS8641": 35,
+    "CS1003": 35,
+    "CS1525": 35,
+    "CS1026": 35,
+    "CS1002": 35
+   },
+   "returncode": 1
+  },
+  "Unity.ProBuilder.KdTree": {
+   "files": 17,
+   "syntax": 0,
+   "binding": 324,
+   "codes": {
+    "CS0246": 49,
+    "CS0518": 269,
+    "CS0538": 6
+   },
+   "returncode": 1
+  },
+  "Unity.ProBuilder.Poly2Tri": {
+   "files": 34,
+   "syntax": 20,
+   "binding": 5,
+   "codes": {
+    "CS8641": 5,
+    "CS1003": 5,
+    "CS1525": 5,
+    "CS1026": 5,
+    "CS1002": 5
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipeline.Universal.ShaderLibrary": {
+   "files": 18,
+   "syntax": 0,
+   "binding": 158,
+   "codes": {
+    "CS0246": 8,
+    "CS0518": 150
+   },
+   "returncode": 1
+  },
+  "Unity.Mathematics": {
+   "files": 81,
+   "syntax": 9,
+   "binding": 30775,
+   "codes": {
+    "CS0246": 272,
+    "CS0518": 30385,
+    "CS0656": 118,
+    "CS1750": 9
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipelines.Core.Runtime": {
+   "files": 460,
+   "syntax": 450,
+   "binding": 110,
+   "codes": {
+    "CS8641": 110,
+    "CS1003": 114,
+    "CS1525": 112,
+    "CS1026": 112,
+    "CS1002": 110,
+    "CS1040": 2
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipelines.Core.Runtime.Shared": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 45,
+   "codes": {
+    "CS0246": 12,
+    "CS0518": 33
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipelines.GPUDriven.Runtime": {
+   "files": 135,
+   "syntax": 172,
+   "binding": 43,
+   "codes": {
+    "CS8641": 43,
+    "CS1003": 43,
+    "CS1525": 43,
+    "CS1026": 43,
+    "CS1002": 43
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipelines.Universal.Runtime": {
+   "files": 291,
+   "syntax": 452,
+   "binding": 113,
+   "codes": {
+    "CS8641": 113,
+    "CS1003": 113,
+    "CS1525": 113,
+    "CS1026": 113,
+    "CS1002": 113
+   },
+   "returncode": 1
+  },
+  "Unity.RenderPipelines.Universal.2D.Runtime": {
+   "files": 110,
+   "syntax": 164,
+   "binding": 41,
+   "codes": {
+    "CS8641": 41,
+    "CS1003": 41,
+    "CS1525": 41,
+    "CS1026": 41,
+    "CS1002": 41
+   },
+   "returncode": 1
+  },
+  "Unity.ResourceManager": {
+   "files": 99,
+   "syntax": 124,
+   "binding": 31,
+   "codes": {
+    "CS8641": 31,
+    "CS1003": 31,
+    "CS1525": 31,
+    "CS1026": 31,
+    "CS1002": 31
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Device": {
+   "files": 7,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core": {
+   "files": 19,
+   "syntax": 0,
+   "binding": 337,
+   "codes": {
+    "CS0234": 10,
+    "CS0518": 271,
+    "CS0246": 37,
+    "CS8701": 1,
+    "CS0656": 16,
+    "CS0538": 2
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Configuration": {
+   "files": 12,
+   "syntax": 0,
+   "binding": 236,
+   "codes": {
+    "CS0234": 9,
+    "CS0246": 58,
+    "CS0518": 160,
+    "CS0656": 7,
+    "CS0538": 2
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Environments": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 30,
+   "codes": {
+    "CS0246": 4,
+    "CS0518": 25,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Internal": {
+   "files": 92,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Environments.Internal": {
+   "files": 1,
+   "syntax": 0,
+   "binding": 7,
+   "codes": {
+    "CS0234": 1,
+    "CS0246": 2,
+    "CS0518": 4
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Scheduler": {
+   "files": 9,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Registration": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 342,
+   "codes": {
+    "CS0246": 95,
+    "CS0234": 10,
+    "CS0518": 216,
+    "CS0656": 9,
+    "CS0538": 12
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Telemetry": {
+   "files": 6,
+   "syntax": 0,
+   "binding": 102,
+   "codes": {
+    "CS0246": 27,
+    "CS0234": 2,
+    "CS0518": 69,
+    "CS0656": 1,
+    "CS0538": 3
+   },
+   "returncode": 1
+  },
+  "Unity.Services.Core.Threading": {
+   "files": 1,
+   "syntax": 0,
+   "binding": 102,
+   "codes": {
+    "CS0246": 37,
+    "CS0234": 1,
+    "CS0518": 55,
+    "CS0538": 9
+   },
+   "returncode": 1
+  },
+  "Unity.Timeline": {
+   "files": 91,
+   "syntax": 196,
+   "binding": 49,
+   "codes": {
+    "CS8641": 49,
+    "CS1003": 49,
+    "CS1525": 49,
+    "CS1026": 49,
+    "CS1002": 49
+   },
+   "returncode": 1
+  },
+  "Unity.TextMeshPro": {
+   "files": 135,
+   "syntax": 688,
+   "binding": 172,
+   "codes": {
+    "CS8641": 172,
+    "CS1003": 172,
+    "CS1525": 172,
+    "CS1026": 172,
+    "CS1002": 172
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AIModule": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 38,
+   "codes": {
+    "CS0246": 8,
+    "CS0518": 30
+   },
+   "returncode": 1
+  },
+  "Unity.UnifiedRayTracing.Runtime": {
+   "files": 75,
+   "syntax": 0,
+   "binding": 2588,
+   "codes": {
+    "CS0246": 526,
+    "CS0234": 3,
+    "CS0518": 2010,
+    "CS0656": 49
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AdaptivePerformanceModule": {
+   "files": 85,
+   "syntax": 48,
+   "binding": 12,
+   "codes": {
+    "CS8641": 12,
+    "CS1003": 12,
+    "CS1525": 12,
+    "CS1026": 12,
+    "CS1002": 12
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AccessibilityModule": {
+   "files": 16,
+   "syntax": 0,
+   "binding": 492,
+   "codes": {
+    "CS0246": 50,
+    "CS0234": 1,
+    "CS0518": 421,
+    "CS0656": 20
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AndroidJNIModule": {
+   "files": 34,
+   "syntax": 20,
+   "binding": 5,
+   "codes": {
+    "CS8641": 5,
+    "CS1003": 5,
+    "CS1525": 5,
+    "CS1026": 5,
+    "CS1002": 5
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AnimationModule": {
+   "files": 69,
+   "syntax": 12,
+   "binding": 3,
+   "codes": {
+    "CS8641": 3,
+    "CS1003": 3,
+    "CS1525": 3,
+    "CS1026": 3,
+    "CS1002": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AssetBundleModule": {
+   "files": 7,
+   "syntax": 0,
+   "binding": 210,
+   "codes": {
+    "CS0246": 53,
+    "CS0234": 14,
+    "CS0518": 136,
+    "CS0656": 7
+   },
+   "returncode": 1
+  },
+  "UnityEngine.AudioModule": {
+   "files": 37,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.CoreModule": {
+   "files": 788,
+   "syntax": 184,
+   "binding": 46,
+   "codes": {
+    "CS8641": 46,
+    "CS1003": 46,
+    "CS1525": 46,
+    "CS1026": 46,
+    "CS1002": 46
+   },
+   "returncode": 1
+  },
+  "UnityEngine.DirectorModule": {
+   "files": 6,
+   "syntax": 0,
+   "binding": 434,
+   "codes": {
+    "CS0246": 111,
+    "CS0234": 13,
+    "CS0518": 293,
+    "CS0656": 13,
+    "CS0538": 2,
+    "CS0208": 2
+   },
+   "returncode": 1
+  },
+  "UnityEngine.GridModule": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 171,
+   "codes": {
+    "CS0246": 62,
+    "CS0518": 108,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.HierarchyCoreModule": {
+   "files": 31,
+   "syntax": 1,
+   "binding": 1217,
+   "codes": {
+    "CS0234": 14,
+    "CS0246": 170,
+    "CS0518": 1008,
+    "CS0656": 25,
+    "CS1750": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.IMGUIModule": {
+   "files": 41,
+   "syntax": 136,
+   "binding": 34,
+   "codes": {
+    "CS8641": 34,
+    "CS1003": 34,
+    "CS1525": 34,
+    "CS1026": 34,
+    "CS1002": 34
+   },
+   "returncode": 1
+  },
+  "UnityEngine.IdentifiersModule": {
+   "files": 2,
+   "syntax": 0,
+   "binding": 11,
+   "codes": {
+    "CS0234": 1,
+    "CS0518": 8,
+    "CS0656": 1,
+    "CS0246": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.InputForUIModule": {
+   "files": 21,
+   "syntax": 12,
+   "binding": 3,
+   "codes": {
+    "CS8641": 3,
+    "CS1003": 3,
+    "CS1525": 3,
+    "CS1026": 3,
+    "CS1002": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.ImageConversionModule": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 33,
+   "codes": {
+    "CS0246": 6,
+    "CS0234": 1,
+    "CS0518": 24,
+    "CS0656": 2
+   },
+   "returncode": 1
+  },
+  "UnityEngine.InputLegacyModule": {
+   "files": 13,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.JSONSerializeModule": {
+   "files": 3,
+   "syntax": 8,
+   "binding": 2,
+   "codes": {
+    "CS8641": 2,
+    "CS1003": 2,
+    "CS1525": 2,
+    "CS1026": 2,
+    "CS1002": 2
+   },
+   "returncode": 1
+  },
+  "UnityEngine.InputModule": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 67,
+   "codes": {
+    "CS0246": 7,
+    "CS0518": 60
+   },
+   "returncode": 1
+  },
+  "UnityEngine.MultiplayerModule": {
+   "files": 2,
+   "syntax": 0,
+   "binding": 4,
+   "codes": {
+    "CS0518": 4
+   },
+   "returncode": 1
+  },
+  "UnityEngine.ParticleSystemModule": {
+   "files": 28,
+   "syntax": 0,
+   "binding": 2289,
+   "codes": {
+    "CS0246": 326,
+    "CS0234": 6,
+    "CS0518": 1945,
+    "CS0656": 12
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Physics2DModule": {
+   "files": 61,
+   "syntax": 32,
+   "binding": 8,
+   "codes": {
+    "CS8641": 8,
+    "CS1003": 8,
+    "CS1525": 8,
+    "CS1026": 8,
+    "CS1002": 8
+   },
+   "returncode": 1
+  },
+  "UnityEngine.PropertiesModule": {
+   "files": 100,
+   "syntax": 16,
+   "binding": 4,
+   "codes": {
+    "CS8641": 4,
+    "CS1003": 4,
+    "CS1525": 4,
+    "CS1026": 4,
+    "CS1002": 4
+   },
+   "returncode": 1
+  },
+  "UnityEngine.PhysicsModule": {
+   "files": 30,
+   "syntax": 0,
+   "binding": 1798,
+   "codes": {
+    "CS0246": 414,
+    "CS0234": 11,
+    "CS0518": 1363,
+    "CS0656": 8,
+    "CS0208": 2
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing": {
+   "files": 79,
+   "syntax": 56,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 14
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.AppleCore": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 41,
+   "codes": {
+    "CS0246": 3,
+    "CS0518": 38
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.AppleMacosStub": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 57,
+   "codes": {
+    "CS0246": 5,
+    "CS0518": 51,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.AppleStub": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 57,
+   "codes": {
+    "CS0246": 5,
+    "CS0518": 51,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.SecurityCore": {
+   "files": 7,
+   "syntax": 0,
+   "binding": 98,
+   "codes": {
+    "CS0246": 19,
+    "CS0518": 79
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.Stores": {
+   "files": 195,
+   "syntax": 160,
+   "binding": 40,
+   "codes": {
+    "CS8641": 40,
+    "CS1003": 40,
+    "CS1525": 40,
+    "CS1026": 40,
+    "CS1002": 40
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.SecurityStub": {
+   "files": 9,
+   "syntax": 0,
+   "binding": 89,
+   "codes": {
+    "CS0246": 13,
+    "CS0518": 75,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.WinRTCore": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 82,
+   "codes": {
+    "CS0246": 7,
+    "CS0518": 75
+   },
+   "returncode": 1
+  },
+  "UnityEngine.Purchasing.WinRTStub": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 25,
+   "codes": {
+    "CS0246": 3,
+    "CS0518": 21,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.RenderAs2DModule": {
+   "files": 1,
+   "syntax": 0,
+   "binding": 3,
+   "codes": {
+    "CS0518": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.ScreenCaptureModule": {
+   "files": 3,
+   "syntax": 0,
+   "binding": 38,
+   "codes": {
+    "CS0234": 1,
+    "CS0518": 33,
+    "CS0656": 1,
+    "CS0246": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.SharedInternalsModule": {
+   "files": 29,
+   "syntax": 0,
+   "binding": 225,
+   "codes": {
+    "CS0246": 46,
+    "CS0518": 179
+   },
+   "returncode": 1
+  },
+  "UnityEngine.SpriteMaskModule": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 137,
+   "codes": {
+    "CS0246": 36,
+    "CS0234": 4,
+    "CS0518": 96,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.SpriteShapeModule": {
+   "files": 9,
+   "syntax": 0,
+   "binding": 217,
+   "codes": {
+    "CS0246": 49,
+    "CS0234": 1,
+    "CS0518": 162,
+    "CS0656": 5
+   },
+   "returncode": 1
+  },
+  "UnityEngine.SubsystemsModule": {
+   "files": 20,
+   "syntax": 0,
+   "binding": 194,
+   "codes": {
+    "CS0246": 49,
+    "CS0234": 2,
+    "CS0518": 140,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.TerrainModule": {
+   "files": 13,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.TextCoreFontEngineModule": {
+   "files": 26,
+   "syntax": 0,
+   "binding": 741,
+   "codes": {
+    "CS0246": 67,
+    "CS0234": 1,
+    "CS0518": 661,
+    "CS0656": 12
+   },
+   "returncode": 1
+  },
+  "UnityEngine.TextCoreTextEngineModule": {
+   "files": 92,
+   "syntax": 284,
+   "binding": 66,
+   "codes": {
+    "CS8641": 66,
+    "CS1003": 66,
+    "CS1525": 69,
+    "CS1026": 69,
+    "CS1002": 73,
+    "CS1056": 4,
+    "CS1513": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.TextRenderingModule": {
+   "files": 15,
+   "syntax": 0,
+   "binding": 527,
+   "codes": {
+    "CS0246": 82,
+    "CS0234": 5,
+    "CS0518": 432,
+    "CS0656": 7,
+    "CS0538": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.TilemapModule": {
+   "files": 14,
+   "syntax": 0,
+   "binding": 1221,
+   "codes": {
+    "CS0246": 345,
+    "CS0234": 25,
+    "CS0518": 842,
+    "CS0656": 9
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UI": {
+   "files": 121,
+   "syntax": 524,
+   "binding": 131,
+   "codes": {
+    "CS8641": 131,
+    "CS1003": 131,
+    "CS1525": 131,
+    "CS1026": 131,
+    "CS1002": 131
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UIModule": {
+   "files": 11,
+   "syntax": 24,
+   "binding": 6,
+   "codes": {
+    "CS8641": 6,
+    "CS1003": 6,
+    "CS1525": 6,
+    "CS1026": 6,
+    "CS1002": 6
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UIElementsModule": {
+   "files": 852,
+   "syntax": 1156,
+   "binding": 289,
+   "codes": {
+    "CS8641": 289,
+    "CS1003": 289,
+    "CS1525": 289,
+    "CS1026": 289,
+    "CS1002": 289
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityAnalyticsModule": {
+   "files": 10,
+   "syntax": 4,
+   "binding": 1,
+   "codes": {
+    "CS8641": 1,
+    "CS1003": 1,
+    "CS1525": 1,
+    "CS1026": 1,
+    "CS1002": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityAnalyticsCommonModule": {
+   "files": 36,
+   "syntax": 0,
+   "binding": 331,
+   "codes": {
+    "CS0246": 121,
+    "CS0518": 209,
+    "CS0656": 1
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityConsentModule": {
+   "files": 5,
+   "syntax": 0,
+   "binding": 50,
+   "codes": {
+    "CS0246": 5,
+    "CS0518": 41,
+    "CS0656": 4
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityWebRequestModule": {
+   "files": 13,
+   "syntax": 20,
+   "binding": 5,
+   "codes": {
+    "CS8641": 5,
+    "CS1003": 5,
+    "CS1525": 5,
+    "CS1026": 5,
+    "CS1002": 5
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityWebRequestAssetBundleModule": {
+   "files": 4,
+   "syntax": 0,
+   "binding": 127,
+   "codes": {
+    "CS0246": 32,
+    "CS0234": 3,
+    "CS0518": 89,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.UnityWebRequestWWWModule": {
+   "files": 1,
+   "syntax": 0,
+   "binding": 12,
+   "codes": {
+    "CS0246": 4,
+    "CS0234": 1,
+    "CS0518": 7
+   },
+   "returncode": 1
+  },
+  "UnityEngine.VRModule": {
+   "files": 2,
+   "syntax": 0,
+   "binding": 22,
+   "codes": {
+    "CS0246": 4,
+    "CS0518": 18
+   },
+   "returncode": 1
+  },
+  "UnityEngine.VFXModule": {
+   "files": 16,
+   "syntax": 0,
+   "binding": 227,
+   "codes": {
+    "CS0246": 51,
+    "CS0234": 4,
+    "CS0518": 169,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.VideoModule": {
+   "files": 14,
+   "syntax": 0,
+   "binding": 679,
+   "codes": {
+    "CS0246": 136,
+    "CS0234": 7,
+    "CS0518": 533,
+    "CS0656": 3
+   },
+   "returncode": 1
+  },
+  "UnityEngine.XRModule": {
+   "files": 25,
+   "syntax": 8,
+   "binding": 2,
+   "codes": {
+    "CS8641": 2,
+    "CS1003": 2,
+    "CS1525": 2,
+    "CS1026": 2,
+    "CS1002": 2
+   },
+   "returncode": 1
+  },
+  "material-timeline": {
+   "files": 18,
+   "syntax": 56,
+   "binding": 14,
+   "codes": {
+    "CS8641": 14,
+    "CS1003": 14,
+    "CS1525": 14,
+    "CS1026": 14,
+    "CS1002": 14
+   },
+   "returncode": 1
+  },
+  "__Generated": {
+   "files": 7,
+   "syntax": 0,
+   "binding": 38,
+   "codes": {
+    "CS0518": 29,
+    "CS8701": 1,
+    "CS0246": 1,
+    "CS0656": 5,
+    "CS0234": 2
+   },
+   "returncode": 1
+  },
+  "sc.posteffects.runtime": {
+   "files": 77,
+   "syntax": 16,
+   "binding": 4,
+   "codes": {
+    "CS8641": 4,
+    "CS1003": 4,
+    "CS1525": 4,
+    "CS1026": 4,
+    "CS1002": 4
+   },
+   "returncode": 1
+  },
+  "mscorlib": {
+   "files": 1428,
+   "syntax": 2243,
+   "binding": 558,
+   "codes": {
+    "CS8641": 558,
+    "CS1003": 561,
+    "CS1525": 564,
+    "CS1026": 558,
+    "CS1002": 559,
+    "CS1513": 1
+   },
+   "returncode": 1
+  },
+  "spine-csharp": {
+   "files": 100,
+   "syntax": 114,
+   "binding": 25,
+   "codes": {
+    "CS8641": 25,
+    "CS1003": 25,
+    "CS1525": 25,
+    "CS1026": 27,
+    "CS1002": 30,
+    "CS1040": 7
+   },
+   "returncode": 1
+  },
+  "spine-timeline": {
+   "files": 17,
+   "syntax": 68,
+   "binding": 17,
+   "codes": {
+    "CS8641": 17,
+    "CS1003": 17,
+    "CS1525": 17,
+    "CS1026": 17,
+    "CS1002": 17
+   },
+   "returncode": 1
+  },
+  "spine-unity": {
+   "files": 82,
+   "syntax": 252,
+   "binding": 62,
+   "codes": {
+    "CS8641": 62,
+    "CS1003": 63,
+    "CS1525": 62,
+    "CS1026": 62,
+    "CS1002": 62,
+    "CS1524": 1,
+    "CS1514": 1,
+    "CS1513": 1
+   },
+   "returncode": 1
+  }
+ },
+ "images_with_errors": 161,
+ "wall_s": 61.1
+}

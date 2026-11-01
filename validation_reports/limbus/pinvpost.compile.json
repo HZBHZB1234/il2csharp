@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\pinvpost",
+  "assembly": "pinvpost",
+  "files": 305,
+  "syntax": 6,
+  "binding": 12624,
+  "top": [
+    [
+      "CS0518",
+      10919
+    ],
+    [
+      "CS0246",
+      1610
+    ],
+    [
+      "CS0656",
+      50
+    ],
+    [
+      "CS0104",
+      22
+    ],
+    [
+      "CS0538",
+      9
+    ],
+    [
+      "CS1750",
+      6
+    ],
+    [
+      "CS0102",
+      5
+    ],
+    [
+      "CS0111",
+      5
+    ],
+    [
+      "CS0426",
+      2
+    ],
+    [
+      "CS0101",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "returncode": 1
+}

@@ -92,7 +92,7 @@ def gate_sweep(args):
 
 
 def gate_compile(args):
-    from compile_gate import run_gate
+    from compile_gate import managed_refs, run_gate
     tree = args.tree or _tree_for(args)
     only = args.only
     if only and not args.tree:
@@ -110,17 +110,45 @@ def gate_compile(args):
                 raise FixtureError(
                     'image %r not found under %s (candidates: %s)'
                     % (only, base, ', '.join(p.name for p in hits[:8])))
-    rep = run_gate(tree, timeout=args.timeout)
+    refs = []
+    for d in (args.refs_dir or []):
+        if not Path(d).is_dir():
+            raise FixtureError('no such refs dir: %s' % d)
+        refs.extend(str(p) for p in sorted(Path(d).glob('*.dll')))
+    if args.managed_refs:
+        fx = resolve(args.fixture)
+        excludes = list(args.exclude or [])
+        # the image under test is emitted by the tree; referencing its
+        # original build would resolve exactly the names recovery missed
+        if only:
+            excludes.append(only + '.dll')
+        else:
+            excludes.append(Path(tree).name + '.dll')
+        got = managed_refs(str(fx.game_dir), excludes)
+        if not got:
+            raise FixtureError(
+                'no */Managed backup folder under %s (an IL2CPP player '
+                'build keeps one under <Player>_BackUpThisFolder_'
+                'ButDontShipItWithYourGame; a shipped game usually has '
+                'none)' % fx.game_dir)
+        refs.extend(got)
+    rep = run_gate(tree, timeout=args.timeout, refs=refs)
     payload = {'kind': 'roslyn compile gate', 'tree': str(Path(tree).resolve()),
                'assembly': only or Path(tree).name, **rep}
     path = Path(_report_path(args, 'compile'))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
-    print('compile: %s -> %s (files=%s syntax=%s binding=%s)' % (
-        tree, path, rep.get('files'), rep.get('syntax'), rep.get('binding')))
+    print('compile: %s -> %s (files=%s syntax=%s binding=%s refs=%s)' % (
+        tree, path, rep.get('files'), rep.get('syntax'), rep.get('binding'),
+        len(refs)))
     if rep.get('tool_error'):
         print('  tool error:', rep['tool_error'])
         return 2
+    for code, row in sorted((rep.get('samples') or {}).items()):
+        if row:
+            print('  %s: %s(%s): %s' % (code, Path(row[0]['file']).name,
+                                        row[0]['line'],
+                                        row[0]['message'][:150]))
     return 0 if rep['syntax'] == 0 else 1
 
 
@@ -199,6 +227,14 @@ def main(argv=None):
     ap.add_argument('--only', help='assembly/image filter')
     ap.add_argument('--timeout', type=int, default=900)
     ap.add_argument('--report', help='explicit report path')
+    ap.add_argument('--managed-refs', action='store_true',
+                    help='compile gate: reference the exact managed closure '
+                         'of the fixture build (its BackUpThisFolder/Managed '
+                         'folder), minus the image under test')
+    ap.add_argument('--refs-dir', action='append',
+                    help='compile gate: reference every .dll in this dir')
+    ap.add_argument('--exclude', action='append',
+                    help='compile gate: extra dll names to skip')
     sub = ap.add_subparsers(dest='command', required=True)
     for name, fn, help_text in (
             ('brace', gate_brace, 'literal-aware brace audit'),
