@@ -195,6 +195,22 @@ referenced by its dependents) does **not** work and is not shipped: `csc`
 writes no assembly that has errors, so one failing image turns every
 dependent into thousands of CS0246.
 
+### Which tree the tests see
+
+`tests/conftest.py` resolves the game tree through `fixtures.out_tree`, which
+prefers `IL2CSHARP_LABEL` and otherwise takes the **newest** directory under
+`out/<fixture>/`. Two gate tests live on specific images
+(`test_game_compile_gate` needs `Unity.Burst.Unsafe`, `test_game_decl_gate`
+needs the same image), so a partial `--only` build left as the newest
+directory makes them fail with "missing emitted type" — a disk-state artefact,
+not a regression. Either delete the partial tree, or run the suite with an
+explicit label:
+
+```text
+$env:IL2CSHARP_LABEL = 'cw4d'      # a 161-image declaration tree
+python -m pytest -q --game limbus
+```
+
 ## 5. Comparing and promoting trees
 
 ```text
