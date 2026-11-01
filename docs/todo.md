@@ -59,6 +59,12 @@ reached.
   proof**: `<X>k__BackingField` exists only for auto-properties, so the
   property can be emitted `{ get; set; }`/`{ get; }` and its accesses spelled
   `X`, with the field kept for the address-taken sites (declines otherwise).
+  Concretely: `_storage_name` (the single choke point every field-name path
+  goes through) returns the property name, `emit_property` takes the
+  bodyless `{ get; }`/`{ get; set; }` path it already has, the field
+  declaration stays (renamed, so no CS0102), and the address-take path
+  respells from a field row stashed on the `_field_expr` result — that is the
+  only place a property spelling would be illegal.
 * **The `unknown` marker is the top CS0103 family.** An unresolved value
   renders the text `unknown` (from `_rewrite_unknowns`), which is honest and
   parseable but not compilable: **10,940** occurrences in limbus `f169`, 251
