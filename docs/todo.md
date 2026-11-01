@@ -7,7 +7,32 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 178 — the unresolved-value marker compiles without hiding itself (2026-11-02, on `main`)
+## Current work: fix 179 — a bare `x = 0` under a struct/class declaration compiles (2026-11-02, on `main`)
+
+IL2CPP renders stack-slot zeroing as `= 0` under whatever type the slot
+carries. The *declaration* path already respells that (`_bare_rhs_needs_default`,
+fix 97b: `UniTask.Awaiter awaiter1 = 0;` → `= default`), but a plain
+**re-assignment of an already-declared local** was left alone — and
+`awaiter1 = 0;` under a struct is the same CS0029. The shapes concentrate in
+the async/iterator machinery: 227 CS0029 in unitask's `Assembly-CSharp`
+alone, and 176 such `= 0` sites across the two MIT trees.
+
+`_zero_assign_default` (dec/flow.py) is a final pass, run after the last
+rename next to `_null_zero_rewrite` because it needs concrete declaration
+spellings: a bare `name = 0;` whose declaration is visible in the body
+becomes `= default;` when the declared type *provably* cannot convert from
+the int literal (reference types and non-enum value types). `object` boxes,
+numerics and enums convert, so all keep their faithful `= 0`;
+generic/array/nullable/pointer spellings and doubly-declared locals decline.
+Value-preserving: `default` is the zero every one of those types starts with.
+
+Measured (unitask `Assembly-CSharp`, where the shape concentrates): binding
+errors **2,447 → 2,375**, entirely CS0029 **227 → 155**, no other code
+moving; the unitask library images and both survivors images unchanged;
+brace **0**, tree-sitter **0/0/0/0**. Portable suite **1,591 passed** (9 new
+tests).
+
+## Previous work: fix 178 — the unresolved-value marker compiles without hiding itself (2026-11-02, on `main`)
 
 An unresolved native value renders the bare text `unknown` (from
 `_rewrite_unknowns`). It is honest and it parses, but it does not compile:

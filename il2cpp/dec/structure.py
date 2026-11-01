@@ -199,6 +199,11 @@ class _StructureMixin:
         # first definition survives; this folds exactly those pairs
         # (adjacent overwrite, pure unknown RHS, no use between).
         rendered = self._drop_dead_unknown_store(rendered)
+        # fix 179: a bare x = 0; under a struct/class declaration is
+        # CS0029 (waiter1 = 0; for UniTask.Awaiter); default is the
+        # same zero value. Runs after the final rename, like the null-zero
+        # rewrite below, because it needs concrete declaration spellings.
+        rendered = self._zero_assign_default(rendered)
         return self._null_zero_rewrite(
             self._boxed_bool_null_fold(
                 self._semantic_local_names(rendered, m)), m)

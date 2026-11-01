@@ -1340,6 +1340,82 @@ class _FlowMixin:
         except Exception:
             return False
 
+    # fix 179: `x = 0;` under a declared non-numeric type.
+    _ZERO_ASSIGN_RX = re.compile(r'^(\s*)([A-Za-z_]\w*)\s*=\s*0;\s*$')
+    _ZERO_DECL_RX = re.compile(
+        r'^(\s*)([A-Za-z_][\w.<>\[\], ]*?)\s+([A-Za-z_]\w*)\s*=(?!=|>)')
+
+    def _zero_needs_default(self, tt):
+        """True when a declaration spelling provably cannot convert from `0`.
+
+        Stack-slot zeroing renders `= 0` under whatever type the slot
+        carries; the DECLARATION path already respells that to `default`
+        (`_bare_rhs_needs_default`, fix 97b), but a plain re-assignment of an
+        already-declared local was left alone: `awaiter1 = 0;` under
+        `UniTask.Awaiter` (a struct) is CS0029, exactly like the declaration
+        form. Reference types and non-enum value types cannot convert from
+        the int literal; primitives and enums can; unresolvable spellings and
+        generic/array/nullable/pointer shapes decline.
+        """
+        try:
+            L = getattr(self, 'L', None)
+            if L is None:
+                return False
+            s = (tt or '').strip()
+            import re as _re
+            s = _re.sub(r'^global::', '', s).strip()
+            if not s or s in ('object', 'System.Object', 'var'):
+                return False
+            if s in self._NULL_ZERO_PRIM:
+                return False
+            if _re.search(r'[<\[(*?&\s]', s):
+                return False
+            try:
+                mp = self._eq_typedef_map()
+            except Exception:
+                return False
+            tdi = mp.get(s)
+            if tdi is None:
+                return False
+            try:
+                tdo = L.meta.typedefs[tdi]
+            except Exception:
+                return False
+            if getattr(tdo, 'is_enum', False):
+                return False
+            return True
+        except Exception:
+            return False
+
+    def _zero_assign_default(self, lines):
+        """Rewrite `x = 0;` to `x = default;` when x's type cannot take `0`.
+
+        Value-preserving: `default` is the zero every one of those types
+        starts with. A local declared twice with different spellings declines
+        (the pass cannot tell which one is live). Fields, member stores,
+        element stores and compound assignments never match -- only a bare
+        `name = 0;` line whose declaration is visible in this body.
+        """
+        decl = {}
+        for st in lines:
+            m = self._ZERO_DECL_RX.match(st)
+            if not m:
+                continue
+            name, dt = m.group(3), m.group(2).strip()
+            if name in decl and decl[name] != dt:
+                decl[name] = None      # ambiguous: decline
+            else:
+                decl.setdefault(name, dt)
+        out = list(lines)
+        for i, st in enumerate(out):
+            m = self._ZERO_ASSIGN_RX.match(st)
+            if not m:
+                continue
+            dt = decl.get(m.group(2))
+            if dt and self._zero_needs_default(dt):
+                out[i] = '%s%s = default;' % (m.group(1), m.group(2))
+        return out
+
     def _null_zero_rewrite(self, lines, m=None):
         """`X == 0` -> `X == null` for proven reference locals (interface-zero).
 

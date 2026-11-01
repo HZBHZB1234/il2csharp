@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\cw9\\UniTask.Addressables",
+  "assembly": "UniTask.Addressables",
+  "files": 2,
+  "syntax": 0,
+  "binding": 5,
+  "top": [
+    [
+      "CS0208",
+      3
+    ],
+    [
+      "CS0103",
+      2
+    ]
+  ],
+  "tool_error": null,
+  "refs": 47,
+  "samples": {
+    "CS0208": [
+      {
+        "file": "out\\unitask\\cw9\\UniTask.Addressables\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 13,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\unitask\\cw9\\UniTask.Addressables\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 14,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\unitask\\cw9\\UniTask.Addressables\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 19,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\unitask\\cw9\\UniTask.Addressables\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 15,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj2\u201d"
+      },
+      {
+        "file": "out\\unitask\\cw9\\UniTask.Addressables\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 15,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj3\u201d"
+      }
+    ]
+  },
+  "returncode": 1
+}

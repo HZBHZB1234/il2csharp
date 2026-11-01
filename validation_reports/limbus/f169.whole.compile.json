@@ -1,0 +1,123 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\f169",
+  "source_files": 24948,
+  "merged_stubs": 1961,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "b34a0ffbc3c02951fd8a8f57240b94e2ec63edbfa6586bd664e297a112588f74",
+  "log": "validation_reports\\limbus\\f169.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "unity D:\\unity_editor_6000: 139 engine + 121 bcl"
+  ],
+  "closure_refs": 260,
+  "exit_code": 1,
+  "files_with_errors": 4321,
+  "errors": 17131,
+  "errors_by_code": {
+    "CS0246": 14259,
+    "CS0234": 2712,
+    "CS0102": 60,
+    "CS0111": 24,
+    "CS0538": 20,
+    "CS0051": 14,
+    "CS0540": 8,
+    "CS0535": 8,
+    "CS0118": 7,
+    "CS9333": 4,
+    "CS9334": 4,
+    "CS0723": 3,
+    "CS0453": 3,
+    "CS0452": 2,
+    "CS0644": 1,
+    "CS0100": 1,
+    "CS0426": 1
+  },
+  "first_error_by_code": {
+    "CS0234": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\2dxFX_4Gradients.cs",
+      "line": 5,
+      "message": "\u547d\u540d\u7a7a\u95f4\u201cUnityEngine\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cUI\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)\r"
+    },
+    "CS0246": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\AbilityBase.cs",
+      "line": 4,
+      "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cCodeStage\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)\r"
+    },
+    "CS0644": {
+      "file": "out\\limbus\\f169\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+      "line": 8,
+      "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f\r"
+    },
+    "CS0538": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\CamAnchorTargetMarker.cs",
+      "line": 21,
+      "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cINotificationOptionProvider\u201d\u4e0d\u662f\u63a5\u53e3\r"
+    },
+    "CS0051": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\CoinModel.cs",
+      "line": 3986,
+      "message": "\u53ef\u8bbf\u95ee\u6027\u4e0d\u4e00\u81f4: \u53c2\u6570\u7c7b\u578b\u201cCoinModel.__c__DisplayClass43_0\u201d\u7684\u53ef\u8bbf\u95ee\u6027\u4f4e\u4e8e\u65b9\u6cd5\u201cCoinModel._GetTypeNameCandidates_g__AddCandidate_43_0(string, ref CoinModel.__c__DisplayClass43_0)\u201d\r"
+    },
+    "CS0452": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\EventBus\\EventBusBase.cs",
+      "line": 12,
+      "message": "\u7c7b\u578b\u201cT\u201d\u5fc5\u987b\u662f\u5f15\u7528\u7c7b\u578b\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cWeakReference<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d\r"
+    },
+    "CS0118": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\FMODVideoPlayer.cs",
+      "line": 25,
+      "message": "\u201cSound\u201d\u662f \u547d\u540d\u7a7a\u95f4\uff0c\u4f46\u6b64\u5904\u88ab\u5f53\u505a \u7c7b\u578b \u6765\u4f7f\u7528\r"
+    },
+    "CS0100": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\RPGSystem\\RpgAddressableManager.cs",
+      "line": 1555,
+      "message": "\u53c2\u6570\u540d\u201c_\u201d\u91cd\u590d\r"
+    },
+    "CS0540": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1513,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.Current\u201d: \u5305\u542b\u7c7b\u578b\u4e0d\u5b9e\u73b0\u63a5\u53e3\u201cIEnumerator<(Int32shopId, Int32itemId, Int32remaining)>\u201d\r"
+    },
+    "CS9333": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1513,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.Current\u201d: \u7c7b\u578b\u5fc5\u987b\u4e3a\u201c(Int32shopId, Int32itemId, Int32remaining)\u201d\u624d\u80fd\u5339\u914d\u5df2\u5b9e\u73b0\u7684\u6210\u5458\u201cIEnumerator<(Int32shopId, Int32itemId, Int32remaining)>.Current\u201d\r"
+    },
+    "CS9334": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1705,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.GetEnumerator()\u201d: \u8fd4\u56de\u7c7b\u578b\u5fc5\u987b\u4e3a\u201cSystem.Collections.Generic.IEnumerator<(Int32shopId, Int32itemId, Int32remaining)>\u201d\u624d\u80fd\u4e0e\u5b9e\u73b0\u7684\u6210\u5458\u201cIEnumerable<(Int32shopId, Int32itemId, Int"
+    },
+    "CS0535": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1506,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIEnumerable<(int, int, int)>.GetEnumerator()\u201d\r"
+    },
+    "CS0426": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp\\TimeCalculator\\Time\\TimeCalculator.cs",
+      "line": 128,
+      "message": "\u7c7b\u578b\u201cTimeCalculator\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u540d\u201cTime\u201d\r"
+    },
+    "CS0111": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp-firstpass\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 8,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1\u201d\u5df2\u5b9a\u4e49\u4e86\u4e00\u4e2a\u540d\u4e3a\u201cGet\u201d\u7684\u5177\u6709\u76f8\u540c\u53c2\u6570\u7c7b\u578b\u7684\u6210\u5458\r"
+    },
+    "CS0102": {
+      "file": "out\\limbus\\f169\\Assembly-CSharp-firstpass\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+      "line": 32,
+      "message": "\u7c7b\u578b\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d\u5df2\u7ecf\u5305\u542b\u201cFilePathsData\u201d\u7684\u5b9a\u4e49\r"
+    },
+    "CS0723": {
+      "file": "out\\limbus\\f169\\CommonAssembly\\CommonConstants.cs",
+      "line": 148,
+      "message": "\u65e0\u6cd5\u58f0\u660e\u9759\u6001\u7c7b\u578b\u201cCommonConstants.Regex\u201d\u7684\u53d8\u91cf\r"
+    },
+    "CS0453": {
+      "file": "out\\limbus\\f169\\CommonAssembly\\StructExtension.cs",
+      "line": 31,
+      "message": "\u7c7b\u578b\u201cT\u201d\u5fc5\u987b\u662f\u4e0d\u53ef\u4e3a null \u503c\u7684\u7c7b\u578b\uff0c\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cNullable<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}
