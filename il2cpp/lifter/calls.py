@@ -366,6 +366,72 @@ class _CallsMixin:
         self.__dict__['_system_type_ty_cache'] = (ty,)
         return ty
 
+    def _value_receiver_field(self, recv, m2):
+        """The field a primitive instance call is really invoked on.
+
+        IL2CPP lowers `v.x.Equals(w.x)` for a struct field `x` to a call to
+        `Single.Equals` whose hidden `this` is `&v` (offset 0) or `&v+4`.
+        Offset 0 is textually the whole struct, so the receiver used to
+        print `v.Equals(w.x)` -- a method that does not exist on `v`.
+        When the callee's declaring type is a value type and the receiver's
+        FIRST field has exactly that declared type, the receiver text is
+        that field.  Only a simple `this`/local/member-chain receiver is
+        refined; call results, casts and byref spellings keep their text.
+        """
+        if recv is None or m2 is None or m2.is_static:
+            return None
+        try:
+            rtd = self._td_of(recv.ty)
+            mtd = self.meta.typedefs[m2.declaring]
+        except (AttributeError, IndexError, TypeError):
+            return None
+        if rtd is None or rtd == m2.declaring or not mtd.is_valuetype:
+            return None
+        try:
+            chain = self.il.instance_field_chain(rtd)
+        except (AttributeError, IndexError, TypeError):
+            return None
+        if not chain:
+            return None
+        # `field_offsets` are object-relative for a class (header 0x10).
+        # A value-type receiver is a pointer to the value itself, so its
+        # first field sits at object-relative 0x10; any other minimum
+        # means offset 0 is padding, not a field, and we decline.
+        try:
+            rtd_obj = self.meta.typedefs[rtd]
+            off = 0x10 if rtd_obj.is_valuetype else 0
+        except (AttributeError, IndexError, TypeError):
+            return None
+        first = chain.get(off)
+        if not first:
+            return None
+        name, fty = first
+        try:
+            ftd = self._td_of(fty)
+        except (AttributeError, IndexError, TypeError):
+            ftd = None
+        if ftd is None:
+            # primitive fields are encoded inline, not by typedef row
+            _PRIM = {
+                'bool': 'System.Boolean', 'char': 'System.Char',
+                'sbyte': 'System.SByte', 'byte': 'System.Byte',
+                'short': 'System.Int16', 'ushort': 'System.UInt16',
+                'int': 'System.Int32', 'uint': 'System.UInt32',
+                'long': 'System.Int64', 'ulong': 'System.UInt64',
+                'float': 'System.Single', 'double': 'System.Double',
+            }
+            try:
+                canon = _PRIM.get(self.il.type_name(self.il.types[fty]))
+            except (AttributeError, IndexError, TypeError):
+                canon = None
+            if canon is not None and canon == '%s.%s' % (
+                    mtd.namespace, mtd.name):
+                return name
+            return None
+        if ftd != m2.declaring:
+            return None
+        return name
+
     def _caller_is_void(self):
         """True when the method being lifted returns void.
 
@@ -3696,6 +3762,15 @@ class _CallsMixin:
                                                   or _BARE_TOKEN_RX.match(bare_inner))
             if byref:
                 recv_txt = recv_txt[1:]
+            # A primitive instance call whose hidden `this` is the first
+            # field of a struct: print `self.x.Equals(...)`, not
+            # `self.Equals(...)` (see _value_receiver_field).
+            if recv_txt and not recv_txt.startswith('&'):
+                _vfield = self._value_receiver_field(recv, m2)
+                if _vfield is not None and re.match(
+                        r'^(?:this|[A-Za-z_]\w*)(?:\.[A-Za-z_]\w*)*$',
+                        recv_txt):
+                    recv_txt = '%s.%s' % (recv_txt, _vfield)
             mname = m2.name
             # metadata ctor names carry a leading dot (`.ctor`); the
             # instance join below adds its own

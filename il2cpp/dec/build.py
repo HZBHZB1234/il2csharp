@@ -349,7 +349,15 @@ class _BuildMixin:
         params.update(('this', 'value'))
         lines, _ = hoist_escaping_locals(lines, params)
         # fix 137b: accessor markers unwrap after every purity-judging pass
-        return [unwrap_accessor_markers(ln) for ln in self._sret_local_decl(lines, m)]
+        out = [unwrap_accessor_markers(ln) for ln in self._sret_local_decl(lines, m)]
+        # fix 172: a full-struct hidden-sret copy is one managed assignment,
+        # not one raw byte store per 16-byte chunk.
+        try:
+            rt = self.il.types[m.return_type]
+            ret_size = self.il.value_type_size(rt[0])
+        except (AttributeError, IndexError, TypeError):
+            ret_size = None
+        return fold_sret_struct_copies(out, ret_size)
 
     _SRET_TOK_RX = re.compile(r'(?<![\w.])__ret\b')
 
@@ -1052,6 +1060,10 @@ _EMPTY_INIT_GUARD_RXS = (
     # matching (survivors/UniTask: 1,336 empty guards stayed in the tree).
     re.compile(r'^\s*if \(\(\(byte\*\)typeof\([^()]*\) \+ 0xe0\)\[0\] '
                r'(?:==|!=) (?:\w+)\)\s*$'),
+    # Same guard when the class pointer is a lifted temp and the field is
+    # read through an `int*` cast: 158 Unitask sites after fix 171.
+    re.compile(r'^\s*if \(\(\((?:int|byte)\*\)\(\(byte\*\)[\w.]+ '
+               r'\+ 0xe0\)\)\[0\] (?:==|!=) (?:\w+)\)\s*$'),
 )
 
 
@@ -1100,6 +1112,102 @@ def drop_duplicate_raw_stores(lines):
         out.append(lines[i])
         i += 1
     return out
+
+
+# A hidden-sret result buffer (`T __ret = default;`) receiving a whole
+# struct value is emitted as one raw byte store per 16-byte chunk:
+#     ((byte*)&__ret + 0x0)[0] = uniTask1;
+#     ((byte*)&__ret + 0x10)[0] = uniTask1;
+# The RHS already has the struct's declared type, so the two machine
+# stores are one managed assignment.  Only the exact copy shape is
+# folded: every local store must name the same local, the local must be
+# declared with `__ret`'s exact type text, offsets must be unique and
+# 16-byte aligned, and the store run must be contiguous.  A field-level
+# store in another arm does not block a full-copy run in this arm, but a
+# lone unknown-size chunk does; any other RHS keeps today's spelling.
+_SRET_DECL_RX = re.compile(r'^(\s*)(.+?) __ret = default;\s*$')
+_SRET_STORE_RX = re.compile(
+    r'^(\s*)\(\(byte\*\)&__ret \+ (0x[0-9a-fA-F]+)\)\[0\] = '
+    r'([A-Za-z_]\w*);\s*$')
+_SRET_LOCAL_RX = re.compile(
+    r'^(\s*)([A-Za-z_][\w.<>\[\], ?]*?) ([A-Za-z_]\w*)'
+    r'(?: = .*)?;\s*$')
+# The first token can be a statement keyword (`return x;`), never a type.
+_SRET_NOT_A_TYPE = frozenset((
+    'return', 'throw', 'goto', 'yield', 'break', 'continue', 'else',
+    'case', 'using', 'fixed', 'lock', 'checked', 'unchecked',
+))
+
+
+def fold_sret_struct_copies(lines, ret_size=None):
+    """Fold 16-byte-chunk raw copies of a struct into `__ret = value;`.
+
+    `ret_size` is the return type's exact size when metadata knows it;
+    a single 16-byte chunk at offset 0 is then provably the whole value.
+    With an unknown size, only multi-chunk runs fold.
+    """
+    out = list(lines)
+    drop = set()
+    i, n = 0, len(lines)
+    while i < n:
+        decl = _SRET_DECL_RX.match(lines[i])
+        if decl is None:
+            i += 1
+            continue
+        ret_ty = decl.group(2).strip()
+        end = i + 1
+        while end < n and _SRET_DECL_RX.match(lines[end]) is None:
+            end += 1
+        stores, locals_ = [], {}
+        other_store = False
+        for j in range(i + 1, end):
+            st = lines[j]
+            sm = _SRET_STORE_RX.match(st)
+            if sm is not None:
+                stores.append((j, sm.group(2), sm.group(3)))
+                continue
+            if '&__ret' in st:
+                # A field-level or non-local store elsewhere in the method
+                # (often another `if` arm).  It does not invalidate a
+                # full-struct copy run; only a single unknown-size chunk
+                # needs the whole method to be one store.
+                other_store = True
+                continue
+            lm = _SRET_LOCAL_RX.match(st)
+            if (lm is not None
+                    and lm.group(2).strip() not in _SRET_NOT_A_TYPE
+                    and lm.group(2).strip() == ret_ty):
+                locals_[lm.group(3)] = j
+        if stores:
+            names = {s[2] for s in stores}
+            if len(names) == 1 and all(int(s[1], 16) % 0x10 == 0
+                                        for s in stores) \
+                    and next(iter(names)) in locals_:
+                name = next(iter(names))
+                runs, cur = [], [stores[0]]
+                for s in stores[1:]:
+                    if s[0] == cur[-1][0] + 1:
+                        cur.append(s)
+                    else:
+                        runs.append(cur)
+                        cur = [s]
+                runs.append(cur)
+                for run in runs:
+                    offsets = [s[1] for s in run]
+                    one_full_chunk = (len(run) == 1 and offsets == ['0x0']
+                                      and ret_size is not None
+                                      and ret_size <= 0x10
+                                      and not other_store)
+                    if ((len(run) > 1 or one_full_chunk)
+                            and len(set(offsets)) == len(offsets)):
+                        first = run[0][0]
+                        indent = lines[first][:len(lines[first])
+                                               - len(lines[first].lstrip())]
+                        out[first] = '%s__ret = %s;' % (indent, name)
+                        for j, _o, _n in run[1:]:
+                            drop.add(j)
+        i = max(end, i + 1)
+    return [ln for k, ln in enumerate(out) if k not in drop]
 
 
 # A.3: the pure Boehm GC cardmark write barrier.  `if (data_X != 0) {`

@@ -7,7 +7,88 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 171 — the open-source differential corpus and four output fixes (2026-11-01, on `main`)
+## Current work: fix 172 — source-differential honesty and three output fixes (2026-11-01, on `main`)
+
+Fix 171 made source comparison possible; fix 172 makes the report trustworthy
+and lands the first fixes it exposed. The two MIT fixtures are unchanged
+(local-only under `fixtures/`, git-ignored).
+
+**172a — the report no longer scores code the compiler rewrote.**
+`tools/source_compare.py` now:
+* strips comments before call/member/shape extraction — a body that is only
+  comments compiles to `{}`, and 51 Unitask + 45 survivors source methods were
+  being scored against an empty method;
+* indexes nested types without repeating the namespace (`N.Outer.Inner` was
+  `N.N.Outer.Inner`), which hid every nested source method;
+* skips test project folders (`NetCoreTests`, `*.Tests`) like `tests/`;
+* treats `[Conditional]` methods, lambdas/local functions, and an output body
+  containing an inlined async/iterator state machine as transformed (a new
+  `inlined` bucket). IL2CPP/MSVC inlines tiny wrappers (`ChangeAnimation`,
+  `WhenAll`, even `Vector3.Equals`), so source and lifted bodies are no longer
+  the same method; scoring them as missing calls measured the inliner, not the
+  decompiler.
+
+After the change Unitask has 510 source types (was 556), type-unmatched
+methods 122 (was 369), and 55 `inlined` methods; survivors has 16 `inlined`.
+The averages are not directly comparable to fix 171 because dishonest rows
+are gone. On the remaining rows: Unitask call F1 **0.600 -> 0.617**, recall
+**0.629 -> 0.644**, full-call recall **739/1,481 (49.9%) -> 687/1,326
+(51.8%)**; survivors F1 **0.647 -> 0.667**, full recall **530/964 (55.0%) ->
+497/810 (61.4%)**. The worst list is now dominated by genuinely inlined
+bodies and async state machines, not by comment/lambda noise.
+
+**172b — empty class-init guards with a lifted class pointer.**
+The fix-171 pattern covered `((byte*)typeof(X) + 0xe0)[0]`; the same runtime
+guard renders as `((int*)((byte*)objN + 0xe0))[0] == 0` in state machines.
+**158** empty Unitask guards removed (empty `if` blocks **177 -> 19** tree-wide;
+survivors unchanged at 56, none of this shape).
+
+**172c — a hidden-sret full-struct copy is one managed assignment.**
+`T __ret` receiving a value was emitted as one byte store per 16-byte chunk:
+`((byte*)&__ret + 0x0)[0] = uniTask1; ... + 0x10 ...`. When a contiguous run
+names the same local and that local has `__ret`'s exact type, the run becomes
+`__ret = uniTask1;`. A single 16-byte chunk folds only when metadata knows the
+return type is at most 16 bytes; field-level stores in other `if` arms are
+preserved. Unitask `&__ret` stores **712 -> 478 (-234)** and the 6-image tree
+**4,456,338 -> 4,421,308 bytes**; survivors 66 -> 62.
+
+**172d — a primitive instance call on a struct's first field.**
+`self.x.Equals(vector.x)` lowers to `Single.Equals` with hidden `this =
+&self`; at offset 0 the receiver printed as the whole struct
+(`self.Equals(vector.x)`, a method that does not exist). When the callee owner
+is a value type and the receiver's first field (metadata offset 0x10) has
+exactly the owner's type, the field is used: `self.x.Equals(vector.x)`. The
+proof declines for padding/non-first fields, static calls, and receivers that
+are not a simple local/member chain. A 200-method Limbus sample lifted
+before/after showed **0 changed**, and the survivors tree is byte-identical
+with/without it; the Unitask diff is 3 `self.x` receivers plus one `self.r`
+(Color). Its regression test is the first Unitask-marked game test,
+`tests/test_game_unitask_struct_receiver.py`.
+
+**Build/gate state (`out/unitask/q9`, `out/survivors-roguelike-kit/q5s`).**
+Unitask: 466 files / 2,238 bodies; survivors: 291 files / 1,936 bodies. Both
+build with **0 failed / 0 fallbacks / 0 type-emit failures**, brace **0
+unbalanced**, tree-sitter parse **0 bad / 0 ERROR / 0 MISSING / 0 recovery**;
+direct sweeps (2,238 and 1,936 methods) report **0 crashes**. Portable suite
+**1,542 passed** (15 new tests cover the metric exclusions, the sret fold,
+the extra class-init guard and the receiver proof). Limbus game suite:
+**1,584 passed / 2 failed / 1 xfailed**, the same two known
+`Unity.Burst.Unsafe` environment failures in the archived partial `f169` tree;
+`tests/test_game_parallel_build.py` still hangs on this box's named-pipe path
+and was ignored.
+
+**What remains, by size.** Unitask still has 2,284 source methods emitted as
+the unavailable-body stub; most are generic methods/types with no registered
+instantiation (the generic-sharing model is still the largest open feature).
+The report's worst rows are now **inlined callees** (`PlayerAnim.Update` has
+no `ChangeAnimation` call because the callee's body is inlined at the native
+site) and **async/iterator state machines**; both are compiler rewrites, not
+decompiler misses. The 478 remaining `&__ret` stores are mostly `objN` copies
+whose argument temp was never bound (`((byte*)&__ret + 0x0)[0] =
+((byte*)obj16 + 0x0)[0]`), and 712 `__ret` mentions remain tree-wide.
+
+
+## Previous work: fix 171 — the open-source differential corpus and four output fixes (2026-11-01, on `main`)
 
 **Two MIT projects now have both the source and an IL2CPP build**, so output
 can be compared with ground truth instead of only with another decompiler.

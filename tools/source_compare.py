@@ -10,9 +10,13 @@ members, keeps the same statement shape.
 
 The report is intentionally conservative.  It never claims equivalence; it
 ranks the methods where the lifted body disagrees most with the source, so a
-human can read a small list instead of 100k bodies.  Async/iterator methods
-are excluded: the C# compiler rewrites them into state machines, so the
-source body is not the body IL2CPP compiled.
+human can read a small list instead of 100k bodies.  Async/iterator methods,
+lambdas/local functions and `[Conditional]` methods are excluded: the C#
+compiler rewrites them into state machines/display classes, or removes the
+body from the build, so the source body is not the body IL2CPP compiled.
+Comments are stripped before sequences are counted, and an output body that
+contains an inlined async/iterator state machine is excluded too (IL2CPP/MSVC
+inlines small wrappers, so a sync source method can map to a rewritten body).
 
 Usage:
     python tools/source_compare.py --fixture unitask --label src1
@@ -44,6 +48,13 @@ SKIP_DIRS = {
     'editor', 'tests', 'test', 'samples', 'samples~', 'benchmarks',
     'benchmark', 'obj', 'library', 'temp', 'logs', 'packages', '.git',
 }
+
+
+def _is_test_dir(name):
+    """Project test folders (`NetCoreTests`, `Foo.Tests`) are not built."""
+    n = name.casefold()
+    return n.endswith(('test', 'tests', '_test', '_tests')) \
+        or n.startswith(('test_', 'tests_'))
 CALL_KEYWORDS = {
     'if', 'for', 'foreach', 'while', 'switch', 'catch', 'using', 'lock',
     'fixed', 'typeof', 'nameof', 'sizeof', 'default', 'checked',
@@ -73,6 +84,13 @@ TELL_PATTERNS = {
     'sret_store': re.compile(r'\(\(byte\*\)&'),
     'qword': re.compile(r'\bqword_'),
 }
+# An async/iterator state machine in the OUTPUT whose source method was not
+# async: IL2CPP/MSVC inlined the async callee into a sync wrapper, so the
+# outer method and the source body are no longer the same method.  The
+# state-machine class name is the reliable tell.
+INLINED_STATE_MACHINE_RX = re.compile(
+    r'(?:<[A-Za-z_]\w*>|_[A-Za-z_]\w*_)d__\d+'
+    r'|\bAsync(?:UniTask|Task|Void|ValueTask)MethodBuilder\b')
 
 
 def _ts():
@@ -89,6 +107,39 @@ def _child(node, field):
     return node.child_by_field_name(field)
 
 
+def _code_text(node):
+    """Node text with comment nodes removed.
+
+    The report compares call/member *sequences*.  A comment mentioning
+    `Foo()` is not a call, and a method whose whole source body is
+    commented out compiles to an empty body.  Dropping comments here keeps
+    the source side honest without changing the output side's spelling.
+    """
+    if node is None:
+        return ''
+    data = node.text
+    cuts = []
+    stack = [node]
+    while stack:
+        cur = stack.pop()
+        if cur.type in ('comment', 'documentation_comment'):
+            cuts.append((cur.start_byte - node.start_byte,
+                         cur.end_byte - node.start_byte))
+        else:
+            stack.extend(cur.named_children)
+    if not cuts:
+        return data.decode('utf-8', 'replace')
+    cuts.sort()
+    parts, pos = [], 0
+    for start, end in cuts:
+        if start > pos:
+            parts.append(data[pos:start])
+        pos = max(pos, end)
+    if pos < len(data):
+        parts.append(data[pos:])
+    return b''.join(parts).decode('utf-8', 'replace')
+
+
 def _normalize_type(name):
     return re.sub(r'`\d+', '', name.replace('/', '.'))
 
@@ -97,6 +148,11 @@ def _join(ns, name):
     if not name:
         return ns
     return (ns + '.' if ns else '') + name
+
+
+def _body_has_code(text):
+    """False for `{}`, `{ /* gone */ }`, whitespace and stray semicolons."""
+    return bool(re.sub(r'[{}\s;]', '', text))
 
 
 def _strip_expr(text):
@@ -164,16 +220,52 @@ def _is_iterator(node):
     return False
 
 
+def _has_attribute(decl, simple_name):
+    """True when the declaration carries `[Conditional(...)]` (or `X.Y`)."""
+    for ch in decl.named_children:
+        if ch.type != 'attribute_list':
+            continue
+        stack = [ch]
+        while stack:
+            cur = stack.pop()
+            if cur.type == 'attribute':
+                name = _text(_child(cur, 'name'))
+                if name.split('.')[-1] == simple_name:
+                    return True
+            stack.extend(cur.named_children)
+    return False
+
+
+def _has_lambda_or_local_function(node):
+    """Compiler-rewritten bodies: closure classes / local functions.
+
+    A lambda body becomes a method on a display class and a local function
+    becomes its own MethodDef, so the outer source body and the lifted body
+    are not the same method.  Excluding these is the same conservative rule
+    already used for async/iterator methods.
+    """
+    stack = [node]
+    while stack:
+        cur = stack.pop()
+        if cur.type in ('lambda_expression', 'anonymous_method_expression',
+                        'local_function_statement'):
+            return True
+        stack.extend(cur.named_children)
+    return False
+
+
 def _add_method(idx, type_full, name, decl, node, file, kind='method'):
     body = _child(node, 'body')
     if body is None:
         return
     params, _types = _param_info(decl)
-    body_text = _text(body)
+    body_text = _code_text(body)
     if node.type in ('property_declaration', 'indexer_declaration',
                      'event_declaration'):
         body_text = _strip_expr(body_text)
-    transformed = _is_async(node) or _is_iterator(node)
+    transformed = (_is_async(node) or _is_iterator(node)
+                   or _has_attribute(decl, 'Conditional')
+                   or _has_lambda_or_local_function(body))
     idx.setdefault(type_full, {}).setdefault(
         (name, len(params)), []).append(
         Method(type_full, name, params, body_text, file,
@@ -206,16 +298,19 @@ def _collect_accessors(idx, type_full, node, file):
                 continue
             idx.setdefault(type_full, {}).setdefault(
                 (prefix + name, len(params)), []).append(
-                Method(type_full, prefix + name, params, _text(body), file,
-                       a.start_point[0] + 1, False, hit.group(1)))
+                Method(type_full, prefix + name, params, _code_text(body), file,
+                       a.start_point[0] + 1,
+                       _has_lambda_or_local_function(body), hit.group(1)))
         return
     # expression-bodied property: the arrow is the getter
     body = _child(node, 'value')
     if body is not None and node.type == 'property_declaration':
         idx.setdefault(type_full, {}).setdefault(
             ('get_' + name, len(params)), []).append(
-            Method(type_full, 'get_' + name, params, _strip_expr(_text(body)),
-                   file, node.start_point[0] + 1, False, 'get'))
+            Method(type_full, 'get_' + name, params,
+                   _strip_expr(_code_text(body)), file,
+                   node.start_point[0] + 1,
+                   _has_lambda_or_local_function(body), 'get'))
 
 
 def _walk_members(idx, type_full, node, file):
@@ -257,11 +352,12 @@ def _walk_types(idx, node, ns, outer, file):
             _walk_types(idx, ch, ns2, outer, file)
         elif t in TYPE_NODES:
             name = _text(_child(ch, 'name'))
-            full = _join(_join(ns, outer), name)
+            rel = _join(outer, name)
+            full = _join(ns, rel)
             body = _child(ch, 'body')
             if body is not None:
                 _walk_members(idx, full, body, file)
-                _walk_types(idx, body, ns, full, file)
+                _walk_types(idx, body, ns, rel, file)
         elif t in ('preproc_if', 'preproc_else', 'preproc_elif'):
             _walk_types(idx, ch, ns, outer, file)
 
@@ -274,7 +370,8 @@ def index_cs(root, files=None, skip_dirs=None):
     if files is None:
         files = []
         for dp, dns, fns in os.walk(root):
-            dns[:] = [d for d in dns if d.casefold() not in skip]
+            dns[:] = [d for d in dns
+                      if d.casefold() not in skip and not _is_test_dir(d)]
             for fn in fns:
                 if fn.endswith('.cs'):
                     files.append(os.path.join(dp, fn))
@@ -400,11 +497,16 @@ def compare(source_idx, tree_idx, min_calls=1):
                 if s.transformed:
                     unmatched['transformed'] += 1
                     continue
-                if not s.body.strip() or not o.body.strip():
+                if not _body_has_code(s.body) or not _body_has_code(o.body):
                     unmatched['empty'] += 1
                     continue
                 if 'Method body was not recovered' in o.body:
                     unmatched['stub'] += 1
+                    continue
+                if INLINED_STATE_MACHINE_RX.search(o.body):
+                    # IL2CPP inlined the async implementation into this
+                    # sync wrapper; the outer body is a compiler rewrite.
+                    unmatched['inlined'] += 1
                     continue
                 sc, oc = call_sequence(s.body), call_sequence(o.body)
                 sm, om = member_sequence(s.body), member_sequence(o.body)

@@ -3,7 +3,9 @@ guards drop (il2cpp/dec/build.py)."""
 from types import SimpleNamespace as NS
 
 from il2cpp.dec.build import (drop_duplicate_raw_stores,
-                              drop_empty_init_guards, hoist_escaping_locals)
+                              drop_empty_init_guards,
+                              fold_sret_struct_copies,
+                              hoist_escaping_locals)
 from il2cpp.emitter import Emitter
 
 
@@ -117,6 +119,22 @@ def test_raw_class_init_guard_dropped_after_fix134_spelling():
     assert out.count('if (((byte*)typeof(UniTask) + 0xe0)[0] == 0)') == 1
 
 
+def test_raw_class_init_guard_with_lifted_class_pointer():
+    lines = [
+        'if (((int*)((byte*)obj72 + 0xe0))[0] == 0)',
+        '{',
+        '}',
+        'Foo();',
+        'if (((int*)((byte*)obj72 + 0xe0))[0] == 0)',
+        '{',
+        '    Bar();',
+        '}',
+    ]
+    out = drop_empty_init_guards(lines)
+    assert out[0] == 'Foo();'
+    assert out.count('if (((int*)((byte*)obj72 + 0xe0))[0] == 0)') == 1
+
+
 def test_duplicate_raw_field_store_dropped_only_for_exact_twin():
     lines = [
         'Rigidbody2D rigidbody2D1 = this.transform.GetComponent();',
@@ -142,6 +160,107 @@ def test_duplicate_raw_store_accepts_inline_void_return_twin():
     ]
     assert drop_duplicate_raw_stores(lines) == [
         'this.MyAnimator = animator1; return;']
+
+
+def test_sret_struct_copy_folds_aligned_twin_stores():
+    lines = [
+        'UniTask<string> __ret = default;',
+        'unsafe',
+        '{',
+        '    UniTask<string> uniTask1 = obj9.Task;',
+        '    ((byte*)&__ret + 0x0)[0] = uniTask1;',
+        '    ((byte*)&__ret + 0x10)[0] = uniTask1;',
+        '    return __ret;',
+        '}',
+    ]
+    out = fold_sret_struct_copies(lines)
+    assert out[4] == '    __ret = uniTask1;'
+    assert len(out) == 7
+    assert not any('&__ret' in ln for ln in out)
+
+
+def test_sret_struct_copy_declines_field_stores():
+    lines = [
+        'CancellationTokenRegistration __ret = default;',
+        '((byte*)&__ret + 0x0)[0] = obj8;',
+        '((byte*)&__ret + 0x8)[0] = 0f;',
+        '((byte*)&__ret + 0x10)[0] = cancellationTokenRegistration1.m_registrationInfo;',
+        'return __ret;',
+    ]
+    assert fold_sret_struct_copies(lines) == lines
+
+
+def test_sret_struct_copy_declines_type_mismatch_or_gap():
+    mismatch = [
+        'UniTask<int> __ret = default;',
+        'UniTask<string> uniTask1 = obj9.Task;',
+        '((byte*)&__ret + 0x0)[0] = uniTask1;',
+        '((byte*)&__ret + 0x10)[0] = uniTask1;',
+        'return __ret;',
+    ]
+    gap = [
+        'UniTask<int> __ret = default;',
+        'UniTask<int> uniTask1 = obj9.Task;',
+        '((byte*)&__ret + 0x0)[0] = uniTask1;',
+        'Foo();',
+        '((byte*)&__ret + 0x10)[0] = uniTask1;',
+        'return __ret;',
+    ]
+    assert fold_sret_struct_copies(mismatch) == mismatch
+    assert fold_sret_struct_copies(gap) == gap
+
+
+def test_sret_struct_copy_accepts_bare_declaration_and_single_chunk():
+    bare = [
+        'UniTask<string> __ret = default;',
+        'UniTask<string> uniTask1;',
+        'if (flag1)',
+        '{',
+        '    uniTask1 = UniTask.FromResult(text1);',
+        '    ((byte*)&__ret + 0x0)[0] = uniTask1;',
+        '    ((byte*)&__ret + 0x10)[0] = uniTask1;',
+        '}',
+        'return __ret;',
+    ]
+    out = fold_sret_struct_copies(bare)
+    assert out[5] == '    __ret = uniTask1;'
+    assert not any('&__ret' in ln for ln in out)
+
+    one = [
+        'UniTask __ret = default;',
+        'UniTask uniTask1 = obj7.Task;',
+        '((byte*)&__ret + 0x0)[0] = uniTask1;',
+        'return __ret;',
+    ]
+    assert fold_sret_struct_copies(one, ret_size=16) == [
+        'UniTask __ret = default;',
+        'UniTask uniTask1 = obj7.Task;',
+        '__ret = uniTask1;',
+        'return __ret;',
+    ]
+    # unknown size: a single chunk is not provably the whole value
+    assert fold_sret_struct_copies(one) == one
+
+
+def test_sret_struct_copy_folds_arm_despite_field_store_elsewhere():
+    lines = [
+        'UniTask<int> __ret = default;',
+        'if (flag1)',
+        '{',
+        '    UniTask<int> uniTask1 = obj9.Task;',
+        '    ((byte*)&__ret + 0x0)[0] = uniTask1;',
+        '    ((byte*)&__ret + 0x10)[0] = uniTask1;',
+        '}',
+        'else',
+        '{',
+        '    ((int*)((byte*)&__ret + 0x12))[0] = 0;',
+        '}',
+        'return __ret;',
+    ]
+    out = fold_sret_struct_copies(lines)
+    assert out[4] == '    __ret = uniTask1;'
+    assert any('&__ret + 0x12' in ln for ln in out)
+    assert not any('&__ret + 0x10' in ln for ln in out)
 
 
 def test_void_tail_strips_inline_return_only_after_a_statement():
