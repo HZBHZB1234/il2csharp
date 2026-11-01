@@ -7,7 +7,49 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: game-wide measurement of fixes 173-179 (2026-11-02, on `main`)
+## Current work: fix 180 — an `object` local takes the type metadata already knows (2026-11-02, on `main`)
+
+A virtual/interface call resolved *textually* after lifting leaves its temp
+untyped, so the declaration printed `object` although the callee's return
+type (or the member's own type) is metadata:
+
+```csharp
+object obj9 = battleUnitModel1.IsDead();     // IsDead() : bool
+object obj2 = dateTime1.Hour;                // Hour     : int
+```
+
+`object` locals are the largest single population in the game tree —
+**165,538** declarations in `Assembly-CSharp`, of which 45,258 come from a call
+and 16,103 from a member access. `_rhs_ref_type` (dec/highlevel.py, inside the
+declaration pass that already owns the scoped declaration map) recovers four
+shapes, each with an exact proof:
+
+* **calls** — `recv.Method(args)` / `Method(args)` on the declaring type by
+  name + arity, with a generic return closed from the call's explicit type
+  arguments (`GetComponent<Image>()` → `Image`);
+* **members** — `recv.Member` / `this.Member` as a field's type or a property
+  getter's return type. Property accessor rows store method indices **relative
+  to the owning type's method range** (metadata v27+); reading them absolutely
+  returned an unrelated method, which is how `DateTime.Hour` first looked like
+  a pointer;
+* **copies** — `object obj5 = source1;` takes a *reference* local's spelling
+  (a value-type copy may be a box, so it declines);
+* **allocations** — `new T(...)` when T is a proven reference type.
+
+Decline-by-default: a receiver that is not a declared local or `this`, an
+ambiguous name+arity, an open generic return without explicit call arguments,
+and user struct/enum value types all keep `object`. `_td_by_suffix` (cached
+per binary) resolves shortened declaration spellings, indexing both the
+`List`1` and the `List` form.
+
+Measured: survivors `Assembly-CSharp` object locals **1,446 → 1,340** (-7.3%),
+binding errors unchanged at 2 (unrelated `ref`-vs-`out` CS0535); unitask
+`Assembly-CSharp` **4,720 → 4,664**, binding 2,375 → 2,372; brace **0**,
+tree-sitter **0/0/0/0** on both. Portable suite **1,613 passed** (19 new
+tests). The game-wide effect is the point of the slice (~60k candidate
+declarations) and needs a full game build to measure.
+
+## Previous: game-wide measurement of fixes 173-179 (2026-11-02, on `main`)
 
 A full 161-image build of the licensed fixture with every fix from this
 session (`out/limbus/full0`, 24,738-file `Assembly-CSharp`) gives the first
