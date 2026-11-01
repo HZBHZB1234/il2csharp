@@ -58,7 +58,13 @@ class Expr:
                   # fix 149: constant-index element stores accumulated on
                   # an inline `new T[n]` -- the collection initializer
                   # `_materialize` renders as `new T[n] { v0, v1, ... }`
-                  '_arr_inits')
+                  '_arr_inits',
+                  # fix 177: (typedef index, property name) when this member
+                  # expression spells an auto-property backing field. The
+                  # access reads as the property (`o.X`); an address-take
+                  # respells to the renamed storage field, because a property
+                  # has no address (CS0206).
+                  '_aprop')
 
     def __init__(self, text, ty=None, kind='?', recv=None):
         self.text = text      # rendered C# expression
@@ -76,6 +82,8 @@ class Expr:
             return None
         if name == '_unk':
             return False
+        if name == '_aprop':
+            return None
         if name == '_mi':
             return None
         if name == '_no_bind':

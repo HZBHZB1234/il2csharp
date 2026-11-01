@@ -323,6 +323,21 @@ fix-123 in `validation_reports/review123_*`.
   proof) over the same line's closed `new` RHS only for the same generic
   definition (same short base, same arity) with argument-position openness
   agreement — qualified names like `TMPro.X` are closed, never params.
+- An auto-property is written in its source shape and its backing field is
+  spelled as the property (fix 177). `<X>k__BackingField` is compiler evidence
+  -- the compiler emits that shape for an auto-property and nothing else --
+  so `csharp.auto_property_maps` keys (typedef, property name) to the field by
+  identity, `fields._storage_name` (the one choke point for access spelling)
+  returns `X`, and `emit_property` takes the bodyless `{ get; }` /
+  `{ get; set; }` path. The renamed `__field_X` declaration stays: it cannot
+  collide with the property (CS0102) and it is the only legal spelling at the
+  two ADDRESS-TAKE sites, where `_field_expr` tags `Expr._aprop` and
+  `_addr_field_text` respells (`lea r,[this+off]` and the GC-write-barrier
+  `add r,[obj+off]`; a property has no address, CS0206). Never respell without
+  that tag, never drop the field declaration, and never lift an auto
+  accessor's trivial body after the access respell -- it would call itself.
+  Non-auto collisions (a real field named like a member, an event field named
+  like the event) keep the `__field_X` spelling.
 - Generic parameter constraints come from the metadata's own
   `GenericParameterAttributes` word plus the flat `genericParameterConstraints`
   TypeIndex array ranged per parameter (fix 173). `_type_param_indices` owns

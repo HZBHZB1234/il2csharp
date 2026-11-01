@@ -1385,8 +1385,24 @@ class Emitter:
         aliases = {p.name: safe_ident(q.name) for p, q in zip(sparams[:-1], index_params)}
         if sparams:
             aliases[sparams[-1].name] = 'value'
-        gbody = self._accessor_lines(getter, td) if getter else None
-        sbody = self._accessor_lines(setter, td, aliases) if setter else None
+        # An AUTO-PROPERTY keeps its `{ get; set; }` shape. The proof is the
+        # compiler's own: a field metadata names `<X>k__BackingField` exists
+        # for an auto-property and nothing else, and the access side already
+        # spells its reads/writes as `X` (see `fields._storage_name`), so
+        # lifting the trivial accessor bodies here would only produce
+        # `return this.X;` -- a call to itself.
+        auto = None
+        if not explicit and not index_params:
+            try:
+                from il2cpp.csharp import auto_property_field
+                auto = auto_property_field(self.il, td.index, raw)
+            except Exception:
+                auto = None
+        if auto is not None:
+            gbody = sbody = None
+        else:
+            gbody = self._accessor_lines(getter, td) if getter else None
+            sbody = self._accessor_lines(setter, td, aliases) if setter else None
         off = (bk_offs or {}).get(raw, '')
         header = '%s    %s%s %s' % (pre, mods, ptype, pname)
         # Keep compact bodyless declarations (abstract/interface/signatures).

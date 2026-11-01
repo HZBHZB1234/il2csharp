@@ -7,7 +7,63 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 176 — a whole-tree compile harness, and the next three families sized (2026-11-02, on `main`)
+## Current work: fix 177 — an auto-property reads as its property (2026-11-02, on `main`)
+
+`<X>k__BackingField` is emitted by the C# compiler for an auto-property and
+for nothing else. That made it a *compiler guarantee*, not a heuristic, and
+fix 177 uses it three ways:
+
+* **the property keeps its source shape.** `emit_property` takes the bodyless
+  `{ get; }` / `{ get; set; }` path it already had for abstract members
+  instead of lifting the trivial accessor (`return this.__field_X;`). This is
+  also what makes the rest safe: lifting that body after the access respell
+  below would have produced a self-call.
+* **every access reads as the property.** `fields._storage_name` is the single
+  choke point every field-name path goes through (instance and static chains,
+  the static blob, the closed-generic layout), so a backing field now renders
+  `o.X`. That is what the source wrote, and it is what binds across
+  assemblies: the renamed `__field_X` storage has no counterpart anywhere,
+  which is why `tween.active` (an *inlined* auto-property getter — `Tween.active`
+  is auto) rendered `tween.__field_active` and could not resolve against the
+  original `DOTween.dll`.
+* **the two address-take sites respell back to the field.** A property has no
+  address (CS0206), so oddly-named-but-legal `&o.__field_X` is required at
+  those instructions: `lea r,[this+off]` (the byref receiver of a value-type
+  instance call) and `add r,[obj+off]` (a GC write-barrier field address).
+  `_field_expr` tags the member expression (`Expr._aprop`), and
+  `_addr_field_text` respells. Real evidence for both halves: the LEA path
+  was 511 sites in limbus `f169`, and the barrier path is the
+  `((byte*)&token.__field_Value + 0x0)[0] = ...` family.
+
+The (typedef, property name) ↔ field index map is a per-`Il2Cpp` lazy cache
+(`csharp.auto_property_maps`), keyed by FieldDef identity and requiring the
+property to live on the *same* typedef. Non-auto collisions keep today's
+spelling: a real field named like a member still renders `__field_X`
+(there is no property to point at), and an event field named like the event
+stays renamed because events have no auto form.
+
+Measured on the two MIT fixtures (`out/unitask/cw7`, `out/survivors-roguelike-kit/cw7s`):
+
+| | unitask | survivors |
+|---|---|---|
+| `__field_` accesses | 151 → **101** | 650 → **232** |
+| auto properties emitted | 28 | 39 |
+| bodies lifted | 2,238 → 2,223 | 1,936 → 1,857 |
+| binding errors, AC image | 2,458 → **2,449** | 2 → 2 (CS0535, unrelated) |
+| binding errors, firstpass | — | 932 → **914** |
+
+The drop in lifted bodies is the accessor bodies that are no longer lifted at
+all (15 and 79). No `CS0206` anywhere, brace **0 unbalanced**, tree-sitter
+**0/0/0/0** on both trees. `this.t.active` now resolves against the original
+`DOTween.dll`; the CS1061s that remain in that image are `object` receivers
+(the unresolved-value family), not backing fields. Portable suite **1,575
+passed** (6 new tests), and the limbus game tests whose bodies touch these
+shapes (`test_game_member_recovery`, `test_game_review80`,
+`test_game_limbus_decompile`, `test_game_interlocked`) still pass unchanged —
+the change is narrow because only compiler-generated `<X>k__BackingField`
+rows qualify.
+
+## Previous work: fix 176 — a whole-tree compile harness, and the next three families sized (2026-11-02, on `main`)
 
 **176a — the corpus compile gate can take a real reference closure.**
 `tools/compile_corpus.py` compiles a whole recovered tree as one diagnostic

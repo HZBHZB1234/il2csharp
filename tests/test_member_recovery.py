@@ -57,8 +57,13 @@ def test_actual_field_declaration_is_retained():
     lines = []
     e.emit_type(td, lines, '')
     text = '\n'.join(lines)
+    # The storage field is still declared (renamed, so it cannot collide with
+    # the property) and the property keeps its source `{ get; }` shape: a
+    # `<X>k__BackingField` name is the compiler's proof that this IS an
+    # auto-property, so its trivial accessor body is not lifted (fix 177).
     assert 'int __field_Count;' in text
-    assert 'return this.__field_Count;' in text
+    assert 'public int Count { get; }' in text
+    assert 'return this.__field_Count;' not in text
     assert 'return this.Count;' not in text
 
 

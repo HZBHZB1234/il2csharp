@@ -1,15 +1,30 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.common import csharp_type_name, u64
-from il2cpp.csharp import FA_LITERAL, FA_STATIC, field_attrs, source_field_name
+from il2cpp.csharp import (FA_LITERAL, FA_STATIC, auto_property_name,
+                           field_attrs, source_field_name)
 from il2cpp.names import safe_ident
 
 
 def _storage_name(il, fi):
-    # Preserve the backing-field marker through expression binding. The
-    # existing late member fold removes it after evaluation order is fixed.
+    """Spelling of a field in an ACCESS position.
+
+    An auto-property backing field reads as the property: the source wrote
+    `o.X`, the field's `<X>k__BackingField` name is the compiler's own proof
+    that `X` is an auto-property, and the property is what binds across
+    assemblies (the renamed `__field_X` has no counterpart anywhere). The
+    DECLARATION still uses `source_field_name`'s renamed storage so the field
+    and the property cannot collide (CS0102), and an address-take site
+    respells back to that storage -- a property has no address.
+
+    Every other backing-field shape keeps the marker spelling: the late
+    member fold removes it after evaluation order is fixed.
+    """
     name = source_field_name(il, fi)
     raw = il.meta.fields[fi].name
     if name != raw and raw.startswith('<') and raw.endswith('>k__BackingField'):
+        prop = auto_property_name(il, fi)
+        if prop is not None:
+            return prop
         return '<' + name + '>k__BackingField'
     return name
 from il2cpp.runtime.meta import meta_lit_repr

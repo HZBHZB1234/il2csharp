@@ -657,7 +657,8 @@ class _InsnMixin:
                     if fe.kind in ('obj', 'arr', 'str') or ('->' in fe.text) \
                             or ('.' in fe.text
                                 and not fe.text.startswith('*')):
-                        self.set_reg(dst, self._mk('&' + fe.text, fe.ty, 'ptr'))
+                        self.set_reg(dst, self._mk('&' + self._addr_field_text(fe),
+                                                   fe.ty, 'ptr'))
                     else:
                         # `lea r,[reg+N]` with a constant base is how the
                         # compiler materialises a small constant. Unfolded it
@@ -810,7 +811,7 @@ class _InsnMixin:
                 if field.ty is not None and not field.text.startswith('*') \
                         and not _vt_field \
                         and (field.text.startswith(_recv_fold(a.text) + '.') or a.kind == 'sfblob'):
-                    e = self._mk('&' + field.text, field.ty, 'ptr')
+                    e = self._mk('&' + self._addr_field_text(field), field.ty, 'ptr')
                     self.set_reg(dst, e)
                     self.flags = (e, Expr('0', None, 'int'))
                     return

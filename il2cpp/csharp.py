@@ -78,6 +78,64 @@ def source_field_name(il, fi):
     return names.get(fi, il.meta.fields[fi].name)
 
 
+def auto_property_maps(il):
+    """Two maps tying compiler auto-property backing fields to their property.
+
+    `field.raw == '<X>k__BackingField'` plus a property named `X` on the same
+    type is a *compiler guarantee*, not a heuristic: that field-name shape is
+    emitted for an auto-property and for nothing else. The access side can
+    therefore spell the property (`o.X`, which is what the source wrote and
+    what binds across assemblies) while the declaration keeps the renamed
+    field the collision rules already chose.
+
+    0: field index -> property name (access spelling)
+    1: (typedef index, property name) -> field index (declaration side)
+    """
+    maps = getattr(il, '_auto_prop_maps', None)
+    if maps is not None:
+        return maps
+    by_field, by_prop = {}, {}
+    meta = il.meta
+    try:
+        for td in meta.typedefs:
+            count = getattr(td, 'property_count', 0)
+            if not count:
+                continue
+            props = set()
+            for k in range(count):
+                try:
+                    props.add(meta.getstr(meta.properties[td.property_start + k][0]))
+                except Exception:
+                    continue
+            if not props:
+                continue
+            for fi in meta.type_fields(td):
+                try:
+                    raw = meta.fields[fi].name or ''
+                except Exception:
+                    continue
+                m = re.fullmatch(r'<(.+)>k__BackingField', raw)
+                if not m or m.group(1) not in props:
+                    continue
+                by_field[fi] = m.group(1)
+                by_prop[(td.index, m.group(1))] = fi
+    except Exception:
+        by_field, by_prop = {}, {}
+    maps = (by_field, by_prop)
+    il._auto_prop_maps = maps
+    return maps
+
+
+def auto_property_name(il, fi):
+    """Property name for an auto-property backing field, else None."""
+    return auto_property_maps(il)[0].get(fi)
+
+
+def auto_property_field(il, td_index, prop_name):
+    """Backing-field index for an auto-property on `td_index`, else None."""
+    return auto_property_maps(il)[1].get((td_index, prop_name))
+
+
 class UsingTracker:
     """Namespace references used by one emitted file, rendered as sorted,
     de-duplicated using statements. Sources are the file's rendered text --

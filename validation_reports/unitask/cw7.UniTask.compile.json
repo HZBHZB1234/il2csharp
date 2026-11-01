@@ -1,0 +1,36 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\cw7\\UniTask",
+  "assembly": "UniTask",
+  "files": 301,
+  "syntax": 0,
+  "binding": 8,
+  "top": [
+    [
+      "CS8701",
+      8
+    ]
+  ],
+  "tool_error": null,
+  "refs": 47,
+  "samples": {
+    "CS8701": [
+      {
+        "file": "out\\unitask\\cw7\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 18,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\unitask\\cw7\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 23,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\unitask\\cw7\\UniTask\\Cysharp\\Threading\\Tasks\\IUniTaskSource.cs",
+        "line": 28,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

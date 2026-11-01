@@ -760,6 +760,7 @@ class _ValuesMixin:
                     if fname == 'invoke_impl' and self._delegate_invoke_method(ty) is not None:
                         fe.kind = 'delegate_impl'
                         fe.recv = base
+                    self._note_auto_prop(fe, td_idx, fname)
                     return fe
                 if _vt and (disp + 0x10) in chain:
                     fname, ftype_idx = chain[disp + 0x10]
@@ -771,7 +772,9 @@ class _ValuesMixin:
                         fkind = 'float'
                     elif _ptr_base and fte == 0x0e:
                         fkind = 'str'
-                    return Expr('%s%s%s' % (_recv_fold(text), _sep, fname), fty, fkind)
+                    fe = Expr('%s%s%s' % (_recv_fold(text), _sep, fname), fty, fkind)
+                    self._note_auto_prop(fe, td_idx, fname)
+                    return fe
                 # C2: an offset INSIDE an embedded value-type field (the
                 # roadmap's `0x18` inside a field at `0x10` -> `.field.z`).
                 # The flat chain stops at each field, so resolve the path
@@ -1122,6 +1125,48 @@ class _ValuesMixin:
         if te in (0x0f, 0x10):
             return self._type_param_owners(self.il.type_from_ptr(ty[0]), out, depth + 1)
         return True
+
+    def _addr_field_text(self, fe):
+        """Text for an address-take of a member expression.
+
+        `_storage_name` spells an auto-property backing field as its
+        property, which reads and binds correctly -- but a property has no
+        address, so `&o.X` is illegal C# (CS0206). Respell to the renamed
+        storage field the declaration side uses; nothing else changes.
+        """
+        ap = getattr(fe, '_aprop', None)
+        if ap is None:
+            return fe.text
+        td_idx, pname = ap
+        try:
+            from il2cpp.csharp import auto_property_field, source_field_name
+            fi = auto_property_field(self.il, td_idx, pname)
+            if fi is None:
+                return fe.text
+            stor = source_field_name(self.il, fi)
+            tail = '.' + pname
+            if fe.text.endswith(tail):
+                return fe.text[:-len(tail)] + '.' + stor
+        except Exception:
+            return fe.text
+        return fe.text
+
+    def _note_auto_prop(self, fe, td_idx, fname):
+        """Tag a member expression that spells an AUTO-PROPERTY backing field.
+
+        `_storage_name` spells such a field as its property (`o.X`), because
+        that is what the source wrote and what binds across assemblies. An
+        address-take (`lea r,[this+off]` -- the byref receiver of a value-type
+        instance call) cannot name a property, so the LEA path reads this tag
+        and respells the renamed storage field. Nothing else consumes it.
+        """
+        try:
+            from il2cpp.csharp import auto_property_field
+            if auto_property_field(self.il, td_idx, fname) is not None:
+                fe._aprop = (td_idx, fname)
+        except Exception:
+            pass
+        return fe
 
     def _recv_member_ty(self, td_idx, recv_ty, fty):
         """Fix 133b: a member's field type as seen through its receiver.
