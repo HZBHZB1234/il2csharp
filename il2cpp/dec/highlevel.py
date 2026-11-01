@@ -1248,11 +1248,14 @@ class _HighLevelMixin:
                 parts = full.split('.')
                 for k in range(1, len(parts) + 1):
                     suf = '.'.join(parts[-k:])
-                    prev = idx.get(suf)
-                    if prev is not None and prev != td.index:
-                        amb.add(suf)
-                    else:
-                        idx[suf] = td.index
+                    # declaration spellings carry no arity backtick
+                    # (`List`, not `List`1`): index both spellings
+                    for key in {suf, re.sub(r'`\d+', '', suf)}:
+                        prev = idx.get(key)
+                        if prev is not None and prev != td.index:
+                            amb.add(key)
+                        else:
+                            idx[key] = td.index
             for suf in amb:
                 idx.pop(suf, None)
             il._td_suffix_map = idx
@@ -1369,21 +1372,80 @@ class _HighLevelMixin:
 
     _MEMBER_RHS_RX = re.compile(
         r'^(?:(?P<recv>this|[A-Za-z_]\w*)\.)?(?P<name>[A-Za-z_]\w*)$')
+    _COPY_RX = re.compile(r'^([A-Za-z_]\w*)$')
 
     def _rhs_ref_type(self, rhs, decl, method):
         """Declaration type of an `object objN = <rhs>;` from metadata.
 
-        Two shapes whose static type is metadata even when the lifter lost
-        it: a call on a locally declared receiver (fix 180) and a plain
-        member access (fix 180b). Both decline unless the receiver resolves
-        through a declared local (or `this`) and the member is unique by
-        name (and arity, for calls).
+        Four shapes whose static type is metadata even when the lifter lost
+        it: a call on a locally declared receiver (fix 180), a plain member
+        access (fix 180b), a copy of another declared local whose type is a
+        reference type (180c), and a fresh allocation of a reference type
+        (180d). All decline unless the proof is exact.
         """
         try:
             text = (rhs or '').strip().rstrip(';').strip()
+            if not text:
+                return None
             if '(' in text:
+                if re.match(r'new\s', text):
+                    return self._alloc_rhs_type(text)
                 return self._call_rhs_type(text, decl, method)
+            m = self._COPY_RX.match(text)
+            if m is not None:
+                entry = decl.get(m.group(1))
+                if entry is None:
+                    return None
+                return self._copy_rhs_type(entry[0])
             return self._member_rhs_type(text, decl, method)
+        except Exception:
+            return None
+
+    _ALLOC_RHS_RX = re.compile(
+        r'new\s+([A-Za-z_@][\w.@]*(?:<[^()<>]*>)?)\s*\(')
+
+    def _alloc_rhs_type(self, text):
+        """`new T(...)` where T is a proven reference type (180d)."""
+        try:
+            L = getattr(self, 'L', None)
+            il = getattr(L, 'il', None)
+            m = self._ALLOC_RHS_RX.match(text)
+            if m is None or il is None:
+                return None
+            spelled = m.group(1)
+            base = spelled.split('<')[0].strip()
+            td = self._td_by_suffix(il, base)
+            if td is None:
+                return None
+            tdo = L.meta.typedefs[td]
+            if getattr(tdo, 'is_valuetype', False) or getattr(tdo, 'is_enum', False):
+                return None
+            return spelled
+        except Exception:
+            return None
+
+    def _copy_rhs_type(self, src_type):
+        """A copy of a reference-typed local has that same static type.
+
+        Value types decline: a copy into `object` may be a box, and spelling
+        the value type would change identity semantics.
+        """
+        try:
+            L = getattr(self, 'L', None)
+            il = getattr(L, 'il', None)
+            if il is None or not src_type:
+                return None
+            spelled = src_type.strip()
+            if spelled == 'object':
+                return None
+            base = spelled.split('<')[0].strip()
+            td = self._td_by_suffix(il, base)
+            if td is None:
+                return None
+            tdo = L.meta.typedefs[td]
+            if getattr(tdo, 'is_valuetype', False) or getattr(tdo, 'is_enum', False):
+                return None
+            return spelled
         except Exception:
             return None
 

@@ -74,7 +74,7 @@ def _meta(methods, typedefs=None, generic_params=None, fields=None,
 
 
 def _decompiler(meta, types=None, chain=None):
-    il = NS(types=list(types or TYPES),
+    il = NS(types=list(types or TYPES), meta=meta,
             _type_enum=lambda t: (t[1] >> 16) & 0xFF,
             type_name=lambda t, depth=0: {
                 T_BOOL: 'bool', T_INT: 'int', T_STRING: 'string',
@@ -82,7 +82,9 @@ def _decompiler(meta, types=None, chain=None):
                 T_ARRAY: 'int[]',
             }.get((t[0], t[1]), '?'),
             base_chain_tds=lambda td: (chain(td) if chain else
-                                       ((td,) if td == 0 else (td, 0))))
+                                       ((td,) if td == 0 else (td, 0))),
+            typedef_full=lambda i: ('NS.' + meta.typedefs[i].name
+                                    if 0 <= i < len(meta.typedefs) else ''))
     dec = _HighLevelMixin.__new__(_HighLevelMixin)
     dec.L = NS(meta=meta, il=il)
     dec._eq_typedef_map = lambda: {'NS.Foo': 1, 'NS.Base': 0}
@@ -202,3 +204,39 @@ def test_a_bare_identifier_member_rhs_declines():
     """`x = y;` is a copy, not a member access."""
     meta = _field_meta(T_FOO)
     assert _member(meta, 'Inner', {}) is None
+
+
+# -- copies and allocations -------------------------------------------------
+
+def _rhs(meta, rhs, decl, self_td=0):
+    m = _method('self', 0, T_INT, declaring=self_td)
+    return _decompiler(meta)._rhs_ref_type(rhs, decl, m)
+
+
+def _typedef_with(name='Foo'):
+    return NS(index=0, name=name, namespace='NS', flags=0, is_valuetype=False,
+              is_enum=False, parent=-1, field_start=0, field_count=0,
+              property_start=0, property_count=0, method_start=0,
+              method_count=0)
+
+
+def test_a_copy_of_a_reference_local_takes_its_type():
+    meta = _meta([], typedefs=[_typedef_with()])
+    assert _rhs(meta, 'source1;', {'source1': ('NS.Foo', 0)}) == 'NS.Foo'
+
+
+def test_a_copy_of_a_primitive_local_declines():
+    """`object o = num1;` may be a box; spelling `int` changes identity."""
+    meta = _meta([], typedefs=[_typedef_with()])
+    assert _rhs(meta, 'num1;', {'num1': ('int', 0)}) is None
+
+
+def test_a_fresh_allocation_takes_its_type():
+    meta = _meta([], typedefs=[_typedef_with()])
+    assert _rhs(meta, 'new NS.Foo();', {}) == 'NS.Foo'
+
+
+def test_an_allocation_of_a_value_type_declines():
+    meta = _meta([], typedefs=[_typedef_with()])
+    assert _rhs(meta, 'new NS.Struct();', {}) is None
+
