@@ -113,3 +113,27 @@ def test_enum_header_stays_bare_int_when_underlying_is_int():
 
 def test_enum_header_keeps_a_recorded_element():
     assert _emit_header(1, T_INT64) == ["public enum Bits : long"]
+
+
+def _return_name(text, ty):
+    """A tiny stand-in for the analyze mixin's literal-return proof."""
+    from il2cpp.dec.analyze import _AnalyzeMixin
+    td = NS(name="UniTaskStatus")
+    L = NS(_td_of=lambda t: 0,
+           il=NS(enum_members=lambda i: {0: "Pending", 1: "Succeeded",
+                                         2: "Faulted", 3: "Canceled"}),
+           meta=NS(typedefs=[td]))
+    return _AnalyzeMixin._return_literal_text(None, L, text, ty)
+
+
+def test_literal_return_names_enum_members_and_booleans():
+    enum_ty = (0, 0x00120000)     # enum
+    bool_ty = (0, 0x00020000)     # System.Boolean
+    int_ty = (0, 0x00080000)      # System.Int32
+    assert _return_name("1", enum_ty) == "UniTaskStatus.Succeeded"
+    assert _return_name("0", enum_ty) == "UniTaskStatus.Pending"
+    assert _return_name("9", enum_ty) == "9"     # no exact member
+    assert _return_name("1", bool_ty) == "true"
+    assert _return_name("0", bool_ty) == "false"
+    assert _return_name("1", int_ty) == "1"
+    assert _return_name("obj1", enum_ty) == "obj1"

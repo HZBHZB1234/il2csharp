@@ -339,6 +339,7 @@ class _BuildMixin:
             return ['/* nothing */']
         lines = self._final_text(self._structure(blocks, bmap, m))
         lines = drop_empty_init_guards(lines)
+        lines = drop_duplicate_raw_stores(lines)
         lines = drop_gc_cardmark_barriers(lines)
         lines = drop_dead_cardmark_fragments(lines)
         try:
@@ -1041,22 +1042,61 @@ def hoist_escaping_locals(lines, params=()):
 # a pure flag read guarding nothing is a no-op, so it is dropped. Only
 # the exact empty shape with a bare-identifier/literal comparand and no
 # `else` is touched; a guard that still has a body keeps it.
-_EMPTY_INIT_GUARD_RX = re.compile(
-    r'^\s*if \((?:!\()?typeof\([^()]*\)\.initialized (?:==|!=) '
-    r'(?:\w+)\)?\)\s*$')
+_EMPTY_INIT_GUARD_RXS = (
+    # pre-fix-134 spelling: `typeof(X).initialized == 0`
+    re.compile(r'^\s*if \((?:!\()?typeof\([^()]*\)\.initialized '
+               r'(?:==|!=) (?:\w+)\)?\)\s*$'),
+    # fix-134 raw-load spelling: `((byte*)typeof(X) + 0xe0)[0] == 0`.
+    # The generic class-init check was always the same native cmpl; only
+    # its rendered text changed, so the old pattern silently stopped
+    # matching (survivors/UniTask: 1,336 empty guards stayed in the tree).
+    re.compile(r'^\s*if \(\(\(byte\*\)typeof\([^()]*\) \+ 0xe0\)\[0\] '
+               r'(?:==|!=) (?:\w+)\)\s*$'),
+)
 
 
 def drop_empty_init_guards(lines):
     out = []
     i, n = 0, len(lines)
     while i < n:
-        if (i + 2 < n and _EMPTY_INIT_GUARD_RX.match(lines[i])
+        if (i + 2 < n
+                and any(rx.match(lines[i]) for rx in _EMPTY_INIT_GUARD_RXS)
                 and lines[i + 1].strip() == '{'
                 and lines[i + 2].strip() == '}'
                 and not (i + 3 < n
                          and lines[i + 3].strip().startswith('else'))):
             i += 3
             continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+# A GC write-barrier field store and its managed twin:
+#     ((byte*)&this.field + 0x0)[0] = value;
+#     this.field = value;
+# The raw store is the barrier's machine store; the next line is the same
+# assignment with the field's real type.  Only the exact, adjacent pair is
+# dropped, and only when both sides spell identically -- a differing value
+# or a non-store neighbour keeps the raw line (its own store may be the
+# only one, e.g. a hidden-sret buffer).
+_RAW_FIELD_STORE_RX = re.compile(
+    r'^\s*\(\(byte\*\)&(.+?) \+ 0x0\)\[0\] = (.+);\s*$')
+
+
+def drop_duplicate_raw_stores(lines):
+    out = []
+    i, n = 0, len(lines)
+    while i < n:
+        m = _RAW_FIELD_STORE_RX.match(lines[i])
+        if m is not None and i + 1 < n:
+            lhs, rhs = m.group(1).strip(), m.group(2).strip()
+            nxt = lines[i + 1].strip()
+            if nxt.endswith(' return;'):
+                nxt = nxt[:-len(' return;')].rstrip()
+            if nxt == '%s = %s;' % (lhs, rhs):
+                i += 1
+                continue
         out.append(lines[i])
         i += 1
     return out

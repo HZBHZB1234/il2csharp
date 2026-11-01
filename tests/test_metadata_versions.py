@@ -316,7 +316,10 @@ def _build_v39_narrow():
     f_size = n_fields * p_stride
     eo = fo + f_size
     e_size = n_events * _v39_event_stride(type_w)
-    fdvo = eo + e_size
+    ifo = eo + e_size
+    n_interfaces = 2
+    i_size = n_interfaces * type_w
+    fdvo = ifo + i_size
     dv_stride = 4 + type_w + 4
     fdv_size = 2 * dv_stride
     pdvo = fdvo + fdv_size
@@ -335,6 +338,7 @@ def _build_v39_narrow():
         'parameters': (po, p_size, n_params),
         'fields': (fo, f_size, n_fields),
         'events': (eo, e_size, n_events),
+        'interfaces': (ifo, i_size, n_interfaces),
         'fieldDefaultValues': (fdvo, fdv_size, 2),
         'parameterDefaultValues': (pdvo, pdv_size, 1),
         'genericContainers': (gco, gc_size, n_td),
@@ -404,6 +408,11 @@ def _build_v39_narrow():
     struct.pack_into('<i', buf, b + 12 + type_w, 0)
     struct.pack_into('<I', buf, b + 16 + type_w, SENTINEL_TOKEN)
 
+    # interfaces table: two TypeDef indices, each type_w wide.  A fixed
+    # 4-byte read turns this into one bogus row (0x00090007).
+    for i, type_index in enumerate((7, 9)):
+        struct.pack_into('<H', buf, ifo + i * type_w, type_index)
+
     # field default row 0 (index 3, type, data 11) and row 1 (index 4, ...)
     for i, (idx, data) in enumerate(((3, 11), (4, 12))):
         b = fdvo + i * dv_stride
@@ -445,6 +454,11 @@ def test_v39_narrow_rows_do_not_shift(tmp_path):
     assert (m.fields[0].name, m.fields[0].type) == ('Ns', SENTINEL_RT)
     assert len(m.events) == 1
     assert (m.events[0][0], m.events[0][5]) == (5, SENTINEL_TOKEN)
+
+    # The interfaces table is also packed at type_w: a fixed 4-byte read
+    # halves a narrow table and leaves the tail out of range (survivors'
+    # header emission raised IndexError on 54 types).
+    assert m.interfaces == [7, 9]
 
     # Default-value tables use the same packed row; a fixed 12 read drops
     # the tail of a narrow file (survivors parsed 8,450 of 12,629).

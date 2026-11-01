@@ -117,11 +117,13 @@ class _AnalyzeMixin:
                         rty = L.il.types[rti] if 0 <= rti < len(L.il.types) else None
                         if rty is not None and _BARE_TOKEN_RX.match(rv.text):
                             L._type_hints.setdefault(rv.text, rty)
-                        if rv.text == '&__ret':
+                        ret_text = self._return_literal_text(L, rv.text, rty)
+                        if ret_text == '&__ret':
                             # the echoed hidden buffer: return the value
                             b.ret = '__ret'
                         else:
-                            b.ret = rv.text if len(rv.text) < 160 else L._materialize(rv, 160)
+                            b.ret = ret_text if len(ret_text) < 160 \
+                                else L._materialize(rv, 160)
                     else:
                         b.ret = ''
                     continue
@@ -369,6 +371,51 @@ class _AnalyzeMixin:
                                     void = 0 <= rti < len(L.il.types) and \
                                         ((L.il.types[rti][1] >> 16) & 0xFF) == 0x01
                                     L._emit_tail(ins.ip, call, None, void=void)
+                            elif info is not None and info[0] == 'generic':
+                                # A tail whose address carries one generic
+                                # spec: resolve it like the call path, then
+                                # trim to the MethodDef's own signature.
+                                # `info[0] == 'generic'` fell into the raw
+                                # `_call_name` branch below, printing the
+                                # whole GPR spray (BoolWrapper.Reset:
+                                # `set_Value(this, 0, set_Value, obj1)`).
+                                _gsi = info[1]
+                                _gmd = L._spec_md(_gsi)
+                                if _gmd is not None:
+                                    _gname = L.il.generic_method_name(_gsi) \
+                                        or L._call_name(t)
+                                    _tg_call, _tg_m = L._tail_generic_call(
+                                        _gname, _gmd, args, arg_exprs)
+                                    _gm = L.meta.methods[_gmd]
+                                    _want = _gm.param_count + (
+                                        0 if _gm.is_static else 1)
+                                    _tg_args = list(args[:_want])
+                                    _base = 0 if _gm.is_static else 1
+                                    _spec = L.il.method_specs[_gsi] \
+                                        if 0 <= _gsi < len(L.il.method_specs) else None
+                                    for _pi, _pp in enumerate(
+                                            L.meta.method_params(_gm)):
+                                        _pty = L._tail_subst_closed(
+                                            L.il.types[_pp.type], _spec) \
+                                            if 0 <= _pp.type < len(L.il.types) else None
+                                        _ai = _base + _pi
+                                        if _pty is not None and _ai < len(_tg_args) \
+                                                and ((_pty[1] >> 16) & 0xFF) == 0x02 \
+                                                and _tg_args[_ai] in ('0', '1'):
+                                            _tg_args[_ai] = 'true' if \
+                                                _tg_args[_ai] == '1' else 'false'
+                                    _tg_sg = L._tail_accessor(_gmd, _tg_args)
+                                    if _tg_sg is not None:
+                                        _tg_call = _tg_sg
+                                    _tg_rti = _tg_m.return_type
+                                    _tg_void = 0 <= _tg_rti < len(L.il.types) and \
+                                        ((L.il.types[_tg_rti][1] >> 16) & 0xFF) == 0x01
+                                    L._emit_tail(ins.ip, _tg_call, None,
+                                                 void=_tg_void, marker=False)
+                                else:
+                                    L._emit_tail(ins.ip, '%s(%s)' % (
+                                        L._call_name(t), L._render_args(args)),
+                                        None, marker=False)
                             else:
                                 nm = L._call_name(t)
                                 if t in getattr(L, 'rt_isinst', ()) and len(arg_exprs) >= 2:
@@ -1369,6 +1416,31 @@ class _AnalyzeMixin:
             return bool(t) and ((t[1] >> 16) & 0xFF) != 0x01
         except Exception:
             return True
+
+    def _return_literal_text(self, L, text, rty):
+        """Name a literal returned through the method's own return type.
+
+        `return 1;` from a `UniTaskStatus` getter is `Succeeded`, and from a
+        bool method it is `true`.  Same exact-member proof as the store path
+        (`_fimm`) and the argument path (fix 85): a [Flags] combination with
+        no single named member keeps its literal.  Non-literal values never
+        change.
+        """
+        if rty is None or not isinstance(rty, tuple) \
+                or not re.fullmatch(r'-?\d+', text):
+            return text
+        val = int(text)
+        te = (rty[1] >> 16) & 0xFF
+        if te == 0x02 and val in (0, 1):
+            return 'true' if val else 'false'
+        if te in (0x11, 0x12, 0x15):
+            etd = L._td_of(rty)
+            em = L.il.enum_members(etd) if etd is not None else None
+            if em and val in em:
+                return '%s.%s' % (
+                    csharp_type_name(L.meta.typedefs[etd].name,
+                                     strip_arity=True), em[val])
+        return text
 
     # ------------------------------------------------------------------
     def _dominators(self, blocks, rpo, reach):

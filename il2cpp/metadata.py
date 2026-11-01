@@ -393,8 +393,20 @@ class Metadata:
         # misc index tables
         nto, ntc = h['nestedTypesOffset'], h['nestedTypesSize']
         self.nested_types = [i32(d, nto + i * 4) for i in range(ntc // 4)]
+        # v38+ packs the interface table's TypeDef index at `type_w`, like
+        # every other type-index row. Limbus (type_w 4) is 4 bytes/row;
+        # survivors-roguelike-kit (type_w 2) is 2. The fixed 4-byte read
+        # halved the table (3,909 -> 1,954), so every type whose interface
+        # range sat in the lost tail raised IndexError while emitting its
+        # header (54 type-emit failures).
         ifo, ifc = h['interfacesOffset'], h['interfacesSize']
-        self.interfaces = [i32(d, ifo + i * 4) for i in range(ifc // 4)]
+        if self.v38:
+            iw = self.type_w
+            self.interfaces = [self._read_vw(ifo + i * iw, iw)
+                               for i in range(h.get('interfacesCount',
+                                                   ifc // iw))]
+        else:
+            self.interfaces = [i32(d, ifo + i * 4) for i in range(ifc // 4)]
         vto, vtc = h['vtableMethodsOffset'], h['vtableMethodsSize']
         self.vtable_methods = [u32(d, vto + i * 4) for i in range(vtc // 4)]
 

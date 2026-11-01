@@ -3718,9 +3718,26 @@ class _CallsMixin:
                 except Exception:
                     gname = None
                 if gname is not None and gname == name:
-                    lt = gname.find('<')
-                    if 0 < lt and lt > gname.rfind('.'):
-                        mdot = gname[gname.rfind('.') + 1:]
+                    # Split at the LAST dot outside generic brackets:
+                    #   Component.GetComponent<UnityEngine.Rigidbody2D>
+                    #     -> GetComponent<...>   (dot inside the argument)
+                    #   System.Collections.Generic.List<T>.RemoveAll
+                    #     -> RemoveAll           (dot after the closing `>`)
+                    # The old global rfind('.') handled the first shape but
+                    # not the second; the first-bracket variant then broke
+                    # `List<T>.RemoveAll` into `List<T>.RemoveAll` after the
+                    # receiver (`list1.List<...>.RemoveAll`).
+                    _depth = 0
+                    _sep = -1
+                    for _i, _ch in enumerate(gname):
+                        if _ch == '<':
+                            _depth += 1
+                        elif _ch == '>':
+                            _depth = max(0, _depth - 1)
+                        elif _ch == '.' and _depth == 0:
+                            _sep = _i
+                    if _sep >= 0:
+                        mdot = gname[_sep + 1:]
             # fix 69b: args[0] is the receiver only when the return
             # does NOT need a hidden sret buffer -- Win64 puts the
             # buffer in RCX and shifts the receiver to RDX when it

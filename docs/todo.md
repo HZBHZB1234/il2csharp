@@ -7,6 +7,119 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
+## Current work: fix 171 — the open-source differential corpus and four output fixes (2026-11-01, on `main`)
+
+**Two MIT projects now have both the source and an IL2CPP build**, so output
+can be compared with ground truth instead of only with another decompiler.
+Both are local-only (`fixtures/registry.json`, git-ignored):
+
+| fixture | source | build | metadata | native methods |
+|---|---|---|---|---|
+| `unitask` | Cysharp/UniTask (MIT) | Unity 2022.3.39f1, Windows x64 | v31 | 24,643 |
+| `survivors-roguelike-kit` | Roo-Roo-Roo (MIT) | Unity 6000.3.12f1, Windows x64 | v39 narrow (type_w 2) | 83,855 |
+
+**New measurement: [`tools/source_compare.py`](../tools/source_compare.py).**
+It parses the source checkout and the emitted tree with tree-sitter, matches
+type/method/arity (property accessors included), and reports call/member
+precision and recall, control-flow cosine, and decompiler tells. Async and
+iterator methods are excluded (the C# compiler rewrites them into state
+machines), as are `Method body was not recovered` stubs. This is the first
+metric in the repo tied to the original source rather than to a previous
+build; it reports a small worst-method list instead of pretending 100k
+bodies were reviewed.
+
+**171a — the v39 `interfaces` table is packed at `type_w`.** The parser read
+a fixed 4 bytes/row. On the narrow survivors file the table is 2 bytes/row,
+so 3,909 rows became 1,954 and every type whose interface range sat in the
+lost tail raised `IndexError` in `type_decl_line`: **54 type-emit failures ->
+0**, and the recovered body count rose **1,378 -> 1,936** because those
+types never reached their methods. Limbus (type_w 4) is byte-identical.
+Test: the synthetic v39 narrow file now carries an interfaces table.
+
+**171b — generic method table rows index `genericMethodPointers[row[1]]`.**
+The row is `{methodSpecIndex, methodPointerIndex, invokerIndex,
+adjustorThunk}`, not a parallel array: the two counts differ (UniTask 59,586
+pointers / 59,725 rows; survivors 96,876 / 97,126). Pairing by row number
+shifted every generic target after the first hole, which is why
+`BoolWrapper.Reset` called `WhereSelectEnumerableIterator<...>.ctor`,
+`GetComponent<T>` called `Memmove<...>`, and the async builders printed
+service methods instead of their generic methods. Cross-checked against
+Il2CppDumper's own read: `genericMethodPointers[table.indices.methodIndex]`.
+Measured with the source differential (same tool, same 1,481/964 matched
+methods):
+
+| tree | call F1 | full call recall | zero-call methods |
+|---|---|---|---|
+| Unitask before | 0.447 | 552/1,481 (37.3%) | 524 |
+| Unitask after | **0.600** | **739/1,481 (49.9%)** | **367** |
+| survivors before | 0.630 | 515/964 (53.4%) | 161 |
+| survivors after | **0.647** | **530/964 (55.0%)** | **150** |
+
+A Limbus A/B (112 sampled `Assembly-CSharp` bodies, snapshot from `HEAD`
+`bf72db7`) compared 112 / changed 14, **+52/-50 lines, two inserts, zero
+missing, zero crashes** (`out/limbus-ab-final.txt`, local); the changes are
+named enum returns, `GetComponent<T>`, correct generic owners, and two
+materialized repeated calls. No full Limbus tree was built or promoted.
+
+**171c — generic single-spec tails and qualified generic names.** A tail
+whose address carries one generic spec now goes through
+`_tail_generic_call` / `_tail_method_args` like a call (both the Lifter and
+the pass-2 twin), and the accessor fold sees the trimmed argument list.
+`BoolWrapper.Reset` went from
+`WhereSelectEnumerableIterator<...>.ctor(this, 0, WrapperT<bool>.set_Value, obj1)`
+to `this.Value = false;`. The method-name slice now splits on the last dot
+outside generic brackets, so `List<T>.RemoveAll` stays `list.RemoveAll` and
+`Component.GetComponent<UnityEngine.Rigidbody2D>` stops printing bare
+`GetComponent()` (`PlayerAnim.Awake` now matches its source).
+
+**171d — output cleanup, all exact-shape and decline-by-default.**
+* the empty class-init guard pattern also matches the post-fix-134 raw
+  spelling `((byte*)typeof(X) + 0xe0)[0] == 0`; **1,423 -> 30** guard lines
+  on Unitask (30 have real bodies and stay);
+* a raw GC-barrier field store immediately followed by its identical
+  managed twin is dropped: survivors' raw `+0x0` stores **400 -> 111**
+  (the pre-fix census found 312 exact adjacent twins; single stores and
+  differing values stay);
+* a void method's trailing inline `return;` after a complete statement is
+  removed: **365 -> 110** on Unitask, **321 -> 173** on survivors (returns
+  inside loops/conditionals stay);
+* a literal return is named through the method's own return type:
+  `return 1;` on `UniTaskStatus` becomes `Succeeded`, a bool becomes
+  `true`, and `[Flags]` combinations with no exact member keep the literal.
+
+**Build/gate state (`out/unitask/q3`, `out/survivors-roguelike-kit/q3`).**
+Unitask 466 files / 2,238 bodies; survivors 291 files / 1,936 bodies; both
+build with **0 failed / 0 fallbacks / 0 type-emit failures**, brace **0
+unbalanced**, tree-sitter parse **0 bad / 0 ERROR / 0 MISSING / 0 recovery**.
+The Unitask tree is 4,544,933 bytes vs 4,787,784 before (-5.1%) with the
+same file set. Portable suite **1,527 passed**; new tests cover the
+registration table, the narrow interfaces row, the three text passes, the
+literal-return proof, and the two survivors bodies. Limbus game suite:
+**1,569 passed / 2 failed / 1 xfailed**, both failures the known
+`Unity.Burst.Unsafe` absence from the archived partial `f169` tree;
+`tests/test_game_parallel_build.py` hangs on this box's named-pipe path
+and was excluded. No promotion, no golden/pin re-pin.
+
+One focused Limbus test encoded the OLD misalignment: it expected
+`SetPropertyUtility.SetStruct<float>` at an address Il2CppDumper identifies
+as `StoryProgressManager.SetScenario<object>` (dump.cs RVA 0x3A9D460, four
+parameters; the native site passes all four). The test now asserts the
+ground-truth call, with the dump evidence in its comment. The two remaining
+Limbus failures are the known partial-`f169` environment gap
+(`Unity.Burst.Unsafe` is absent from that archived scoped tree, so the
+compile-gate and decl-gate tests cannot find it); `test_game_parallel_build`
+hangs on this box's named-pipe path and was excluded from the run.
+
+**What remains, by size.** Unitask still has 2,393 source methods whose
+emitted body is the unavailable-body stub; most are methods of generic type
+definitions (`AsyncReactiveProperty<T>` and friends), which have no module
+method pointer at all. Recovering them needs a generic-context body model,
+not a spelling fix. Coroutine/async state machines are compiler rewrites and
+are excluded from the metric; shared generic bodies with one registered
+representative can still name a sibling instantiation, and the SRE
+`__ret` byte stores (712 Unitask sites) remain the largest single textual
+family. These are recorded, not silently claimed.
+
 ## Current work: fix 170 — v38+ metadata rows are PACKED, not fixed-width (2026-11-01, on `main`)
 
 **Found by registering new open-source fixtures**, not by a gate: the

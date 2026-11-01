@@ -426,7 +426,7 @@ class Emitter:
         if td.interfaces_count:
             for k in range(td.interfaces_count):
                 ii = self.meta.interfaces[td.interfaces_start + k]
-                t = self.il.types[ii] if ii < len(self.il.types) else None
+                t = self.il.types[ii] if 0 <= ii < len(self.il.types) else None
                 if t:
                     base.append(self.il.type_name(t))
         if td.is_valuetype and not td.is_enum and not base:
@@ -1092,7 +1092,18 @@ class Emitter:
         if rt is not None and ((rt[1] >> 16) & 0xFF) == 0x01:
             while body and body[-1].strip() == 'return;':
                 body.pop()
+            # The same trailing native `ret` after a real statement renders
+            # inline: `Foo(); return;`.  A void method returns at `}`, so
+            # the trailing jump is redundant exactly when what precedes it
+            # is a complete statement (`;`) or a closed block (`}`); any
+            # other spelling (`if (x) return;`) stays untouched.
+            if body:
+                hit = self._INLINE_RETURN_RX.match(body[-1])
+                if hit is not None:
+                    body[-1] = hit.group(1).rstrip()
         return body
+
+    _INLINE_RETURN_RX = re.compile(r'^(.*(?:;|\}))[ \t]+return;$')
 
     def _lift_body(self, m: MethodDef, td: TypeDef, abstract=False):
         """Lift a body or emit an explicit unavailable-body throw.

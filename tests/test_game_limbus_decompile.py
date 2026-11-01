@@ -67,4 +67,7 @@ def test_story_return_handle_disables_lobby_voice(baseline_game_decompiler):
     body = lift_text(il, dec, mi)
     assert 'GlobalGameManager._instance' in body
     assert '_canPlayLobbyPersonalityVoice = false;' in body
-    assert 'UnityEngine.UI.SetPropertyUtility.SetStruct<float>' in body
+    # 0x183A9D460 is StoryProgressManager.SetScenario<object> (Il2CppDumper
+    # dump.cs: RVA 0x3A9D460, four parameters).  The old pin named it
+    # SetStruct<float> from the pre-fix generic row/pointer misalignment.
+    assert 'SetScenario<object>(StoryId, delegateEvent2, false, 0)' in body

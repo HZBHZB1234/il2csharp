@@ -225,6 +225,48 @@ class _InsnMixin:
                         for r in VOLATILE:
                             self.regs.pop(r, None)
                         return
+                    if info is not None and info[0] == 'generic':
+                        # A tail whose address carries exactly one generic
+                        # spec: resolve it like the call path, then trim to
+                        # the MethodDef's own signature.  Before this the
+                        # tail printed the raw GPR spray (BoolWrapper.Reset:
+                        # `set_Value(this, 0, set_Value, obj1)`), because
+                        # only the `method` info path trimmed.
+                        _gsi = info[1]
+                        _gmd = self._spec_md(_gsi)
+                        if _gmd is not None:
+                            _gname = self.il.generic_method_name(_gsi) \
+                                or self._call_name(t)
+                            _tg_call, _tg_m = self._tail_generic_call(
+                                _gname, _gmd, args, arg_exprs)
+                            _gm = self.meta.methods[_gmd]
+                            _want = _gm.param_count + (
+                                0 if _gm.is_static else 1)
+                            _tg_args = list(args[:_want])
+                            _base = 0 if _gm.is_static else 1
+                            _spec = self.il.method_specs[_gsi] \
+                                if 0 <= _gsi < len(self.il.method_specs) else None
+                            for _pi, _pp in enumerate(
+                                    self.meta.method_params(_gm)):
+                                _pty = self._tail_subst_closed(
+                                    self.il.types[_pp.type], _spec) \
+                                    if 0 <= _pp.type < len(self.il.types) else None
+                                _ai = _base + _pi
+                                if _pty is not None and _ai < len(_tg_args) \
+                                        and ((_pty[1] >> 16) & 0xFF) == 0x02 \
+                                        and _tg_args[_ai] in ('0', '1'):
+                                    _tg_args[_ai] = 'true' if \
+                                        _tg_args[_ai] == '1' else 'false'
+                            _tg_sg = self._tail_accessor(_gmd, _tg_args)
+                            if _tg_sg is not None:
+                                _tg_call = _tg_sg
+                            _tg_rti = _tg_m.return_type
+                            _tg_void = 0 <= _tg_rti < len(self.il.types) and \
+                                ((self.il.types[_tg_rti][1] >> 16) & 0xFF) == 0x01
+                            self._emit_tail(ip, _tg_call, asm, void=_tg_void)
+                            for r in VOLATILE:
+                                self.regs.pop(r, None)
+                            return
                     if tail_gen is not None and tail_gen[1] is not None:
                         # fix 94: resolved through the hidden
                         # instantiation argument -- render the true

@@ -591,13 +591,41 @@ class _RegistrationMixin:
                 thunk = u64(b.d, to + 8)
                 if thunk and b.is_exec_va(thunk):
                     self.addr_to_method.setdefault(thunk, ('thunk', (mod.name, token)))
-        # generic method pointers
+        # Generic method pointers.
+        #
+        # The table is NOT parallel to the pointer array: each row is
+        # {methodSpecIndex, methodPointerIndex, invokerIndex, adjustorThunk}
+        # and the pointer lives at genericMethodPointers[methodPointerIndex]
+        # (Il2CppDumper: `genericMethodPointers[table.indices.methodIndex]`).
+        # The two counts differ (Unitask: 59,586 pointers vs 59,725 table
+        # rows), so pairing by row index shifted every generic call target
+        # after the first gap: `BoolWrapper.Reset`'s tail read as
+        # `WhereSelectEnumerableIterator.ctor` instead of
+        # `WrapperT<bool>.set_Value`, and `GetComponent<object>` read as
+        # `Memmove<...>`.  Same address, wrong owner.
         gmp = b.read_qword_array(self.generic_method_pointers, self.generic_method_pointers_count)
-        for i, p in enumerate(gmp):
-            if p and b.is_exec_va(p) and i < len(self.generic_method_table_list):
-                spec_idx = self.generic_method_table_list[i][0]
-                self.addr_to_method.setdefault(p, ('generic', spec_idx))
-                self.addr_candidates[p].append(('generic', spec_idx))
+        for p, spec_idx in self._generic_method_addresses(
+                self.generic_method_table_list, gmp, b.is_exec_va):
+            self.addr_to_method.setdefault(p, ('generic', spec_idx))
+            self.addr_candidates[p].append(('generic', spec_idx))
+
+    @staticmethod
+    def _generic_method_addresses(table_rows, pointers, is_exec):
+        """Yield `(code_address, method_spec_index)` for the generic table.
+
+        `methodPointerIndex` is the row's own index into `pointers`; using
+        the table row number instead silently pairs every row after the
+        first hole with the next method's body.
+        """
+        for row in table_rows:
+            if len(row) < 2:
+                continue
+            spec_idx, ptr_idx = row[0], row[1]
+            if not (0 <= ptr_idx < len(pointers)):
+                continue
+            p = pointers[ptr_idx]
+            if p and is_exec(p):
+                yield p, spec_idx
 
     def method_pointer(self, image_name: str, m: MethodDef) -> int:
         mod = self.modules.get(image_name)
