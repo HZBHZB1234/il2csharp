@@ -69,3 +69,25 @@ def test_a_block_comment_spanning_lines_is_untouched():
     text = '/*\nx = unknown;\n*/\ny = unknown;'
     assert spell_unresolved_values(text) == \
         '/*\nx = unknown;\n*/\ny = /*unknown*/ default;'
+
+
+def test_a_conditional_condition_becomes_a_typed_default():
+    """A condition must be `bool`, so the type IS known (178b)."""
+    assert spell_unresolved_values('(unknown ? a : b)') == \
+        '(/*unknown*/ default(bool) ? a : b)'
+    assert spell_unresolved_values('if (unknown ? flag1 : flag2) {') == \
+        'if (/*unknown*/ default(bool) ? flag1 : flag2) {'
+    assert spell_unresolved_values('bool f = unknown ? a : b;') == \
+        'bool f = /*unknown*/ default(bool) ? a : b;'
+
+
+def test_a_nullable_type_marker_is_not_a_condition():
+    """`unknown?` (no space) is a type spelling, never a ternary."""
+    for line in ('int? num1 = unknown?;', 'unknown? x = null;'):
+        assert spell_unresolved_values(line) == line, line
+
+
+def test_a_conditional_inside_a_literal_or_comment_is_untouched():
+    for line in ('string s = "unknown ? a : b";',
+                 '// unknown ? a : b'):
+        assert spell_unresolved_values(line) == line, line

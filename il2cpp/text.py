@@ -148,6 +148,12 @@ MANGLED_IDENT_RX = re.compile(
 _UNKNOWN_RHS_RX = re.compile(r'=\s*unknown\s*;')
 _UNKNOWN_RETURN_RX = re.compile(r'\breturn\s+unknown\s*;')
 _UNKNOWN_MEMBER_RX = re.compile(r'(?<![\w.])unknown\.[A-Za-z_]\w*')
+# A conditional expression's condition is required to be `bool`, so the
+# target type IS known even though the value is not (658 sites on the game
+# tree). `default` alone would have no type there (CS8716), so the spelling
+# carries it. The literal space is load-bearing: `unknown?` is a nullable
+# TYPE marker, never a condition.
+_UNKNOWN_COND_RX = re.compile(r'(?<![\w.])unknown(\s+)\?')
 
 
 def spell_unresolved_values(text):
@@ -155,9 +161,10 @@ def spell_unresolved_values(text):
 
     ``= unknown;`` and ``return unknown;`` become the marker plus a
     target-typed ``default``; ``unknown.Member`` (a member access on an
-    unresolved value, whose name is fabricated) becomes the marker alone.
-    Literal-aware: the scans run on the NUL-masked line, so a string or
-    comment that spells any of this is untouched.
+    unresolved value, whose name is fabricated) becomes the marker alone; a
+    conditional's condition becomes ``default(bool)``, whose type the grammar
+    guarantees. Literal-aware: the scans run on the NUL-masked line, so a
+    string or comment that spells any of this is untouched.
     """
     out = []
     in_block = False
@@ -170,7 +177,8 @@ def spell_unresolved_values(text):
         last = 0
         for rx, repl in ((_UNKNOWN_MEMBER_RX, '/*unknown*/ default'),
                          (_UNKNOWN_RHS_RX, '= /*unknown*/ default;'),
-                         (_UNKNOWN_RETURN_RX, 'return /*unknown*/ default;')):
+                         (_UNKNOWN_RETURN_RX, 'return /*unknown*/ default;'),
+                         (_UNKNOWN_COND_RX, '/*unknown*/ default(bool) ?')):
             pos = 0
             while True:
                 m = rx.search(masked, pos)
