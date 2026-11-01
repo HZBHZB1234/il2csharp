@@ -61,7 +61,12 @@ passed** (6 new tests), and the limbus game tests whose bodies touch these
 shapes (`test_game_member_recovery`, `test_game_review80`,
 `test_game_limbus_decompile`, `test_game_interlocked`) still pass unchanged —
 the change is narrow because only compiler-generated `<X>k__BackingField`
-rows qualify.
+rows qualify. The **full** suite (portable + every limbus game test) is
+**1,621 passed / 1 xpassed** in 21.6 min, and a licensed-fixture build of
+`Assembly-CSharp-firstpass` (51 types / 729 bodies) is 0 failed / 0
+fallbacks with brace 0 and parse 0/0/0. The game-wide `__field_` population
+(13,966 in `f169`) sits almost entirely in `Assembly-CSharp`, which was not
+rebuilt this round (a full game body build is ~2.5 h here).
 
 ## Previous work: fix 176 — a whole-tree compile harness, and the next three families sized (2026-11-02, on `main`)
 
