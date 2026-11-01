@@ -1174,6 +1174,313 @@ class _HighLevelMixin:
     _FLOAT_DECLS = frozenset(['float', 'double', 'decimal'])
     _FLOAT_LIT_RX = re.compile(r'^[+-]?(\d+\.\d*|\.\d+|\d+)([eE][+-]?\d+)?[fFdD]?$')
 
+    # fix 180: `recv.Method(args)` / `Method(args)` as a declaration RHS.
+    _CALL_RHS_RX = re.compile(
+        r'^(?:(?P<recv>[A-Za-z_]\w*)\.)?(?P<name>[A-Za-z_]\w*)'
+        r'(?:<(?P<gargs>[^()]*)>)?\((?P<args>[^()]*)\)$')
+
+    @staticmethod
+    def _top_arg_count(text):
+        """Top-level comma count + 1 for an argument list spelling."""
+        t = (text or '').strip()
+        if not t:
+            return 0
+        depth = 0
+        n = 1
+        for ch in t:
+            if ch in '([{<':
+                depth += 1
+            elif ch in ')]}>':
+                depth -= 1
+            elif ch == ',' and depth == 0:
+                n += 1
+        return n
+
+    @staticmethod
+    def _split_top(text):
+        t = (text or '').strip()
+        if not t:
+            return []
+        out, cur, depth = [], [], 0
+        for ch in t:
+            if ch in '([{<':
+                depth += 1
+            elif ch in ')]}>':
+                depth -= 1
+            if ch == ',' and depth == 0:
+                out.append(''.join(cur).strip())
+                cur = []
+                continue
+            cur.append(ch)
+        out.append(''.join(cur).strip())
+        return out
+
+    _PRIM_RETRUN = frozenset((
+        'bool', 'byte', 'sbyte', 'short', 'ushort', 'int', 'uint', 'long',
+        'ulong', 'char', 'float', 'double', 'decimal', 'string', 'nint',
+        'nuint'))
+
+    @staticmethod
+    def _td_by_suffix(il, spelling):
+        """Unique TypeDef whose full path ends with `spelling`, else None.
+
+        Declaration spellings are shortened (`BattleUnitModel`, a nested
+        `DOTweenModuleAudio.__c__DisplayClass0_0`), while `_eq_typedef_map`
+        only carries printed full names and *globally* unique short names.
+        A suffix that names exactly one typedef is the same proof; anything
+        ambiguous declines. Cached per binary on the Il2Cpp instance.
+        """
+        s = re.sub(r'^(?:ref|out|in)\s+', '', (spelling or '')).strip()
+        s = s.split('<')[0].strip()
+        if not s or not re.fullmatch(r'[A-Za-z_@][\w.@]*', s):
+            return None
+        idx = getattr(il, '_td_suffix_map', None)
+        if idx is None:
+            idx = {}
+            amb = set()
+            for td in il.meta.typedefs:
+                try:
+                    full = il.typedef_full(td.index)
+                except Exception:
+                    continue
+                if not full:
+                    continue
+                parts = full.split('.')
+                for k in range(1, len(parts) + 1):
+                    suf = '.'.join(parts[-k:])
+                    prev = idx.get(suf)
+                    if prev is not None and prev != td.index:
+                        amb.add(suf)
+                    else:
+                        idx[suf] = td.index
+            for suf in amb:
+                idx.pop(suf, None)
+            il._td_suffix_map = idx
+        return idx.get(s)
+
+    def _call_rhs_type(self, rhs, decl, method):
+        """Declaration type of an `object objN = <call>;` from the callee.
+
+        A virtual/interface call resolved *textually* after lifting leaves its
+        temp untyped, so the declaration printed `object` even though the
+        callee's return type is metadata (`object obj9 =
+        battleUnitModel1.IsDead();`). Resolve `recv.Method(args)` from the
+        receiver's own declaration spelling in this body, walk the base chain
+        by name + arity, and take the return type.
+
+        Decline-by-default: a receiver that is not a declared local (`this`,
+        a field, a call chain), an ambiguous name+arity, an open generic
+        return without explicit call arguments, and a VALUE-type return (the
+        local would then hold a box, which a spelled value type would change).
+        """
+        try:
+            L = getattr(self, 'L', None)
+            il = getattr(L, 'il', None)
+            if il is None:
+                return None
+            m = self._CALL_RHS_RX.match((rhs or '').strip().rstrip(';').strip())
+            if not m:
+                return None
+            name = m.group('name')
+            argc = self._top_arg_count(m.group('args'))
+            recv = m.group('recv')
+            if recv is not None:
+                entry = decl.get(recv)
+                if entry is None:
+                    return None          # field/member receiver: decline
+                rspell = (entry[0] or '').strip()
+                try:
+                    td0 = self._eq_typedef_map().get(rspell)
+                except Exception:
+                    td0 = None
+                if td0 is None:
+                    td0 = self._td_by_suffix(il, rspell)
+                if td0 is None:
+                    return None
+            else:
+                if method is None:
+                    return None
+                td0 = method.declaring
+            if td0 is None or not (0 <= td0 < len(L.meta.typedefs)):
+                return None
+            hits = []
+            for td_i in il.base_chain_tds(td0):
+                try:
+                    rows = L.meta.type_methods(L.meta.typedefs[td_i])
+                except Exception:
+                    continue
+                for mi in rows:
+                    cand = L.meta.methods[mi]
+                    if (cand.name or '').lstrip('.').replace('|', '_') != name:
+                        continue
+                    if cand.param_count != argc:
+                        continue
+                    hits.append(cand)
+                if hits:
+                    break
+            if len(hits) != 1:
+                return None
+            ret = hits[0]
+            rt = il.types[ret.return_type] if 0 <= ret.return_type < len(il.types) else None
+            if rt is None:
+                return None
+            te = il._type_enum(rt)
+            if te in (0x13, 0x1e):          # generic parameter
+                gargs = m.group('gargs')
+                if not gargs:
+                    return None
+                args = self._split_top(gargs)
+                gp = L.meta.generic_parameter(rt[0]) if hasattr(L.meta, 'generic_parameter') else None
+                if gp is None:
+                    gp = (L.meta.generic_parameters[rt[0]]
+                          if 0 <= rt[0] < len(L.meta.generic_parameters) else None)
+                if gp is None:
+                    return None
+                ordn = gp[4]
+                if not (0 <= ordn < len(args)):
+                    return None
+                spelled = args[ordn]
+                if not spelled or not re.fullmatch(r'[A-Za-z_@][\w.@<>\[\], ]*', spelled):
+                    return None
+                return spelled
+            if te in (0x1d, 0x14):          # arrays are reference types
+                return il.type_name(rt)
+            if te == 0x0e:                   # string
+                return 'string'
+            nm = il.type_name(rt)
+            if not nm or nm in ('object', 'void'):
+                return None
+            if te in (0x11, 0x12):
+                tdi = rt[0]
+                if not (0 <= tdi < len(L.meta.typedefs)):
+                    return None
+                tdo = L.meta.typedefs[tdi]
+                if getattr(tdo, 'is_valuetype', False) or getattr(tdo, 'is_enum', False):
+                    # A primitive return is the raw value (the native code
+                    # does not box); a user struct/enum return could have
+                    # been a box, so only primitive spellings are retyped.
+                    return nm if nm in self._PRIM_RETRUN else None
+                return nm
+            # A primitive return (bool/int/float/... have their own type
+            # enums, not VALUETYPE rows): the raw value, never a box.
+            return nm if nm in self._PRIM_RETRUN else None
+        except Exception:
+            return None
+
+    _MEMBER_RHS_RX = re.compile(
+        r'^(?:(?P<recv>this|[A-Za-z_]\w*)\.)?(?P<name>[A-Za-z_]\w*)$')
+
+    def _rhs_ref_type(self, rhs, decl, method):
+        """Declaration type of an `object objN = <rhs>;` from metadata.
+
+        Two shapes whose static type is metadata even when the lifter lost
+        it: a call on a locally declared receiver (fix 180) and a plain
+        member access (fix 180b). Both decline unless the receiver resolves
+        through a declared local (or `this`) and the member is unique by
+        name (and arity, for calls).
+        """
+        try:
+            text = (rhs or '').strip().rstrip(';').strip()
+            if '(' in text:
+                return self._call_rhs_type(text, decl, method)
+            return self._member_rhs_type(text, decl, method)
+        except Exception:
+            return None
+
+    def _member_rhs_type(self, rhs, decl, method):
+        """`recv.Member` -> the field/property type, when both prove out."""
+        try:
+            L = getattr(self, 'L', None)
+            il = getattr(L, 'il', None)
+            if il is None:
+                return None
+            m = self._MEMBER_RHS_RX.match((rhs or '').strip())
+            if not m:
+                return None
+            name = m.group('name')
+            recv = m.group('recv')
+            if recv is None:
+                return None                  # bare identifier: a copy
+            if recv == 'this':
+                if method is None:
+                    return None
+                td0 = method.declaring
+            else:
+                entry = decl.get(recv)
+                if entry is None:
+                    return None
+                rspell = (entry[0] or '').strip()
+                try:
+                    td0 = self._eq_typedef_map().get(rspell)
+                except Exception:
+                    td0 = None
+                if td0 is None:
+                    td0 = self._td_by_suffix(il, rspell)
+                if td0 is None:
+                    return None
+            if td0 is None or not (0 <= td0 < len(L.meta.typedefs)):
+                return None
+            rt = None
+            for td_i in il.base_chain_tds(td0):
+                tdo = L.meta.typedefs[td_i]
+                hits = []
+                for fi in L.meta.type_fields(tdo):
+                    f = L.meta.fields[fi]
+                    if (f.name or '') == name:
+                        hits.append(f)
+                if hits:
+                    if len(hits) != 1:
+                        return None
+                    rt = il.types[hits[0].type] if 0 <= hits[0].type < len(il.types) else None
+                    break
+                prop_hits = []
+                for k in range(getattr(tdo, 'property_count', 0)):
+                    row = L.meta.properties[tdo.property_start + k]
+                    try:
+                        pname = L.meta.getstr(row[0])
+                    except Exception:
+                        continue
+                    if pname != name or row[1] is None or row[1] < 0:
+                        continue
+                    # property accessor rows hold method indices RELATIVE to
+                    # the owning type's method range (metadata v27+)
+                    _gi = tdo.method_start + row[1]
+                    if 0 <= _gi < len(L.meta.methods):
+                        prop_hits.append(L.meta.methods[_gi])
+                if prop_hits:
+                    if len(prop_hits) != 1:
+                        return None
+                    g = prop_hits[0]
+                    rt = il.types[g.return_type] if 0 <= g.return_type < len(il.types) else None
+                    break
+            if rt is None:
+                return None
+            return self._field_ty_spelling(il, L, rt)
+        except Exception:
+            return None
+
+    def _field_ty_spelling(self, il, L, rt):
+        """C# spelling for a member/return type, declining ambiguity."""
+        te = il._type_enum(rt)
+        if te in (0x13, 0x1e):
+            return None                      # open generic: decline
+        if te in (0x1d, 0x14):
+            return il.type_name(rt)
+        if te == 0x0e:
+            return 'string'
+        nm = il.type_name(rt)
+        if not nm or nm in ('object', 'void'):
+            return None
+        if te in (0x11, 0x12):
+            tdi = rt[0]
+            if not (0 <= tdi < len(L.meta.typedefs)):
+                return None
+            tdo = L.meta.typedefs[tdi]
+            if getattr(tdo, 'is_valuetype', False) or getattr(tdo, 'is_enum', False):
+                return nm if nm in self._PRIM_RETRUN else None
+            return nm
+        return nm if nm in self._PRIM_RETRUN else None
+
     def _bare_rhs_needs_default(self, dt, rhs):
         """True when a zero literal RHS cannot spell its declaration type.
 
@@ -1664,6 +1971,18 @@ class _HighLevelMixin:
                         dt = _hetero_decl(nm, dt, rhs)
                     except Exception:
                         pass
+                    if dt == 'object' and rhs:
+                        # fix 180: a virtual/interface call resolved
+                        # *textually* after lifting carries no type on its
+                        # temp, so the declaration printed `object` although
+                        # the callee's return type is metadata. Resolve the
+                        # call/member from the receiver's declaration spelling.
+                        try:
+                            _ct = self._rhs_ref_type(rhs, decl, m)
+                        except Exception:
+                            _ct = None
+                        if _ct:
+                            dt = _ct
                     if tok_of[nm] in gp_blocked and dt not in ('object', 'System.Type'):
                         cm = callno_rx.match(rhs)
                         if cm:
@@ -1695,6 +2014,16 @@ class _HighLevelMixin:
                         dt = _hetero_decl(nm, dt, rhs)
                     except Exception:
                         pass
+                    if dt == 'object' and rhs:
+                        # fix 180: same recovery as the `var` branch above --
+                        # a textually-named dispatch call / member access
+                        # carries no type on its temp.
+                        try:
+                            _ct = self._rhs_ref_type(rhs, decl, m)
+                        except Exception:
+                            _ct = None
+                        if _ct:
+                            dt = _ct
                     if tok_of.get(nm, nm) in gp_blocked and dt not in ('object', 'System.Type'):
                         cm = callno_rx.match(rhs)
                         if cm:
