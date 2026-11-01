@@ -269,13 +269,21 @@ class Metadata:
                     u32(d, b + 80), u32(d, b + 84)))
 
         # methods: v31 adds returnParameterToken; v38+ uses variable-width
-        # declaring/return/parameter indices and a 32-byte row.
+        # declaring/return/parameter indices, so the row is PACKED and its
+        # stride follows the widths -- never a fixed 32. Limbus (type_w 4,
+        # gc_w 2) happens to land on 32; a file with narrower indices (a
+        # 6000.x build whose parametersSize/parametersCount implies type_w 2)
+        # is 30, and a hard 32 then shifts every row by 2 bytes: names
+        # fragment ('arSpacing', 'cted') and rid becomes garbage, which
+        # silently starves the method-address map (survivors-roguelike-kit
+        # resolved 11,427/94,205 = 12% before this fix).
         mo, mc = h['methodsOffset'], h['methodsSize']
         self.methods: List[MethodDef] = []
         if self.v38:
             nm = h['methodsCount']
+            m_stride = 4 + self.td_w + self.type_w + 4 + self.param_w + self.gc_w + 4 + 8
             for i in range(nm):
-                b = mo + i * 32
+                b = mo + i * m_stride
                 p = b + 4
                 decl = self._read_vw(p, self.td_w); p += self.td_w
                 rtok = self._read_vw(p, self.type_w); p += self.type_w
@@ -303,18 +311,60 @@ class Metadata:
                     u32(d, b + 24 if self.v31 else b + 20), tail[0], tail[1], tail[2], tail[3]))
 
         # parameters / fields / properties / events
+        #
+        # Every v38+ row that carries a type index packs it at `type_w`, so
+        # the stride is NOT a constant: Limbus (type_w 4) has 12-byte
+        # parameter/field/default rows and 24-byte event rows, while a
+        # narrower v39 file (type_w 2) has 10 and 22. Reading the fixed
+        # width on the narrow file truncates each table AND shifts every
+        # row after the first, which surfaced as an IndexError deep in a
+        # lift (survivors-roguelike-kit). The same rule applies to
+        # parameterDefaultValues, fieldDefaultValues and fieldMarshaledSizes.
         po, pc = h['parametersOffset'], h['parametersSize']
-        self.params: List[ParamDef] = [
-            ParamDef(self.getstr(u32(d, po + i * 12)), u32(d, po + i * 12 + 4), i32(d, po + i * 12 + 8))
-            for i in range(pc // 12)]
+        if self.v38:
+            p_stride = 4 + 4 + self.type_w
+            self.params: List[ParamDef] = [
+                ParamDef(self.getstr(u32(d, po + i * p_stride)),
+                         u32(d, po + i * p_stride + 4),
+                         self._read_vw(po + i * p_stride + 8, self.type_w))
+                for i in range(h['parametersCount'])]
+        else:
+            self.params: List[ParamDef] = [
+                ParamDef(self.getstr(u32(d, po + i * 12)), u32(d, po + i * 12 + 4), i32(d, po + i * 12 + 8))
+                for i in range(pc // 12)]
         fo, fc = h['fieldsOffset'], h['fieldsSize']
-        self.fields: List[FieldDef] = [
-            FieldDef(self.getstr(u32(d, fo + i * 12)), i32(d, fo + i * 12 + 4), u32(d, fo + i * 12 + 8))
-            for i in range(fc // 12)]
+        # v38+ packs the field row as 4 (name) + type_w (type index) + 4
+        # (token), so it is 10 with 2-byte type indices and 12 with 4-byte
+        # ones. Limbus (type_w 4) is 12; a narrower v39 file is 10, and a
+        # hard 12 read then truncates the table (survivors-roguelike-kit
+        # parsed 38,765 of 46,518 fields, and the missing tail raised
+        # IndexError in source_field_name during a lift).
+        if self.v38:
+            f_stride = 4 + self.type_w + 4
+            self.fields: List[FieldDef] = [
+                FieldDef(self.getstr(u32(d, fo + i * f_stride)),
+                         self._read_vw(fo + i * f_stride + 4, self.type_w),
+                         u32(d, fo + i * f_stride + 4 + self.type_w))
+                for i in range(h['fieldsCount'])]
+        else:
+            self.fields: List[FieldDef] = [
+                FieldDef(self.getstr(u32(d, fo + i * 12)), i32(d, fo + i * 12 + 4), u32(d, fo + i * 12 + 8))
+                for i in range(fc // 12)]
         pro, prc = h['propertiesOffset'], h['propertiesSize']
         self.properties = [struct.unpack_from('<5i', d, pro + i * 20) for i in range(prc // 20)]
         eo, ec = h['eventsOffset'], h['eventsSize']
-        self.events = [struct.unpack_from('<6i', d, eo + i * 24) for i in range(ec // 24)]
+        if self.v38:
+            # 4 name + type_w type + 4 add + 4 remove + 4 raise + 4 token
+            e_stride = 4 + self.type_w + 16
+            self.events = [(u32(d, eo + i * e_stride),
+                            self._read_vw(eo + i * e_stride + 4, self.type_w),
+                            i32(d, eo + i * e_stride + 4 + self.type_w),
+                            i32(d, eo + i * e_stride + 8 + self.type_w),
+                            i32(d, eo + i * e_stride + 12 + self.type_w),
+                            u32(d, eo + i * e_stride + 16 + self.type_w))
+                           for i in range(h['eventsCount'])]
+        else:
+            self.events = [struct.unpack_from('<6i', d, eo + i * 24) for i in range(ec // 24)]
 
         # generic containers / parameters
         gco, gcc = h['genericContainersOffset'], h['genericContainersSize']
@@ -349,14 +399,32 @@ class Metadata:
         self.vtable_methods = [u32(d, vto + i * 4) for i in range(vtc // 4)]
 
         # default values
+        #
+        # Same packed-row rule as parameters/fields: the default row is
+        # 4 (field/parameter index) + type_w (type index) + 4 (data index),
+        # so 10 on a narrow v39 file and 12 on Limbus. The old fixed 12
+        # dropped a fifth of survivors' rows (8,450 of 12,629).
         fdvo, fdvc = h['fieldDefaultValuesOffset'], h['fieldDefaultValuesSize']
-        self.field_default_values = {
-            i32(d, fdvo + i * 12): (i32(d, fdvo + i * 12 + 4), i32(d, fdvo + i * 12 + 8))
-            for i in range(fdvc // 12)}
         pdvo, pdvc = h['parameterDefaultValuesOffset'], h['parameterDefaultValuesSize']
-        self.param_default_values = {
-            i32(d, pdvo + i * 12): (i32(d, pdvo + i * 12 + 4), i32(d, pdvo + i * 12 + 8))
-            for i in range(pdvc // 12)}
+        if self.v38:
+            d_stride = 4 + self.type_w + 4
+            self.field_default_values = {
+                i32(d, fdvo + i * d_stride):
+                    (self._read_vw(fdvo + i * d_stride + 4, self.type_w),
+                     i32(d, fdvo + i * d_stride + 4 + self.type_w))
+                for i in range(h['fieldDefaultValuesCount'])}
+            self.param_default_values = {
+                i32(d, pdvo + i * d_stride):
+                    (self._read_vw(pdvo + i * d_stride + 4, self.type_w),
+                     i32(d, pdvo + i * d_stride + 4 + self.type_w))
+                for i in range(h['parameterDefaultValuesCount'])}
+        else:
+            self.field_default_values = {
+                i32(d, fdvo + i * 12): (i32(d, fdvo + i * 12 + 4), i32(d, fdvo + i * 12 + 8))
+                for i in range(fdvc // 12)}
+            self.param_default_values = {
+                i32(d, pdvo + i * 12): (i32(d, pdvo + i * 12 + 4), i32(d, pdvo + i * 12 + 8))
+                for i in range(pdvc // 12)}
         self.dv_off = h['fieldAndParameterDefaultValueDataOffset']
 
         # per-type method/field lookup accelerators

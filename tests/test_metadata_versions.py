@@ -248,3 +248,208 @@ def test_v39_typedef_stride_follows_the_variable_widths():
     # The fixture above declares 256 generic containers, so gc_w is 2 and
     # its 82-byte rows are exactly the derived stride.
     assert GC_W == 2
+
+
+# -- v38+ packed rows follow type_w, not a constant ----------------------
+# The type index inside a parameter/field/event/method row is type_w wide,
+# so the row shrinks when a file's indexes are narrow.  Only Limbus's
+# shape (type_w 4) happened to equal the old hard-coded widths (12/12/24/
+# 32).  survivors-roguelike-kit is v39 with type_w 2: its real rows are
+# 10/10/22/30, and reading them at the Limbus constants shifted every row
+# after the first, fragmenting names and starving the method-address map
+# (11,427 of 94,205 methods resolved, 12%, instead of 89%).
+
+def _v39_method_stride(type_w, td_w, param_w, gc_w):
+    """4 name + td_w declaring + type_w return + 4 return-param token
+    + param_w parameter start + gc_w generic container + 4 token
+    + 8 (4 tail ushorts)."""
+    return 4 + td_w + type_w + 4 + param_w + gc_w + 4 + 8
+
+
+def _v39_param_stride(type_w):
+    """4 name + type_w type + 4 token."""
+    return 4 + type_w + 4
+
+
+def _v39_event_stride(type_w):
+    """4 name + type_w type + 4 add + 4 remove + 4 raise + 4 token."""
+    return 4 + type_w + 16
+
+
+def test_v39_row_strides_follow_the_variable_widths():
+    """Pin the packed-row formulas at both endpoints, not just Limbus."""
+    assert _v39_method_stride(4, 2, 4, 2) == 32   # Limbus Company
+    assert _v39_method_stride(2, 2, 4, 2) == 30   # survivors (type_w 2)
+    assert _v39_param_stride(4) == 12             # Limbus params/fields
+    assert _v39_param_stride(2) == 10             # survivors params/fields
+    assert _v39_event_stride(4) == 24             # Limbus events
+    assert _v39_event_stride(2) == 22             # survivors events
+
+
+def _build_v39_narrow():
+    """A v39 file whose widths force type_w = 2 (the survivors shape).
+
+    parametersSize/parametersCount = 10 implies type_w 2, so every packed
+    row is narrower than the Limbus constants: methods 30, parameters 10,
+    fields 10, events 22.  Two methods pin the stride (the second row is
+    only reachable when the first row advances by 30, not 32)."""
+    td_w = gc_w = 2
+    type_w = 2
+    n_td = 256
+    n_methods = 2
+    # parametersCount must exceed 65535 so param_w is 4 (survivors shape),
+    # while parametersSize/parametersCount = 10 pins type_w to 2.
+    n_params = 70000
+    n_fields = 1
+    n_events = 1
+
+    hdr_end = 8 + 31 * 12
+    tdo = hdr_end
+    td_size = n_td * _v39_typedef_stride_from_widths(type_w, gc_w)
+    mo = tdo + td_size
+    m_stride = _v39_method_stride(type_w, td_w, 4, gc_w)
+    m_size = n_methods * m_stride
+    po = mo + m_size
+    p_stride = _v39_param_stride(type_w)
+    p_size = n_params * p_stride
+    fo = po + p_size
+    f_size = n_fields * p_stride
+    eo = fo + f_size
+    e_size = n_events * _v39_event_stride(type_w)
+    fdvo = eo + e_size
+    dv_stride = 4 + type_w + 4
+    fdv_size = 2 * dv_stride
+    pdvo = fdvo + fdv_size
+    pdv_size = 1 * dv_stride
+    gco = pdvo + pdv_size
+    gc_size = n_td * 16
+    so = gco + gc_size
+    strings = b'\x00Foo\x00Bar\x00Baz\x00Ns\x00asm.dll\x00'
+    buf = bytearray(so + len(strings))
+
+    struct.pack_into('<I', buf, 0, 0xFAB11BAF)
+    struct.pack_into('<i', buf, 4, 39)
+    tables = {
+        'string': (so, len(strings), len(strings)),
+        'methods': (mo, m_size, n_methods),
+        'parameters': (po, p_size, n_params),
+        'fields': (fo, f_size, n_fields),
+        'events': (eo, e_size, n_events),
+        'fieldDefaultValues': (fdvo, fdv_size, 2),
+        'parameterDefaultValues': (pdvo, pdv_size, 1),
+        'genericContainers': (gco, gc_size, n_td),
+        'typeDefinitions': (tdo, td_size, n_td),
+    }
+    off = 8
+    for tname, _ in HEADER_TABLES:
+        if 39 < V_TABLES_MIN.get(tname, 0):
+            raise AssertionError('table missing in v39: %s' % tname)
+        toff, tsize, tcount = tables.get(tname, (0, 0, 0))
+        struct.pack_into('<3i', buf, off, toff, tsize, tcount)
+        off += 12
+    assert off == hdr_end
+
+    td = bytearray(td_size)
+    struct.pack_into('<2I', td, 0, 1, 9)
+    struct.pack_into('<H', td, 8, 1)              # byval (type_w)
+    struct.pack_into('<H', td, 8 + type_w, 0xFFFF)  # declaring = -1
+    struct.pack_into('<H', td, 8 + 2 * type_w, 0xFFFF)  # parent = -1
+    gc_off = 8 + 3 * type_w
+    struct.pack_into('<H', td, gc_off, 0xFFFF)    # generic container = -1
+    flags_off = gc_off + gc_w
+    struct.pack_into('<i', td, flags_off, 0x10)
+    starts_off = flags_off + 4
+    struct.pack_into('<8i', td, starts_off, 0, 0, 0, 0, 0, 0, 0, 0)
+    counts_off = starts_off + 32
+    struct.pack_into('<8H', td, counts_off, n_methods, n_fields, 0, 0, 0, 0, 0, 0)
+    buf[tdo:tdo + td_size] = td
+
+    # method 0 -> 'Bar', method 1 -> 'Baz'.  If the reader advances 32
+    # instead of 30 the second name is garbage.
+    for i, (name_idx, token) in enumerate(((5, SENTINEL_TOKEN), (9, 0x06000002))):
+        md = bytearray(m_stride)
+        b = mo + i * m_stride
+        struct.pack_into('<I', buf, b, name_idx)
+        p = b + 4
+        struct.pack_into('<H', buf, p, 0)          # declaring (td_w)
+        p += td_w
+        struct.pack_into('<H', buf, p, SENTINEL_RT)  # return type (type_w)
+        p += type_w
+        struct.pack_into('<i', buf, p, SENTINEL_RP)
+        p += 4
+        struct.pack_into('<I', buf, p, i)          # parameter start (param_w)
+        p += 4
+        struct.pack_into('<H', buf, p, 0xFFFF)     # generic container
+        p += gc_w
+        struct.pack_into('<I', buf, p, token)
+        p += 4
+        struct.pack_into('<4H', buf, p, 0x10, 0, 3, 1)
+
+    for i in range(n_params):
+        b = po + i * p_stride
+        struct.pack_into('<I', buf, b, 1)                  # 'Foo'
+        struct.pack_into('<I', buf, b + 4, SENTINEL_RP)    # token
+        struct.pack_into('<H', buf, b + 8, SENTINEL_RT)    # type (type_w)
+
+    b = fo
+    struct.pack_into('<I', buf, b, 13)             # 'Ns'
+    struct.pack_into('<H', buf, b + 4, SENTINEL_RT)   # type (type_w)
+    struct.pack_into('<I', buf, b + 4 + type_w, SENTINEL_TOKEN)
+
+    b = eo
+    struct.pack_into('<I', buf, b, 5)              # 'Bar'
+    struct.pack_into('<H', buf, b + 4, SENTINEL_RT)
+    struct.pack_into('<i', buf, b + 4 + type_w, 0)
+    struct.pack_into('<i', buf, b + 8 + type_w, 0)
+    struct.pack_into('<i', buf, b + 12 + type_w, 0)
+    struct.pack_into('<I', buf, b + 16 + type_w, SENTINEL_TOKEN)
+
+    # field default row 0 (index 3, type, data 11) and row 1 (index 4, ...)
+    for i, (idx, data) in enumerate(((3, 11), (4, 12))):
+        b = fdvo + i * dv_stride
+        struct.pack_into('<i', buf, b, idx)
+        struct.pack_into('<H', buf, b + 4, SENTINEL_RT)
+        struct.pack_into('<i', buf, b + 4 + type_w, data)
+    # parameter default row 0 at its own offset
+    b = pdvo
+    struct.pack_into('<i', buf, b, 7)
+    struct.pack_into('<H', buf, b + 4, SENTINEL_RT)
+    struct.pack_into('<i', buf, b + 4 + type_w, 21)
+
+    buf[so:so + len(strings)] = strings
+    return bytes(buf)
+
+
+def test_v39_narrow_rows_do_not_shift(tmp_path):
+    """The narrow file must parse every table at its own stride.
+
+    A hard 32/12/12/24 read parses one method, zero fields, one bogus
+    parameter and a misaligned event, and the IndexError it plants only
+    shows up much later in a lift."""
+    path = tmp_path / 'global-metadata.dat'
+    path.write_bytes(_build_v39_narrow())
+
+    m = Metadata(str(path))
+
+    assert m.type_w == 2
+    assert len(m.methods) == 2
+    assert [md.name for md in m.methods] == ['Bar', 'Baz']
+    assert [md.rid for md in m.methods] == [1, 2]
+    assert all(md.return_type == SENTINEL_RT for md in m.methods)
+    assert m.methods[1].token == 0x06000002
+
+    assert len(m.params) == 70000
+    assert all(p.name == 'Foo' and p.type == SENTINEL_RT and p.token == SENTINEL_RP
+               for p in m.params)
+    assert len(m.fields) == 1
+    assert (m.fields[0].name, m.fields[0].type) == ('Ns', SENTINEL_RT)
+    assert len(m.events) == 1
+    assert (m.events[0][0], m.events[0][5]) == (5, SENTINEL_TOKEN)
+
+    # Default-value tables use the same packed row; a fixed 12 read drops
+    # the tail of a narrow file (survivors parsed 8,450 of 12,629).
+    assert len(m.field_default_values) == 2
+    assert m.field_default_values[3] == (SENTINEL_RT, 11)
+    assert m.field_default_values[4] == (SENTINEL_RT, 12)
+    assert len(m.param_default_values) == 1
+    assert m.param_default_values[7] == (SENTINEL_RT, 21)
