@@ -115,9 +115,20 @@ def reg_name(r) -> str:
 # match requires a word boundary before the `<` and no trailing word char
 # after the `>` run, so `a < b` comparisons and generics like
 # `Foo<int>` are untouched.
+#
+# The third alternative covers a compiler-generated name whose OWN brackets
+# carry a type-argument list --
+# `<System_Collections_Generic_IEnumerable<T>_GetEnumerator>d__21`, an
+# iterator state machine named after the interface it implements. The first
+# alternative cannot span the inner `<T>` and the second needs a literal
+# `<>`, so that one name reached the file with raw angle brackets and was
+# the only parse error on a full 161-image declaration build. One nested
+# bracket group is all the compiler emits; legal `List<Foo<int>>` source is
+# excluded by the same lookbehind (its `<` follows a word character).
 MANGLED_IDENT_RX = re.compile(
     r'(?<![\w`])<?<[\w.`]+(?:`\d+)?>[\w`]*(?:\|[\w`]+)*(?:>[\w`]+)?'
-    r'|<>[\w`]*(?:\|[\w`]+)*')
+    r'|<>[\w`]*(?:\|[\w`]+)*'
+    r'|(?<![\w`])<[\w.]*(?:<[\w.,\s]*>[\w.]*)*>[\w`]*(?:\|[\w`]+)*')
 
 
 def _brace_scan(line):

@@ -1,0 +1,38 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\cw3d",
+  "files": 36331,
+  "bad_files": 1,
+  "errors": 4,
+  "missing": 0,
+  "recovery_nodes": 0,
+  "details": {
+    "System.Core\\System\\Linq\\Parallel\\QueryResults.cs": [
+      {
+        "kind": "ERROR",
+        "row": 101,
+        "column": 38,
+        "text": "<"
+      },
+      {
+        "kind": "ERROR",
+        "row": 101,
+        "column": 80,
+        "text": "_GetEnumerator>d__21"
+      },
+      {
+        "kind": "ERROR",
+        "row": 121,
+        "column": 20,
+        "text": "<"
+      },
+      {
+        "kind": "ERROR",
+        "row": 121,
+        "column": 76,
+        "text": ">d__21"
+      }
+    ]
+  },
+  "elapsed_seconds": 38.328
+}

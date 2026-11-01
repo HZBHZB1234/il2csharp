@@ -66,6 +66,8 @@ validation_reports/**/output_changes.diff.gz
 validation_reports/**/*comparison.json
 validation_reports/**/output_audit.json
 validation_reports/**/*_vs*.json
+# per-method quality dumps (tools/source_compare.py): reproducible, not summaries
+validation_reports/**/*.quality.json
 
 # local build artifacts (never commit)
 limbus_*.log
