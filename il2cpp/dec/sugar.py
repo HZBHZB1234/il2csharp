@@ -338,6 +338,20 @@ class _SugarMixin:
             # closing comment just as it does to its identifier.
             if not call_paren and start > 2 and text[start - 3:start - 1] == '*/':
                 call_paren = True
+            # A GENERIC callee ends in `>`, not an identifier char
+            # (`EnsureInitializedCore<T>(blob)`), and a call can follow `]`
+            # or `)` too. Those elided the call's own parens and glued the
+            # callee to its argument:
+            # `EnsureInitializedCore<object>typeof(Hashtable).s_field`
+            # -- the one unparseable line in the game's mscorlib
+            # (`Hashtable.get_SerializationInfoTable`). A binary `>` is
+            # always space-separated in rendered text, so an identifier
+            # character just before the `>` proves a generic callee.
+            if not call_paren and pre2 == '>':
+                _b4 = text[start - 3] if start > 2 else ''
+                call_paren = bool(_b4) and (_b4.isalnum() or _b4 in '_]>')
+            elif not call_paren and pre2 in (']', ')'):
+                call_paren = True
             if pre == '(' and after == ')' and not call_paren:
                 start = start - 1
                 end = end + 1

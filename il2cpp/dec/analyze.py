@@ -1051,34 +1051,105 @@ class _AnalyzeMixin:
 
     def _order_copies(self, cps):
         """Sequentialize a parallel copy: a copy that overwrites a name another
-        copy still reads has to come later; true cycles get spilled to a temp."""
+        copy still reads has to come later; true cycles get spilled to a temp.
+
+        The read sets are computed ONCE and only a spilled copy's set is
+        recomputed (the spill rewrites RHS texts; nothing else does). Recomputing
+        every set on every iteration made this quadratic in regex scans:
+        `TextMeshProUGUI.GenerateTextMesh` -- thousands of phi copies over long
+        RHS texts -- did not finish in ten minutes, which is why its type never
+        reached the emitted tree.
+        """
         out = []
         pending = list(cps)
+        if not pending:
+            return out
+        lhs = {n for n, _ in pending}
+
+        def _reads(r):
+            return set(self._TOKRX.findall(r)) & lhs
+
+        # Ready-queue form: emitting a copy unblocks the copies that read
+        # what it writes, so each edge is visited a constant number of times
+        # instead of rescanning every pending copy per round (the old loop was
+        # O(rounds * n^2) and did not finish on `GenerateTextMesh`).
+        reads = {n: _reads(r) for n, r in pending}
+        writers = {}
+        for i, (n, _r) in enumerate(pending):
+            writers.setdefault(n, set()).add(i)
+        rev = {}
+        block = {}
+        for i, (n, r) in enumerate(pending):
+            bs = set()
+            for nm in reads[n]:
+                for j in writers.get(nm, ()):
+                    if j != i:
+                        bs.add(j)
+            block[i] = len(bs)
+            for j in bs:
+                rev.setdefault(j, set()).add(i)
+        ready = [i for i in range(len(pending)) if not block[i]]
+        emitted = set()
         guard = 0
-        while pending and guard < 300:
+        while len(emitted) < len(pending) and guard < 300:
             guard += 1
-            lhs = {n for n, _ in pending}
-            reads = {n: set(self._TOKRX.findall(r)) & lhs for n, r in pending}
-            rest = []
-            progress = False
-            for n, r in pending:
-                if any(m != n and n in reads[m] for m, _ in pending):
-                    rest.append((n, r))
-                else:
-                    out.append('%s = %s;' % (n, r))
-                    progress = True
-            if not progress and rest:
-                n = rest[0][0]
-                self.L._u += 1
-                tmp = 'v%d' % self.L._u
-                self.phi_names.add(tmp)
-                ty = self._var_types.get(n)
-                if ty is not None:
-                    self._var_types[tmp] = ty
-                out.append('%s = %s;' % (tmp, n))
-                rx = re.compile(r'(?<![\w.])%s(?![\w])' % n)
-                rest = [(mm, (rr if mm == n else rx.sub(tmp, rr))) for mm, rr in rest]
-            pending = rest
+            while ready:
+                i = ready.pop()
+                if i in emitted:
+                    continue
+                emitted.add(i)
+                n, r = pending[i]
+                out.append('%s = %s;' % (n, r))
+                for j in rev.get(i, ()):
+                    if j in emitted:
+                        continue
+                    block[j] -= 1
+                    if block[j] <= 0:
+                        ready.append(j)
+            left = [i for i in range(len(pending)) if i not in emitted]
+            if not left:
+                break
+            # a true cycle: spill one member to a temp and retry
+            i = left[0]
+            n, r = pending[i]
+            self.L._u += 1
+            tmp = 'v%d' % self.L._u
+            self.phi_names.add(tmp)
+            ty = self._var_types.get(n)
+            if ty is not None:
+                self._var_types[tmp] = ty
+            out.append('%s = %s;' % (tmp, n))
+            rx = re.compile(r'(?<![\w.])%s(?![\w])' % n)
+            for j in left:
+                if j == i:
+                    continue
+                rj = pending[j][1]
+                nr = rx.sub(tmp, rj)
+                if nr != rj:
+                    pending[j] = (pending[j][0], nr)
+                    reads[pending[j][0]] = _reads(nr)
+            emitted.add(i)
+            # the spill breaks the cycle: recompute the dependency graph
+            writers = {}
+            for k in range(len(pending)):
+                if k in emitted:
+                    continue
+                writers.setdefault(pending[k][0], set()).add(k)
+            rev = {}
+            block = {}
+            for k in range(len(pending)):
+                if k in emitted:
+                    continue
+                bs = set()
+                for nm in reads.get(pending[k][0], ()):
+                    for j in writers.get(nm, ()):
+                        if j != k:
+                            bs.add(j)
+                block[k] = len(bs)
+                for j in bs:
+                    rev.setdefault(j, set()).add(k)
+            ready = [k for k in range(len(pending)) if k not in emitted
+                     and not block[k]]
         return out
 
     def _prune_nonreturning(self, blocks):

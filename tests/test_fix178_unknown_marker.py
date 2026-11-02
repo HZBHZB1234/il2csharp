@@ -54,8 +54,9 @@ def test_a_larger_expression_keeps_todays_text():
         assert spell_unresolved_values(line) == line, line
 
 
-def test_a_plain_unknown_statement_is_untouched():
-    assert spell_unresolved_values('unknown;') == 'unknown;'
+def test_a_plain_unknown_statement_becomes_a_marker_statement():
+    """fix 184: a bare `unknown;` is not a C# expression statement either."""
+    assert spell_unresolved_values('unknown;') == '/*unknown call*/;'
 
 
 def test_strings_and_comments_are_untouched():

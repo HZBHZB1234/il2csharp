@@ -91,9 +91,16 @@ class _StructureMixin:
         raw = self._tidy_gotos(raw)
         raw = self._drop_redundant_gotos(raw)
         raw = self._resolve_labels(raw)
-        raw = self._hoist_shared_tails(raw)
+        # A pathological method (TextMeshProUGUI.GenerateTextMesh reaches
+        # 116k statements) turns this tail hoist super-linear AND duplicates
+        # tails (116k -> 153k statements, 58 s). Declining the sugar for a
+        # body this size keeps the honest CFG shape and a finite lift.
+        _huge = len(raw) > 6000
+        if not _huge:
+            raw = self._hoist_shared_tails(raw)
         raw = self._resolve_labels(raw)
-        raw = self._drop_dead_copies(raw)
+        if not _huge:
+            raw = self._drop_dead_copies(raw)
         raw = self._drop_dead_temps(raw)
         raw = [self._fold_consts(x) for x in raw]
         raw = self._for_sugar(raw)
@@ -204,6 +211,10 @@ class _StructureMixin:
         # same zero value. Runs after the final rename, like the null-zero
         # rewrite below, because it needs concrete declaration spellings.
         rendered = self._zero_assign_default(rendered)
+        # fix 185: a metadata arity suffix (EqualityComparer1) is never
+        # valid C# in code position -- respell it from the call's receiver
+        # declaration or drop it to the unknown marker.
+        rendered = self._arity_suffix_respell(rendered)
         return self._null_zero_rewrite(
             self._boxed_bool_null_fold(
                 self._semantic_local_names(rendered, m)), m)

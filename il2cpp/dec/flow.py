@@ -1,6 +1,7 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.cfg import LBL, _ELSEIF_CMP_RX, _ITF_CALL_RX, _ITF_SLOT_RX, _ITF_TYPEOF_RX, _LOOP_HDR_RX, _can_fall, _construct_arms, _falls_to, _header_idx, _hoist_point, _match_brace, _split_args
 from il2cpp.expr import _recv_fold, _recv_shaped
+from il2cpp.text import mask_spans
 
 class _FlowMixin:
     def _resolve_labels(self, lines: List[str]) -> List[str]:
@@ -1386,6 +1387,54 @@ class _FlowMixin:
             return True
         except Exception:
             return False
+
+    # fix 185: a metadata arity suffix in a code position (`X`1.M(...)`).
+    _ARITY_REF_RX = re.compile(r'([A-Za-z_][\w.]*)`(\d+)\.([A-Za-z_]\w*)\(')
+
+    def _arity_suffix_respell(self, lines):
+        """Respell or mark a `Name`N` type reference left in code.
+
+        A shared static body for an instance method on an open generic type
+        renders as `EqualityComparer`1.GetHashCode(comparer, value)` -- the
+        metadata arity suffix, which is not C# (CS1056, the only parse error
+        in the game's `UnityEngine.TextCoreTextEngineModule`). The first
+        argument of that call is the folded receiver, so when it is a local
+        whose declaration names the same generic type with closed arguments
+        (`EqualityComparer<Vector4> comparer7`), that spelling is the same
+        type. Anything else (unknown receiver, arity mismatch) drops the
+        reference to the `unknown` marker, which the marker rules already
+        turn into something that compiles.
+        """
+        decl = {}
+        for st in lines:
+            m = self._ZERO_DECL_RX.match(st)
+            if not m:
+                continue
+            name, dt = m.group(3), m.group(2).strip()
+            if name in decl and decl[name] != dt:
+                decl[name] = None
+            else:
+                decl.setdefault(name, dt)
+        out = list(lines)
+        for i, st in enumerate(out):
+            if '`' not in st:
+                continue
+            masked, _ = mask_spans(st, False)
+            if '`' not in masked:
+                continue          # the suffix is inside a literal/comment
+            def _fix(m):
+                base, arity, _meth = m.group(1), m.group(2), m.group(3)
+                rest = masked[m.end():]
+                am = re.match(r'\s*([A-Za-z_]\w*)', rest)
+                arg = dict(decl).get(am.group(1)) if am else None
+                if arg:
+                    short = arg.split('<')[0].strip()
+                    if short == base and arg.count('<') and arg.count('>') \
+                            and arg[arg.find('<'):].count(',') + 1 == int(arity):
+                        return arg + '.' + _meth + '('
+                return 'unknown.' + _meth + '('
+            out[i] = self._ARITY_REF_RX.sub(_fix, st)
+        return out
 
     def _zero_assign_default(self, lines):
         """Rewrite `x = 0;` to `x = default;` when x's type cannot take `0`.

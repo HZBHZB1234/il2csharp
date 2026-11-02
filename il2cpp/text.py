@@ -174,6 +174,29 @@ _UNKNOWN_MEMBER_RX = re.compile(r'(?<![\w.])unknown\.[A-Za-z_]\w*')
 # carries it. The literal space is load-bearing: `unknown?` is a nullable
 # TYPE marker, never a condition.
 _UNKNOWN_COND_RX = re.compile(r'(?<![\w.])unknown(\s+)\?')
+# A call whose CALLEE was never resolved renders as `?(args)` (the lifter's
+# placeholder register). That is not an expression: `object o = ?(pUnk);`
+# broke the parse of three emitted images (mscorlib Marshal, Plugins, TMPro).
+# The call's value is exactly an unresolved value, so it takes the marker and
+# the rules above turn the surrounding shape into something that compiles.
+_UNK_CALL_RX = re.compile(r'(?<![\w.\])])\?\(([^()]*)\)')
+# The same call in STATEMENT position: a bare `unknown;` is not a C#
+# expression statement either, so it becomes the marker alone.
+_UNKNOWN_STMT_RX = re.compile(r'^(\s*)unknown\s*;$')
+
+
+def _sub_unknown_calls(line, masked):
+    """`?(args)` -> the `unknown` marker, literal-aware."""
+    spans = [m.span() for m in _UNK_CALL_RX.finditer(masked)]
+    if not spans:
+        return line
+    out, last = [], 0
+    for a, b in spans:
+        out.append(line[last:a])
+        out.append('unknown')
+        last = b
+    out.append(line[last:])
+    return ''.join(out)
 
 
 def spell_unresolved_values(text):
@@ -183,13 +206,22 @@ def spell_unresolved_values(text):
     target-typed ``default``; ``unknown.Member`` (a member access on an
     unresolved value, whose name is fabricated) becomes the marker alone; a
     conditional's condition becomes ``default(bool)``, whose type the grammar
-    guarantees. Literal-aware: the scans run on the NUL-masked line, so a
-    string or comment that spells any of this is untouched.
+    guarantees; a call on an unresolved callee (``?(args)``) becomes the marker
+    in value position and the bare marker in statement position. Literal-aware:
+    the scans run on the NUL-masked line, so a string or comment that spells
+    any of this is untouched.
     """
     out = []
     in_block = False
     for line in text.split('\n'):
         masked, in_block = mask_spans(line, in_block)
+        if '?' in masked:
+            line = _sub_unknown_calls(line, masked)
+            masked, in_block = mask_spans(line, in_block)
+        stmt = _UNKNOWN_STMT_RX.match(masked)
+        if stmt is not None and masked.strip() == 'unknown;':
+            out.append('%s/*unknown call*/;' % stmt.group(1))
+            continue
         if 'unknown' not in masked:
             out.append(line)
             continue
