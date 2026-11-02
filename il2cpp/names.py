@@ -24,6 +24,17 @@ def safe_ident(n: str) -> str:
     return s if s not in CSHARP_KEYWORDS else s + '_'
 
 
+def ident_name(n: str) -> str:
+    """A metadata name spelled as a C# identifier, not a type spelling.
+
+    `safe_ident` keeps the angle brackets because generic TYPE spellings need
+    them; a parameter/local/field identifier never may. Roslyn names lambda and
+    generic parameters with angle brackets, and such a parameter is CS1001 --
+    the last compile error in the whole game tree.
+    """
+    return safe_ident(n).replace('<', '_').replace('>', '_')
+
+
 def sanitize_qualifier(s: str) -> str:
     """sanitize() for explicit-interface qualifiers (`A.B.IFoo<T, U[]>`):
     generic structure (``<>[],``) survives while every identifier segment

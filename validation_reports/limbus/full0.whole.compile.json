@@ -1,9 +1,9 @@
 {
   "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\full0",
-  "source_files": 29362,
-  "merged_stubs": 2019,
+  "source_files": 29366,
+  "merged_stubs": 2060,
   "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
-  "inventory_sha256": "630dc9449b3840706d8fe227115fdc6b53cb778db38bdb9a370ceda2a2362b0a",
+  "inventory_sha256": "e84192d5436867270b8d2cd5a8be6bd546e893103c563886b9ffca0a39548635",
   "log": "validation_reports\\limbus\\full0.whole.compile.log.gz",
   "references": null,
   "reference_closure": [
@@ -11,19 +11,19 @@
   ],
   "closure_refs": 260,
   "exit_code": 1,
-  "files_with_errors": 1423,
-  "errors": 4082,
+  "files_with_errors": 367,
+  "errors": 1629,
   "errors_by_code": {
-    "CS0246": 3265,
+    "CS0246": 821,
     "CS0102": 219,
     "CS0234": 187,
     "CS0111": 122,
     "CS0122": 96,
     "CS0051": 33,
-    "CS0535": 24,
     "CS0683": 22,
     "CS0538": 17,
     "CS0104": 15,
+    "CS0535": 15,
     "CS0738": 15,
     "CS0460": 10,
     "CS0100": 10,
@@ -75,8 +75,8 @@
       "message": "\u201cArrayBufferWriter<T>\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIBufferWriter<T>.GetSpan(int)\u201d\r"
     },
     "CS8051": {
-      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Diagnostics\\CodeAnalysis\\UnconditionalSuppressMessageAttribute.cs",
-      "line": 13,
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\ObsoleteAttribute.cs",
+      "line": 12,
       "message": "\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u5fc5\u987b\u5177\u6709 get \u8bbf\u95ee\u5668\u3002\r"
     },
     "CS0051": {
@@ -114,10 +114,20 @@
       "line": 25,
       "message": "\u201cSound\u201d\u662f \u547d\u540d\u7a7a\u95f4\uff0c\u4f46\u6b64\u5904\u88ab\u5f53\u505a \u7c7b\u578b \u6765\u4f7f\u7528\r"
     },
+    "CS0426": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\TimeCalculator\\Time\\TimeCalculator.cs",
+      "line": 128,
+      "message": "\u7c7b\u578b\u201cTimeCalculator\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u540d\u201cTime\u201d\r"
+    },
     "CS0100": {
       "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgAddressableManager.cs",
       "line": 1603,
       "message": "\u53c2\u6570\u540d\u201c_\u201d\u91cd\u590d\r"
+    },
+    "CS0122": {
+      "file": "out\\limbus\\full0\\Unity.TextMeshPro\\TMPro\\TMP_FontAsset.cs",
+      "line": 5007,
+      "message": "\u201cLigatureSubstitutionRecord\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b\r"
     },
     "CS0540": {
       "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
@@ -134,16 +144,6 @@
       "line": 1710,
       "message": "\u201cRpgShopManager._GetConsumedStock_d__77.GetEnumerator()\u201d: \u8fd4\u56de\u7c7b\u578b\u5fc5\u987b\u4e3a\u201cSystem.Collections.Generic.IEnumerator<(Int32shopId, Int32itemId, Int32remaining)>\u201d\u624d\u80fd\u4e0e\u5b9e\u73b0\u7684\u6210\u5458\u201cIEnumerable<(Int32shopId, Int32itemId, Int"
     },
-    "CS0426": {
-      "file": "out\\limbus\\full0\\Assembly-CSharp\\TimeCalculator\\Time\\TimeCalculator.cs",
-      "line": 128,
-      "message": "\u7c7b\u578b\u201cTimeCalculator\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u540d\u201cTime\u201d\r"
-    },
-    "CS0122": {
-      "file": "out\\limbus\\full0\\Unity.TextMeshPro\\TMPro\\TMP_FontAsset.cs",
-      "line": 5008,
-      "message": "\u201cLigatureSubstitutionRecord\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b\r"
-    },
     "CS0538": {
       "file": "out\\limbus\\full0\\UnityEngine.Purchasing.Stores\\UnityEngine\\Purchasing\\Extension\\UnityUtil.cs",
       "line": 183,
@@ -154,15 +154,15 @@
       "line": 148,
       "message": "\u65e0\u6cd5\u58f0\u660e\u9759\u6001\u7c7b\u578b\u201cCommonConstants.Regex\u201d\u7684\u53d8\u91cf\r"
     },
-    "CS0534": {
-      "file": "out\\limbus\\full0\\SocketIOUnityAssembly\\SocketIOClient\\Newtonsoft\\Json\\ByteArrayConverter.cs",
-      "line": 13,
-      "message": "\u201cByteArrayConverter\u201d\u4e0d\u5b9e\u73b0\u7ee7\u627f\u7684\u62bd\u8c61\u6210\u5458\u201cJsonConverter.ReadJson(JsonReader, Type, object, JsonSerializer)\u201d\r"
-    },
     "CS0264": {
       "file": "out\\limbus\\full0\\Febucci.TextAnimator.Runtime\\f__AnonymousType0.cs",
       "line": 5,
       "message": "\u201c__f__AnonymousType0<_domainAssembly_j__TPar, _assemblyType_j__TPar>\u201d\u7684\u5206\u90e8\u58f0\u660e\u5fc5\u987b\u5177\u6709\u987a\u5e8f\u76f8\u540c\u7684\u76f8\u540c\u7c7b\u578b\u53c2\u6570\u540d\r"
+    },
+    "CS0534": {
+      "file": "out\\limbus\\full0\\SocketIOUnityAssembly\\SocketIOClient\\Newtonsoft\\Json\\ByteArrayConverter.cs",
+      "line": 13,
+      "message": "\u201cByteArrayConverter\u201d\u4e0d\u5b9e\u73b0\u7ee7\u627f\u7684\u62bd\u8c61\u6210\u5458\u201cJsonConverter.ReadJson(JsonReader, Type, object, JsonSerializer)\u201d\r"
     },
     "CS0453": {
       "file": "out\\limbus\\full0\\Facepunch.Steamworks.Win64\\Steamworks\\SteamUGC.cs",

@@ -2002,11 +2002,13 @@ class _HighLevelMixin:
                 return False
         _hetero_assigns = {}
         try:
-            _nm_alt = '|'.join(_re.escape(_n) for _n in new_names)
-            _as_rx = _re.compile(r'^\s*(' + _nm_alt + r')\s*=(?!=|>)(.*);\s*$')
+            # generic identifier + membership, never an alternation over every
+            # renamed token: the alternation is retried at each line start and
+            # cost minutes on a 116k-line body (GenerateTextMesh)
+            _as_rx = _re.compile(r'^\s*([A-Za-z_]\w*)\s*=(?!=|>)(.*);\s*$')
             for _st in lines:
                 _am = _as_rx.match(_st)
-                if _am is None:
+                if _am is None or _am.group(1) not in new_name_set:
                     continue
                 _hetero_assigns.setdefault(_am.group(1), []).append(_am.group(2).strip())
         except Exception:

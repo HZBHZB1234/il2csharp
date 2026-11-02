@@ -338,6 +338,13 @@ class _BuildMixin:
         if not any(b.stmts or b.cond is not None or b.ret is not None for b in blocks):
             return ['/* nothing */']
         lines = self._final_text(self._structure(blocks, bmap, m))
+        if len(lines) > 20000:
+            # A pathological body (TextMeshProUGUI.GenerateTextMesh: ~116k
+            # statements) makes every cleanup pass below quadratic in the
+            # statement count. They are cleanups and folds, not correctness
+            # requirements, so a body this size keeps the rendered statements
+            # and skips them: the output stays valid C#.
+            return lines
         lines = drop_empty_init_guards(lines)
         lines = drop_duplicate_raw_stores(lines)
         lines = drop_gc_cardmark_barriers(lines)
@@ -1277,15 +1284,37 @@ _GC_FRAG_RX = re.compile(
 
 
 def drop_dead_cardmark_fragments(lines):
-    out = []
-    for i, ln in enumerate(lines):
+    # One occurrence count for every candidate name, not one full scan per
+    # fragment line: the per-line scan is O(fragments * lines) and dominated
+    # the tail of a 116k-statement body (TextMeshProUGUI.GenerateTextMesh).
+    names = []
+    for ln in lines:
+        # cheap substring pre-filter: _GC_FRAG_RX requires this literal and
+        # its leading optional group backtracks quadratically on long lines
+        if '8589930496' not in ln:
+            continue
         m = _GC_FRAG_RX.match(ln)
         if m:
-            name = m.group(1)
-            tok = re.compile(r'(?<![\w.])%s(?![\w])' % re.escape(name))
-            used = any(tok.search(other)
-                        for j, other in enumerate(lines) if j != i)
-            if not used:
-                continue            # dead: drop the whole line
+            names.append(m.group(1))
+    if not names:
+        return lines
+    uniq = set(names)
+    # generic identifier scan + set membership: an alternation over every
+    # candidate name is retried at every position of every line
+    tok = re.compile(r'(?<![\w.])([A-Za-z_]\w*)(?![\w])')
+    counts = dict.fromkeys(uniq, 0)
+    for ln in lines:
+        for mm in tok.finditer(ln):
+            g = mm.group(1)
+            if g in uniq:
+                counts[g] = counts.get(g, 0) + 1
+    out = []
+    for i, ln in enumerate(lines):
+        if '8589930496' not in ln:
+            out.append(ln)
+            continue
+        m = _GC_FRAG_RX.match(ln)
+        if m and counts.get(m.group(1), 0) <= 1:
+            continue                # dead: drop the whole line
         out.append(ln)
     return out

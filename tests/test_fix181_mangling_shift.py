@@ -54,6 +54,13 @@ def test_generated_names_are_still_mangled():
         assert _fix(src) == want, (src, _fix(src))
 
 
+def test_the_module_static_array_class_is_mangled():
+    # `<PrivateImplementationDetails>` carries no `__` but never contains
+    # whitespace, so it is still a generated name (fix 186).
+    assert _fix('internal sealed partial class <PrivateImplementationDetails>') == \
+        'internal sealed partial class _PrivateImplementationDetails_'
+
+
 def test_the_helper_declines_a_match_without_a_generated_marker():
     assert mangle_generated_ident('< section >') == '< section >'
     assert mangle_generated_ident('') == ''

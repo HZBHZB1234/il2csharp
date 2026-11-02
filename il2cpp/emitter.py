@@ -5,7 +5,8 @@ from il2cpp.common import compressed_int, csharp_type_name, i32, i64, read_compr
 from il2cpp.csharp import FA_INITONLY, FA_LITERAL, FA_STATIC, FIELD_VIS, METH_VIS, TYPE_VIS, UsingTracker, field_attrs, nameof_sugar, strip_namespaces, collision_heads, source_field_name
 from il2cpp.lifter import Lifter
 from il2cpp.metadata import ImageDef, MethodDef, TypeDef
-from il2cpp.names import repr_f32, repr_f64, safe_ident, sanitize, sanitize_qualifier
+from il2cpp.names import (ident_name, repr_f32, repr_f64, safe_ident, sanitize,
+                       sanitize_qualifier)
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.runtime.meta import meta_lit_repr
 from il2cpp.text import (MANGLED_IDENT_RX, mangle_generated_ident, reindent,
@@ -866,7 +867,7 @@ class Emitter:
             byref = (pt[1] >> 29) & 1 if pt else 0
             pmod = 'ref ' if byref else ''
             suf, seen_opt = self._param_default_suffix(m, k, p, pt, seen_opt)
-            ps.append('%s%s %s%s' % (pmod, tn, safe_ident(p.name), suf))
+            ps.append('%s%s %s%s' % (pmod, tn, ident_name(p.name), suf))
             info.append(bool(suf))
         ps = self._strip_mid_defaults(ps, info)
         if m.name in ('op_Explicit', 'op_Implicit') and m.is_static \
@@ -1013,7 +1014,7 @@ class Emitter:
                 tn = self.il.type_name(pt) if pt else 'object'
                 byref = (pt[1] >> 29) & 1 if pt else 0
                 ps.append('%s%s %s' % ('ref ' if byref else '', tn,
-                                       safe_ident(p.name)))
+                                       ident_name(p.name)))
             nm = self._type_ident(td.name) + \
                 self._type_generic_params(td)
             unsafe = 'unsafe ' if '*' in rtname or any(
@@ -1172,7 +1173,7 @@ class Emitter:
             byref = (pt[1] >> 29) & 1 if pt else 0
             pmod = 'ref ' if byref else ''
             suf, seen_opt = self._param_default_suffix(m, k, p, pt, seen_opt)
-            ps.append('%s%s %s%s' % (pmod, tn, safe_ident(p.name), suf))
+            ps.append('%s%s %s%s' % (pmod, tn, ident_name(p.name), suf))
             info.append(bool(suf))
         ps = self._strip_mid_defaults(ps, info)
         return ', '.join(ps)
@@ -1378,7 +1379,7 @@ class Emitter:
         index_params = gparams if getter else sparams[:-1]
         if index_params:
             prefix = pname.rpartition('.')[0] + '.' if explicit else ''
-            params = ', '.join('%s %s' % (self.il.type_name(self.il.types[p.type]), safe_ident(p.name)) for p in index_params)
+            params = ', '.join('%s %s' % (self.il.type_name(self.il.types[p.type]), ident_name(p.name)) for p in index_params)
             pname = prefix + 'this[' + params + ']'
         mods = self._accessor_modifiers(td, present, explicit)
         if '*' in ptype or any('*' in self.il.type_name(self.il.types[p.type]) for p in index_params):

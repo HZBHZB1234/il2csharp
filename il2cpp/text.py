@@ -135,17 +135,23 @@ def mangle_generated_ident(text):
     """Replace the angle brackets of compiler-generated identifiers.
 
     Roslyn spells a state machine `<Method>d__3`, a closure `<>c`, a local
-    function `<M>g__F|0_0` -- all of which no C# grammar accepts. The
-    heuristic that finds them must not fire on an ordinary shift
+    function `<M>g__F|0_0`, the module's static array class
+    `<PrivateImplementationDetails>` -- all of which no C# grammar accepts.
+    The heuristic that finds them must not fire on an ordinary shift
     expression: `(section & value) << section >> 32` matched the nested
     angle-bracket alternative (`< section >`) and reached the file as
-    `__ section __`, the only parse error on the game tree. Every generated
-    name carries a double underscore (`d__`, `c__`, `9__`, `g__`, `b__`,
-    `f__`) or IS the bare `<>`-prefixed closure family, so anything else
-    stays untouched.
+    `__ section __`, the only parse error on the game tree.
+
+    Two positive proofs, and a skipped match is returned untouched:
+    a double underscore (every generated *method*-shaped name carries one:
+    `d__`, `c__`, `9__`, `g__`, `b__`, `f__`), or no WHITESPACE at all -- a
+    generated name never contains one, while every false positive (a shift or
+    comparison inside brackets) does. The second proof is what keeps
+    `<PrivateImplementationDetails>` mangled; a `'__'`-only test left its raw
+    brackets in every `PrivateImplementationDetails.cs` in the tree.
     """
     t = text or ''
-    if '__' not in t and not t.startswith('<>'):
+    if '__' not in t and not t.startswith('<>') and (' ' in t or '\t' in t):
         return t
     return (t.replace('<', '_').replace('>', '_')
              .replace('.', '_').replace('|', '_'))

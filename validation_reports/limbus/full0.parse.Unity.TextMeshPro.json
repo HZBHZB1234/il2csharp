@@ -1,11 +1,22 @@
 {
   "kind": "tree-sitter C# syntax gate",
   "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\full0\\Unity.TextMeshPro",
-  "files": 129,
-  "bad_files": 0,
+  "files": 134,
+  "bad_files": 1,
   "errors": 0,
   "missing": 0,
-  "recovery_nodes": 0,
-  "details": {},
-  "elapsed_seconds": 1.203
+  "recovery_nodes": 1,
+  "details": {
+    "TMPro\\TMP_Text.cs": [
+      {
+        "kind": "RECOVERY",
+        "node_type": "identifier",
+        "row": 10798644,
+        "column": 51,
+        "zero_width": true,
+        "text": ""
+      }
+    ]
+  },
+  "elapsed_seconds": 6.047
 }

@@ -659,6 +659,11 @@ class _TextPassMixin:
         ))
 
         def _rewrite_unknowns(ln: str) -> str:
+            # A character-level scan: skip every line that has no select mark.
+            # On a 116k-statement body (TextMeshProUGUI.GenerateTextMesh) this
+            # pass ran twice over every line and dominated the render.
+            if '?' not in ln:
+                return ln
             out = []
             n = len(ln)
             i = 0
@@ -727,7 +732,9 @@ class _TextPassMixin:
         # a chain of two unknown operands with an unknown operator between
         # them (`? ? ?` -> `unknown unknown unknown`) collapses to one.
         for _ in range(3):
-            raw = [self._sub_outside_literals(re.compile(r'\bunknown\s+unknown\b'), 'unknown', ln, _mask_line_spans(ln, False)[0]) for ln in raw]
+            raw = [self._sub_outside_literals(re.compile(r'\bunknown\s+unknown\b'), 'unknown', ln, _mask_line_spans(ln, False)[0])
+                   if 'unknown' in ln else ln
+                   for ln in raw]
         # `?.NAME : default` is the selective-shock `?` receiver: the rewrite
         # above already produced `unknown.NAME`; drop the dangling ` : default`
         # ternary tail that would leave an unparseable `expr : default` in an
