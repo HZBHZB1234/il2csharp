@@ -36,8 +36,6 @@ and the honest marker is better than a fabricated struct).
 
 ## Previous: the survivors fixture's defect map (2026-11-03, on `main`)
 
-## Previous: the survivors fixture's defect map (2026-11-03, on `main`)
-
 Source-vs-tree on the complete survivors tree (`full_s1`, 810 matched methods,
 call_f1 0.667 / member_f1 0.361 / shape 0.584) has 52 of its 200 worst rows
 carrying no honesty marker. Most are the same inlining story as unitask
