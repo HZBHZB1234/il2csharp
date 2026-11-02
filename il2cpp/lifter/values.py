@@ -412,7 +412,13 @@ class _ValuesMixin:
                     if _ttd is None or _ttd.namespace != 'Unity.Mathematics' \
                             or _ttd.name != 'float2':
                         continue
-                    tname = 'float2'
+                    # FULLY QUALIFIED: the bare loat2 is only a name when
+                    # the file imports Unity.Mathematics, and the using
+                    # tracker never learns that namespace from a bare
+                    # spelling -- 830 survivors-tree sites were CS0246 (no
+                    # such type) purely for this. The using-strip shortens a
+                    # dotted chain again when the file really does import it.
+                    tname = 'Unity.Mathematics.float2'
             else:
                 continue
             e = arg_exprs[pos]
