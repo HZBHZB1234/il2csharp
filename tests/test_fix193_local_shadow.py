@@ -41,3 +41,12 @@ def test_an_undeclared_name_is_still_shortened():
 def test_no_declared_names_keeps_the_old_behaviour():
     line = 'public partial class Foo : UnityEngine.UIElements.UxmlTraits'
     assert _strip(line) == ['public partial class Foo : UxmlTraits']
+
+
+def test_a_generic_nested_name_shadows_with_its_arity_stripped():
+    # metadata names a generic type UxmlObjectTraits`1; the emitted short
+    # spelling is UxmlObjectTraits, which is what the head comparison sees.
+    line = ('internal partial class UxmlObjectTraits<T> : '
+            'UnityEngine.UIElements.UxmlObjectTraits<T>')
+    out = _strip(line, declared={'UxmlObjectTraits`1', 'UxmlObjectTraits'})
+    assert out == [line], out
