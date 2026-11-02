@@ -7,7 +7,59 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 180 — an `object` local takes the type metadata already knows (2026-11-02, on `main`)
+## Current work: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
+
+The file boundary replaces the angle brackets of compiler-generated
+identifiers (`<Foo>d__13`, `<>c`, `<>9__0_0`, a nested
+`<IEnumerable<T>_GetEnumerator>d__21`) because no C# grammar accepts them.
+`MANGLED_IDENT_RX`'s nested-bracket alternative accepted spaces, so a plain
+shift expression matched it. The game tree's **only** `Assembly-CSharp` parse
+error was
+
+```csharp
+ulong num1 = ... | (section & value) __ section __ 32 & 63;   // << section >> 32
+```
+
+— 45 sites in 5 files, all hand-optimized bit-twiddling code
+(`BitVector64`, `Base64`, `RIPEMD160Managed`, `X86`, `IPv4AddressHelper`).
+`mangle_generated_ident` now declines any match without a double underscore
+(every Roslyn-generated name carries one: `d__`, `c__`, `9__`, `g__`, `b__`,
+`f__`) and keeps the bare `<>`-prefixed closure family.
+
+Measured: re-emitting the offending types gives `<< section >> 32 & 63`, the
+game tree now has **0** dunder sites, `Assembly-CSharp/Server` parses 907
+files / 0 errors, and two images that previously *segfaulted* the parse gate
+(`System`, `Unity.Burst`) now parse clean. Portable suite **1,617 passed**
+(4 new tests).
+
+### Open defect found while gating (next fix candidate)
+
+`mscorlib` still has one parse error, and it is a **statement spliced into a
+ternary arm**, not a mangling artifact:
+
+```csharp
+// out/limbus/full0/mscorlib/System/Buffer.cs:195
+((byte*)dstOffset + 0x20 + dst)[0] = num4 == dst ? srcOffset + 0x20 + num4; return : srcOffset + 0x20 + num4;
+```
+
+The true arm carries `; return`, i.e. some pass composed the arm from text that
+included a following statement. Reproduce by lifting the `Buffer.BlockCopy`
+overload at that site; the ternary builder to suspect is the one that composes
+arms from multi-statement text (not `_ternary_pass`, which requires the exact
+one-assignment-per-arm layout).
+
+### Harness limitation (documented, mitigated)
+
+`tools/gate.py parse` parses a corpus in one process and **segfaults at
+teardown** on the largest images (`mscorlib`, `UnityEngine.TextCoreTextEngineModule`):
+the same files parse fine file-by-file and every subdirectory alone is clean,
+so it is a native free/stack limit, not a verdict. The gate now (a) recreates
+the `Parser` every 100 files and (b) caps the per-file detail list at 60 nodes
+(`DETAIL_NODES`, with a `truncated` map) so a cascading recovery cannot blow up
+the report. Parse the remaining two images by subdirectory until the teardown
+crash is root-caused.
+
+## Previous: fix 180 — an `object` local takes the type metadata already knows (2026-11-02, on `main`)
 
 A virtual/interface call resolved *textually* after lifting leaves its temp
 untyped, so the declaration printed `object` although the callee's return

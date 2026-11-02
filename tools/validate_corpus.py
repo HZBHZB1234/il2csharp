@@ -69,6 +69,10 @@ def mask_literals(text, keep_literal_token=False):
 TOKEN = re.compile(r"[{}]|\bgoto\s+(?P<goto>L_[0-9a-fA-F]+)\s*;|(?P<label>\bL_[0-9a-fA-F]+)\s*:")
 EMPTY = re.compile(r"\(\s*,|,\s*,|,\s*\)")
 
+# Per-file cap on the reported error nodes; the summary counts stay exact and
+# `truncated` records which files were cut (see parse_tree).
+DETAIL_NODES = 60
+
 
 def audit_body(body):
     # A literal is an operand, not an empty argument. Preserve one opaque
@@ -120,12 +124,21 @@ def parse_tree(args):
     import tree_sitter_c_sharp
     from tree_sitter import Language, Parser
 
-    parser = Parser(Language(tree_sitter_c_sharp.language()))
+    lang = Language(tree_sitter_c_sharp.language())
+    parser = Parser(lang)
     started = time.monotonic()
     files = sorted(Path(args.tree).rglob("*.cs"))
     bad = {}
     errors = missing = recoveries = 0
-    for p in files:
+    for _fi, p in enumerate(files):
+        # A single Parser instance segfaults (0xC0000005) partway through a
+        # large corpus -- reproducible on the 1,426-file mscorlib of the game
+        # tree while every subdirectory alone parses clean, so the native
+        # parser state accumulates across files. A fresh Parser per batch
+        # cannot change any per-file verdict (files are independent) and
+        # keeps the gate usable on whole trees.
+        if _fi and not _fi % 100:
+            parser = Parser(lang)
         data = p.read_bytes()
         # Keep the Tree alive throughout traversal (also for older bindings).
         tree = parser.parse(data)
@@ -168,9 +181,18 @@ def parse_tree(args):
         "kind": "tree-sitter C# syntax gate",
         "tree": str(Path(args.tree).resolve()),
         "files": len(files), "bad_files": len(bad),
-        "errors": errors, "missing": missing, "recovery_nodes": recoveries, "details": bad,
+        "errors": errors, "missing": missing, "recovery_nodes": recoveries,
+        "details": {k: v[:DETAIL_NODES] for k, v in bad.items()},
         "elapsed_seconds": round(time.monotonic() - started, 3),
     }
+    # A file whose recovery cascades (one bad line splitting a whole 4k-line
+    # type) can collect thousands of nodes, and json's C encoder then
+    # overflows its stack on the report (0xC0000005 on mscorlib of the game
+    # tree) -- the summary counts are the evidence, the per-node list is a
+    # sample. Truncation is recorded so a capped file cannot read as small.
+    capped = {k: len(v) for k, v in bad.items() if len(v) > DETAIL_NODES}
+    if capped:
+        report["truncated"] = capped
     write_report(args.report, report)
     print(json.dumps({k: v for k, v in report.items() if k != "details"}, indent=2))
     return 1 if bad or not files else 0
