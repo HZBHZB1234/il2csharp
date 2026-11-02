@@ -38,8 +38,6 @@ HEAD and patched once, precisely; `text.py` now has exactly one definition.
 
 ## Previous: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
 
-## Previous: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
-
 The full 75-image rebuild with fixes 195/196/197 (`out/survivors-roguelike-kit/
 full_s3`, 7,523 type files / 80,091 bodies) is the first *complete* survivors
 tree measured end to end:
