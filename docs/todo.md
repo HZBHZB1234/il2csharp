@@ -1,4 +1,46 @@
-## Current work: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
+## Current work: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
+
+Both come from one 33-line method on the survivors fixture,
+`RGame.ScriptableCoreKit.SetScaleStateNode.Validate`, whose source is
+
+```csharp
+if (targetScale.x == 0f || targetScale.y == 0f || targetScale.z == 0f)
+    issues.Add("Target scale contains zero values, ...");
+```
+
+and whose emitted form was an empty-typed `float.IsNaN(this.targetScale)` plus a
+label cascade (nine ifs, four gotos, labels *inside* if bodies).
+
+**fix 200** — `_aggregate_load` returned None as soon as a load's offset was ANY
+field offset, so `movss xmm0,[rbx+30h]` (a 4-byte read of a `Vector3` field) fell
+through to the whole-field render and the operand became the struct. The narrow
+case now slices through metadata (`<field>.<first component>`, proved at that
+exact width). 2,823 `float.IsNaN(...)` sites exist tree-wide and every one whose
+operand is a struct field was type-wrong.
+
+**fix 201** — MSVC lowers a float comparison to ONE compare and TWO branches
+(`ucomiss; jp NaN_arm; je equal_arm`), and the jcc handler cleared the flags
+operands after the first, so the second printed `? == ?` and the decompiler had
+no condition to work with. The operands now stay; staleness is already covered
+by `_flags_mn` (any flags-writing instruction, calls included, updates the
+setter, and `flag_cond` declines what it cannot derive).
+
+Result on that method:
+
+```csharp
+if (float.IsNaN(this.targetScale.x)) goto L_1803d5ad5;   // jp short
+if (this.targetScale.x == 0f) goto L_1803d5aed;          // je short  (was ? == ?)
+```
+
+every component's condition now the source's own comparison. Portable 1,656
+passed, pinned bodies unchanged.
+
+A full survivors rebuild with fixes 198-201 is in flight (`full_s5`); the
+earlier `full_s4` run (198/199 only) was cancelled at 20/75 images rather than
+measured, since 200/201 change the very shapes it would have counted.
+
+## Previous: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
+## Previous: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
 
 The `float.IsNaN(this.targetScale)` finding from the masked-compile note is
 fixed at its root. `_aggregate_load` returned None as soon as a load's offset
