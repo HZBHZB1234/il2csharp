@@ -62,6 +62,23 @@ pass (`aggregates.py`) composing the pair the way it already does for two
 4-byte stores. Neither is done yet; the shape is recorded here with the
 disassembly so the next session does not have to rediscover it.
 
+### Measurement note: a single-image compile of Assembly-CSharp is not a metric
+
+`gate.py compile` on one image compiles that image alone, so every namespace
+its siblings own is unresolved. On the survivors tree, the 63 binding errors
+from `Assembly-CSharp` alone are **61 CS0234** of the form "the type or
+namespace name `CommonStat` does not exist in the namespace `RGame`" — i.e.
+`RGame.CommonStat`, `RGame.Framework`, `RGame.ScriptableCoreKit` come from
+*other* images of the same build (they are not missing from the tree; the file
+`RGame/RoguelikeKit/BaseBulletShootState.cs` compiles fine once its siblings
+are in the compilation). The same effect produced the `__SharedBodyStubs`
+CS0246 when a *subdirectory* was compiled alone.
+
+So for these fixtures the number to quote is the **whole-tree compile**
+(`compile_corpus.py` with the fixture's exact managed closure for the BCL),
+exactly as unitask is measured: the per-image gate answers "does this image
+name things its own assembly owns", not "is the recovered code correct".
+
 ## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
 
 Both came out of parse-gating the **complete survivors tree**, which had never
