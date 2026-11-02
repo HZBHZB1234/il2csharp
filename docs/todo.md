@@ -96,7 +96,35 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
+## Current work: fix 189 — two text defects, generated-type visibility, scaffolding dedupe (2026-11-02, on `main`)
+
+Found by reading the remaining 393 errors apart:
+
+* **`global::` mangling** — `mangle_generated_ident` turned the explicit
+  interface spelling
+  `byte global::System.Collections.Generic.IEnumerable<byte>.GetEnumerator()`
+  into `global__System...` (5 sites, CS0246), because the text matched the
+  generated-name heuristic. A name containing `::` is never generated.
+* **Generated nested type visibility** — a closure or state machine nested in
+  its owner was emitted `private` from its flags, while the local functions and
+  inlined bodies that mention it are `internal`, so 33 signatures were CS0051
+  (`JsonDocument._CreateForLiteral_g__Create_73_0(byte[], ref
+  JsonDocument.__c__DisplayClass73_0 _)`). Generated nested types are `internal`
+  now: still implementation detail, and no signature exposes something less
+  accessible.
+* **Scaffolding dedupe** grows `IsUnmanagedAttribute`, `IsExternalInit`,
+  `ScopedRefAttribute`, `CompilerFeatureRequiredAttribute` (-20 artifact
+  CS0111).
+* Six more referenced images built (`System.Text.Encodings.Web`,
+  `Unity.InternalAPIEngineBridge.001`, `Unity.Services.Core`,
+  `Unity.2D.Common.Runtime`, `Unity.ProBuilder*`).
+
+A full rebuild (`out/limbus/full1`) is in flight to carry all of it plus fixes
+186-188 into the measured tree; the previous measurement stands at 393 errors
+with 0 syntax errors, and the families above account for ~58 of them.
+
 ## Current work: 393 whole-tree errors, zero syntax errors (2026-11-02, on `main`)
+
 
 Seventeen images the game references but the tree never emitted were built
 (`UnityEngine.Purchasing` and its five siblings, `Unity.ResourceManager`,
