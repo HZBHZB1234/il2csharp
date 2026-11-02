@@ -1109,13 +1109,59 @@ class _AnalyzeMixin:
             live = rest
         return out
 
+    def _abort_carries_managed_throw(self, b):
+        """True when an `abort` block is a REAL throw site, not a guard stub.
+
+        `_prune_nonreturning` keeps only paths that reach `ret`/`stop`, so
+        every `throw` arm -- `call raise_helper; int3` -- is dropped: the
+        awaiter's `if (continuationAction != null) throw new
+        InvalidOperationException(...)` rendered as an empty `if { }`
+        (found by diffing against the fixture source). The lifter renders
+        those calls perfectly (`Error.ThrowInvalidOperationExceptionCore("...")`),
+        so the loss is here, and it is decidable from the CALL TARGET: a
+        managed throw helper is an address with exactly one metadata
+        candidate, while IL2CPP's own null-guard stub calls an unregistered
+        runtime routine (which renders as a bare `throw new
+        NullReferenceException()`). Keep the managed one, prune the guard.
+        """
+        try:
+            from iced_x86 import Mnemonic as _M
+        except Exception:
+            return False
+        calls = [i for i in (b.insns or ()) if i.mnemonic == _M.CALL]
+        if not calls:
+            return False
+        il = getattr(self, 'il', None) or getattr(
+            getattr(self, 'L', None), 'il', None)
+        cands = (getattr(il, 'addr_candidates', None) or {}).get(
+            calls[-1].near_branch_target) or []
+        if len(cands) != 1 or cands[0][0] != 'method':
+            return False
+        try:
+            m = il.meta.methods[cands[0][1]]
+            td = il.meta.typedefs[m.declaring]
+        except Exception:
+            return False
+        # The BCL's own guard helpers (System.ThrowHelper.ThrowArgumentOut
+        # OfRange_IndexException) are the noise the pruning exists to remove:
+        # keeping one folded RpgInventoryManager.AddItem's tail and lost its
+        # event sugar (	his.__field_OnItemAdded). Only a throw written in
+        # the game's/library's own namespace is real source-level control flow.
+        ns = getattr(td, 'namespace', '') or ''
+        return bool(ns) and not ns.startswith('System')
+
     def _prune_nonreturning(self, blocks):
         """Drop edges into paths that can never come back. IL2CPP guards every
         member access with a null check that branches to a throw stub; those
         stubs are compiler scaffolding, and keeping them buries the real code
         (and leaves loops without an exit, which breaks postdominance)."""
         good = set()
-        stack = [b.bid for b in blocks if b.term and b.term[0] in ('ret', 'stop')]
+        seed = [b.bid for b in blocks if b.term and b.term[0] in ('ret', 'stop')]
+        # a real 	hrow arm ends in 'abort' but calls a MANAGED helper
+        seed += [b.bid for b in blocks
+                 if b.term and b.term[0] == 'abort'
+                 and self._abort_carries_managed_throw(b)]
+        stack = seed
         while stack:
             x = stack.pop()
             if x in good:
