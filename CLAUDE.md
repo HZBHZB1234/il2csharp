@@ -338,6 +338,39 @@ fix-123 in `validation_reports/review123_*`.
   accessor's trivial body after the access respell -- it would call itself.
   Non-auto collisions (a real field named like a member, an event field named
   like the event) keep the `__field_X` spelling.
+- An explicit interface implementation of a **property** is emitted as a
+  property (fix 190). IL stores an accessor as a plain method, and an explicit
+  implementation keeps its fully dotted metadata name
+  (`TMPro.IRubyText.get_enableAutoSizing`), so a method render produces
+  `bool IRubyText.get_enableAutoSizing()` -- CS0683, it cannot implement an
+  accessor. The type emitter groups a getter/setter pair by
+  (qualifier, base name) and calls `emit_property(..., force_name=...)`, which
+  skips the property-row lookup because the row lives on the INTERFACE. Only a
+  pair whose qualifier is the method's own dotted path -- or one uniquely
+  proved by `_explicit_impl_qualifier` -- is grouped; a lone accessor still
+  renders as a property with that single accessor. `_tuple_qualifier_fix`
+  repairs IL2CPP's glued tuple spelling inside a qualifier
+  (`<(System.Int32shopId, ...)>` -> `<(int, ...)>`, fix 191): each element is
+  `<full type name><element name>`, so the longest known type-name prefix is
+  the type and the rest is a name that must not survive. `_iface_qualifier`
+  counts parenthesis depth when it computes a qualifier's top-level argument
+  count, because a tuple argument is ONE argument.
+- A compiler-generated NESTED type (closure, state machine) is emitted
+  `internal`, never the flags' `private` (fix 189): the local functions and
+  inlined bodies that mention it are `internal`, so a private spelling makes
+  every such signature CS0051 (33 sites on the game fixture). Generated
+  TOP-LEVEL scaffolding is unchanged.
+- `mangle_generated_ident` (the file boundary's generated-name mangler) must
+  skip a text containing `::` (a `global::` alias path is not a name,
+  fix 189), and must accept two positive proofs of "generated": a double
+  underscore, or NO WHITESPACE at all (`<PrivateImplementationDetails>` has no
+  `__` but never contains a space, while every false positive -- a shift or a
+  comparison inside brackets, fix 181 -- does). `spell_unresolved_values`
+  consumes a whole `unknown` member CHAIN plus its arguments
+  (`unknown.GetEnumerator(0)`), and a chain that is an entire statement
+  renders `/*unknown call*/;` rather than `/*unknown*/ default;` (a bare
+  `default;` is not an expression statement) -- fix 188.
+
 - Generic parameter constraints come from the metadata's own
   `GenericParameterAttributes` word plus the flat `genericParameterConstraints`
   TypeIndex array ranged per parameter (fix 173). `_type_param_indices` owns
