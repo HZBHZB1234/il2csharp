@@ -39,6 +39,30 @@ A full survivors rebuild with fixes 198-201 is in flight (`full_s5`); the
 earlier `full_s4` run (198/199 only) was cancelled at 20/75 images rather than
 measured, since 200/201 change the very shapes it would have counted.
 
+### Correction: the sret byte-stores are a fidelity issue, not a compile error
+
+An `UniTask` method emits its struct return through raw byte stores:
+
+```csharp
+Cysharp.Threading.Tasks.UniTask<bool> __ret = default;
+((byte*)&__ret + 0x0)[0] = uniTask1;
+((short*)((byte*)&__ret + 0xa))[0] = this.token;
+return __ret;
+```
+
+which looked like CS0029 ("cannot convert `UniTask<bool>` to `byte`"). A minimal
+repro with a plain struct DOES fail that way, but the real tree does not: the
+whole `UniTask` image (301 files) compiles with **8 errors, all CS8701**, and the
+whole unitask tree with 19 (18 CS8701 + 1 CS0644). Measured twice, so the
+measurement is not skipping files — the address-of local of a *generic* struct
+is evidently not a `byte` lvalue in the same way.
+
+So the family stays a **fidelity** issue (the return value is written field-wise
+instead of being constructed), not a compilability one, and the earlier
+suspicion that the whole-tree compile silently skips files was wrong. Worth
+recording because it is exactly the kind of plausible-looking deduction that
+would have sent the next session chasing a non-existent compiler error.
+
 ## Previous: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
 
 The `float.IsNaN(this.targetScale)` finding from the masked-compile note is
