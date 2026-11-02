@@ -41,8 +41,6 @@ known artifacts). Portable 1,650 passed, game pins 5 passed.
 
 ## Previous: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
 
-## Previous: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
-
 `tools/source_compare.py` now splits the unmatched population by side and
 records samples (`unmatched_samples`), which makes the whole diff classifiable
 instead of a single "mismatch" number. For the complete unitask tree
