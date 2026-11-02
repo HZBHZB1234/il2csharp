@@ -35,6 +35,51 @@ one type with `--types TextMeshProUGUI` did not finish in 10 minutes.
 Root-cause this next: a silently dropped type is worse than a wrong body,
 because every reference to it fails.
 
+## Current work: every emitted image now parses clean (2026-11-02, on `main`)
+
+Gating the freshly built game tree found three more syntax defects, all fixed,
+plus the reason one type never reached the tree at all.
+
+**The whole tree parses.** `Assembly-CSharp` 24,739 files / 0 bad,
+`mscorlib` 1,427 / 0, `UnityEngine.TextCoreTextEngineModule` 88 / 0, and the
+other 57 images 0 — 34,582 files, zero ERROR/MISSING nodes. The gate's earlier
+"teardown segfault" was a *symptom* of the two broken files (a pathological
+tree crashes tree-sitter's traversal and free), not a harness limit; with them
+fixed every image gates in one process. (The parser-refresh and detail-cap
+mitigations stay: they are cheap and make a broken tree diagnosable.)
+
+* **fix 183** — `_fold_static_addrs` glued a generic callee to its argument:
+  `EnsureInitializedCore<T>(typeof(X).__static_fields)` became
+  `EnsureInitializedCore<T>typeof(X).s_field`, mscorlib's
+  `Hashtable.get_SerializationInfoTable`. The "is this a call paren" test now
+  also recognises a callee ending in `>`/`]`/`)` (a rendered binary `>` is
+  always space-separated, so an identifier char before it proves a generic).
+* **fix 184** — a call on an unresolved callee rendered `?(args)` (five sites:
+  mscorlib `Marshal.ReleaseInternal`, Plugins, TMPro). It routes through the
+  unknown marker now: `= /*unknown*/ default;` in value position,
+  `/*unknown call*/;` in statement position.
+* **fix 185** — a residual metadata arity suffix in code
+  (`EqualityComparer`1.GetHashCode(comparer, value)`, CS1056) is respelled from
+  the call's folded receiver (`EqualityComparer<Vector4> comparer7`) and drops
+  to `unknown` otherwise. 130 of the tree's 134 backtick sites are inside
+  string literals and are untouched.
+
+**Why `TMPro.TextMeshProUGUI` never appeared** (2,435 references in AC): not a
+skip — a performance stall. `TextMeshProUGUI.GenerateTextMesh` is ~116k
+statements and three passes went super-linear on it:
+
+* `_order_copies` recomputed every phi copy's read set per round; it is a
+  ready-queue over precomputed sets now (spills recompute only what they
+  rewrite);
+* `_hoist_shared_tails` took 58 s and *duplicated* tails (115,924 → 153,035
+  statements), so the tail hoist and `_drop_dead_copies` decline above 6,000
+  statements (honest CFG shape, finite lift);
+* `_rename_locals` scanned every line once per renamed token (and once per
+  scalar-parameter copy in its prologue census); it is one identifier scan +
+  dict lookup per line now, still matched on the literal-blanked shadow line.
+
+Portable suite **1,637 passed** (15 new tests). Commits: `4a251df`, `84839d8`.
+
 ## Previous: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
 
 The file boundary replaces the angle brackets of compiler-generated
