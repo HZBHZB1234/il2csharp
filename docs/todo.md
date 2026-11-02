@@ -53,6 +53,42 @@ Full build in flight at the end of the round (`out/survivors-roguelike-kit/
 full_s1`); its gates and whole-tree compile follow the same recipe.
 
 
+### Source-comparison triage of the full unitask tree (2026-11-02)
+
+`tools/source_compare.py` against `out/unitask/full_u4` (1,327 matched methods,
+call_f1 0.618, member_f1 0.326, shape_cos 0.792) says the *worst* list is
+dominated by things that are **faithful, not defective**: IL2CPP inlined
+`Bounds.Equals` into twelve `IsNaN` comparisons, inlined `TrySetResult` into the
+promise `MoveNext` bodies, inlined `ThrowArgumentNullException` into a
+`...Core` call. Those are what the native code does.
+
+Only 14 of the 200 worst rows carry **no tell at all** (no `sub_`, no
+`obj_temp`, no `byte_ptr`), i.e. shapes that differ without an honesty marker.
+Nine of them are the same real defect:
+
+* `AssetBundleRequestAllAssetsAwaiter.UnsafeOnCompleted` (and its web-request
+  twin) — the source is
+  `if (continuationAction != null) throw new InvalidOperationException(...)`;
+  the emitted body is an **empty `if { }`** whose condition is garbage
+  (`((byte*)typeof(PooledDelegate<AsyncOperation>) + 0xe0)[0] ==
+  this.continuationAction`), and `GetResult` loses its whole
+  `if (result.IsError()) throw new UnityWebRequestException(result);` arm.
+
+Instrumenting `_prune_nonreturning` on that method shows the pruned targets are
+**empty abort blocks with no predecessors**, so the pruning is not what drops
+the throw: the raise call never reaches a block at all, and the surviving
+branch keeps a condition whose right-hand side is a klass slot. So this is a
+*lift-side* gap (a noreturn raise call / cast-class-throw shape), not the
+pruning trade-off. An experimental prune change that seeded reachability with
+non-empty abort blocks was measured and reverted: it does not affect this
+method and risks reintroducing the null-check-stub noise the pruning exists to
+remove.
+
+Next: take the `throw`-helper shape apart at lift time
+(`_eh_helper_returns` / `rt_noreturn` / the cast-class throw at
+`insn.py:1647`) on that awaiter's method, with the fixture source as ground
+truth.
+
 ## Previous: two whole-tree models (2026-11-02, on `main`)
 
  — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)

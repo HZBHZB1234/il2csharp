@@ -1927,11 +1927,20 @@ class Emitter:
             # names this file declares shadow same-named namespace types, so
             # the strip must keep those prefixes (fix 193: `class UxmlTraits :
             # UxmlTraits` inside VisualElement)
-            declared = {td.name}
+            # both the metadata arity spelling (UxmlObjectTraits1) and the
+            # emitted short one (UxmlObjectTraits) shadow the namespace type
+            declared = set()
             try:
-                for k in range(getattr(td, 'nested_count', 0)):
-                    ni = self.meta.nested_types[td.nested_start + k]
-                    declared.add(self.meta.typedefs[ni].name)
+                names = [td.name] + [self.meta.typedefs[ni].name
+                                     for k in range(getattr(td, 'nested_count', 0))
+                                     for ni in (self.meta.nested_types[td.nested_start + k],)]
+                for _n in names:
+                    if not _n:
+                        continue
+                    declared.add(_n)
+                    _short = _n.split(chr(96))[0]
+                    if _short:
+                        declared.add(_short)
             except Exception:
                 pass
             dup = collision_heads('\n'.join(buf), ns, uses_set,
