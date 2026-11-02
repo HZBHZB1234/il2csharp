@@ -92,3 +92,16 @@ def test_a_conditional_inside_a_literal_or_comment_is_untouched():
     for line in ('string s = "unknown ? a : b";',
                  '// unknown ? a : b'):
         assert spell_unresolved_values(line) == line, line
+
+
+def test_a_member_chain_and_its_arguments_go_together():
+    # fix 188: `unknown.GetEnumerator(0)` used to leave `(0)` behind and
+    # `unknown.a.b` used to leave `.b`; both were unparseable.
+    assert spell_unresolved_values('X e = unknown.GetEnumerator(0);') == \
+        'X e = /*unknown*/ default;'
+    assert spell_unresolved_values('X a = unknown.a.b(1);') == \
+        'X a = /*unknown*/ default;'
+    assert spell_unresolved_values('X a = unknown.a.b;') == \
+        'X a = /*unknown*/ default;'
+    # an indexer is a bigger expression, not a simple member: keep it honest
+    assert spell_unresolved_values('X a = unknown[0];') == 'X a = unknown[0];'

@@ -153,9 +153,25 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
     sources, stub_members = [], []
     stub_order = {}
     inventory = hashlib.sha256()
+    # Compiler scaffolding is emitted per ASSEMBLY, so a whole-tree compile as
+    # ONE unit sees the same helper type declared by every image (CS0102 /
+    # CS0111 -- 484 of the game tree's 857 errors). Those declarations are
+    # byte-identical compiler artifacts, not game code: keep the first and
+    # skip the rest.
+    _SCAFFOLDING = {
+        "PrivateImplementationDetails.cs", "EmbeddedAttribute.cs",
+        "NullableAttribute.cs", "NullableContextAttribute.cs",
+        "RefSafetyRulesAttribute.cs",
+        "UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+    }
+    seen_scaffolding = set()
     for path in files:
         inventory.update(path.relative_to(Path(tree).resolve()).as_posix().encode())
         inventory.update(hashlib.sha256(path.read_bytes()).digest())
+        if path.name in _SCAFFOLDING:
+            if path.name in seen_scaffolding:
+                continue
+            seen_scaffolding.add(path.name)
         if path.name == "__SharedBodyStubs.cs":
             text = path.read_text(encoding="utf-8-sig")
             for va, block in _stub_members(text):
@@ -165,7 +181,15 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
                 stub_members.extend(block)
         else:
             sources.append(path)
-    with tempfile.TemporaryDirectory(prefix="il2csharp_compile_") as temporary:
+    # The scratch dir holds the merged stub file the compiler must open by
+    # path. Create it beside the report, not in %TEMP%: a temp cleaner removed
+    # the directory between the write and the compiler invocation, and csc then
+    # reported `CS2001: source file not found __SharedBodyStubs.cs` -- which
+    # reads like a decompiler failure and is not one.
+    scratch_parent = Path(report).resolve().parent if report else Path.cwd()
+    scratch_parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="il2csharp_compile_",
+                                     dir=str(scratch_parent)) as temporary:
         temp = Path(temporary)
         merged = temp / "__SharedBodyStubs.cs"
         merged.write_text("internal static class __SharedBodyStubs {\n" +

@@ -173,7 +173,18 @@ def mangle_generated_ident(text):
 # old text: `default` there would need a type the tree does not have.
 _UNKNOWN_RHS_RX = re.compile(r'=\s*unknown\s*;')
 _UNKNOWN_RETURN_RX = re.compile(r'\breturn\s+unknown\s*;')
-_UNKNOWN_MEMBER_RX = re.compile(r'(?<![\w.])unknown\.[A-Za-z_]\w*')
+# A member access on an unresolved value renders `unknown.Member`; the whole
+# CHAIN and any call argument list must go with it. `unknown.GetEnumerator(0)`
+# used to become `/*unknown*/ default(0)` (the arguments were left behind) and
+# `unknown.a.b` became `/*unknown*/ default.b` -- both unparseable; the game
+# tree's last two syntax-error files were exactly this shape. One level of
+# nested parentheses is allowed because an argument can itself be a call
+# (`AddComponent(list, new Provider<T>())`).
+_UNKNOWN_CHAIN = r'unknown(?:\.[A-Za-z_]\w*)+(?:\((?:[^()]|\([^()]*\))*\))?'
+_UNKNOWN_MEMBER_RX = re.compile(r'(?<![\w.])' + _UNKNOWN_CHAIN)
+# The same chain as a whole STATEMENT: `default;` is not a C# expression
+# statement, so the statement form becomes the marker alone (`/*unknown call*/;`).
+_UNKNOWN_CHAIN_STMT_RX = re.compile(r'^(\s*)' + _UNKNOWN_CHAIN + r'\s*;$')
 # A conditional expression's condition is required to be `bool`, so the
 # target type IS known even though the value is not (658 sites on the game
 # tree). `default` alone would have no type there (CS8716), so the spelling
@@ -227,6 +238,10 @@ def spell_unresolved_values(text):
         stmt = _UNKNOWN_STMT_RX.match(masked)
         if stmt is not None and masked.strip() == 'unknown;':
             out.append('%s/*unknown call*/;' % stmt.group(1))
+            continue
+        chain_stmt = _UNKNOWN_CHAIN_STMT_RX.match(masked)
+        if chain_stmt is not None:
+            out.append('%s/*unknown call*/;' % chain_stmt.group(1))
             continue
         if 'unknown' not in masked:
             out.append(line)
