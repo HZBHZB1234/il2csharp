@@ -35,7 +35,7 @@ one type with `--types TextMeshProUGUI` did not finish in 10 minutes.
 Root-cause this next: a silently dropped type is worse than a wrong body,
 because every reference to it fails.
 
-## Current work: every emitted image now parses clean (2026-11-02, on `main`)
+## Previous: every emitted image now parses clean (2026-11-02, on `main`)
 
 Gating the freshly built game tree found three more syntax defects, all fixed,
 plus the reason one type never reached the tree at all.
@@ -96,7 +96,59 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
-## Current work: fix 189 — two text defects, generated-type visibility, scaffolding dedupe (2026-11-02, on `main`)
+## Current work: fix 190 — explicit interface properties are properties (2026-11-02, on `main`)
+
+IL stores a property accessor as a plain method, and an explicit interface
+implementation keeps its fully dotted metadata name, so the render was
+
+```csharp
+bool TMPro.IRubyText.get_enableAutoSizing()
+{
+    return this.m_enableAutoSizing;
+}
+```
+
+which cannot implement a property accessor (**CS0683, 22 sites** in the game
+tree). The type emitter now groups an accessor pair back into the property it
+implements:
+
+```csharp
+bool TMPro.IRubyText.enableAutoSizing
+{
+    get
+    {
+        return this.m_enableAutoSizing;
+    }
+}
+```
+
+`emit_property` gained a `force_name` path, because a synthesized property has
+no row to read: the accessors are plain methods on *this* type and the property
+row lives on the interface. Only a pair whose qualifier is the method's own
+dotted path — or one uniquely proved by `_explicit_impl_qualifier` — is
+grouped; a lone accessor renders as a property with that single accessor.
+
+Verified: `CustomRubyTextMeshProUGUI`'s three `IRubyText` properties become
+properties; the pinned game bodies and the decl gate are unchanged. Portable
+suite 1,639 passed.
+
+### Artifacts found while triaging the rest (documented, not fixed)
+
+* **CS0535 `ArrayBufferWriter<T>.GetSpan(int)`** — the metadata for that type
+  lists 9 methods and no `GetSpan` at all (every one of them has address 0 and
+  renders as a `NotImplementedException` stub). The interface member is
+  stripped from the game's own metadata, so no render can implement it.
+* **CS0122 99** — `TMP_FontAsset` uses TextCore's `internal`
+  `LigatureSubstitutionRecord`/`MarkToBaseAdjustmentRecord`. The real Unity
+  package compiles because TextCore ships `[InternalsVisibleTo]` to the TMP
+  assembly; a whole-tree compile against the editor's reference dlls cannot
+  see that. Cross-assembly inlining artifact, not a decompiler defect.
+* **CS0104 15** — `Vector2` is ambiguous between `UnityEngine.Vector2` (game
+  metadata) and `System.Numerics.Vector2` (reference closure). The
+  using-strip's collision detector works from game metadata only, so it cannot
+  see the closure's name.
+
+## Previous: fix 189 — two text defects, generated-type visibility, scaffolding dedupe (2026-11-02, on `main`)
 
 Found by reading the remaining 393 errors apart:
 
@@ -123,7 +175,7 @@ A full rebuild (`out/limbus/full1`) is in flight to carry all of it plus fixes
 186-188 into the measured tree; the previous measurement stands at 393 errors
 with 0 syntax errors, and the families above account for ~58 of them.
 
-## Current work: 393 whole-tree errors, zero syntax errors (2026-11-02, on `main`)
+## Previous: 393 whole-tree errors, zero syntax errors (2026-11-02, on `main`)
 
 
 Seventeen images the game references but the tree never emitted were built
