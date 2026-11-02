@@ -33,6 +33,35 @@ rectTransform1.anchorMin = num1;
   alone; the aggregate/struct-tile pass declines this shape. This is the
   next fidelity target, and it is also a compilability one (int -> Vector2).
 
+### Next fidelity target: a struct constant printed as an integer bit pattern
+
+`TMP_FrameRateCounter.Set_FrameCounter_Position` shows the shape and its
+native evidence. The source writes `new Vector2(1, 0)`; the native code writes
+`mov qword [rbp+10h], 3F800000h` -- ONE 8-byte store whose low dword is the
+float 1.0f and whose high dword is 0 -- and the lifter prints
+
+```csharp
+s_10 = 1065353216;          // mov qword [rbp+10h],3F800000h
+t2.pivot = s_10;            // Vector2 property
+```
+
+so the `new Vector2(1, 0)` construction is lost (15 such temps in
+Assembly-CSharp alone; it is also a compilability defect, int -> Vector2).
+The neighbouring `movdqa [rbp-10h],xmm0` path already renders
+`(float2)(1.0f, 1.0f)` correctly, and a split pair renders
+`s_10.x = 1.0f;` for the first half, so only the *single wide immediate*
+store misses.
+
+The obstacle is that the store's width and the slot's pointee type are what
+decide the render, and the consumer (`pivot = s_10`, a Vector2) is what proves
+it: a text-level rewrite would need the member type, and the lifter does not
+know the slot type at the store. The two candidate hooks are the immediate
+store path in `insn.py` (render `(float2)(f, 0.0f)` for a width-8 store whose
+high dword is zero and whose low dword is a finite float) and the aggregate
+pass (`aggregates.py`) composing the pair the way it already does for two
+4-byte stores. Neither is done yet; the shape is recorded here with the
+disassembly so the next session does not have to rediscover it.
+
 ## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
 
 Both came out of parse-gating the **complete survivors tree**, which had never
