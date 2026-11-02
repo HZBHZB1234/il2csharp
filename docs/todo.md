@@ -96,7 +96,25 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
-## Current work: fix 191 — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
+### Two whole-tree models, and what each measures (2026-11-02, on `main`)
+
+`tools/compile_corpus.py --extra-ref` makes a second model possible, and the
+difference is informative:
+
+| model | sources | refs | errors | dominant families |
+|---|---|---|---|---|
+| **game + packages** vs the editor's engine modules | 29,764 | 260 (engine + BCL) | **393** | CS0122 99 (TMP reading TextCore's `internal` types — the real project has `[InternalsVisibleTo]`, a fake assembly boundary cannot), CS0246 69, CS0051 33, CS0683/CS0104/CS0535 ~15 each |
+| **self-contained tree** (our engine modules as sources, BCL only from the closure) | 31,753 | 49 (BCL) | **4,058** | CS0246 2,835 (our engine/BCL-module code names types the BCL refs do not expose), CS0115 678 (types not implementing inherited abstract members), CS0234 156 |
+
+The first is the number that answers "can the recovered game be recompiled";
+the second is a *fidelity* probe of the engine modules we emit (which the game
+does not own, but which the whole-tree model must resolve). Both are recorded;
+neither is a single "quality score".
+
+## Current work: two whole-tree models (2026-11-02, on `main`)
+
+ — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
+## Previous: fix 191 — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
 
 IL2CPP names an explicit implementation of a tuple-typed interface with each
 element's TYPE and NAME concatenated, so the `_GetConsumedStock_d__77` iterator

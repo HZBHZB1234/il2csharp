@@ -1,0 +1,193 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\full0",
+  "source_files": 31753,
+  "merged_stubs": 2349,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "61ef0712ba1d2769257d8fc3268bbf4bc351575a7e928b8875c4bd14e049c3c6",
+  "log": "validation_reports\\limbus\\full0.selftree.compile.log.gz",
+  "references": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\10.0.9\\ref\\net10.0",
+  "reference_closure": [],
+  "closure_refs": 49,
+  "exit_code": 1,
+  "files_with_errors": 1314,
+  "errors": 4058,
+  "errors_by_code": {
+    "CS0246": 2835,
+    "CS0115": 678,
+    "CS0234": 156,
+    "CS8051": 89,
+    "CS0311": 55,
+    "CS0051": 37,
+    "CS0104": 35,
+    "CS0538": 23,
+    "CS0111": 22,
+    "CS0683": 22,
+    "CS0535": 15,
+    "CS0738": 15,
+    "CS0460": 11,
+    "CS0118": 11,
+    "CS0100": 11,
+    "CS0540": 8,
+    "CS0146": 6,
+    "CS0102": 5,
+    "CS9333": 4,
+    "CS9334": 4,
+    "CS8345": 3,
+    "CS0723": 3,
+    "CS0453": 2,
+    "CS0534": 2,
+    "CS0507": 2,
+    "CS0539": 1,
+    "CS0426": 1,
+    "CS1715": 1,
+    "CS0264": 1
+  },
+  "first_error_by_code": {
+    "CS0234": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\EgoVideoList.cs",
+      "line": 6,
+      "message": "\u547d\u540d\u7a7a\u95f4\u201cUnityEngine\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cVideo\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)\r"
+    },
+    "CS0246": {
+      "file": "out\\limbus\\full0\\ACTk.Runtime\\CodeStage\\AntiCheat\\Detectors\\TimeCheatingDetector.cs",
+      "line": 596,
+      "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cUnityWebRequest\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)\r"
+    },
+    "CS0104": {
+      "file": "out\\limbus\\full0\\ACTk.Runtime\\CodeStage\\AntiCheat\\Storage\\ObscuredPrefs.cs",
+      "line": 599,
+      "message": "\u201cVector2\u201d\u662f\u201cUnityEngine.Vector2\u201d\u548c\u201cSystem.Numerics.Vector2\u201d\u4e4b\u95f4\u7684\u4e0d\u660e\u786e\u7684\u5f15\u7528\r"
+    },
+    "CS0111": {
+      "file": "out\\limbus\\full0\\Newtonsoft.Json\\System\\Runtime\\CompilerServices\\IsReadOnlyAttribute.cs",
+      "line": 11,
+      "message": "\u7c7b\u578b\u201cIsReadOnlyAttribute\u201d\u5df2\u5b9a\u4e49\u4e86\u4e00\u4e2a\u540d\u4e3a\u201cIsReadOnlyAttribute\u201d\u7684\u5177\u6709\u76f8\u540c\u53c2\u6570\u7c7b\u578b\u7684\u6210\u5458\r"
+    },
+    "CS0102": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Runtime\\CompilerServices\\NullablePublicOnlyAttribute.cs",
+      "line": 10,
+      "message": "\u7c7b\u578b\u201cNullablePublicOnlyAttribute\u201d\u5df2\u7ecf\u5305\u542b\u201cIncludesInternals\u201d\u7684\u5b9a\u4e49\r"
+    },
+    "CS8051": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Diagnostics\\CodeAnalysis\\UnconditionalSuppressMessageAttribute.cs",
+      "line": 13,
+      "message": "\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u5fc5\u987b\u5177\u6709 get \u8bbf\u95ee\u5668\u3002\r"
+    },
+    "CS0051": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Text\\Json\\JsonDocument.cs",
+      "line": 2569,
+      "message": "\u53ef\u8bbf\u95ee\u6027\u4e0d\u4e00\u81f4: \u53c2\u6570\u7c7b\u578b\u201cJsonDocument.__c__DisplayClass73_0\u201d\u7684\u53ef\u8bbf\u95ee\u6027\u4f4e\u4e8e\u65b9\u6cd5\u201cJsonDocument._CreateForLiteral_g__Create_73_0(byte[], ref JsonDocument.__c__DisplayClass73_0)\u201d\r"
+    },
+    "CS0539": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Text\\Json\\Nodes\\JsonObject.cs",
+      "line": 449,
+      "message": "\u5728\u53ef\u5b9e\u73b0\u7684\u63a5\u53e3\u7684\u6210\u5458\u4e2d\u627e\u4e0d\u5230\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684 \"JsonObject.TryGetValue(string, ref JsonNode)\"\r"
+    },
+    "CS0535": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Text\\Json\\Nodes\\JsonObject.cs",
+      "line": 14,
+      "message": "\u201cJsonObject\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, JsonNode>.TryGetValue(string, out JsonNode)\u201d\r"
+    },
+    "CS8345": {
+      "file": "out\\limbus\\full0\\System.Text.Json\\System\\Text\\Json\\Utf8JsonReader.cs",
+      "line": 14,
+      "message": "\u5b57\u6bb5\u6216\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u4e0d\u80fd\u662f\u7c7b\u578b\u201cReadOnlySpan<byte>\u201d\uff0c\u9664\u975e\u5b83\u662f ref \u7ed3\u6784\u7684\u5b9e\u4f8b\u6210\u5458\u3002\r"
+    },
+    "CS0683": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\CustomUnityCode\\CustomScrollRect.cs",
+      "line": 2291,
+      "message": "\u201cCustomScrollRect.get_transform()\u201d\u663e\u5f0f\u65b9\u6cd5\u5b9e\u73b0\u65e0\u6cd5\u5b9e\u73b0\u201cICanvasElement.transform.get\u201d\uff0c\u56e0\u4e3a\u5b83\u662f\u4e00\u4e2a\u8bbf\u95ee\u5668\r"
+    },
+    "CS0460": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\Performance\\TransformComponent.cs",
+      "line": 43,
+      "message": "\u91cd\u5199\u548c\u663e\u5f0f\u63a5\u53e3\u5b9e\u73b0\u65b9\u6cd5\u7684\u7ea6\u675f\u662f\u4ece\u57fa\u65b9\u6cd5\u7ee7\u627f\u7684\uff0c\u56e0\u6b64\u4e0d\u80fd\u76f4\u63a5\u6307\u5b9a\u8fd9\u4e9b\u7ea6\u675f\uff0c\u9664\u975e\u6307\u5b9a \"class\" \u6216 \"struct\" \u7ea6\u675f\u3002\r"
+    },
+    "CS0146": {
+      "file": "out\\limbus\\full0\\FMODUnity\\FMODUnity\\FMODEventPlayableBehavior.cs",
+      "line": 515,
+      "message": "\u6d89\u53ca\u201cFMODEventPlayableBehavior.EventArgs\u201d\u548c\u201cFMODEventPlayableBehavior.EventArgs\u201d\u7684\u5faa\u73af\u57fa\u7c7b\u578b\u4f9d\u8d56\u9879\r"
+    },
+    "CS0118": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\FMODVideoPlayer.cs",
+      "line": 25,
+      "message": "\u201cSound\u201d\u662f \u547d\u540d\u7a7a\u95f4\uff0c\u4f46\u6b64\u5904\u88ab\u5f53\u505a \u7c7b\u578b \u6765\u4f7f\u7528\r"
+    },
+    "CS0100": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgAddressableManager.cs",
+      "line": 1603,
+      "message": "\u53c2\u6570\u540d\u201c_\u201d\u91cd\u590d\r"
+    },
+    "CS0540": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1518,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.Current\u201d: \u5305\u542b\u7c7b\u578b\u4e0d\u5b9e\u73b0\u63a5\u53e3\u201cIEnumerator<(Int32shopId, Int32itemId, Int32remaining)>\u201d\r"
+    },
+    "CS9333": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1518,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.Current\u201d: \u7c7b\u578b\u5fc5\u987b\u4e3a\u201c(Int32shopId, Int32itemId, Int32remaining)\u201d\u624d\u80fd\u5339\u914d\u5df2\u5b9e\u73b0\u7684\u6210\u5458\u201cIEnumerator<(Int32shopId, Int32itemId, Int32remaining)>.Current\u201d\r"
+    },
+    "CS9334": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\RPGSystem\\RpgShopManager.cs",
+      "line": 1710,
+      "message": "\u201cRpgShopManager._GetConsumedStock_d__77.GetEnumerator()\u201d: \u8fd4\u56de\u7c7b\u578b\u5fc5\u987b\u4e3a\u201cSystem.Collections.Generic.IEnumerator<(Int32shopId, Int32itemId, Int32remaining)>\u201d\u624d\u80fd\u4e0e\u5b9e\u73b0\u7684\u6210\u5458\u201cIEnumerable<(Int32shopId, Int32itemId, Int"
+    },
+    "CS0426": {
+      "file": "out\\limbus\\full0\\Assembly-CSharp\\TimeCalculator\\Time\\TimeCalculator.cs",
+      "line": 128,
+      "message": "\u7c7b\u578b\u201cTimeCalculator\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u540d\u201cTime\u201d\r"
+    },
+    "CS0723": {
+      "file": "out\\limbus\\full0\\CommonAssembly\\CommonConstants.cs",
+      "line": 148,
+      "message": "\u65e0\u6cd5\u58f0\u660e\u9759\u6001\u7c7b\u578b\u201cCommonConstants.Regex\u201d\u7684\u53d8\u91cf\r"
+    },
+    "CS0538": {
+      "file": "out\\limbus\\full0\\Coffee.SoftMaskForUGUI\\Coffee\\UISoftMask\\SoftMaskable.cs",
+      "line": 204,
+      "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cICanvasRaycastFilter\u201d\u4e0d\u662f\u63a5\u53e3\r"
+    },
+    "CS0453": {
+      "file": "out\\limbus\\full0\\Facepunch.Steamworks.Win64\\Steamworks\\SteamUGC.cs",
+      "line": 504,
+      "message": "\u7c7b\u578b\u201cItem\u201d\u5fc5\u987b\u662f\u4e0d\u53ef\u4e3a null \u503c\u7684\u7c7b\u578b\uff0c\u624d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cNullable<T>\u201d\u4e2d\u7684\u53c2\u6570\u201cT\u201d\r"
+    },
+    "CS0534": {
+      "file": "out\\limbus\\full0\\SocketIOUnityAssembly\\SocketIOClient\\Newtonsoft\\Json\\ByteArrayConverter.cs",
+      "line": 13,
+      "message": "\u201cByteArrayConverter\u201d\u4e0d\u5b9e\u73b0\u7ee7\u627f\u7684\u62bd\u8c61\u6210\u5458\u201cJsonConverter.ReadJson(JsonReader, Type, object, JsonSerializer)\u201d\r"
+    },
+    "CS0115": {
+      "file": "out\\limbus\\full0\\Newtonsoft.Json\\Newtonsoft\\Json\\Serialization\\DefaultSerializationBinder.cs",
+      "line": 395,
+      "message": "\u201cDefaultSerializationBinder.BindToName(Type, ref string, ref string)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199\r"
+    },
+    "CS1715": {
+      "file": "out\\limbus\\full0\\Newtonsoft.Json\\Newtonsoft\\Json\\Serialization\\JsonSerializerProxy.cs",
+      "line": 409,
+      "message": "\u201cJsonSerializerProxy.Error\u201d: \u7c7b\u578b\u5fc5\u987b\u662f\u201cEventHandler<ErrorEventArgs>\u201d\u624d\u80fd\u4e0e\u91cd\u5199\u6210\u5458\u201cJsonSerializer.Error\u201d\u5339\u914d\r"
+    },
+    "CS0507": {
+      "file": "out\\limbus\\full0\\Unity.RenderPipelines.Universal.Runtime\\UnityEngine\\Rendering\\Universal\\UniversalRenderPipeline.cs",
+      "line": 652,
+      "message": "\u201cUniversalRenderPipeline.IsRenderRequestSupported<RequestData>(Camera, RequestData)\u201d: \u5f53\u91cd\u5199\u201cprotected internal\u201d\u7ee7\u627f\u6210\u5458\u201cRenderPipeline.IsRenderRequestSupported<RequestData>(Camera, RequestData)\u201d\u65f6\uff0c\u65e0\u6cd5\u66f4\u6539\u8bbf\u95ee\u4fee\u9970\u7b26\r"
+    },
+    "CS0264": {
+      "file": "out\\limbus\\full0\\Febucci.TextAnimator.Runtime\\f__AnonymousType0.cs",
+      "line": 5,
+      "message": "\u201c__f__AnonymousType0<_domainAssembly_j__TPar, _assemblyType_j__TPar>\u201d\u7684\u5206\u90e8\u58f0\u660e\u5fc5\u987b\u5177\u6709\u987a\u5e8f\u76f8\u540c\u7684\u76f8\u540c\u7c7b\u578b\u53c2\u6570\u540d\r"
+    },
+    "CS0311": {
+      "file": "out\\limbus\\full0\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\Columns.cs",
+      "line": 1428,
+      "message": "\u7c7b\u578b\u201cUnityEngine.UIElements.Columns.UxmlObjectTraits<T>\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cUxmlObjectFactory<TCreatedType, TTraits>\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cTTraits\u201d\u3002\u6ca1\u6709\u4ece\u201cUnityEngine.UIElements.Columns.UxmlObjectTraits<T>\u201d\u5230\u201cUnityEngine.UIElemen"
+    },
+    "CS0738": {
+      "file": "out\\limbus\\full0\\Firebase.App\\Firebase\\CharVector.cs",
+      "line": 13,
+      "message": "\u201cCharVector\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIEnumerable<byte>.GetEnumerator()\u201d\u3002\u201cCharVector.GetEnumerator()\u201d\u65e0\u6cd5\u5b9e\u73b0\u201cIEnumerable<byte>.GetEnumerator()\u201d\uff0c\u56e0\u4e3a\u5b83\u6ca1\u6709\u201cIEnumerator<byte>\u201d\u7684\u5339\u914d\u8fd4\u56de\u7c7b\u578b\u3002\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}

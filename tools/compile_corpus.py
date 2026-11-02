@@ -28,6 +28,7 @@ supplied closure already carries `System.Object`.
 import argparse
 from collections import Counter
 import gzip
+import glob
 import hashlib
 import json
 from pathlib import Path
@@ -126,7 +127,7 @@ def _stub_members(text):
 
 def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
                  exclude=(), exclude_images=True, dotnet_refs=True,
-                 timeout=1800, exclude_dirs=()):
+                 timeout=1800, exclude_dirs=(), extra_refs=()):
     dotnet = shutil.which("dotnet")
     if not dotnet:
         raise RuntimeError("A .NET SDK is required")
@@ -140,6 +141,8 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
         raise RuntimeError(".NET reference assemblies are required")
     closure, notes = _closure_refs(tree, refs_dirs, unity_roots, managed_dirs,
                                    exclude, exclude_images)
+    if extra_refs:
+        closure = list(closure) + [p for p in extra_refs if p not in closure]
     files = []
     root_dir = Path(tree).resolve()
     skip_dirs = tuple(d for d in exclude_dirs if d)
@@ -252,6 +255,11 @@ if __name__ == "__main__":
                         help="Unity player build dir: its Managed backup folder")
     parser.add_argument("--exclude", action="append", default=[],
                         help="dll names to skip (repeatable)")
+    parser.add_argument("--extra-ref", action="append", default=[],
+                        help="extra reference dll or glob (repeatable), added "
+                             "to the closure: a self-contained compile keeps "
+                             "only the BCL from the closure and takes the "
+                             "engine modules from the tree's own sources")
     parser.add_argument("--exclude-dirs", action="append", default=[],
                         help="image directories whose sources are left out of "
                              "the diagnostic assembly (repeatable; e.g. "
@@ -273,7 +281,10 @@ if __name__ == "__main__":
     provided_closure = bool(args.refs_dir or args.unity or args.managed_refs)
     use_dotnet = (args.dotnet_refs if args.dotnet_refs is not None
                   else not provided_closure)
+    _extra = []
+    for _pat in args.extra_ref:
+        _extra.extend(glob.glob(_pat))
     raise SystemExit(compile_tree(
         args.tree, args.report, args.refs_dir, args.unity, args.managed_refs,
         args.exclude, not args.keep_emitted_refs, use_dotnet, args.timeout,
-        args.exclude_dirs))
+        args.exclude_dirs, tuple(_extra)))
