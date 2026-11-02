@@ -502,17 +502,6 @@ class Emitter:
             vis = 'internal '  # a nested form on a top-level row: unreadable
         if self._is_blob_container(td):
             vis = 'internal '
-        # A compiler-generated nested type (a closure, a state machine) is
-        # named by the compiler and referenced from the owner's own members.
-        # Roslyn makes them private, but this decompiler must also emit the
-        # local functions and inlined bodies that mention them, so a private
-        # spelling makes every such signature CS0051 (33 sites). Keep them
-        # internal: they stay implementation detail of the assembly.
-        _gen = td.name or ''
-        if td.declaring >= 0 and ('__' in _gen or 'DisplayClass' in _gen
-                                  or _gen.startswith('<>')
-                                  or _gen.startswith('_')):
-            vis = 'internal '
         vis = self._pub(vis)
         lines = []
         if f & 0x20:
@@ -900,6 +889,17 @@ class Emitter:
                     return '~%s()' % self._type_ident(td.name)
         f = m.flags
         vis = self._pub(METH_VIS.get(f & 7, ''))
+        # A LOCAL FUNCTION is lifted as a method of the containing type and
+        # named <Outer>g__Local|0_0 (mangled to _Outer_g__Local_0_0). The
+        # compiler emits it private; this decompiler must keep it private too,
+        # because it takes the compiler's own closure as a parameter and the
+        # closure is a PRIVATE nested type -- an internal spelling is CS0051
+        # on 33 game-tree signatures. The closure type itself must keep its
+        # flags' visibility: a private USER type may appear in the closure's
+        # own member signatures, so widening the closure is CS0050
+        # (FormulaParser.Token on the survivors fixture).
+        if 'g__' in (m.name or '') and vis and not getattr(self, 'publicize', False):
+            vis = 'private '
         # CLI MethodAttributes: Final=0x20, Virtual=0x40,
         # NewSlot=0x100, Abstract=0x400. TypeAttributes use different bits.
         explicit = '.' in m.name
