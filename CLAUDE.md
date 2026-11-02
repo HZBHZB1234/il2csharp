@@ -355,11 +355,15 @@ fix-123 in `validation_reports/review123_*`.
   the type and the rest is a name that must not survive. `_iface_qualifier`
   counts parenthesis depth when it computes a qualifier's top-level argument
   count, because a tuple argument is ONE argument.
-- A compiler-generated NESTED type (closure, state machine) is emitted
-  `internal`, never the flags' `private` (fix 189): the local functions and
-  inlined bodies that mention it are `internal`, so a private spelling makes
-  every such signature CS0051 (33 sites on the game fixture). Generated
-  TOP-LEVEL scaffolding is unchanged.
+- A LOCAL FUNCTION (`<Outer>g__Local|0_0`, mangled `_Outer_g__Local_0_0`) is
+  emitted `private` (fix 189): the compiler emits it private, and it takes the
+  compiler's own closure as a parameter while that closure is a PRIVATE nested
+  type — an internal spelling is CS0051 (33 game-tree signatures). Do NOT widen
+  the closure instead: a private USER type may appear in the closure's own
+  member signatures, so making generated nested types `internal` is CS0050
+  (`FormulaParser.Token` on the survivors fixture — a measured regression, both
+  directions were tried). Generated nested types keep their flags' visibility;
+  only the lifted local function changes.
 - `mangle_generated_ident` (the file boundary's generated-name mangler) must
   skip a text containing `::` (a `global::` alias path is not a name,
   fix 189), and must accept two positive proofs of "generated": a double
