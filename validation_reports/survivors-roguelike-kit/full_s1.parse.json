@@ -1,0 +1,20 @@
+{
+ "files": 7188,
+ "bad_files": 0,
+ "errors": 0,
+ "missing": 0,
+ "recovery_nodes": 0,
+ "crashed_images": [
+  [
+   "Unity.Localization",
+   3221225477,
+   ""
+  ],
+  [
+   "UnityEngine",
+   1,
+   ""
+  ]
+ ],
+ "details": {}
+}

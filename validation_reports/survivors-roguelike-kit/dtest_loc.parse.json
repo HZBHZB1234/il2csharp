@@ -1,0 +1,322 @@
+{
+ "files": 260,
+ "bad_files": 4,
+ "errors": 56,
+ "missing": 5,
+ "recovery_nodes": 0,
+ "details": {
+  "UnityEngine\\Localization\\LocalizedString.cs": [
+   {
+    "kind": "ERROR",
+    "row": 1869,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1869,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1863,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1863,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1854,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1854,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1841,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1841,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1835,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1835,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1825,
+    "text": "UnityEngine.Localization.LocalizedString.<System_Collections"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1825,
+    "text": "<"
+   },
+   {
+    "kind": "MISSING",
+    "row": 652,
+    "text": "!"
+   },
+   {
+    "kind": "ERROR",
+    "row": 652,
+    "text": "."
+   },
+   {
+    "kind": "ERROR",
+    "row": 652,
+    "text": "d__57 obj4 ="
+   },
+   {
+    "kind": "ERROR",
+    "row": 652,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 651,
+    "text": "."
+   }
+  ],
+  "UnityEngine\\Localization\\SmartFormat\\Core\\Parsing\\Parser.cs": [
+   {
+    "kind": "ERROR",
+    "row": 1422,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1414,
+    "text": "UnityEngine.Localization.SmartFormat.Core.Parsing.Parser.__c"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1402,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1394,
+    "text": "UnityEngine.Localization.SmartFormat.Core.Parsing.Parser.__c"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1272,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1266,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1227,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1221,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "MISSING",
+    "row": 151,
+    "text": "'"
+   },
+   {
+    "kind": "MISSING",
+    "row": 26,
+    "text": "'"
+   }
+  ],
+  "UnityEngine\\Localization\\SmartFormat\\Extensions\\PersistentVariablesSource.cs": [
+   {
+    "kind": "ERROR",
+    "row": 890,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 890,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 884,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 884,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 875,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 875,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 862,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 862,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 856,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 856,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 846,
+    "text": "UnityEngine.Localization.SmartFormat.Extensions.PersistentVa"
+   },
+   {
+    "kind": "ERROR",
+    "row": 846,
+    "text": "<"
+   },
+   {
+    "kind": "MISSING",
+    "row": 335,
+    "text": "!"
+   },
+   {
+    "kind": "ERROR",
+    "row": 335,
+    "text": "."
+   },
+   {
+    "kind": "ERROR",
+    "row": 335,
+    "text": "d__34 obj4 ="
+   },
+   {
+    "kind": "ERROR",
+    "row": 335,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 334,
+    "text": "."
+   }
+  ],
+  "UnityEngine\\Localization\\SmartFormat\\PersistentVariables\\VariablesGroupAsset.cs": [
+   {
+    "kind": "ERROR",
+    "row": 581,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 581,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 575,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 575,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 566,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 566,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 553,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 553,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 547,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 547,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 537,
+    "text": "UnityEngine.Localization.SmartFormat.PersistentVariables.Var"
+   },
+   {
+    "kind": "ERROR",
+    "row": 537,
+    "text": "<"
+   },
+   {
+    "kind": "MISSING",
+    "row": 209,
+    "text": "!"
+   },
+   {
+    "kind": "ERROR",
+    "row": 209,
+    "text": "."
+   },
+   {
+    "kind": "ERROR",
+    "row": 209,
+    "text": "d__22 obj4 ="
+   },
+   {
+    "kind": "ERROR",
+    "row": 209,
+    "text": "<"
+   },
+   {
+    "kind": "ERROR",
+    "row": 208,
+    "text": "."
+   }
+  ]
+ }
+}

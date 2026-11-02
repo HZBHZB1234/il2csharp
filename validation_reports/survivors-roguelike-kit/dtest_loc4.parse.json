@@ -1,0 +1,21 @@
+{
+ "files": 260,
+ "bad_files": 1,
+ "errors": 0,
+ "missing": 2,
+ "recovery_nodes": 0,
+ "details": {
+  "UnityEngine\\Localization\\SmartFormat\\Core\\Parsing\\Parser.cs": [
+   {
+    "kind": "MISSING",
+    "row": 151,
+    "text": "'"
+   },
+   {
+    "kind": "MISSING",
+    "row": 26,
+    "text": "'"
+   }
+  ]
+ }
+}

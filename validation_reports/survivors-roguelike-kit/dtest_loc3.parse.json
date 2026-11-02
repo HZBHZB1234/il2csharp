@@ -1,0 +1,61 @@
+{
+ "files": 260,
+ "bad_files": 1,
+ "errors": 8,
+ "missing": 2,
+ "recovery_nodes": 0,
+ "details": {
+  "UnityEngine\\Localization\\SmartFormat\\Core\\Parsing\\Parser.cs": [
+   {
+    "kind": "ERROR",
+    "row": 1422,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1414,
+    "text": "UnityEngine.Localization.SmartFormat.Core.Parsing.Parser.__c"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1402,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1394,
+    "text": "UnityEngine.Localization.SmartFormat.Core.Parsing.Parser.__c"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1272,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1266,
+    "text": "8__locals1"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1227,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "ERROR",
+    "row": 1221,
+    "text": "8__locals2"
+   },
+   {
+    "kind": "MISSING",
+    "row": 151,
+    "text": "'"
+   },
+   {
+    "kind": "MISSING",
+    "row": 26,
+    "text": "'"
+   }
+  ]
+ }
+}

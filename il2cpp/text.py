@@ -158,9 +158,98 @@ def mangle_generated_ident(text):
         return t
     if '__' not in t and not t.startswith('<>') and (' ' in t or '\t' in t):
         return t
+    # ,/[/]/space reach here only inside a generic argument list
+    # (<System_Collections_Generic_IEnumerable<A, B>>d__57): the brackets
+    # become _, so leaving the separator would print Foo_A, B_, which is
+    # not an identifier (four survivors-tree files, 25 parse errors).
     return (t.replace('<', '_').replace('>', '_')
-             .replace('.', '_').replace('|', '_'))
+             .replace('.', '_').replace('|', '_')
+             .replace(',', '_').replace('[', '_').replace(']', '_')
+             .replace(' ', '_').replace(chr(9), '_'))
 
+
+_NAME_CHARS = set('abcdefghijklmnopqrstuvwxyz'
+                  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                  '0123456789_.`[]| ,')
+
+
+def mangle_generated_names(text):
+    """Mangle every generated identifier that must be one in the given text.
+
+    The regex form (`MANGLED_IDENT_RX`) cannot see a name whose generic
+    arguments nest more than one level, and IL2CPP spells a state machine
+    after its whole interface: `LocalizedString.<System_Collections_Generic_
+    IEnumerable<System_Collections_Generic_KeyValuePair<System_String,
+    UnityEngine.Localization...>>__>d__57` reached four files of the survivors
+    tree verbatim (60 tree-sitter ERRORs plus 8 MISSING). This walks the
+    brackets instead of matching them: a `<` at an identifier start opens a
+    candidate, the candidate is kept only while every character is a
+    name character (letters, digits, `_`, `.`, backtick, `[`, `]`, `|`, space)
+    and the brackets balance, and `mangle_generated_ident` still applies its
+    own two positive proofs to the result.
+
+    A shift or comparison (`(section & value) << section >> 32`) contains
+    `&`/`(`, so its candidate fails at once; a string literal is not scanned
+    because the caller hands in source text whose literals may contain `<>`,
+    which is why the candidate also refuses `"` and `'`.
+    """
+    if '<' not in text:
+        return text
+    out = []
+    i = 0
+    n = len(text)
+    while i < n:
+        ch = text[i]
+        if ch == '<' and i and text[i:i + 2] == '<>' \
+                and (text[i - 1].isalnum() or text[i - 1] in '_`'):
+            # `CS$<>8__locals2` -> the `$` sanitize leaves `CS_<>8__locals2`,
+            # where the empty angle pair sits INSIDE the identifier: mangle
+            # from the identifier start, not from the `<`.
+            start = i
+            while start and (text[start - 1].isalnum() or text[start - 1] in '_`'):
+                start -= 1
+            k = i + 2
+            while k < n and (text[k].isalnum() or text[k] in '_`'):
+                k += 1
+            # the identifier's own characters are already in `out`
+            del out[len(out) - (i - start):]
+            out.append(mangle_generated_ident(text[start:k]))
+            i = k
+            continue
+        if ch != '<' or (i and (text[i - 1].isalnum() or text[i - 1] in '_`')):
+            out.append(ch)
+            i += 1
+            continue
+        depth = 0
+        j = i
+        ok = True
+        while j < n:
+            c = text[j]
+            if c == '<':
+                depth += 1
+            elif c == '>':
+                depth -= 1
+                if depth == 0:
+                    j += 1
+                    break
+            elif c not in _NAME_CHARS:
+                ok = False
+                break
+            j += 1
+        else:
+            ok = False
+        if not ok or depth != 0:
+            out.append(ch)
+            i += 1
+            continue
+        # trailing identifier part (`d__57`, `c`, `9__0_0`)
+        k = j
+        while k < n and (text[k].isalnum() or text[k] in '_`'):
+            k += 1
+        cand = text[i:k]
+        out.append(mangle_generated_ident(cand))
+        i = k
+    return ''.join(out)
 
 # An unresolved native value renders the bare text `unknown` (from
 # `_rewrite_unknowns` in dec/textpass.py). It is honest and it parses, but it

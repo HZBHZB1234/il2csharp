@@ -9,7 +9,8 @@ from il2cpp.names import (ident_name, repr_f32, repr_f64, safe_ident, sanitize,
                        sanitize_qualifier)
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.runtime.meta import meta_lit_repr
-from il2cpp.text import (MANGLED_IDENT_RX, mangle_generated_ident, reindent,
+from il2cpp.text import (MANGLED_IDENT_RX, mangle_generated_ident,
+                       mangle_generated_names, reindent,
                        spell_unresolved_values)
 from il2cpp import rawaddr
 
@@ -713,6 +714,10 @@ class Emitter:
                 return self._enum_default_cast(enum_ty, str(v - 0x100 if te == 0x04 and v >= 0x80 else v), rte)
             if te == 0x03:
                 c = chr(u16(d, off))
+                if c == '\\':
+                    return "'" + '\\\\' + "'"
+                if c == "'":
+                    return "'" + "\\'" + "'"
                 if c.isprintable():
                     return "'%s'" % c
                 return "'\\u%04x'" % u16(d, off)
@@ -2004,8 +2009,14 @@ class Emitter:
         # match that is not a generated name: `<< section >>` (a shift)
         # matched the nested angle-bracket heuristic and reached the file
         # as `__ section __`, a parse error.
-        content = MANGLED_IDENT_RX.sub(
-            lambda m: mangle_generated_ident(m.group(0)), content)
+        # A bracket WALK, not the regex: IL2CPP names a state machine after
+        # its whole interface, and MANGLED_IDENT_RX cannot see more than one
+        # level of nested generic arguments (four survivors-tree files carried
+        # class <System_Collections_Generic_IEnumerable<...<..., ...>>>d__57
+        # verbatim, 60 parse errors). mangle_generated_names keeps
+        # mangle_generated_ident's two positive proofs and refuses any
+        # candidate containing an operator.
+        content = mangle_generated_names(content)
         # an unresolved native value compiles as a marker plus a
         # target-typed default; see text.spell_unresolved_values
         content = spell_unresolved_values(content)
