@@ -68,17 +68,33 @@ mitigations stay: they are cheap and make a broken tree diagnosable.)
 skip — a performance stall. `TextMeshProUGUI.GenerateTextMesh` is ~116k
 statements and three passes went super-linear on it:
 
-* `_order_copies` recomputed every phi copy's read set per round; it is a
-  ready-queue over precomputed sets now (spills recompute only what they
-  rewrite);
+* `_order_copies` recomputed every phi copy's read set per round; it now
+  precomputes each copy's full token set once and intersects it with the
+  round's live names. The rewrite had to be **byte-identical** (same emission
+  order, same spill choice, same temp numbers): the first cut changed
+  independent copies' order and moved a pinned body (`num19` → `num18`) plus the
+  parallel-vs-serial byte-identity test. Both are green again;
 * `_hoist_shared_tails` took 58 s and *duplicated* tails (115,924 → 153,035
   statements), so the tail hoist and `_drop_dead_copies` decline above 6,000
-  statements (honest CFG shape, finite lift);
-* `_rename_locals` scanned every line once per renamed token (and once per
-  scalar-parameter copy in its prologue census); it is one identifier scan +
-  dict lookup per line now, still matched on the literal-blanked shadow line.
+  statements, and a body that large skips the sugar pipeline entirely after
+  `_rename_locals` (locals are declared, so the render still compiles — the
+  honest CFG shape with gotos instead of for/switch sugar);
+* `_rename_locals` scanned every line once per renamed token (and its prologue
+  census once per scalar-parameter copy). It is one identifier scan + dict
+  lookup per line now (still matched on the literal-blanked shadow line), its
+  declaration regexes are generic identifiers + a name-set check instead of a
+  thousands-wide alternation, and `_hetero_vetoed`/`_numeric_obj_retype`
+  decline above 4,000 statements (declining keeps `object`, the honest
+  default).
 
-Portable suite **1,637 passed** (15 new tests). Commits: `4a251df`, `84839d8`.
+**Still slow**: with those gone, the 116k-statement method now reaches
+`_render` → `_rewrite_unknowns`/`mask_spans`, which is still quadratic enough to
+need >3 minutes; emitting `TextMeshProUGUI` therefore still needs one more pass
+over the render path (next candidate: mask once per body, not per line per
+rewrite rule). Every other type in the image finishes in seconds.
+
+Portable suite **1,637 passed** (15 new tests), full game suite green after the
+ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
 ## Previous: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
 
