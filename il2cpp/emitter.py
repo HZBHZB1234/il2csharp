@@ -1574,7 +1574,7 @@ class Emitter:
                 auto = None
         if auto is not None and getter is None:
             # A SET-ONLY auto-property is CS8051: C# requires the getter for
-            # auto-implementation, so a ool X { set; } declaration is not
+            # auto-implementation, so a bool X { set; } declaration is not
             # legal (UnityEngine.Bindings.IgnoreAttribute.
             # DoesNotContributeToSize). Lift the real setter body instead.
             auto = None
