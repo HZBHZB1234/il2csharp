@@ -96,7 +96,52 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
-## Current work: the whole game tree compiles with ZERO syntax errors (2026-11-02, on `main`)
+## Current work: 393 whole-tree errors, zero syntax errors (2026-11-02, on `main`)
+
+Seventeen images the game references but the tree never emitted were built
+(`UnityEngine.Purchasing` and its five siblings, `Unity.ResourceManager`,
+`Unity.Addressables`, `Unity.RenderPipelines.Universal.ShaderLibrary`,
+`Unity.Services.Core.Internal`, `Firebase.Platform`, the two 2D runtimes, ...),
+taking the tree to 93 images / 35,149 files:
+
+| gate | result |
+|---|---|
+| tree-sitter parse (one process) | 35,149 files, **0 bad / 0 ERROR / 0 MISSING / 0 recovery** |
+| brace audit | 35,149 files, **0 unbalanced** |
+| Roslyn whole-tree compile (29,764 sources) | **0 syntax errors, 393 semantic errors in 137 files** |
+
+Families: CS0122 99, CS0246 69, CS0051 33, CS0234 22, CS0683 22, CS0111 20,
+CS0104 15, CS0535 15, CS0538 15, CS0738 15, CS0100 11, CS0460 10. Two rounds
+ago this compile read 4,082 — and that number was meaningless, because Roslyn
+skips declaration and binding diagnostics whenever the compilation has a
+syntax error.
+
+* **fix 188** — `_UNKNOWN_MEMBER_RX` consumed only `unknown.Member`, so a chain
+  or a call's argument list was left behind (`unknown.GetEnumerator(0)` →
+  `/*unknown*/ default(0)`, `unknown.AddComponent(a, new P<T>())` →
+  `/*unknown*/ default(a, ...)`). Those were the tree's last two syntax-error
+  files. The pattern spans the whole chain with one nesting level of
+  arguments, and a chain that is an entire statement renders
+  `/*unknown call*/;`.
+* **harness** — `compile_corpus`'s scratch dir moved beside the report after a
+  temp cleaner removed it between writing the merged stub file and invoking
+  the compiler (`CS2001: source file not found __SharedBodyStubs.cs`, which
+  reads like a decompiler failure and was not one); per-assembly compiler
+  scaffolding (`PrivateImplementationDetails`, `EmbeddedAttribute`, the
+  nullable/ref-safety attributes, the MonoScript types file) is deduped, which
+  removed 484 artifact errors; and `tools/compile_full_tree.py` is the shipped
+  whole-tree compile (closure-derived exclusions, so packages the editor does
+  not ship stay sources).
+
+Portable suite 1,639 passed.
+
+**Next**: CS0122 99 (accessibility across images — a semantics decision, not a
+text fix), CS0246 69 (the long tail of still-unbuilt images), CS0051 33
+(inconsistent accessibility: a private type in a public signature),
+CS0535/CS0538/CS0738 (interface implementation and explicit-interface shapes),
+CS0683 (explicit implementation signature mismatch).
+
+## Previous: fix 186/187 — the whole game tree with zero syntax errors (2026-11-02, on `main`)
 
 `tools/compile_corpus.py` over the whole tree (29,366 sources; editor closure
 of 260 refs; the 21 images the closure provides are excluded):

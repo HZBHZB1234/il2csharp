@@ -1,7 +1,11 @@
 {
- "files": 34590,
- "bad_files": 0,
- "errors": 0,
- "missing": 0,
- "recovery_nodes": 0
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\full0",
+  "files": 35149,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0,
+  "details": {},
+  "elapsed_seconds": 181.235
 }
