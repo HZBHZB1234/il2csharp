@@ -414,6 +414,27 @@ class _AggregatesMixin:
             return None
         chain = self.il.instance_field_chain(td) or {}
         if offset in chain:
+            # A load NARROWER than the field it sits at is a fragment of that
+            # struct: `movss xmm0,[rbx+30h]` on a Vector3 field is its `.x`,
+            # and returning None here made the caller print the whole field --
+            # 2,823 `float.IsNaN(...)` sites tree-wide, and
+            # `float.IsNaN(this.targetScale)` passes a Vector3 to
+            # float.IsNaN (SetScaleStateNode.Validate). Slice the field when
+            # metadata proves a first scalar component of that exact width;
+            # a whole-field load and a non-valuetype keep today's spelling.
+            name, ti = chain[offset]
+            ft = self.il.types[ti] if 0 <= ti < len(self.il.types) else None
+            ftd = self._td_of(ft) if ft is not None else None
+            if ftd is not None and self.meta.typedefs[ftd].is_valuetype:
+                try:
+                    fsize = self.il._sf_field_size(ft, 0)
+                except Exception:
+                    fsize = None
+                if fsize is not None and 0 < width < fsize:
+                    frag = self._fragment(Expr(base.text + '.' + name, ft, 'obj'),
+                                          0, width)
+                    if frag.text != base.text + '.' + name:
+                        return frag
             return None
         for off, (name, ti) in chain.items():
             ft = self.il.types[ti]
