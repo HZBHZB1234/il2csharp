@@ -1,4 +1,42 @@
-## Current work: the survivors fixture's defect map (2026-11-03, on `main`)
+## Current work: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
+
+The lifter spells a two-component float value `(float2)(a, b)` (and
+`float3`/`float4`/`doubleN`), but **no such type is ever emitted**, so every
+one of those sites is CS0246. Verified by compiling the shape in isolation
+against the survivors closure:
+
+```
+probe_f2.cs(6,14): error CS0246: the type or namespace name 'float2' could not be found
+```
+
+Census (tree text, both fixtures): **830 sites** in the survivors tree
+(`Unity.Mathematics` 242, `UIElementsModule` 180, `TextMeshPro` 74, `UI` 66,
+`Assembly-CSharp` 48, `DOTween` 46, ...) and **358** in the unitask tree — the
+largest undeclared-name family found so far, and it is *not* fixture-shaped:
+the spelling comes from the SIMD/aggregate paths and appears in every image.
+
+The two ways out, with the trade-off already worked out:
+
+* **emit the type** — a `float2/float3/float4` (and `doubleN`) struct in the
+  scaffolding. To make the *cast* form legal it needs a user-defined
+  conversion from `ValueTuple<float,float>` (`(float2)(a, b)` parses as a cast
+  of a tuple literal), plus conversions to `Vector2`/`Vector3`/`Color` for the
+  assignments to type-check. That is a scaffolding with real semantics and it
+  fabricates a type the source never had.
+* **spell the real type** — the aggregate path already knows the *expected*
+  type (`_piece_value`'s `expected`, and `_color_text` does exactly this for
+  `UnityEngine.Color`), so a two-float value whose expected type is `Vector2`
+  should render `new Vector2(a, b)`. This is the source's own spelling and
+  needs no new type; the work is threading `expected` through the remaining
+  call sites and declining when it is unknown.
+
+The second is the right one; the first is the fallback for a site whose
+expected type is genuinely unknown (then the value is not recoverable anyway
+and the honest marker is better than a fabricated struct).
+
+## Previous: the survivors fixture's defect map (2026-11-03, on `main`)
+
+## Previous: the survivors fixture's defect map (2026-11-03, on `main`)
 
 Source-vs-tree on the complete survivors tree (`full_s1`, 810 matched methods,
 call_f1 0.667 / member_f1 0.361 / shape 0.584) has 52 of its 200 worst rows
