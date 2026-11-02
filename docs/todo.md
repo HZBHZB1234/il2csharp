@@ -24,7 +24,6 @@ diagnostic, which is why the complete survivors tree could read "4 errors"
 while almost certainly holding many more.
 
 ## Previous: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
-## Previous: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
 
 The complete survivors tree had four CS1519 errors in one file, and they came
 from one display-class field:
