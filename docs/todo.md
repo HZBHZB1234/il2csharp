@@ -27,6 +27,43 @@ Verified: the awaiter emits
 `AddItem` is back to its pinned shape, game pins 5 passed, portable 1,650
 passed (4 new tests).
 
+### Open lead: constructed-exception (`throw new T(...)`) arms
+
+fix 194 restores arms that call a *managed* throw helper. The other real family
+is `throw new Ex<T>(...)`, which compiles as an allocation plus the runtime
+raiser, and it is **not** restored:
+
+```csharp
+// source
+if (result.IsError()) { throw new UnityWebRequestException(result); }
+// emitted
+(no arm)
+```
+
+Two extensions were tried and measured, both reverted:
+
+1. keep any `abort` arm with >= 2 calls — restored
+   `UnityWebRequestAsyncOperationAwaiter.GetResult` but took mscorlib's
+   `ManifestBasedResourceGroveler` from 0 to 1 unparseable file (a bare
+   comparison statement and a `throw;` with code after it, inside a `finally`);
+2. allow any `.ctor` call in the arm (the measured shape there is
+   `object_new, il2cpp_object_new, UnityWebRequestException..ctor, object_new,
+   raise`) — same mscorlib break, and excluding pad blocks *and* pad-reached
+   blocks did not stop it.
+
+The reason is visible in the broken text: those discarded arms render as a
+bare `throw;` from the **rethrow** helper, which is legal only inside a
+`catch`, so keeping the arm also keeps the code after it and the pad's own
+condition leaks out as a statement. The distinction needed is *rethrow vs
+raise*, and the prune cannot see it — it runs before the lifter renders the
+block (statements are empty at that point; that is also why the first
+`b.stmts`-keyed attempt was a measured no-op).
+
+Next avenue: decide *after* the lift — mark blocks the lifter rendered with a
+`throw new <T>(...)` statement (or a named raise) and re-run the
+reachability/purning on that classification, rather than predicating on the
+call targets before rendering.
+
 ## Previous: full-corpus testing on the two lightweight fixtures (2026-11-02, on `main`)
 
 Per the user's call, the primary corpus is now the two MIT-licensed fixtures
