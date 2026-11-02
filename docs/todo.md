@@ -36,6 +36,33 @@ fix-195 splice had left **two copies** of `mangle_generated_names` in
 appeared not to apply on the first three attempts). The file was restored from
 HEAD and patched once, precisely; `text.py` now has exactly one definition.
 
+### The survivors "4 compile errors" was a MASKED number
+
+`compile_corpus` on the complete survivors tree reported **4 errors, all
+CS1519** — and that headline is not trustworthy: csc reports at most the
+syntax tier when a syntax error exists, so all *binding* diagnostics for that
+compilation were suppressed. The tree's real binding state is unknown until the
+CS1519 family (fixed by fix 199) is gone from a full rebuild.
+
+Two families are already visible as likely binding errors, both in code the
+masked run could not reach:
+
+* `float.IsNaN(this.targetScale)` — a **Vector3** passed to `float.IsNaN`
+  at `RGame/ScriptableCoreKit/SetScaleStateNode.cs`. 2,823 `float.IsNaN`
+  sites exist tree-wide; most take floats, but the source here is
+  `targetScale.x == 0f || targetScale.y == 0f || targetScale.z == 0f`, so the
+  reconstruction is wrong twice: the argument is the whole struct and the
+  predicate is a NaN test instead of a zero test. The `IsNaN` text comes from
+  `x64.flag_cond`'s parity-jump fold, where the flags operand rendered as the
+  containing struct instead of its float component — the same class of
+  text/type inconsistency the `(float2)` family shows.
+* the same method also shows the shaping artifact: labels emitted *inside* if
+  bodies (`L_1803d5ad5:` followed by more code) and nine ifs + four gotos for
+  a one-line source condition.
+
+So the next measurement is not just "how many errors" but "which of them are
+one family": both symptoms point at the struct-valued float comparison.
+
 ## Previous: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
 
 The full 75-image rebuild with fixes 195/196/197 (`out/survivors-roguelike-kit/
