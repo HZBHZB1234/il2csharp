@@ -1,0 +1,526 @@
+{
+ "files": 7085,
+ "bad_files": 0,
+ "errors": 0,
+ "missing": 0,
+ "recovery_nodes": 0,
+ "images": {
+  "Assembly-CSharp": {
+   "files": 280,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Assembly-CSharp-firstpass": {
+   "files": 11,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "DOTween": {
+   "files": 102,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Mono.Security": {
+   "files": 64,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Newtonsoft.Json": {
+   "files": 273,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System": {
+   "files": 536,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Configuration": {
+   "files": 10,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Core": {
+   "files": 309,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Data": {
+   "files": 203,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Drawing": {
+   "files": 11,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Numerics": {
+   "files": 9,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Runtime.Serialization": {
+   "files": 4,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Xml": {
+   "files": 527,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "System.Xml.Linq": {
+   "files": 31,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.2D.Animation.Runtime": {
+   "files": 55,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.2D.Common.Runtime": {
+   "files": 35,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.2D.IK.Runtime": {
+   "files": 23,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Addressables": {
+   "files": 41,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Burst": {
+   "files": 42,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Burst.Unsafe": {
+   "files": 4,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Collections": {
+   "files": 199,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Collections.LowLevel.ILSupport": {
+   "files": 3,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.InputSystem.ForUI": {
+   "files": 4,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.InternalAPIEngineBridge.001": {
+   "files": 5,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.InternalAPIEngineBridge.004": {
+   "files": 3,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Localization": {
+   "files": 260,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.Mathematics": {
+   "files": 80,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.ResourceManager": {
+   "files": 98,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "Unity.TextMeshPro": {
+   "files": 134,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AIModule": {
+   "files": 1,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AccessibilityModule": {
+   "files": 15,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AdaptivePerformanceModule": {
+   "files": 84,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AndroidJNIModule": {
+   "files": 33,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AnimationModule": {
+   "files": 48,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AssetBundleModule": {
+   "files": 6,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.AudioModule": {
+   "files": 31,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.CoreModule": {
+   "files": 601,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.DirectorModule": {
+   "files": 5,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.GridModule": {
+   "files": 1,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.HierarchyCoreModule": {
+   "files": 30,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.IMGUIModule": {
+   "files": 36,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.ImageConversionModule": {
+   "files": 2,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.InputLegacyModule": {
+   "files": 12,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.InputModule": {
+   "files": 6,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.JSONSerializeModule": {
+   "files": 2,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.MultiplayerModule": {
+   "files": 2,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.ParticleSystemModule": {
+   "files": 4,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.Physics2DModule": {
+   "files": 49,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.PhysicsModule": {
+   "files": 20,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.PropertiesModule": {
+   "files": 99,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.SharedInternalsModule": {
+   "files": 28,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.SpriteShapeModule": {
+   "files": 1,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.SubsystemsModule": {
+   "files": 19,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.TerrainModule": {
+   "files": 8,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.TextCoreFontEngineModule": {
+   "files": 25,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.TextCoreTextEngineModule": {
+   "files": 91,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.TextRenderingModule": {
+   "files": 16,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.TilemapModule": {
+   "files": 12,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UI": {
+   "files": 120,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UIElementsModule": {
+   "files": 856,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UIModule": {
+   "files": 10,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UnityAnalyticsCommonModule": {
+   "files": 34,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UnityAnalyticsModule": {
+   "files": 6,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UnityConsentModule": {
+   "files": 4,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UnityWebRequestAssetBundleModule": {
+   "files": 3,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.UnityWebRequestModule": {
+   "files": 11,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.VFXModule": {
+   "files": 14,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.VRModule": {
+   "files": 1,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.VideoModule": {
+   "files": 11,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "UnityEngine.XRModule": {
+   "files": 26,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "__Generated": {
+   "files": 6,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  },
+  "mscorlib": {
+   "files": 1340,
+   "bad_files": 0,
+   "errors": 0,
+   "missing": 0,
+   "recovery_nodes": 0
+  }
+ },
+ "crashed_images": [
+  {
+   "image": "Unity.InputSystem",
+   "rc": 1,
+   "stderr": ""
+  },
+  {
+   "image": "UnityEngine.InputForUIModule",
+   "rc": 1,
+   "stderr": ""
+  }
+ ],
+ "details": {}
+}

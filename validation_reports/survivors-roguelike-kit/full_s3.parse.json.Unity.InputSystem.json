@@ -1,0 +1,42 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s3\\Unity.InputSystem",
+  "files": 343,
+  "bad_files": 3,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 3,
+  "details": {
+    "UnityEngine\\InputSystem\\InputBindingCompositeContext.cs": [
+      {
+        "kind": "RECOVERY",
+        "node_type": "identifier",
+        "row": 102,
+        "column": 83,
+        "zero_width": true,
+        "text": ""
+      }
+    ],
+    "UnityEngine\\InputSystem\\Layouts\\InputControlLayout.cs": [
+      {
+        "kind": "RECOVERY",
+        "node_type": "identifier",
+        "row": 211477,
+        "column": 96,
+        "zero_width": true,
+        "text": ""
+      }
+    ],
+    "UnityEngine\\InputSystem\\Layouts\\InputDeviceMatcher.cs": [
+      {
+        "kind": "RECOVERY",
+        "node_type": "identifier",
+        "row": 49221,
+        "column": 81,
+        "zero_width": true,
+        "text": ""
+      }
+    ]
+  },
+  "elapsed_seconds": 4.594
+}

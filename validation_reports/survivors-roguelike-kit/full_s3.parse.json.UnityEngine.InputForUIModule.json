@@ -1,0 +1,22 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s3\\UnityEngine.InputForUIModule",
+  "files": 20,
+  "bad_files": 1,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 1,
+  "details": {
+    "UnityEngine\\InputForUI\\KeyEvent.cs": [
+      {
+        "kind": "RECOVERY",
+        "node_type": "identifier",
+        "row": 179,
+        "column": 79,
+        "zero_width": true,
+        "text": ""
+      }
+    ]
+  },
+  "elapsed_seconds": 0.11
+}

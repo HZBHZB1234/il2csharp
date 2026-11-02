@@ -1,4 +1,41 @@
-## Current work: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
+## Current work: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
+
+The full 75-image rebuild with fixes 195/196/197 (`out/survivors-roguelike-kit/
+full_s3`, 7,523 type files / 80,091 bodies) is the first *complete* survivors
+tree measured end to end:
+
+| gate | result |
+|---|---|
+| brace | 7,448 files, **0 unbalanced** |
+| tree-sitter, per image | 7,448 files, **0 bad / 0 ERROR / 0 MISSING / 0 recovery** |
+| whole-tree Roslyn (4,413 sources, 6 BCL refs from the exact closure) | **4 errors in 1 file** (CS1519 x4) |
+
+Getting the parse number required the crash-safe gate: two images
+(`Unity.InputSystem` 343 files, `UnityEngine.InputForUIModule` 20 files) kill
+the single-process parser outright, and both are **0/0/0/0** when parsed in
+batches. Before fixes 195/196 the same tree had 4 unparseable files (60 ERROR
++ 8 MISSING); those are gone.
+
+The four remaining errors are one defect shape, seen at
+`Unity.InputSystem/.../Layouts/InputDeviceMatcher.cs:963`:
+
+```csharp
+public UnityEngine.InputSystem.Layouts.InputDeviceMatche3____4__this; // 0x38
+```
+
+A display-class field `<>4__this` whose type and name were mangled **into one
+identifier** (the `.`/separator is gone and the type name lost its tail), so
+the line has no type at all. It is a mangling interaction, not a parse problem
+(tree-sitter accepts it), and it is the next fix.
+
+The old AC-only number (63 binding errors) was an artifact: 61 of them are
+CS0234 for namespaces owned by sibling images. Compiling the tree as one unit
+is the number to quote, exactly as for unitask (19 errors there, two artifact
+families).
+
+## Previous: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
+
+## Previous: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
 
 The lifter spells a two-component float value `(float2)(a, b)` (and
 `float3`/`float4`/`doubleN`), but **no such type is ever emitted**, so every

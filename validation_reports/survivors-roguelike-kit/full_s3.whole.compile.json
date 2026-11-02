@@ -1,0 +1,27 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s3",
+  "source_files": 4413,
+  "merged_stubs": 826,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "266595e437afc344ec727727879dc77eb496167a87a5e59ef71e23e05b88e828",
+  "log": "validation_reports\\survivors-roguelike-kit\\full_s3.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/survivors-roguelike-kit/build: 6 (excluded 69 tree images)"
+  ],
+  "closure_refs": 6,
+  "exit_code": 1,
+  "files_with_errors": 4,
+  "errors": 4,
+  "errors_by_code": {
+    "CS1519": 4
+  },
+  "first_error_by_code": {
+    "CS1519": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.InputSystem\\UnityEngine\\InputSystem\\Layouts\\InputDeviceMatcher.cs",
+      "line": 963,
+      "message": "\u6210\u5458\u58f0\u660e\u4e2d\u7684\u6807\u8bb0\u201c;\u201d\u65e0\u6548\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}
