@@ -481,6 +481,12 @@ def _pair_overloads(slist, olist):
 def compare(source_idx, tree_idx, min_calls=1):
     rows = []
     unmatched = collections.Counter()
+    samples = {}          # category -> a few (type, name, arity, file, line)
+
+    def _note(cat, item):
+        bucket = samples.setdefault(cat, [])
+        if len(bucket) < 400:
+            bucket.append(item)
     for type_full, smeths in source_idx.items():
         omeths = tree_idx.get(_normalize_type(type_full))
         if not omeths:
@@ -492,6 +498,8 @@ def compare(source_idx, tree_idx, min_calls=1):
                 # accessor/property spellings can differ by '.'/'_'; try the
                 # exact name with the other arity as a last resort
                 unmatched['method'] += len(slist)
+                for s in slist[:2]:
+                    _note('method', [type_full, name, arity, s.file, s.line])
                 continue
             for s, o in _pair_overloads(slist, olist):
                 if s.transformed:
@@ -499,9 +507,19 @@ def compare(source_idx, tree_idx, min_calls=1):
                     continue
                 if not _body_has_code(s.body) or not _body_has_code(o.body):
                     unmatched['empty'] += 1
+                    which = ('src' if not _body_has_code(s.body) else '') + \
+                            ('out' if not _body_has_code(o.body) else '')
+                    # split the side: mpty_out (the source has a body and
+                    # ours does not) is the only DEFECT of the three; both
+                    # empty is pairing noise and src-only is a stripped or
+                    # [Conditional] body in the player build
+                    unmatched['empty_' + (which or 'both')] += 1
+                    _note('empty', [type_full, name, arity, s.file, s.line,
+                                    which])
                     continue
                 if 'Method body was not recovered' in o.body:
                     unmatched['stub'] += 1
+                    _note('stub', [type_full, name, arity, s.file, s.line])
                     continue
                 if INLINED_STATE_MACHINE_RX.search(o.body):
                     # IL2CPP inlined the async implementation into this
@@ -536,7 +554,7 @@ def compare(source_idx, tree_idx, min_calls=1):
                               for k, rx in TELL_PATTERNS.items()
                               if rx.search(o.body)},
                 })
-    return rows, unmatched
+    return rows, unmatched, samples
 
 
 def census(tree_dir, image_dirs):
@@ -626,7 +644,7 @@ def main(argv=None):
                 dst.setdefault(key, []).extend(methods)
     tree_idx = index_tree(tree, images)
 
-    rows, unmatched = compare(src_idx, tree_idx)
+    rows, unmatched, samples = compare(src_idx, tree_idx)
     files, tells = census(tree, images)
 
     def _avg(key):
@@ -645,6 +663,7 @@ def main(argv=None):
         'tree_types': len(tree_idx),
         'matched_methods': len(rows),
         'unmatched': dict(unmatched),
+        'unmatched_samples': samples,
         'averages': {k: _avg(k) for k in (
             'call_precision', 'call_recall', 'call_f1', 'member_f1',
             'shape_cos')},

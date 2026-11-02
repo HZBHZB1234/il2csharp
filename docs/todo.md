@@ -1,4 +1,33 @@
-## Current work: fix 194 — real throw arms survive the non-returning prune (2026-11-03, on `main`)
+## Current work: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
+
+`tools/source_compare.py` now splits the unmatched population by side and
+records samples (`unmatched_samples`), which makes the whole diff classifiable
+instead of a single "mismatch" number. For the complete unitask tree
+(`out/unitask/full_u5`, 49 images) every category is accounted for:
+
+| category | count | verdict |
+|---|---|---|
+| `stub` | 2,283 | generic-DEFINITION methods with no native code: `AsyncLazy<T>`'s rows are all `addr=0` (verified), so the honest `NotImplementedException` stub is correct, not a defect |
+| `transformed` | 544 | async/iterator/`[Conditional]`/lambda source methods — the compiler rewrote them, no 1:1 body exists |
+| `type` | 121 | source types absent from the PLAYER build: `Editor/` scripts, `External/` packages, unused generic definitions, stripped rows |
+| `inlined` | 55 | IL2CPP inlined the async implementation into the sync wrapper; the outer body IS a compiler rewrite |
+| `empty_src` / `empty_srcout` | 28 / 32 | `[Conditional("UNITY_EDITOR")]` bodies compiled out in the player (`TaskTracker.TrackActiveTask`, `RemoveTracking`) and pairing noise |
+| `empty_out` | 4 | all four are `#if`-guarded or sample-scene code (`BindTo` under `#if !UNITY_2019_1_OR_NEWER`, `SandboxMain.Awake`) |
+| `method` | 13 | `PlayerLoopHelper.InitOnEditor` and friends: editor-only (`#if UNITY_EDITOR`) or overload-plus-generic-arity spellings |
+
+The per-method `worst` list is dominated by the same inlining: `Bounds.Equals`
+expanded into twelve `IsNaN` comparisons, `TrySetResult` inlined into promise
+`MoveNext`, `ThrowArgumentNullException` inlined into its `..Core` call. Those
+are what the native code does; the source spelling cannot be recovered without
+un-inlining, which would be a guess.
+
+So on this fixture the *matched* population has no unexplained remaining
+defect, and the tree's own gates are clean: brace **0** unbalanced over 3,547
+files, tree-sitter **0/0/0/0**, whole-tree Roslyn **19 errors** (18 CS8701
+target-framework default-interface-method artifact + 1 CS0644
+`Il2CppFullySharedGenericType : ValueType`, which C# forbids for user types).
+
+## Previous: fix 194 — real throw arms survive the non-returning prune (2026-11-03, on `main`)
 
 The first defect the source comparison actually convicted (see the triage note
 further down) is fixed. `_prune_nonreturning` keeps only paths that reach
