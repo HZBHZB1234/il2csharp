@@ -121,7 +121,13 @@ class _InsnMixin:
                     self.emit(ip, 'if (%s %s null) goto L_%x;' % (lt, op, t), asm)
                 else:
                     self.emit(ip, 'if (%s %s %s) goto L_%x;' % (lt, op, rt, t), asm)
-            self.flags = None
+            # DO NOT clear the operands: MSVC emits ONE compare followed by
+            # two branches (ucomiss; jp for NaN; je for equal), and clearing
+            # here made the second branch print `? == ?` and the decompiler
+            # re-derive it as a label cascade (SetScaleStateNode.Validate).
+            # Staleness is already handled by `_flags_mn`: any instruction that
+            # WRITES the flags (a call included) updates it, and `flag_cond`
+            # declines a setter it cannot derive from.
             return
         if mn == Mnemonic.JMP and A(0) == OpKind.NEAR_BRANCH64:
             t = ins.near_branch_target
