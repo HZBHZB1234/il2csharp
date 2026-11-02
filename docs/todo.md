@@ -34,6 +34,13 @@ The second is the right one; the first is the fallback for a site whose
 expected type is genuinely unknown (then the value is not recoverable anyway
 and the honest marker is better than a fabricated struct).
 
+**fix 198 (done)** — the producer that PROVES the type (alues.py: a SIMD
+slot whose struct is exactly Unity.Mathematics.float2 with two float fields)
+now emits the fully qualified Unity.Mathematics.float2(a, b); the using-strip
+shortens a dotted chain again when the file imports the namespace, so nothing
+is lost where it resolved before. The const-pool pair path (insn.py, no type
+proof) keeps the house spelling and is the remaining half of the family.
+
 ## Previous: the survivors fixture's defect map (2026-11-03, on `main`)
 
 Source-vs-tree on the complete survivors tree (`full_s1`, 810 matched methods,
