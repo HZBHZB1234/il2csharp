@@ -1123,6 +1123,60 @@ class Emitter:
                 for x in ev[2:4]:
                     if self._rel_method(td, x) is not None:
                         accessor_idxs.add(td.method_start + x)
+        # Explicit interface PROPERTY implementations. IL stores a property
+        # accessor as a plain method, so a method render produces
+        #   bool IRubyText.get_enableAutoSizing() { return this.x; }
+        # which cannot implement a property accessor (CS0683, 22 sites).
+        # Group the accessor pair back into the property it implements.
+        exp_props = {}
+        for mi in self.meta.type_methods(td):
+            if mi in accessor_idxs:
+                continue
+            m = self.meta.methods[mi]
+            nm = m.name or ''
+            pfx = None
+            base = ''
+            qual = None
+            if '.' in nm:
+                # metadata names an explicit implementation with the full
+                # dotted path: `TMPro.IRubyText.get_enableAutoSizing`
+                q, _, last = nm.rpartition('.')
+                for cand in ('get_', 'set_'):
+                    if last.startswith(cand) and len(last) > len(cand):
+                        pfx = cand
+                        base = last[len(cand):]
+                        qual = q
+                        break
+            else:
+                for cand in ('get_', 'set_'):
+                    if nm.startswith(cand) and len(nm) > len(cand):
+                        pfx = cand
+                        base = nm[len(cand):]
+                        break
+            if pfx is None:
+                continue
+            if qual is None:
+                try:
+                    qual = self._explicit_impl_qualifier(m, td)
+                except Exception:
+                    qual = None
+            if not qual:
+                continue
+            g, st = exp_props.get((qual, base), (None, None))
+            if pfx == 'get_':
+                g = mi
+            else:
+                st = mi
+            exp_props[(qual, base)] = (g, st)
+        for (qual, base), (g, st) in exp_props.items():
+            def _rel(idx):
+                return -1 if idx is None else idx - td.method_start
+            self.emit_property(td, out, pre, (0, _rel(g), _rel(st)),
+                               force_name='%s.%s' % (qual, base))
+            if g is not None:
+                accessor_idxs.add(g)
+            if st is not None:
+                accessor_idxs.add(st)
         # methods
         skip_delegate = self._is_delegate_td(td) \
             and self._delegate_viable(td)
@@ -1374,13 +1428,19 @@ class Emitter:
         out.append(pre + '}')
 
     def emit_property(self, td: TypeDef, out: List[str], pre: str, pr,
-                      bk_offs=None):
+                      bk_offs=None, force_name=None):
         getter = self._rel_method(td, pr[1])
         setter = self._rel_method(td, pr[2])
         present = [a for a in (getter, setter) if a is not None]
-        raw = self.meta.getstr(pr[0])
-        pname = self._member_name(raw, td)
-        explicit = '.' in raw
+        if force_name is not None:
+            # a synthesized explicit-interface property: the accessors are
+            # plain methods on this type, so there is no property row to read
+            raw = pname = force_name
+            explicit = True
+        else:
+            raw = self.meta.getstr(pr[0])
+            pname = self._member_name(raw, td)
+            explicit = '.' in raw
         gparams = list(self.meta.method_params(getter)) if getter else []
         sparams = list(self.meta.method_params(setter)) if setter else []
         ptype = self.prop_type(getter)
