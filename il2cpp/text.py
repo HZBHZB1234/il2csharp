@@ -151,6 +151,11 @@ def mangle_generated_ident(text):
     brackets in every `PrivateImplementationDetails.cs` in the tree.
     """
     t = text or ''
+    # A qualified alias path (`global::System.Collections...`) is not a
+    # generated name; mangling one produced the undeclarable identifier
+    # `global__System...` in five explicit-interface implementations.
+    if '::' in t:
+        return t
     if '__' not in t and not t.startswith('<>') and (' ' in t or '\t' in t):
         return t
     return (t.replace('<', '_').replace('>', '_')

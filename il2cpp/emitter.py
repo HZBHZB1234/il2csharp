@@ -494,6 +494,17 @@ class Emitter:
             vis = 'internal '  # a nested form on a top-level row: unreadable
         if self._is_blob_container(td):
             vis = 'internal '
+        # A compiler-generated nested type (a closure, a state machine) is
+        # named by the compiler and referenced from the owner's own members.
+        # Roslyn makes them private, but this decompiler must also emit the
+        # local functions and inlined bodies that mention them, so a private
+        # spelling makes every such signature CS0051 (33 sites). Keep them
+        # internal: they stay implementation detail of the assembly.
+        _gen = td.name or ''
+        if td.declaring >= 0 and ('__' in _gen or 'DisplayClass' in _gen
+                                  or _gen.startswith('<>')
+                                  or _gen.startswith('_')):
+            vis = 'internal '
         vis = self._pub(vis)
         lines = []
         if f & 0x20:

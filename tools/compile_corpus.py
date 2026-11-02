@@ -161,7 +161,9 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
     _SCAFFOLDING = {
         "PrivateImplementationDetails.cs", "EmbeddedAttribute.cs",
         "NullableAttribute.cs", "NullableContextAttribute.cs",
-        "RefSafetyRulesAttribute.cs",
+        "RefSafetyRulesAttribute.cs", "IsUnmanagedAttribute.cs",
+        "IsExternalInit.cs", "ScopedRefAttribute.cs",
+        "CompilerFeatureRequiredAttribute.cs",
         "UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
     }
     seen_scaffolding = set()
