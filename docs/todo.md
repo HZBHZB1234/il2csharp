@@ -7,7 +7,35 @@
 > (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
 > [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
 
-## Current work: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
+### Whole-tree recompile measurement of the game (2026-11-02, on `main`)
+
+`tools/compile_corpus.py` with the editor closure (260 refs) over the 60-image
+game tree, excluding exactly the images the closure provides (BCL + engine
+modules — excluding by prefix silently dropped `UnityEngine.UI`, a package the
+editor does not ship):
+
+| | value |
+|---|---|
+| sources compiled as one assembly | **29,362** |
+| files with errors | **1,423** |
+| errors | **4,082** |
+
+Families: CS0246 **3,265**, CS0102 219 + CS0111 122 (cross-image duplicate
+helper types — an artifact of compiling 60 assemblies as one), CS0234 187,
+CS0122 96 (internal accessibility across images), CS0051 33, CS0535 24
+(the `ref`-vs-`out` family), CS0683 22, CS0538 17, CS0104 15, CS0738 15.
+
+**The single biggest cause is a missing type, not a body defect**:
+`TMPro.TextMeshProUGUI` (TypeDefIndex 43728, 74 methods, in
+`Unity.TextMeshPro.dll`) is referenced 2,435 times across
+`Assembly-CSharp` and **is not declared anywhere in the emitted tree** — the
+image was built (129 files) and its sibling `TMP_Text.cs` is 1.1 MB, so the
+type was silently skipped or its emission never completed. Re-emitting that
+one type with `--types TextMeshProUGUI` did not finish in 10 minutes.
+Root-cause this next: a silently dropped type is worse than a wrong body,
+because every reference to it fails.
+
+## Previous: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
 
 The file boundary replaces the angle brackets of compiler-generated
 identifiers (`<Foo>d__13`, `<>c`, `<>9__0_0`, a nested
