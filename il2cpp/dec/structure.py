@@ -172,6 +172,7 @@ class _StructureMixin:
         # else-if chain; _elseif_flatten needs a single construct and
         # declines it.  Runs before _switch_synth so the chains it
         # produces are visible to the switch synthesis below.
+        raw = self._enum_shift_fold(raw)
         raw = self._elseif_flatten_multi(raw)
         raw = self._phi_chain_decl_hoist(raw)
         # fix 72e: the flat chains the flattener just produced are

@@ -360,6 +360,90 @@ class _HighLevelMixin:
                 return True
         return False
 
+    _ENUM_SHIFT_RX = re.compile(
+        r'(?<![\w.])'
+        r'(?P<lhs>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)'
+        r' - (?P<n>\d+)'
+        r' (?P<op>==|!=|>=|<=|>|<) '
+        r'(?P<rhs>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+|\d+)')
+
+    def _enum_value_maps(self):
+        """short enum name -> ({member: value}, {value: member}), cached."""
+        cache = getattr(self, '_enum_maps', None)
+        if cache is not None:
+            return cache
+        cache = self._enum_maps = {}
+        il = getattr(self, 'il', None) or getattr(self.L, 'il', None)
+        try:
+            for td in il.meta.typedefs:
+                if not getattr(td, 'is_valuetype', False):
+                    continue
+                try:
+                    members = il.enum_members(td.index)
+                except Exception:
+                    members = None
+                if not members:
+                    continue
+                by_name = {v: k for k, v in members.items()}
+                cache.setdefault(td.name, []).append((by_name, members))
+        except Exception:
+            pass
+        return cache
+
+    def _enum_shift_fold(self, lines):
+        """`x - 1 == ComparisonType.LessThan` -> `x == ComparisonType.Equal`.
+
+        MSVC lowers a switch into a dispatch that shifts the index, and the
+        lifter renders the shift inside the comparison: 892 survivors-tree
+        sites read `expr - N == Enum.Member`, which is not even legal C#
+        (`enum - int` is CS0019) and which also hides the flat `==` chain
+        from `_switch_synth`. The rewrite is exact algebra: comparing
+        `x - N` against the member whose value is `V` is comparing `x`
+        against `V + N`, and the member that HAS that value is the right
+        spelling. Declines (keeps today's text) when the enum is unknown,
+        ambiguous, has no member for the shifted value, or the operand is an
+        enum name the metadata does not resolve.
+        """
+        rx = self._ENUM_SHIFT_RX
+        maps = self._enum_value_maps()
+        if not maps:
+            return lines
+
+        def fix(m):
+            lhs, n, op, rhs = (m.group('lhs'), int(m.group('n')),
+                               m.group('op'), m.group('rhs'))
+            if rhs.isdigit():
+                return '%s %s %d' % (lhs, op, int(rhs) + n)
+            owners = rhs.split('.')[:-1]
+            member = rhs.split('.')[-1]
+            short = owners[-1] if owners else ''
+            hits = maps.get(short) or ()
+            want = None
+            named = None
+            for by_name, members in hits:
+                if member not in by_name:
+                    continue
+                v = by_name[member] + n
+                nm = members.get(v)
+                if nm is None:
+                    continue
+                if named is None:
+                    want, named = v, nm
+                elif (want, named) != (v, nm):
+                    return m.group(0)          # ambiguous across enums
+            if named is None:
+                return m.group(0)
+            return '%s %s %s.%s' % (lhs, op, '.'.join(owners), named)
+
+        out = []
+        for line in lines:
+            if ' - ' in line and (' == ' in line or ' != ' in line
+                                  or ' >= ' in line or ' <= ' in line
+                                  or ' > ' in line or ' < ' in line):
+                line = rx.sub(fix, line)
+            out.append(line)
+        return out
+
     def _ternary_pass(self, lines: List[str]) -> List[str]:
         """`if (c) { x = a; } else { x = b; }` -> `x = c ? a : b;` -- when
         both arms are a single assignment to the same lvalue. Each arm's
