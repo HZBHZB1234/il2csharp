@@ -269,6 +269,7 @@ class Emitter:
             head, rest = dotted.split('<', 1)
             args = '<' + rest
             depth = commas = 0
+            pdepth = 0
             has_arg = False
             for ch in args[1:]:
                 if ch == '<':
@@ -277,7 +278,14 @@ class Emitter:
                     if depth == 0:
                         break
                     depth -= 1
-                elif ch == ',' and depth == 0:
+                elif ch == '(':
+                    # a TUPLE argument is one type argument: IL2CPP spells it
+                    # with the element types and names glued, so its commas
+                    # must not count as top-level argument separators
+                    pdepth += 1
+                elif ch == ')':
+                    pdepth = max(0, pdepth - 1)
+                elif ch == ',' and depth == 0 and pdepth == 0:
                     commas += 1
                 elif ch not in ', ':
                     has_arg = True
@@ -747,6 +755,81 @@ class Emitter:
             return None
         return None
 
+    def _tuple_qualifier_fix(self, qual):
+        """Repair IL2CPP's glued tuple spelling inside an explicit qualifier.
+
+        IL2CPP names an explicit implementation of a tuple-typed interface with
+        each element's TYPE and NAME concatenated:
+        `SYSTEM.COLLECTIONS...<(System.Int32shopId, System.Int32itemId)>.get_Current`
+        is not C#. Each element is `<full type name><element name>`, so the
+        longest known type-name prefix is the type; the rest is the name. The
+        rewrite keeps types only (`(int, int)`), which is the same tuple type
+        and needs no name agreement with the interface.
+        """
+        if '(' not in qual:
+            return qual
+        full = self.__dict__.get('_full_ty_names')
+        if full is None:
+            full = {}
+            for i in range(len(self.meta.typedefs)):
+                try:
+                    nm = self.typedef_full(i)
+                except Exception:
+                    continue
+                if nm:
+                    full[nm] = nm
+            for k, v in (('System.Int32', 'int'), ('System.Int64', 'long'),
+                         ('System.String', 'string'), ('System.Boolean', 'bool'),
+                         ('System.Single', 'float'), ('System.Double', 'double'),
+                         ('System.Byte', 'byte'), ('System.Int16', 'short'),
+                         ('System.UInt32', 'uint'), ('System.UInt64', 'ulong')):
+                full[k] = v
+            self._full_ty_names = full
+        names = sorted(full, key=len, reverse=True)
+
+        def _element(txt):
+            t = txt.strip()
+            for nm in names:
+                if t.startswith(nm):
+                    return full[nm]
+            return t
+
+        out = []
+        i = 0
+        while i < len(qual):
+            if qual[i] != '(':
+                out.append(qual[i])
+                i += 1
+                continue
+            depth = 0
+            j = i
+            while j < len(qual):
+                if qual[j] == '(':
+                    depth += 1
+                elif qual[j] == ')':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            inner = qual[i + 1:j]
+            parts = []
+            depth = 0
+            cur = []
+            for ch in inner:
+                if ch == '(':
+                    depth += 1
+                elif ch == ')':
+                    depth -= 1
+                if ch == ',' and depth == 0:
+                    parts.append(''.join(cur))
+                    cur = []
+                    continue
+                cur.append(ch)
+            parts.append(''.join(cur))
+            out.append('(' + ', '.join(_element(p) for p in parts) + ')')
+            i = j + 1
+        return ''.join(out)
+
     def _explicit_impl_qualifier(self, m, td):
         """Interface head for an undotted explicit implementation, else None.
 
@@ -853,7 +936,22 @@ class Emitter:
         raw = csharp_type_name(m.name)
         if '.' in raw:
             head, _, tail = raw.rpartition('.')
-            name = sanitize_qualifier(self._arity_qualifier(head, td)) + '.' + safe_ident(tail)
+            # IL2CPP spells a tuple-typed interface with the element TYPE
+            # and NAME glued: IEnumerator<(System.Int32shopId,...)>.get_Current
+            # is not C#. The type's own interface list carries the same
+            # interface spelled by type_name, so prefer that spelling when it
+            # matches uniquely (fix 191).
+            _iq = None
+            try:
+                _iq = self._iface_qualifier(head, td)
+            except Exception:
+                _iq = None
+            if _iq:
+                name = _iq + '.' + safe_ident(tail)
+            else:
+                _head = self._tuple_qualifier_fix(
+                    self._arity_qualifier(head, td))
+                name = sanitize_qualifier(_head) + '.' + safe_ident(tail)
         elif qual is not None:
             name = sanitize_qualifier(self._arity_qualifier(qual, td)) + '.' + safe_ident(raw)
         else:
@@ -1439,6 +1537,9 @@ class Emitter:
             explicit = True
         else:
             raw = self.meta.getstr(pr[0])
+            # an explicit implementation of a tuple-typed interface carries
+            # IL2CPP's glued element spelling (fix 191)
+            raw = self._tuple_qualifier_fix(raw)
             pname = self._member_name(raw, td)
             explicit = '.' in raw
         gparams = list(self.meta.method_params(getter)) if getter else []
