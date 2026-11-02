@@ -198,23 +198,29 @@ def mangle_generated_names(text):
     out = []
     i = 0
     n = len(text)
+    # text index just past the last thing appended to `out` as a whole chunk
+    # (a mangled candidate). Backward extension over "the identifier's own
+    # characters" may not cross it: those characters are no longer the raw
+    # text in `out`, so the deletion below would count the wrong span --
+    # `Matcher <>3__<>4__this` lost `r ` and two underscores this way
+    # (CS1519 x4 on the survivors tree).
+    chunk_end = 0
     while i < n:
         ch = text[i]
         if ch == '<' and i and text[i:i + 2] == '<>' \
                 and (text[i - 1].isalnum() or text[i - 1] in '_`'):
-            # `CS$<>8__locals2` -> the `$` sanitize leaves `CS_<>8__locals2`,
-            # where the empty angle pair sits INSIDE the identifier: mangle
-            # from the identifier start, not from the `<`.
             start = i
-            while start and (text[start - 1].isalnum() or text[start - 1] in '_`'):
+            while start > chunk_end and (text[start - 1].isalnum()
+                                         or text[start - 1] in '_`'):
                 start -= 1
             k = i + 2
             while k < n and (text[k].isalnum() or text[k] in '_`'):
                 k += 1
-            # the identifier's own characters are already in `out`
+            # characters from `start` are the raw text still sitting in `out`
             del out[len(out) - (i - start):]
             out.append(mangle_generated_ident(text[start:k]))
             i = k
+            chunk_end = k
             continue
         if ch != '<' or (i and (text[i - 1].isalnum() or text[i - 1] in '_`')):
             out.append(ch)
@@ -249,6 +255,7 @@ def mangle_generated_names(text):
         cand = text[i:k]
         out.append(mangle_generated_ident(cand))
         i = k
+        chunk_end = k
     return ''.join(out)
 
 # An unresolved native value renders the bare text `unknown` (from

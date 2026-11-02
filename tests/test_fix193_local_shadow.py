@@ -50,3 +50,16 @@ def test_a_generic_nested_name_shadows_with_its_arity_stripped():
             'UnityEngine.UIElements.UxmlObjectTraits<T>')
     out = _strip(line, declared={'UxmlObjectTraits`1', 'UxmlObjectTraits'})
     assert out == [line], out
+
+
+
+def test_a_doubled_closure_name_keeps_the_type_and_a_space():
+    # IL2CPP spells a closure field that refers to another closure field
+    # <>3__<>4__this; mangling it must not eat the space or the type's
+    # tail (CS1519 x4 on the survivors tree).
+    from il2cpp.text import mangle_generated_names
+    line = 'public X.InputDeviceMatcher <>3__<>4__this;'
+    out = mangle_generated_names(line)
+    assert out == 'public X.InputDeviceMatcher __3____4__this;', out
+    assert mangle_generated_names('x = (a & b) << c >> 32;') == \
+        'x = (a & b) << c >> 32;'
