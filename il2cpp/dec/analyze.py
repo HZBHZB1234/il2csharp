@@ -1131,6 +1131,14 @@ class _AnalyzeMixin:
         calls = [i for i in (b.insns or ()) if i.mnemonic == _M.CALL]
         if not calls:
             return False
+        if len(calls) >= 2:
+            # A constructed exception is `new T(args)` (a ctor call) followed
+            # by the runtime raiser call and int3, so the arm CONSTRUCTS its
+            # exception: source-level `throw`, not a runtime null guard (which
+            # is a single raiser call with a klass constant --
+            # UnityWebRequestAsyncOperationAwaiter.GetResult's real arms are
+            # 60 bytes here against a 6-byte guard).
+            return True
         il = getattr(self, 'il', None) or getattr(
             getattr(self, 'L', None), 'il', None)
         cands = (getattr(il, 'addr_candidates', None) or {}).get(

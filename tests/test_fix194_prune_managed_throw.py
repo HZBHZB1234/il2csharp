@@ -60,3 +60,13 @@ def test_a_call_with_no_single_candidate_is_pruned():
 def test_a_block_without_a_call_is_pruned():
     dec = _dec('Game.Foo')
     assert _AnalyzeMixin._abort_carries_managed_throw(dec, _Block([])) is False
+
+
+def test_a_constructed_exception_arm_is_kept():
+    # new T(args) + raise + int3: two calls, one of them unregistered. The arm
+    # constructs its own exception, so it is source-level control flow even
+    # though the raiser has no metadata owner.
+    dec = _dec('System')
+    dec.il.addr_candidates = {0x100: [], 0x200: []}
+    assert _AnalyzeMixin._abort_carries_managed_throw(
+        dec, _Block([0x100, 0x200])) is True
