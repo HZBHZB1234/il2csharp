@@ -1629,6 +1629,7 @@ class _HighLevelMixin:
                 copy_rx = _re.compile(
                     r'^\s*(?:var\s+)?((?:v\d+|t\d+|s_[0-9a-fA-F]+))\s*=\s*'
                     r'([A-Za-z_@]\w*)\s*;$')
+                copies = []
                 for st in lines:
                     if _re.match(r'^\s*(?:if|else|while|for|foreach|do|switch|'
                                  r'try|catch|finally|goto|return|throw)\b', st) \
@@ -1637,15 +1638,29 @@ class _HighLevelMixin:
                     hit = copy_rx.match(st)
                     if hit is None or hit.group(2) not in scalar_params:
                         continue
-                    tok, src = hit.groups()
-                    token = _re.escape(tok)
-                    writes = _re.compile(r'(?<![\w.])%s(?!\w)\s*(?:[+\-*/%%&|^]?=(?!=|>)|\+\+|--)'
-                                         % token)
-                    escapes = _re.compile(r'(?<!&)&(?!&)\s*%s\b|\b(?:ref|out|in)\s+%s\b'
-                                          % (token, token))
-                    if sum(bool(writes.search(line)) for line in lines) == 1 \
-                            and not any(escapes.search(line) for line in lines):
-                        self._var_types.setdefault(tok, scalar_params[src])
+                    copies.append(hit.groups())
+                # One pass for the write/escape census. Scanning every line per
+                # prologue copy is O(copies * lines): a 116k-statement method
+                # (TextMeshProUGUI.GenerateTextMesh) spent minutes here alone.
+                if copies:
+                    toks = sorted({tok for tok, _src in copies})
+                    w_rx = _re.compile(
+                        r'(?<![\w.])(%s)(?!\w)\s*(?:[+\-*/%%&|^]?=(?!=|>)|\+\+|--)'
+                        % '|'.join(_re.escape(t) for t in toks))
+                    e_rx = _re.compile(
+                        r'(?<!&)&(?!&)\s*(%s)\b|\b(?:ref|out|in)\s+(%s)\b'
+                        % ('|'.join(_re.escape(t) for t in toks),
+                           '|'.join(_re.escape(t) for t in toks)))
+                    w_cnt = dict.fromkeys(toks, 0)
+                    esc = set()
+                    for line in lines:
+                        for mm in w_rx.finditer(line):
+                            w_cnt[mm.group(1)] = w_cnt.get(mm.group(1), 0) + 1
+                        for mm in e_rx.finditer(line):
+                            esc.add(mm.group(1) or mm.group(2))
+                    for tok, src in copies:
+                        if w_cnt.get(tok) == 1 and tok not in esc:
+                            self._var_types.setdefault(tok, scalar_params[src])
             except (AttributeError, IndexError, TypeError):
                 pass
         ordered = [t for t in tokens
@@ -1698,16 +1713,24 @@ class _HighLevelMixin:
                 cnt[k] += 1
                 candidate = '%s%d' % (self.PREFIX[k], cnt[k])
             names[tok] = candidate
-        rx = _re.compile(r'(?<![\w.])(' + '|'.join(_re.escape(t) for t in names) + r')(?![\w])')
+        # A single identifier scan + dict lookup, not one alternation over
+        # every renamed token: the alternation cost 2,000 tries per position
+        # on a 116k-statement body (TextMeshProUGUI.GenerateTextMesh). Family
+        # tokens are all `[A-Za-z_]\w*`, and the same `(?<![\w.])` guard keeps
+        # member tails out. Matches are found on the SHADOW line (literal and
+        # comment spans blanked) and spliced into the real one, so a string
+        # that spells a token is never renamed.
+        tok_rx = _re.compile(r'(?<![\w.])([A-Za-z_]\w*)(?![\w])')
         renamed = []
         for st, sh in zip(lines, shadow):
-            spans = [mm.span() for mm in rx.finditer(sh)]
+            spans = [(mm.span(), mm.group(1)) for mm in tok_rx.finditer(sh)
+                     if mm.group(1) in names]
             if spans:
                 parts = []
                 last = 0
-                for a, b in spans:
+                for (a, b), tok in spans:
                     parts.append(st[last:a])
-                    parts.append(names[sh[a:b]])
+                    parts.append(names[tok])
                     last = b
                 parts.append(st[last:])
                 st = ''.join(parts)
