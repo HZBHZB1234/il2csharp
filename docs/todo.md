@@ -40,7 +40,6 @@ earlier `full_s4` run (198/199 only) was cancelled at 20/75 images rather than
 measured, since 200/201 change the very shapes it would have counted.
 
 ## Previous: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
-## Previous: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
 
 The `float.IsNaN(this.targetScale)` finding from the masked-compile note is
 fixed at its root. `_aggregate_load` returned None as soon as a load's offset
