@@ -44,15 +44,23 @@ def version_key(path):
 
 
 def _closure_refs(tree_root, refs_dirs, unity_roots, managed_dirs,
-                  exclude=(), exclude_images=True):
-    """Assemblies to reference for a whole-tree compile, plus a note list."""
+                  exclude=(), exclude_images=True, source_excluded=()):
+    """Assemblies to reference for a whole-tree compile, plus a note list.
+
+    `source_excluded` names the image directories left OUT of the sources:
+    those images are not the recovered code under test, so their original
+    assemblies stay in the closure. That is what makes a COMPLETE tree
+    compilable at all: a tree that emits every image would otherwise filter
+    its whole closure away and have no corlib.
+    """
     import compile_gate as cg
 
+    skip_excluded = {d.casefold() for d in source_excluded if d}
     tree_images = set()
     if exclude_images:
         try:
             tree_images = {p.name.casefold() for p in Path(tree_root).iterdir()
-                           if p.is_dir()}
+                           if p.is_dir() and p.name.casefold() not in skip_excluded}
         except OSError:
             tree_images = set()
     skip = {e.casefold() for e in exclude if e}
@@ -140,7 +148,7 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
     if dotnet_refs and not packs:
         raise RuntimeError(".NET reference assemblies are required")
     closure, notes = _closure_refs(tree, refs_dirs, unity_roots, managed_dirs,
-                                   exclude, exclude_images)
+                                   exclude, exclude_images, exclude_dirs)
     if extra_refs:
         closure = list(closure) + [p for p in extra_refs if p not in closure]
     files = []

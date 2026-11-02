@@ -104,7 +104,15 @@ def auto_property_maps(il):
             props = set()
             for k in range(count):
                 try:
-                    props.add(meta.getstr(meta.properties[td.property_start + k][0]))
+                    row = meta.properties[td.property_start + k]
+                    # an AUTO-PROPERTY always has a getter: C# requires one
+                    # for auto-implementation (CS8051), so a set-only property
+                    # was written with an explicit body over a plain field.
+                    # Treating its field as a backing field respells the body
+                    # to X = value -- infinite recursion.
+                    if row[1] is None or row[1] < 0:
+                        continue
+                    props.add(meta.getstr(row[0]))
                 except Exception:
                     continue
             if not props:
@@ -201,12 +209,21 @@ def _ambiguous_head(head, file_ns, uses, short_to_ns, ns_finals):
     return head in ns_finals
 
 
-def collision_heads(buf_text, file_ns, uses, short_to_ns):
+def collision_heads(buf_text, file_ns, uses, short_to_ns, declared=()):
     """Short heads that shortening must never produce, mirroring rep():
     for every dotted chain and every using-prefix strip rep() would apply,
     the remaining head must resolve unambiguously (one visible typedef and
     no visible namespace final-segment match). Computed on masked text so
-    strings/comments can only over-keep."""
+    strings/comments can only over-keep.
+
+    `declared` are the type names this FILE declares (its own type and the
+    nested types it holds). A name declared in the file SHADOWS a same-named
+    namespace type at every point inside it, so shortening
+    `UnityEngine.UIElements.UxmlTraits` to `UxmlTraits` inside
+    `class VisualElement`, which declares its own nested `UxmlTraits`,
+    produced `class UxmlTraits : UxmlTraits` -- CS0146 circular base, which
+    then cascaded into 52 CS0311 constraint errors.
+    """
     try:
         masked = UsingTracker._STR_RX.sub("", buf_text)
     except Exception:
@@ -217,6 +234,7 @@ def collision_heads(buf_text, file_ns, uses, short_to_ns):
         for k in range(1, len(parts) + 1):
             vis_ns.add(".".join(parts[:k]))
     ns_finals = set(ns.split(".")[-1] for ns in vis_ns if ns)
+    local = {d for d in (declared or ()) if d}
     order = sorted(uses or (), key=lambda u: (-len(u), u))
     dup = set()
     for m in UsingTracker._DOTID_RX.finditer(masked):
@@ -225,7 +243,8 @@ def collision_heads(buf_text, file_ns, uses, short_to_ns):
             if chain.startswith(u + "."):
                 rest = chain[len(u) + 1:]
                 head = rest.split(".")[0]
-                if _ambiguous_head(head, file_ns, uses, short_to_ns, ns_finals):
+                if head in local or _ambiguous_head(head, file_ns, uses,
+                                                   short_to_ns, ns_finals):
                     dup.add(head)
     return dup
 

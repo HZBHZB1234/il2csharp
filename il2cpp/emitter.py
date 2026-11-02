@@ -1572,6 +1572,12 @@ class Emitter:
                 auto = auto_property_field(self.il, td.index, raw)
             except Exception:
                 auto = None
+        if auto is not None and getter is None:
+            # A SET-ONLY auto-property is CS8051: C# requires the getter for
+            # auto-implementation, so a ool X { set; } declaration is not
+            # legal (UnityEngine.Bindings.IgnoreAttribute.
+            # DoesNotContributeToSize). Lift the real setter body instead.
+            auto = None
         if auto is not None:
             gbody = sbody = None
         else:
@@ -1918,7 +1924,18 @@ class Emitter:
             tr.add_text(l)
         uses_set = set(tr.used)   # own ns too: in scope inside its block
         if uses_set:
-            dup = collision_heads('\n'.join(buf), ns, uses_set, self._short_ns_index())
+            # names this file declares shadow same-named namespace types, so
+            # the strip must keep those prefixes (fix 193: `class UxmlTraits :
+            # UxmlTraits` inside VisualElement)
+            declared = {td.name}
+            try:
+                for k in range(getattr(td, 'nested_count', 0)):
+                    ni = self.meta.nested_types[td.nested_start + k]
+                    declared.add(self.meta.typedefs[ni].name)
+            except Exception:
+                pass
+            dup = collision_heads('\n'.join(buf), ns, uses_set,
+                                  self._short_ns_index(), declared)
             buf = strip_namespaces(buf, uses_set, ns, dup)
         members = self._nameof_members(uses_set)
         if members:

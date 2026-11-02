@@ -1,0 +1,51 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\full_u1",
+  "source_files": 976,
+  "merged_stubs": 228,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "310bde84bece973cdc17245d7dea53030d08dc44aa6250fdc0a5e05e6f072de6",
+  "log": "validation_reports\\unitask\\full_u1.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/unitask/build: 9 (excluded 40 tree images)"
+  ],
+  "closure_refs": 9,
+  "exit_code": 1,
+  "files_with_errors": 21,
+  "errors": 41,
+  "errors_by_code": {
+    "CS8051": 25,
+    "CS8701": 9,
+    "CS0122": 5,
+    "CS0644": 1,
+    "CS0012": 1
+  },
+  "first_error_by_code": {
+    "CS8701": {
+      "file": "out\\unitask\\full_u1\\__Generated\\IActivationFactory.cs",
+      "line": 7,
+      "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002\r"
+    },
+    "CS8051": {
+      "file": "out\\unitask\\full_u1\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\IgnoreAttribute.cs",
+      "line": 11,
+      "message": "\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u5fc5\u987b\u5177\u6709 get \u8bbf\u95ee\u5668\u3002\r"
+    },
+    "CS0122": {
+      "file": "out\\unitask\\full_u1\\UnityEngine.UI\\UnityEngine\\EventSystems\\EventSystem.cs",
+      "line": 642,
+      "message": "\u201cBaseRuntimePanel\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b\r"
+    },
+    "CS0644": {
+      "file": "out\\unitask\\full_u1\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+      "line": 8,
+      "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f\r"
+    },
+    "CS0012": {
+      "file": "out\\unitask\\full_u1\\UnityEngine.UI\\UnityEngine\\UIElements\\PanelEventHandler.cs",
+      "line": 825,
+      "message": "\u7c7b\u578b\u201cPenStatus\u201d\u5728\u672a\u5f15\u7528\u7684\u7a0b\u5e8f\u96c6\u4e2d\u5b9a\u4e49\u3002\u5fc5\u987b\u6dfb\u52a0\u5bf9\u7a0b\u5e8f\u96c6\u201cUnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\u201d\u7684\u5f15\u7528\u3002\r"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}
