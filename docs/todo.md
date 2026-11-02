@@ -1,4 +1,30 @@
-## Current work: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
+## Current work: fix 200 — narrow loads slice the struct field (2026-11-03, on `main`)
+
+The `float.IsNaN(this.targetScale)` finding from the masked-compile note is
+fixed at its root. `_aggregate_load` returned None as soon as a load's offset
+was ANY field offset, so `movss xmm0,[rbx+30h]` — a 4-byte read of a `Vector3`
+field — fell through to the whole-field render and the compare's operand became
+the struct (2,823 `float.IsNaN(...)` sites tree-wide; every one whose operand is
+a struct field was type-wrong).
+
+The narrow case now slices through metadata: when the field at that offset is a
+closed valuetype and the load is strictly narrower than it, `_fragment` returns
+`<field>.<first component>`, proved by the field chain at that exact width. A
+whole-field load and a non-valuetype keep today's spelling.
+
+```csharp
+if (float.IsNaN(this.targetScale.x))   // was: float.IsNaN(this.targetScale)
+```
+
+Portable 1,656 passed; the five pinned bodies are unchanged.
+
+`compile_corpus` also learned to flag a **masked** binding count
+(`binding_masked`): a CS1xxx syntax error makes csc skip every binding
+diagnostic, which is why the complete survivors tree could read "4 errors"
+while almost certainly holding many more.
+
+## Previous: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
+## Previous: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
 
 The complete survivors tree had four CS1519 errors in one file, and they came
 from one display-class field:
