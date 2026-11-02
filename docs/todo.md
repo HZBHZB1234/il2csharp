@@ -1,4 +1,41 @@
-## Current work: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
+## Current work: the survivors fixture's defect map (2026-11-03, on `main`)
+
+Source-vs-tree on the complete survivors tree (`full_s1`, 810 matched methods,
+call_f1 0.667 / member_f1 0.361 / shape 0.584) has 52 of its 200 worst rows
+carrying no honesty marker. Most are the same inlining story as unitask
+(`Mathf.Clamp`/`Lerp` and `List<T>.Add` expanded in place), but one small
+method exposed two real defects at once, and both are families:
+
+`TMP_UiFrameRateCounter.Set_FrameCounter_Position` (a 33-line `switch`):
+
+```csharp
+// source
+switch (anchor_position) {
+    case FpsCounterAnchorPositions.BottomLeft:
+        m_frameCounter_transform.pivot = new Vector2(0, 0);
+        ...
+}
+// emitted before fix 197
+else if (anchor_position - 1 - 1 == FpsCounterAnchorPositions.TopLeft) { ... }
+num1 = 1008981770;
+rectTransform1.anchorMin = num1;
+```
+
+* **fix 197** (`_enum_shift_fold`) — MSVC's switch dispatch shifts the index
+  before comparing, so 892 sites tree-wide read `expr - N == Enum.Member`.
+  `enum - int` is CS0019 and the shape also hides the flat `==` chain from
+  `_switch_synth`. The fold is exact algebra through `il.enum_members`
+  (`x - N == E.M` ⇔ `x == E.<member with value(M) + N>`), declining on an
+  unknown/ambiguous enum or a value with no member.
+* **open** — a struct constant is printed as a raw integer bit pattern
+  (`num1 = 1008981770;` is 0.01f, assigned to a `Vector2` property), so the
+  `new Vector2(a, b)` construction is lost. 15 such temps in Assembly-CSharp
+  alone; the aggregate/struct-tile pass declines this shape. This is the
+  next fidelity target, and it is also a compilability one (int -> Vector2).
+
+## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
+
+## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
 
 Both came out of parse-gating the **complete survivors tree**, which had never
 been gated as a tree: the aggregate tree-sitter gate *segfaults* on it (exit
