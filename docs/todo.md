@@ -1,4 +1,33 @@
-## Current work: full-corpus testing on the two lightweight fixtures (2026-11-02, on `main`)
+## Current work: fix 194 — real throw arms survive the non-returning prune (2026-11-03, on `main`)
+
+The first defect the source comparison actually convicted (see the triage note
+further down) is fixed. `_prune_nonreturning` keeps only paths that reach
+`ret`/`stop`, and a managed `throw` compiles to `call raise_helper; int3`, so
+its block ends in `abort` and the whole arm was dropped: the awaiter's
+`if (continuationAction != null) throw new InvalidOperationException(...)`
+rendered as an empty `if { }`, and `GetResult` lost
+`if (result.IsError()) throw new UnityWebRequestException(result);`.
+
+The lifter was innocent — it renders both arms correctly, with the message
+string and the exception type. The predicate that separates a real throw from
+the guard noise the pruning exists to remove is a property of the **call
+target**: exactly one metadata candidate, and its declaring type outside
+`System.*`. The `System.*` exclusion is load-bearing, not cosmetic — keeping
+`System.ThrowHelper.ThrowArgumentOutOfRange_IndexException` restructured
+`RpgInventoryManager.AddItem` (190 -> 217 lines) and dropped the event sugar,
+which the pinned body test caught immediately.
+
+The prune runs before `_analyze`, so the seed is decided from the
+instructions, not from statements (an earlier attempt keyed on
+`b.stmts`/`b.ret` was vacuous — every block is empty at that point — and was
+measured as a no-op before being replaced).
+
+Verified: the awaiter emits
+`Error.ThrowInvalidOperationExceptionCore("continuation is already registered.");`,
+`AddItem` is back to its pinned shape, game pins 5 passed, portable 1,650
+passed (4 new tests).
+
+## Previous: full-corpus testing on the two lightweight fixtures (2026-11-02, on `main`)
 
 Per the user's call, the primary corpus is now the two MIT-licensed fixtures
 built into complete player trees — **all** their images, not the game images
