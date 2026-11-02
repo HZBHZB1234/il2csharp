@@ -1,4 +1,47 @@
-## Current work: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
+## Current work: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
+
+Both came out of parse-gating the **complete survivors tree**, which had never
+been gated as a tree: the aggregate tree-sitter gate *segfaults* on it (exit
+`0xC0000005`, nothing written) although every file parses fine in isolation,
+so the gate is now run image by image (7,188 files clean) and the one image it
+crashed on (`Unity.Localization`, 260 files) was parsed in batches of 25 with
+a fresh parser. That exposed **4 unparseable files, 60 ERROR nodes and 8
+MISSING ones** — and both causes are general, not fixture-shaped.
+
+**fix 195** — IL2CPP names a state machine after its whole interface, so a
+generated identifier can carry generic arguments nested several levels deep:
+
+```csharp
+private sealed partial class <System_Collections_Generic_IEnumerable<
+    System_Collections_Generic_KeyValuePair<System_String,
+    UnityEngine.Localization...>>__>d__57
+```
+
+`MANGLED_IDENT_RX` cannot see more than one level of nesting, so the name
+reached four files verbatim. `mangle_generated_names` now **walks** the
+brackets instead of matching them: a `<` at an identifier start opens a
+candidate, it survives only while every character is a name character
+(letters, digits, `_`, `.`, backtick, `[`, `]`, `|`, `,`, space) and the
+brackets balance, and `mangle_generated_ident` still applies its two positive
+proofs. Two supporting rules: the mangler turns `,`/`[`/`]`/space into `_`
+(a mangled `Foo_A, B_` is not an identifier), and an EMPTY angle pair inside
+an identifier (`CS$<>8__locals2` → `CS_<>8__locals2` after the `$` sanitize)
+mangles from the identifier start. The standing regression still holds: a
+shift (`(section & v) << section >> 32`) is untouched, because `&`/`(` end a
+candidate immediately.
+
+**fix 196** — a `const char` whose value is a backslash or a quote emitted the
+raw character (`internal const char m_CharLiteralEscapeChar = '\';`). Both are
+`isprintable()`, so the printable path fired; they are escaped now.
+
+Result: `Unity.Localization` 4 bad files / 60 ERROR / 8 MISSING → **260 files,
+0/0/0**. The rebuilt complete unitask tree (`full_u7`) is unchanged:
+brace 0, parse 0/0/0/0 over 3,547 files, whole-tree compile 19 errors (the two
+known artifacts). Portable 1,650 passed, game pins 5 passed.
+
+## Previous: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
+
+## Previous: unitask source-vs-tree diff fully triaged (2026-11-03, on `main`)
 
 `tools/source_compare.py` now splits the unmatched population by side and
 records samples (`unmatched_samples`), which makes the whole diff classifiable
