@@ -127,6 +127,21 @@ an artifact of the whole-tree model, not a defect. Same class: `__c` /
 `__c__DisplayClassN` collisions between images whose closures happen to share a
 name.
 
+### Known minor regression to revisit (2026-11-02)
+
+Diffing the survivors tree before and after fixes 181-191 shows **exactly one
+changed file** and no compile-count change, but that file lost a loop counter's
+integer type: `int num31 = 0;` became `object obj216 = 0;`
+(`VertexShakeB.<AnimateVertexColors>d__10.MoveNext`, 879-line body). Four such
+counters flip tree-wide (object-zero declarations 75 -> 79, int-zero 108 ->
+104). The temp is integer-only (`>=`, `* 5`, `+= 1`), so `_numeric_obj_retype`
+should retype it and declines; its body is far below the 4,000-line guard, so
+the guard is not the cause. The rename happens *before* that pass, and the
+counter carries an `obj` name already -- i.e. the tracked type was gone at
+`_rename_locals` time. Most likely `_order_copies`' rewrite changes which phi
+spill owns the value. Worth a targeted look, but it is a *type quality* cost of
+4 temps, not a correctness or compilability change.
+
 ## Previous: fix 191 — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
 
 IL2CPP names an explicit implementation of a tuple-typed interface with each
