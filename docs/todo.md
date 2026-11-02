@@ -1,4 +1,44 @@
-## Current work: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
+## Current work: fix 199 — the last CS1519 family on the survivors tree (2026-11-03, on `main`)
+
+The complete survivors tree had four CS1519 errors in one file, and they came
+from one display-class field:
+
+```csharp
+public UnityEngine.InputSystem.Layouts.InputDeviceMatche3____4__this; // 0x38
+```
+
+IL2CPP spells a closure field that refers to *another* closure field
+`<>3__<>4__this` — 302 such fields here (298 `<>4__this`, 4
+`<>3__<>4__this`). fix 195's bracket walk extends BACK over the identifier's
+own characters for the "empty angle pair inside an identifier" case
+(`CS$<>8__locals2`), then deletes that many characters from the output. After
+the first `<>3__` candidate the output tail is the *mangled* text, which is
+shorter than the raw span, so the deletion took the space, the type's last
+character and two underscores with it.
+
+The walk now records `chunk_end` (the text index just past the last whole
+chunk it appended) and refuses to extend back across it, so a deletion always
+covers raw characters that are really in the output. Verified on both affected
+images:
+
+```csharp
+public UnityEngine.InputSystem.Layouts.InputDeviceMatcher __3____4__this; // 0x38
+public UnityEngine.InputForUI.KeyEvent.ButtonsState __3____4__this; // 0x44
+```
+
+The standing regressions hold: a shift (`(a & b) << c >> 32`) is untouched, a
+deep-nested generic name is mangled whole, and the `CS_<>9__0_0` closure case
+still mangles. Portable 1,656 passed (one new test), game pins 5 passed.
+
+A side effect worth recording: while patching this I discovered the earlier
+fix-195 splice had left **two copies** of `mangle_generated_names` in
+`il2cpp/text.py` (Python used the stale last one, which is why the fix
+appeared not to apply on the first three attempts). The file was restored from
+HEAD and patched once, precisely; `text.py` now has exactly one definition.
+
+## Previous: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
+
+## Previous: the complete survivors tree measured — 4 compile errors over 4,413 sources (2026-11-03, on `main`)
 
 The full 75-image rebuild with fixes 195/196/197 (`out/survivors-roguelike-kit/
 full_s3`, 7,523 type files / 80,091 bodies) is the first *complete* survivors

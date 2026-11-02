@@ -3,7 +3,7 @@
   "source_files": 4413,
   "merged_stubs": 826,
   "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
-  "inventory_sha256": "266595e437afc344ec727727879dc77eb496167a87a5e59ef71e23e05b88e828",
+  "inventory_sha256": "f37dc78b7fb5dcab132f473678d4e3be9e1532c7cf3dffbc5b0c5c381878af99",
   "log": "validation_reports\\survivors-roguelike-kit\\full_s3.whole.compile.log.gz",
   "references": null,
   "reference_closure": [
@@ -11,16 +11,94 @@
   ],
   "closure_refs": 6,
   "exit_code": 1,
-  "files_with_errors": 4,
-  "errors": 4,
+  "files_with_errors": 59,
+  "errors": 118,
   "errors_by_code": {
-    "CS1519": 4
+    "CS0234": 61,
+    "CS0117": 16,
+    "CS8701": 14,
+    "CS0111": 7,
+    "CS0535": 6,
+    "CS0507": 4,
+    "CS0052": 2,
+    "CS0460": 2,
+    "CS8345": 1,
+    "CS0644": 1,
+    "CS0100": 1,
+    "CS0053": 1,
+    "CS0051": 1,
+    "CS0115": 1
   },
   "first_error_by_code": {
-    "CS1519": {
-      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.InputSystem\\UnityEngine\\InputSystem\\Layouts\\InputDeviceMatcher.cs",
-      "line": 963,
-      "message": "\u6210\u5458\u58f0\u660e\u4e2d\u7684\u6807\u8bb0\u201c;\u201d\u65e0\u6548\r"
+    "CS8701": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\__Generated\\IActivationFactory.cs",
+      "line": 7,
+      "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002\r"
+    },
+    "CS0111": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.Burst.Unsafe\\System\\Runtime\\CompilerServices\\IsReadOnlyAttribute.cs",
+      "line": 11,
+      "message": "\u7c7b\u578b\u201cIsReadOnlyAttribute\u201d\u5df2\u5b9a\u4e49\u4e86\u4e00\u4e2a\u540d\u4e3a\u201cIsReadOnlyAttribute\u201d\u7684\u5177\u6709\u76f8\u540c\u53c2\u6570\u7c7b\u578b\u7684\u6210\u5458\r"
+    },
+    "CS0234": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Assembly-CSharp\\RGame\\RoguelikeKit\\BaseBulletShootState.cs",
+      "line": 112,
+      "message": "\u547d\u540d\u7a7a\u95f4\u201cRGame.RoguelikeKit.RGame.RoguelikeKit\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cBaseBulletShootState\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)\r"
+    },
+    "CS8345": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\System.Numerics\\System\\Text\\ValueStringBuilder.cs",
+      "line": 14,
+      "message": "\u5b57\u6bb5\u6216\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u4e0d\u80fd\u662f\u7c7b\u578b\u201cSpan<char>\u201d\uff0c\u9664\u975e\u5b83\u662f ref \u7ed3\u6784\u7684\u5b9e\u4f8b\u6210\u5458\u3002\r"
+    },
+    "CS0644": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+      "line": 8,
+      "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f\r"
+    },
+    "CS0100": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.2D.Animation.Runtime\\UnityEngine\\U2D\\Animation\\SpriteLibCategoryOverride.cs",
+      "line": 145,
+      "message": "\u53c2\u6570\u540d\u201c_\u201d\u91cd\u590d\r"
+    },
+    "CS0535": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Newtonsoft.Json\\Newtonsoft\\Json\\Linq\\JObject.cs",
+      "line": 23,
+      "message": "\u201cJObject\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, JToken>.TryGetValue(string, out JToken)\u201d\r"
+    },
+    "CS0052": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Assembly-CSharp\\RGame\\RoguelikeKit\\SaveGame.cs",
+      "line": 18,
+      "message": "\u53ef\u8bbf\u95ee\u6027\u4e0d\u4e00\u81f4: \u5b57\u6bb5\u7c7b\u578b\u201cLocale\u201d\u7684\u53ef\u8bbf\u95ee\u6027\u4f4e\u4e8e\u5b57\u6bb5\u201cSaveGame.LanguageLocale\u201d\r"
+    },
+    "CS0053": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Assembly-CSharp\\RGame\\RoguelikeKit\\SettingsSO.cs",
+      "line": 60,
+      "message": "\u53ef\u8bbf\u95ee\u6027\u4e0d\u4e00\u81f4: \u5c5e\u6027\u7c7b\u578b\u201cLocale\u201d\u7684\u53ef\u8bbf\u95ee\u6027\u4f4e\u4e8e\u5c5e\u6027\u201cSettingsSO.LanguageLocale\u201d\r"
+    },
+    "CS0051": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Assembly-CSharp\\RGame\\RoguelikeKit\\SettingsSO.cs",
+      "line": 69,
+      "message": "\u53ef\u8bbf\u95ee\u6027\u4e0d\u4e00\u81f4: \u53c2\u6570\u7c7b\u578b\u201cLocale\u201d\u7684\u53ef\u8bbf\u95ee\u6027\u4f4e\u4e8e\u65b9\u6cd5\u201cSettingsSO.SaveSettings(float, float, float, int, bool, Locale, bool)\u201d\r"
+    },
+    "CS0115": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Newtonsoft.Json\\Newtonsoft\\Json\\Serialization\\DefaultSerializationBinder.cs",
+      "line": 196,
+      "message": "\u201cDefaultSerializationBinder.BindToName(Type, ref string, ref string)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199\r"
+    },
+    "CS0117": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\UnityEngine.Physics2DModule\\UnityEngine\\Physics2D.cs",
+      "line": 213,
+      "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49\r"
+    },
+    "CS0460": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.Localization\\UnityEngine\\Localization\\LocalizedAsset.cs",
+      "line": 63,
+      "message": "\u91cd\u5199\u548c\u663e\u5f0f\u63a5\u53e3\u5b9e\u73b0\u65b9\u6cd5\u7684\u7ea6\u675f\u662f\u4ece\u57fa\u65b9\u6cd5\u7ee7\u627f\u7684\uff0c\u56e0\u6b64\u4e0d\u80fd\u76f4\u63a5\u6307\u5b9a\u8fd9\u4e9b\u7ea6\u675f\uff0c\u9664\u975e\u6307\u5b9a \"class\" \u6216 \"struct\" \u7ea6\u675f\u3002\r"
+    },
+    "CS0507": {
+      "file": "out\\survivors-roguelike-kit\\full_s3\\Unity.Localization\\UnityEngine\\Localization\\LocalizedAsset.cs",
+      "line": 123,
+      "message": "\u201cLocalizedAsset<TObject>.Update(ref BindingContext)\u201d: \u5f53\u91cd\u5199\u201cprotected internal\u201d\u7ee7\u627f\u6210\u5458\u201cCustomBinding.Update(ref BindingContext)\u201d\u65f6\uff0c\u65e0\u6cd5\u66f4\u6539\u8bbf\u95ee\u4fee\u9970\u7b26\r"
     }
   },
   "scope": "Single diagnostic assembly; original project wiring is not tested"
