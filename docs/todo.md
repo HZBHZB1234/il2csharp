@@ -35,8 +35,6 @@ families).
 
 ## Previous: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
 
-## Previous: the `(float2)` literal family — 830 sites of undeclared type (2026-11-03, on `main`)
-
 The lifter spells a two-component float value `(float2)(a, b)` (and
 `float3`/`float4`/`doubleN`), but **no such type is ever emitted**, so every
 one of those sites is CS0246. Verified by compiling the shape in isolation
