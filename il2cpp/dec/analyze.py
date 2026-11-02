@@ -1131,14 +1131,14 @@ class _AnalyzeMixin:
         calls = [i for i in (b.insns or ()) if i.mnemonic == _M.CALL]
         if not calls:
             return False
-        if len(calls) >= 2:
-            # A constructed exception is `new T(args)` (a ctor call) followed
-            # by the runtime raiser call and int3, so the arm CONSTRUCTS its
-            # exception: source-level `throw`, not a runtime null guard (which
-            # is a single raiser call with a klass constant --
-            # UnityWebRequestAsyncOperationAwaiter.GetResult's real arms are
-            # 60 bytes here against a 6-byte guard).
-            return True
+        pads = getattr(self, '_pad_bids', None) or ()
+        if b.bid in pads or any(p in pads for p in (b.preds or ())):
+            # An SEH pad block is a finally/fault body, and an arm reached
+            # FROM one renders inside it: a preserved throw there is not legal
+            # C# and the pad's own condition leaks out as a bare comparison
+            # statement (mscorlib ManifestBasedResourceGroveler). Pads keep
+            # the old prune; ordinary arms are unaffected.
+            return False
         il = getattr(self, 'il', None) or getattr(
             getattr(self, 'L', None), 'il', None)
         cands = (getattr(il, 'addr_candidates', None) or {}).get(
@@ -1153,7 +1153,7 @@ class _AnalyzeMixin:
         # The BCL's own guard helpers (System.ThrowHelper.ThrowArgumentOut
         # OfRange_IndexException) are the noise the pruning exists to remove:
         # keeping one folded RpgInventoryManager.AddItem's tail and lost its
-        # event sugar (	his.__field_OnItemAdded). Only a throw written in
+        # event sugar (this.__field_OnItemAdded). Only a throw written in
         # the game's/library's own namespace is real source-level control flow.
         ns = getattr(td, 'namespace', '') or ''
         return bool(ns) and not ns.startswith('System')

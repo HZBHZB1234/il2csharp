@@ -1,0 +1,20 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\full_u6",
+  "files": 3547,
+  "bad_files": 1,
+  "errors": 0,
+  "missing": 1,
+  "recovery_nodes": 0,
+  "details": {
+    "mscorlib\\System\\Resources\\ManifestBasedResourceGroveler.cs": [
+      {
+        "kind": "MISSING",
+        "row": 53,
+        "column": 61,
+        "text": ""
+      }
+    ]
+  },
+  "elapsed_seconds": 46.141
+}
