@@ -48,6 +48,35 @@ overload at that site; the ternary builder to suspect is the one that composes
 arms from multi-statement text (not `_ternary_pass`, which requires the exact
 one-assignment-per-arm layout).
 
+### fix 182 — a two-statement ternary arm no longer splices (2026-11-02, on `main`)
+
+`_ternary_pass` folds `if (c) { x = a; } else { x = b; }` into `x = c ? a : b;`.
+An arm line can carry more than its own statement — a joined inline return
+puts `X = v; return;` on one line — and folding that spliced the second
+statement into the ternary:
+
+```csharp
+((byte*)dstOffset + 0x20 + dst)[0] = num4 == dst ? srcOffset + 0x20 + num4; return : srcOffset + 0x20 + num4;
+```
+
+That was the one unparseable line on the game tree's mscorlib
+(`System/Buffer.cs`, `Buffer.BlockCopy`, VA 0x185C200D0). An arm whose RHS runs
+past its own `;` now declines and both arms stay as `if`/`else` (valid C#).
+Verified: the method re-lifts with the `if`/`else` intact and the re-emitted
+`Buffer.cs` leaves the image's bad-file list. Portable suite **1,620 passed**
+(3 new tests).
+
+### Still open in mscorlib (next fix candidates)
+
+The same census found two more syntax defects, both real:
+
+* `System/Collections/Hashtable.cs` — 70 ERROR + 29 MISSING nodes; the first
+  node's text is an `OnDeserialization(object sender)` signature, i.e. a
+  cascade whose root is earlier in the file (both declarations in the emitted
+  file do have bodies, so the break is inside one of their bodies).
+* `System/Marshal.cs` — 2 errors whose node text is `?` (an unexpanded select
+  or nullable mark).
+
 ### Harness limitation (documented, mitigated)
 
 `tools/gate.py parse` parses a corpus in one process and **segfaults at

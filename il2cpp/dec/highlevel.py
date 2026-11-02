@@ -379,6 +379,17 @@ class _HighLevelMixin:
                     and lines[i + 7].strip() == '}':
                 m1 = self._ASGN_RX.match(lines[i + 2].strip())
                 m2 = self._ASGN_RX.match(lines[i + 6].strip())
+                # An arm that carries more than one statement (`X = v;
+                # return;`, a joined inline return) is NOT an expression:
+                # folding it into `c ? X = v; return : ...` splices the
+                # second statement into the ternary and produces the one
+                # unparseable line on the game tree's mscorlib
+                # (System/Buffer.cs `Buffer.BlockCopy`). Decline any arm
+                # whose RHS runs past its own `;`.
+                if m1 is not None and ';' in m1.group(2):
+                    m1 = None
+                if m2 is not None and ';' in m2.group(2):
+                    m2 = None
                 # fix 97: either arm may carry its declaration (`bool x`
                 # vs `x`) now that first-use bare assignments declare.
                 # Compare the temp, keep the declaration. `var` keeps
