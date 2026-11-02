@@ -96,7 +96,44 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
-## Current work: fix 190 — explicit interface properties are properties (2026-11-02, on `main`)
+## Current work: fix 191 — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
+
+IL2CPP names an explicit implementation of a tuple-typed interface with each
+element's TYPE and NAME concatenated, so the `_GetConsumedStock_d__77` iterator
+declared
+
+```csharp
+System.ValueTuple<int, int, int>
+System.Collections.Generic.IEnumerator<(System.Int32shopId, System.Int32itemId, System.Int32remaining)>.Current
+```
+
+which is not C#: `Int32shopId` is a type and an element name in one token, and
+the element names disagree with the interface's own spelling anyway. The
+qualifier is repaired by taking each element's longest known type-name prefix
+and dropping the name:
+
+```csharp
+... System.Collections.Generic.IEnumerator<(int, int, int)>.Current
+```
+
+The same tuple type, and no name agreement is needed. Two supporting pieces:
+`_iface_qualifier` counts parenthesis depth when it computes a qualifier's
+top-level argument count (a tuple argument is ONE argument), and when the
+type's own interface list does resolve the qualifier, that spelling —
+rendered by `type_name` — is preferred over the metadata string. The repair
+runs in both the method and the property path (this case is a property).
+
+Portable suite 1,639 passed; the pinned game bodies are unchanged.
+
+### Note on this round's build
+
+The full rebuild started in round 13 was killed by an interrupted tool call and
+left six orphaned pool workers holding a partial `out/limbus/full1`. They are
+gone and the build is restarted **without `--only`**, so it produces the
+complete 162-image tree: 2,970 type-tasks, 299,371 of 319,100 methods with
+native code. Expect ~3-4 h.
+
+## Previous: fix 190 — explicit interface properties are properties (2026-11-02, on `main`)
 
 IL stores a property accessor as a plain method, and an explicit interface
 implementation keeps its fully dotted metadata name, so the render was
