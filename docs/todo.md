@@ -133,7 +133,12 @@ syntax error.
   whole-tree compile (closure-derived exclusions, so packages the editor does
   not ship stay sources).
 
-Portable suite 1,639 passed.
+Portable suite 1,639 passed. Full suite: 1,683 passed / 1 xpassed with two
+disk-state failures -- the game tree's `Unity.Burst.Unsafe` directory was
+**empty** (an artifact of the first, killed 161-image build), so the decl and
+compile gate tests looked for types that were never emitted. Building that
+image (5 files) closes both; that class of failure always means "look at the
+tree, not the source".
 
 **Next**: CS0122 99 (accessibility across images — a semantics decision, not a
 text fix), CS0246 69 (the long tail of still-unbuilt images), CS0051 33
