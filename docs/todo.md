@@ -104,6 +104,8 @@ of 260 refs; the 21 images the closure provides are excluded):
 | | value |
 |---|---|
 | syntax errors | **0** |
+| tree-sitter parse (whole tree, one process) | **34,590 files, 0 bad / 0 ERROR / 0 MISSING / 0 recovery** |
+| brace audit | **34,590 files, 0 unbalanced** |
 | semantic errors | **1,629** in 367 files |
 | families | CS0246 821, CS0102 219 (cross-image duplicate helper types — a harness artifact), CS0234 187, CS0111 122, CS0122 96, CS0051 33, CS0683 22, CS0538 17, CS0104 15, CS0535 15 |
 
