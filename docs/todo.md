@@ -96,6 +96,52 @@ rewrite rule). Every other type in the image finishes in seconds.
 Portable suite **1,637 passed** (15 new tests), full game suite green after the
 ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
 
+## Current work: the whole game tree compiles with ZERO syntax errors (2026-11-02, on `main`)
+
+`tools/compile_corpus.py` over the whole tree (29,366 sources; editor closure
+of 260 refs; the 21 images the closure provides are excluded):
+
+| | value |
+|---|---|
+| syntax errors | **0** |
+| semantic errors | **1,629** in 367 files |
+| families | CS0246 821, CS0102 219 (cross-image duplicate helper types — a harness artifact), CS0234 187, CS0111 122, CS0122 96, CS0051 33, CS0683 22, CS0538 17, CS0104 15, CS0535 15 |
+
+Getting there closed the last two syntax defects and, at last, emitted
+`TMPro.TextMeshProUGUI` (2,435 references were failing on the missing type):
+
+* **fix 186** — `mangle_generated_ident` declined every match without a double
+  underscore, so `<PrivateImplementationDetails>` kept raw angle brackets
+  (CS1001) in every image's `PrivateImplementationDetails.cs`. A generated name
+  also never contains whitespace, which every false positive (a shift or a
+  comparison inside brackets) does — that is the second positive proof now.
+* **fix 187** — a parameter named `<p0>` (Roslyn's spelling) reached the
+  signature as `void f(TMP_TextInfo <p0>)`. `safe_ident` must keep angle
+  brackets for generic TYPE spellings, so a new `names.ident_name` strips them
+  for identifiers and the emitter uses it for every parameter.
+* **performance** — `TextMeshProUGUI.GenerateTextMesh` (116k statements) lifts in
+  **147 s** now: `_rewrite_unknowns` returns early without a `?`, the
+  hetero-assignment census uses a generic identifier + name-set check instead
+  of an alternation over every renamed token, `drop_dead_cardmark_fragments`
+  counts occurrences once behind a substring pre-filter, and `lift_method`
+  skips the remaining cleanup passes above 20,000 statements (they are folds,
+  not correctness requirements).
+
+**Measurement lesson, recorded because it cost a wrong headline**: an earlier
+run of this same compile reported "1 error". Roslyn skips declaration and
+binding diagnostics entirely when the compilation has ANY syntax error, so two
+unparseable files masked the whole 1,629-error backlog. Read the syntax count
+first; a small total next to a syntax error means the compiler never checked
+the rest.
+
+**Next**: CS0246 821 is dominated by types from images this tree never emitted
+(`Unity.Addressables`/`ResourceManagement`, `Unity.InputSystem`, `Uniject`,
+`Unity.Localization`, ...) — build those images and the count should fall the
+way TMP's did. CS0102/CS0111 341 are duplicate helper types across images, an
+artifact of compiling 60 assemblies as one unit (the per-image gates do not see
+them). CS0122 96 / CS0051 33 / CS0538 17 are real accessibility and explicit-
+interface defects.
+
 ## Previous: fix 181 — the generated-name mangler no longer eats shift expressions (2026-11-02, on `main`)
 
 The file boundary replaces the angle brackets of compiler-generated
