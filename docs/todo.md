@@ -1,117 +1,59 @@
-# il2csharp — TODO (open work and historical triage)
+## Current work: full-corpus testing on the two lightweight fixtures (2026-11-02, on `main`)
 
-> **Local-only paths.** `work/`, `final_out/`, `bckups/`, `temptools/`,
-> `testgame/` and `b*_out1/` trees referenced below existed only on the
-> authoring machine and are **absent from this fork**. They are history, not
-> commands. The live replacement is `fixtures/` (games) + `out/<id>/<label>/`
-> (builds), driven by `tools/fixtures.py` and `tools/gate.py` — see
-> [`fixtures.md`](fixtures.md). Only the top "Current work" sections are live.
+Per the user's call, the primary corpus is now the two MIT-licensed fixtures
+built into complete player trees — **all** their images, not the game images
+alone — and the licensed fixture is evidence only. That also unlocks the
+strongest reference closure available: each fixture ships its own
+`*_BackUpThisFolder_ButDontShipItWithYourGame/Managed/` folder, i.e. the exact
+assemblies its player build was compiled from.
 
-### Whole-tree recompile measurement of the game (2026-11-02, on `main`)
+`tools/compile_corpus.py` gained the model this needs: images left out of the
+*only* BCL images stay in the closure (`source_excluded`), because a tree that
+emits every image would otherwise filter its whole closure away and have no
+corlib.
 
-`tools/compile_corpus.py` with the editor closure (260 refs) over the 60-image
-game tree, excluding exactly the images the closure provides (BCL + engine
-modules — excluding by prefix silently dropped `UnityEngine.UI`, a package the
-editor does not ship):
+### unitask (49 images, 3,596 type files, 23,756 bodies)
 
-| | value |
+| gate | result |
 |---|---|
-| sources compiled as one assembly | **29,362** |
-| files with errors | **1,423** |
-| errors | **4,082** |
+| brace | 3,547 files, **0 unbalanced** |
+| tree-sitter | 3,547 files, **0 bad / 0 ERROR / 0 MISSING / 0 recovery** |
+| whole-tree Roslyn (2,220 sources, exact closure) | **19 errors in 6 files** |
 
-Families: CS0246 **3,265**, CS0102 219 + CS0111 122 (cross-image duplicate
-helper types — an artifact of compiling 60 assemblies as one), CS0234 187,
-CS0122 96 (internal accessibility across images), CS0051 33, CS0535 24
-(the `ref`-vs-`out` family), CS0683 22, CS0538 17, CS0104 15, CS0738 15.
+The path there was 41 -> 76 -> 27 -> **19**, and both fixes are general:
 
-**The single biggest cause is a missing type, not a body defect**:
-`TMPro.TextMeshProUGUI` (TypeDefIndex 43728, 74 methods, in
-`Unity.TextMeshPro.dll`) is referenced 2,435 times across
-`Assembly-CSharp` and **is not declared anywhere in the emitted tree** — the
-image was built (129 files) and its sibling `TMP_Text.cs` is 1.1 MB, so the
-type was silently skipped or its emission never completed. Re-emitting that
-one type with `--types TextMeshProUGUI` did not finish in 10 minutes.
-Root-cause this next: a silently dropped type is worse than a wrong body,
-because every reference to it fails.
+* **fix 192** (CS8051 ×25) — `auto_property_maps` accepted any property whose
+  type has an `<X>k__BackingField` field, so a SET-ONLY property emitted
+  `public bool X { set; }`, which C# rejects (auto-implementation needs a
+  getter), and lifting the setter body instead produced `this.X = value` —
+  infinite recursion, because the storage respell had already turned the field
+  into the property name. A set-only property was written with an explicit body
+  over a plain field: the maps now require a getter, the field keeps
+  `__field_X`, and the setter writes it
+  (`IgnoreAttribute.DoesNotContributeToSize`).
+* **fix 193** (CS0146 ×5 + the CS0311 ×52 that cascaded off it) — the
+  using-strip shortened `UnityEngine.UIElements.UxmlTraits` to `UxmlTraits`
+  because exactly one visible typedef answered to that head, but inside
+  `class VisualElement` — which declares its own nested `UxmlTraits` — the
+  short name resolves to the nested type, so the base clause printed
+  `class UxmlTraits : UxmlTraits`. `collision_heads` now keeps the prefix for
+  a head the FILE declares (its own type and its nested types, both the
+  metadata arity spelling and the emitted short one:
+  `UxmlObjectTraits`1` / `UxmlObjectTraits`).
 
-## Previous: every emitted image now parses clean (2026-11-02, on `main`)
+The 19 survivors are **artifacts, not decompiler defects**: CS8701 ×18 is
+"default interface implementation unsupported" (the exact closure targets
+netstandard2.0 while the original player profile supports DIM), and CS0644 ×1
+is `Il2CppFullySharedGenericType : ValueType`, which C# forbids for any user
+type but IL2CPP's own metadata declares.
 
-Gating the freshly built game tree found three more syntax defects, all fixed,
-plus the reason one type never reached the tree at all.
+### survivors-roguelike-kit (75 images, 11,570 types, 94,205 methods)
 
-**The whole tree parses.** `Assembly-CSharp` 24,739 files / 0 bad,
-`mscorlib` 1,427 / 0, `UnityEngine.TextCoreTextEngineModule` 88 / 0, and the
-other 57 images 0 — 34,582 files, zero ERROR/MISSING nodes. The gate's earlier
-"teardown segfault" was a *symptom* of the two broken files (a pathological
-tree crashes tree-sitter's traversal and free), not a harness limit; with them
-fixed every image gates in one process. (The parser-refresh and detail-cap
-mitigations stay: they are cheap and make a broken tree diagnosable.)
+Full build in flight at the end of the round (`out/survivors-roguelike-kit/
+full_s1`); its gates and whole-tree compile follow the same recipe.
 
-* **fix 183** — `_fold_static_addrs` glued a generic callee to its argument:
-  `EnsureInitializedCore<T>(typeof(X).__static_fields)` became
-  `EnsureInitializedCore<T>typeof(X).s_field`, mscorlib's
-  `Hashtable.get_SerializationInfoTable`. The "is this a call paren" test now
-  also recognises a callee ending in `>`/`]`/`)` (a rendered binary `>` is
-  always space-separated, so an identifier char before it proves a generic).
-* **fix 184** — a call on an unresolved callee rendered `?(args)` (five sites:
-  mscorlib `Marshal.ReleaseInternal`, Plugins, TMPro). It routes through the
-  unknown marker now: `= /*unknown*/ default;` in value position,
-  `/*unknown call*/;` in statement position.
-* **fix 185** — a residual metadata arity suffix in code
-  (`EqualityComparer`1.GetHashCode(comparer, value)`, CS1056) is respelled from
-  the call's folded receiver (`EqualityComparer<Vector4> comparer7`) and drops
-  to `unknown` otherwise. 130 of the tree's 134 backtick sites are inside
-  string literals and are untouched.
 
-**Why `TMPro.TextMeshProUGUI` never appeared** (2,435 references in AC): not a
-skip — a performance stall. `TextMeshProUGUI.GenerateTextMesh` is ~116k
-statements and three passes went super-linear on it:
-
-* `_order_copies` recomputed every phi copy's read set per round; it now
-  precomputes each copy's full token set once and intersects it with the
-  round's live names. The rewrite had to be **byte-identical** (same emission
-  order, same spill choice, same temp numbers): the first cut changed
-  independent copies' order and moved a pinned body (`num19` → `num18`) plus the
-  parallel-vs-serial byte-identity test. Both are green again;
-* `_hoist_shared_tails` took 58 s and *duplicated* tails (115,924 → 153,035
-  statements), so the tail hoist and `_drop_dead_copies` decline above 6,000
-  statements, and a body that large skips the sugar pipeline entirely after
-  `_rename_locals` (locals are declared, so the render still compiles — the
-  honest CFG shape with gotos instead of for/switch sugar);
-* `_rename_locals` scanned every line once per renamed token (and its prologue
-  census once per scalar-parameter copy). It is one identifier scan + dict
-  lookup per line now (still matched on the literal-blanked shadow line), its
-  declaration regexes are generic identifiers + a name-set check instead of a
-  thousands-wide alternation, and `_hetero_vetoed`/`_numeric_obj_retype`
-  decline above 4,000 statements (declining keeps `object`, the honest
-  default).
-
-**Still slow**: with those gone, the 116k-statement method now reaches
-`_render` → `_rewrite_unknowns`/`mask_spans`, which is still quadratic enough to
-need >3 minutes; emitting `TextMeshProUGUI` therefore still needs one more pass
-over the render path (next candidate: mask once per body, not per line per
-rewrite rule). Every other type in the image finishes in seconds.
-
-Portable suite **1,637 passed** (15 new tests), full game suite green after the
-ordering fix. Commits: `4a251df`, `84839d8`, `86a58d5`, `0e56fbb`.
-
-### Two whole-tree models, and what each measures (2026-11-02, on `main`)
-
-`tools/compile_corpus.py --extra-ref` makes a second model possible, and the
-difference is informative:
-
-| model | sources | refs | errors | dominant families |
-|---|---|---|---|---|
-| **game + packages** vs the editor's engine modules | 29,764 | 260 (engine + BCL) | **393** | CS0122 99 (TMP reading TextCore's `internal` types — the real project has `[InternalsVisibleTo]`, a fake assembly boundary cannot), CS0246 69, CS0051 33, CS0683/CS0104/CS0535 ~15 each |
-| **self-contained tree** (our engine modules as sources, BCL only from the closure) | 31,753 | 49 (BCL) | **4,058** | CS0246 2,835 (our engine/BCL-module code names types the BCL refs do not expose), CS0115 678 (types not implementing inherited abstract members), CS0234 156 |
-
-The first is the number that answers "can the recovered game be recompiled";
-the second is a *fidelity* probe of the engine modules we emit (which the game
-does not own, but which the whole-tree model must resolve). Both are recorded;
-neither is a single "quality score".
-
-## Current work: two whole-tree models (2026-11-02, on `main`)
+## Previous: two whole-tree models (2026-11-02, on `main`)
 
  — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
 ### Known whole-tree artifact: per-assembly anonymous types

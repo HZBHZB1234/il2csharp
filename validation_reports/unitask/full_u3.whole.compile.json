@@ -1,0 +1,45 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\full_u3",
+  "source_files": 2220,
+  "merged_stubs": 425,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "6ea2c26768ce4526bef25dcdd853cd9c6e2de2e5f175acdf3458173e5a62023b",
+  "log": "validation_reports\\unitask\\full_u3.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/unitask/build: 4 (excluded 45 tree images)"
+  ],
+  "closure_refs": 4,
+  "exit_code": 1,
+  "files_with_errors": 10,
+  "errors": 27,
+  "errors_by_code": {
+    "CS8701": 18,
+    "CS0146": 4,
+    "CS0311": 4,
+    "CS0644": 1
+  },
+  "first_error_by_code": {
+    "CS8701": {
+      "file": "out\\unitask\\full_u3\\__Generated\\IActivationFactory.cs",
+      "line": 7,
+      "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002\r"
+    },
+    "CS0644": {
+      "file": "out\\unitask\\full_u3\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+      "line": 8,
+      "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f\r"
+    },
+    "CS0146": {
+      "file": "out\\unitask\\full_u3\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\SortColumnDescription.cs",
+      "line": 202,
+      "message": "\u6d89\u53ca\u201cSortColumnDescription.UxmlObjectTraits<T>\u201d\u548c\u201cSortColumnDescription.UxmlObjectTraits<T>\u201d\u7684\u5faa\u73af\u57fa\u7c7b\u578b\u4f9d\u8d56\u9879\r"
+    },
+    "CS0311": {
+      "file": "out\\unitask\\full_u3\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\SortColumnDescription.cs",
+      "line": 194,
+      "message": "\u7c7b\u578b\u201cUnityEngine.UIElements.SortColumnDescription.UxmlObjectTraits<T>\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cUxmlObjectFactory<TCreatedType, TTraits>\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cTTraits\u201d\u3002\u6ca1\u6709\u4ece\u201cUnityEngine.UIElements.SortColumnDescription.UxmlObjectTrai"
+    }
+  },
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}
