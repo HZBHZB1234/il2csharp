@@ -35,8 +35,6 @@ rectTransform1.anchorMin = num1;
 
 ## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
 
-## Previous: fixes 195/196 — deep-nested generated names and escaped char literals (2026-11-03, on `main`)
-
 Both came out of parse-gating the **complete survivors tree**, which had never
 been gated as a tree: the aggregate tree-sitter gate *segfaults* on it (exit
 `0xC0000005`, nothing written) although every file parses fine in isolation,
