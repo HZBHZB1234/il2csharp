@@ -8,7 +8,8 @@ from il2cpp.metadata import ImageDef, MethodDef, TypeDef
 from il2cpp.names import repr_f32, repr_f64, safe_ident, sanitize, sanitize_qualifier
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.runtime.meta import meta_lit_repr
-from il2cpp.text import MANGLED_IDENT_RX, reindent, spell_unresolved_values
+from il2cpp.text import (MANGLED_IDENT_RX, mangle_generated_ident, reindent,
+                       spell_unresolved_values)
 from il2cpp import rawaddr
 
 class Emitter:
@@ -1800,10 +1801,12 @@ class Emitter:
         # generated identifiers carry IL-only characters (`<>c`,
         # `<Foo>d__13`, `<>9__0_0`) that no C# grammar accepts; mangle
         # them deterministically at the file boundary so declarations
-        # and every reference move together
+        # and every reference move together. The replacement declines a
+        # match that is not a generated name: `<< section >>` (a shift)
+        # matched the nested angle-bracket heuristic and reached the file
+        # as `__ section __`, a parse error.
         content = MANGLED_IDENT_RX.sub(
-            lambda m: m.group(0).replace('<', '_').replace('>', '_')
-            .replace('.', '_').replace('|', '_'), content)
+            lambda m: mangle_generated_ident(m.group(0)), content)
         # an unresolved native value compiles as a marker plus a
         # target-typed default; see text.spell_unresolved_values
         content = spell_unresolved_values(content)

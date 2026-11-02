@@ -131,6 +131,26 @@ MANGLED_IDENT_RX = re.compile(
     r'|(?<![\w`])<[\w.]*(?:<[\w.,\s]*>[\w.]*)*>[\w`]*(?:\|[\w`]+)*')
 
 
+def mangle_generated_ident(text):
+    """Replace the angle brackets of compiler-generated identifiers.
+
+    Roslyn spells a state machine `<Method>d__3`, a closure `<>c`, a local
+    function `<M>g__F|0_0` -- all of which no C# grammar accepts. The
+    heuristic that finds them must not fire on an ordinary shift
+    expression: `(section & value) << section >> 32` matched the nested
+    angle-bracket alternative (`< section >`) and reached the file as
+    `__ section __`, the only parse error on the game tree. Every generated
+    name carries a double underscore (`d__`, `c__`, `9__`, `g__`, `b__`,
+    `f__`) or IS the bare `<>`-prefixed closure family, so anything else
+    stays untouched.
+    """
+    t = text or ''
+    if '__' not in t and not t.startswith('<>'):
+        return t
+    return (t.replace('<', '_').replace('>', '_')
+             .replace('.', '_').replace('|', '_'))
+
+
 # An unresolved native value renders the bare text `unknown` (from
 # `_rewrite_unknowns` in dec/textpass.py). It is honest and it parses, but it
 # does not COMPILE (CS0103) -- 10,940 occurrences on the licensed game tree,
