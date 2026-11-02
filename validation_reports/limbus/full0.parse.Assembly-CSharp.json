@@ -2,19 +2,10 @@
   "kind": "tree-sitter C# syntax gate",
   "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\limbus\\full0\\Assembly-CSharp",
   "files": 24739,
-  "bad_files": 1,
-  "errors": 1,
+  "bad_files": 0,
+  "errors": 0,
   "missing": 0,
   "recovery_nodes": 0,
-  "details": {
-    "Server\\BitVector64.cs": [
-      {
-        "kind": "ERROR",
-        "row": 42,
-        "column": 92,
-        "text": "__ section __ 32"
-      }
-    ]
-  },
-  "elapsed_seconds": 98.657
+  "details": {},
+  "elapsed_seconds": 98.938
 }

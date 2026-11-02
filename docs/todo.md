@@ -48,6 +48,21 @@ overload at that site; the ternary builder to suspect is the one that composes
 arms from multi-statement text (not `_ternary_pass`, which requires the exact
 one-assignment-per-arm layout).
 
+### Current work: the game's own Assembly-CSharp now parses 100% clean (2026-11-02, on `main`)
+
+`tools/gate.py parse --tree out/limbus/full0/Assembly-CSharp`:
+**24,739 files, 0 bad files, 0 ERROR, 0 MISSING, 0 recovery nodes** (98.9 s).
+That is the licensed fixture's own code — 178,649 lifted bodies — with every
+class of syntax defect the gates can see gone: the last two were fix 181's
+mangled shift expression (45 sites in 5 files) and fix 182's statement
+spliced into a ternary arm.
+
+The rest of the tree: 58 of 60 emitted images parse clean (per-image reports
+in `validation_reports/limbus/full0.parse.*.json`); `mscorlib` and
+`UnityEngine.TextCoreTextEngineModule` still cannot be gated in one process
+(see the harness limitation below) and mscorlib's `Hashtable.cs` / `Marshal.cs`
+still carry real defects (above). Brace gate: 34,582 files, **0 unbalanced**.
+
 ### fix 182 — a two-statement ternary arm no longer splices (2026-11-02, on `main`)
 
 `_ternary_pass` folds `if (c) { x = a; } else { x = b; }` into `x = c ? a : b;`.
