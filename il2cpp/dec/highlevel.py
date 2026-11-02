@@ -1743,8 +1743,13 @@ class _HighLevelMixin:
         tok_of = {new: tok for tok, new in names.items()}
         decl = {}
         new_names = sorted(set(names.values()))
-        decl_rx = _re.compile(r'^(\s*)var (' + '|'.join(_re.escape(n) for n in new_names)
-                              + r')( = )(.*)$')
+        # Generic identifier patterns + set membership, NOT one alternation
+        # over every renamed token: an alternation of thousands of names is
+        # retried at every position of every line, which cost minutes on a
+        # 116k-statement body (TextMeshProUGUI.GenerateTextMesh).
+        # `new_name_set` restores the exact behavior of the alternation.
+        new_name_set = set(new_names)
+        decl_rx = _re.compile(r'^(\s*)var ([A-Za-z_]\w*)( = )(.*)$')
         # fix 97: a first-use bare assignment (`objN = rhs;` -- stack-slot
         # zeroing, phi copies, unbound call results) declares nothing, so
         # the method never compiles. Declare it exactly like a `var`
@@ -1752,8 +1757,7 @@ class _HighLevelMixin:
         # the same temp then keeps only its assignment. Labels, member
         # stores, comparisons and lambdas never match: the name must
         # follow the indent directly and `=` must stand alone.
-        bare_rx = _re.compile(r'^(\s*)(' + '|'.join(_re.escape(n) for n in new_names)
-                              + r') = (?!==|=|>)(.*)$')
+        bare_rx = _re.compile(r'^(\s*)([A-Za-z_]\w*) = (?!==|=|>)(.*)$')
         # fix 138: `_for_sugar` folds a counter's entry copy into the loop
         # head without a type when the counter outlives the loop (or its
         # init is not a literal): `for (num4 = 0; ...)`. When no enclosing
@@ -1763,8 +1767,7 @@ class _HighLevelMixin:
         # loop, with the same tracked-type lookup as a first-use bare
         # assignment; the later scope repair hoists it when a read escapes
         # that block. Nothing is initialised -- the head still assigns.
-        forhead_rx = _re.compile(r'^(\s*)for \((' + '|'.join(_re.escape(n) for n in new_names)
-                                 + r') = (?!=)([^;]*);')
+        forhead_rx = _re.compile(r'^(\s*)for \(([A-Za-z_]\w*) = (?!=)([^;]*);')
         gp_blocked = getattr(self.L, '_gp_blocked', ())
         # `Foo.Method()` (bare, no `<T>`) is what a shared-generic call for a
         # reference-type argument compiles down to (`GetComponent<T>()` and
@@ -1888,7 +1891,15 @@ class _HighLevelMixin:
             Matches pre-rename spellings in the masked shadow: the
             rename is structure-preserving token substitution, while
             `shadow` is the only literal-masked view available here.
+
+            Body-size guard: this scans every shadow line once per declared
+            temp, which is O(temps * lines). A 116k-statement body
+            (TextMeshProUGUI.GenerateTextMesh) spent tens of minutes here, so
+            above 4,000 lines the veto declines -- that keeps `object`, the
+            honest default, and a finite lift.
             """
+            if len(shadow) > 4000:
+                return True
             try:
                 _pre = tok_of.get(_nm_post, _nm_post)
                 _te = _re.escape(_pre)
@@ -2058,6 +2069,8 @@ class _HighLevelMixin:
                 for k2 in [k2 for k2, dd in decl.items() if dd[1] > depth]:
                     del decl[k2]
             m = decl_rx.match(st)
+            if m is not None and m.group(2) not in new_name_set:
+                m = None
             if m:
                 nm = m.group(2)
                 rhs = m.group(4)
@@ -2102,7 +2115,10 @@ class _HighLevelMixin:
                         decl[nm] = (dt, depth)
                         out.append('%s%s %s;' % (fh.group(1), dt, nm))
                 b = bare_rx.match(st)
-                if b is not None and b.group(2) not in decl:
+                if b is not None and (b.group(2) not in new_name_set
+                                      or b.group(2) in decl):
+                    b = None
+                if b is not None:
                     nm = b.group(2)
                     rhs = b.group(3)
                     dt = self._decl_type_of(tok_of.get(nm, nm), rhs)
@@ -2214,6 +2230,10 @@ class _HighLevelMixin:
         return kind if saw else None
 
     def _numeric_obj_retype(self, lines):
+        # O(temps * occurrences) per-token work: decline above 4,000 lines
+        # (TextMeshProUGUI.GenerateTextMesh) and keep today's object.
+        if len(lines) > 4000:
+            return lines
         masked = []
         in_bc = False
         for st in lines:

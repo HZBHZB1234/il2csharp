@@ -112,6 +112,13 @@ class _StructureMixin:
         raw = self._forhead_call_fold(raw)
         raw = self._switch_to_if(raw)
         raw = self._rename_locals(raw, m)
+        if _huge:
+            # A pathological body (TextMeshProUGUI.GenerateTextMesh: ~116k
+            # statements) makes most sugar passes quadratic in the statement
+            # count. Locals are already declared by _rename_locals, so render
+            # the honest CFG shape and stop: no ternaries/for/switch sugaring,
+            # but a finite lift and compilable output.
+            return self._render(raw)
         raw = self._phi_decl_hoist(raw)
         raw = self._bool_sugar(raw, m)
         raw = self._flag_inline(raw)
