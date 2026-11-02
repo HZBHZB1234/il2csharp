@@ -114,6 +114,19 @@ neither is a single "quality score".
 ## Current work: two whole-tree models (2026-11-02, on `main`)
 
  — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
+### Known whole-tree artifact: per-assembly anonymous types
+
+Two assemblies each declare their own compiler-generated `<>f__AnonymousType0`
+with *different* generic parameters (`_presenceToken_j__TPar` vs
+`_product_j__TPar, _metadata_j__TPar` on the game tree)). Per-assembly output is
+correct and self-consistent; compiling 90+ assemblies as ONE unit sees two types
+with the same emitted name, which surfaces as CS0102 (duplicate) or CS0246 on
+the other file's type-parameter spellings. Unlike the byte-identical
+scaffolding this cannot be deduped -- the declarations differ -- so it counts as
+an artifact of the whole-tree model, not a defect. Same class: `__c` /
+`__c__DisplayClassN` collisions between images whose closures happen to share a
+name.
+
 ## Previous: fix 191 — IL2CPP's glued tuple spelling in explicit qualifiers (2026-11-02, on `main`)
 
 IL2CPP names an explicit implementation of a tuple-typed interface with each
