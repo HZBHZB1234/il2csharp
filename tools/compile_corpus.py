@@ -241,11 +241,19 @@ def compile_tree(tree, report, refs_dirs=(), unity_roots=(), managed_dirs=(),
                    files_with_errors=len(error_files),
                    errors=sum(errors.values()), errors_by_code=dict(errors.most_common()),
                    first_error_by_code=first,
+                   # A syntax error makes csc skip EVERY binding diagnostic
+                   # for the whole compilation, so a small total next to a
+                   # CS1xxx says nothing about the tree's binding state.
+                   binding_masked=any(c.startswith("CS1") for c in errors),
                    scope="Single diagnostic assembly; original project wiring is not tested")
     report.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: summary[k] for k in
                       ("source_files", "closure_refs", "files_with_errors",
-                       "errors", "errors_by_code")}, indent=2))
+                       "errors", "errors_by_code", "binding_masked")}, indent=2))
+    if summary["binding_masked"]:
+        print("note: a syntax error (CS1xxx) suppresses every BINDING "
+              "diagnostic for the whole compilation -- fix the syntax tier "
+              "first, this total says nothing about the binding state")
     return result.returncode
 
 
