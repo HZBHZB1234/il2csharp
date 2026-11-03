@@ -4326,6 +4326,13 @@ class _CallsMixin:
                     if pc is None:
                         pc = self._pending_calls = []
                     pc.append((result, ins.ip, asm))
+                    dp = result._defpos
+                    if te == 0x12 and dp is not None and dp[0] is not None:
+                        anchors = getattr(self, '_pending_phi_anchors', None)
+                        if anchors is None:
+                            anchors = self._pending_phi_anchors = {}
+                        epoch = getattr(self, '_stmt_insert_epochs', {}).get(id(dp[0]), 0)
+                        anchors[id(result)] = (result, dp[0], dp[1], epoch)
             return
         # unresolved-return calls cannot be emitted bare AND kept as a
         # value: the next store/read would re-render the entire call text

@@ -4,6 +4,47 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Native-definition capture of pending phi calls (2026-11-04)
+
+Accepted source slice `game_out28` (not promoted), versus out26. An unrendered
+CLASS-return pending call flowing directly into a phi is captured once at its
+native CALL definition, by **Expr object identity**, before SSA destruction.
+Phi copies then read a pure temp; text-twin dead-copy cleanup cannot erase a
+loop iteration against the exit path. Definition-slot creation epochs must
+remain unchanged. Mixed pending/complex phi cohorts, used/rendered calls,
+byrefs, generics and nested/raw/index/address argument spellings decline.
+No textual replacement or general effect/lifetime/argument proof is claimed.
+
+Survivors rows **70222 / 70238** each keep one rendered CreateBullet site
+inside the proven native natural loop (block 2), instead of once after it.
+Original synthetic Win64 callback loop versus recovered output: checked on
+and off each **1,005 cases / zero recovered mismatches**; the old output has
+**998 mismatches** per mode. This executes original synthetic code, not game
+native code and not a whole-method/game equivalence proof.
+
+Strict selected builds: **2,227 / 1,857 bodies**, zero failures/fallbacks/type-emit
+failures, source fingerprints verified, brace/parse clean. Five files change
+per fixture. All **nine complete compiler diagnostic multisets are unchanged**:
+survivors main **3,797**, firstpass **814**; UniTask **5,515**. Real Editor/BCL/
+package references, original assembly names, no stubs/self-reference. UniTask.Linq
+still misses the body sentinel; no near-zero-error recompilation or speed claim.
+
+**69 new portable / 2 new game tests**; portable **2,331 passed**. Frozen full
+excluding parallel: **2,400 passed / 259 skipped / 1 non-strict xpassed / 3 failed**;
+parallel **2 passed**. Scoped stash proof on clean `e6d9acd` reproduces exactly
+the same three baseline failures, then restores all five candidate files
+byte-exact. No golden re-pin or output promotion.
+
+Rejected out27 had a lower diagnostic total but **one added UniTask CS1503**,
+and an independent mixed-pending repro reversed two effects sharing one slot.
+Out28 declines mixed cohorts and unsafe argument spellings; all nine diagnostic
+multisets now match. Next probe: a resolved SZARRAY call retains array type but
+uses object kind through a phi, leaving an exact reference load as a raw byte
+read. Broad producer reclassification is not accepted: its legacy array fallback
+also folds partial-width reads. The separate consumer-only prototype requires
+an exact pointer-width MOV and reference-element vector type; not yet landed.
+Aggregate-only evidence: `validation_reports/quality_pending_phi_calls_2026-11-04.json`.
+
 ### Consumer-only copied scalar struct arguments (2026-11-04)
 
 Accepted source slice `game_out26` (not promoted), versus out23/out20. Managed

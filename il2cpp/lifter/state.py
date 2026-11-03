@@ -2059,6 +2059,8 @@ class _StateMixin:
         # reset per method/pass: t-names repeat across methods and v-names
         # differ between the two analysis passes, so leftovers mis-type
         self._var_types = {}
+        self._stmt_insert_epochs = {}
+        self._pending_phi_anchors = {}
         # Only these metadata entry names denote C# managed aliases. A phi
         # can inherit the byref type without being emitted as a ref local.
         self._entry_byrefs = {}
@@ -2289,6 +2291,15 @@ class _StateMixin:
         s = st[-1]
         return s if type(s) is str else (s[1] if type(s) is tuple else None)
 
+    def _insert_bound_statement(self, block, index, statement):
+        # Late pending-call materialization may trust an integer definition
+        # slot only if no earlier binding has shifted that block's slots.
+        epochs = getattr(self, '_stmt_insert_epochs', None)
+        if epochs is None:
+            epochs = self._stmt_insert_epochs = {}
+        epochs[id(block)] = epochs.get(id(block), 0) + 1
+        block.stmts.insert(index, statement)
+
     def _bind(self, e):
         """Materialize `e` to a temp declared at its definition (or, when no
         definition site was recorded, immediately before the first rendered
@@ -2334,7 +2345,7 @@ class _StateMixin:
                     break
                 didx += 1
             if dblk is not None:
-                dblk.stmts.insert(didx, line)
+                self._insert_bound_statement(dblk, didx, line)
             else:
                 self.out.insert(didx, (self._cur_ip, line, None))
         else:
@@ -2351,7 +2362,7 @@ class _StateMixin:
                     didx = i
                     break
             if dblk is not None:
-                dblk.stmts.insert(didx, line)
+                self._insert_bound_statement(dblk, didx, line)
             else:
                 self.out.insert(didx, (self._cur_ip, line, None))
         st = self._stmt_sink(dblk)
@@ -2487,6 +2498,7 @@ class _StateMixin:
         """Emit ignored non-void call results as bare statements."""
         pending = getattr(self, '_pending_calls', None)
         self._pending_calls = []
+        self._pending_phi_anchors = {}
         if not pending or getattr(self, 'dry', False):
             return
         by_blk = {}

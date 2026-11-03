@@ -887,10 +887,93 @@ class _AnalyzeMixin:
     # ------------------------------------------------------------------
     _TOKRX = re.compile(r'(?<![\w.])(v\d+)(?![\w])')
 
+    def _materialize_pending_phi_calls(self, blocks, phi, FLAGS):
+        """Capture unrendered class-return calls at their native definition.
+
+        A phi edge can be the first rendering of an ignored call result.
+        Leaving the call inline moves its effect to that edge; a later text
+        twin cleanup can then erase a loop iteration against its exit path.
+        Use pending Expr identity, not RHS equality, to capture the value
+        before SSA destruction. Already rendered, generic, byref, non-class and nested/raw argument
+        spellings retain the old path. Mixed pending or still-complex phi
+        definitions cannot share this insertion block. This does not repair
+        general argument typing, lifetime or effect flow.
+        """
+        L = self.L
+        pending = getattr(L, '_pending_calls', None)
+        if not pending or getattr(L, 'dry', False):
+            return
+        source_values = {id(v): v for bid, k in phi if k != FLAGS
+                   for pred in blocks[bid].preds
+                   if blocks[pred].end_state is not None
+                   for v in [blocks[pred].end_state.get(k)]
+                   if isinstance(v, Expr)}
+        sources = source_values.keys()
+        if not sources:
+            return
+        values = list(blocks.values()) if isinstance(blocks, dict) else blocks
+        owners = {id(b) for b in values}
+        rendered = [text for b in values
+                    for text in [*b.stmts, b.cond, b.ret, b.switch_idx] if text]
+        captures = []
+        seen = set()
+        for e, ip, _asm in pending:
+            if (id(e) not in sources or id(e) in seen or e._unk
+                    or e._uses or e._sites or e._no_bind or e.ty is None
+                    or L.il._type_enum(e.ty) != 0x12
+                    or e.ty[1] & (1 << 29)
+                    or not e.text.endswith(')') or '(' not in e.text
+                    or '<' in e.text or '>' in e.text
+                    or e.text.count('(') != 1
+                    or any(c in e.text for c in '*[]&')):
+                continue
+            dp = e._defpos
+            if dp is None or id(dp[0]) not in owners:
+                continue
+            block, index = dp
+            anchor = getattr(L, '_pending_phi_anchors', {}).get(id(e))
+            epoch = getattr(L, '_stmt_insert_epochs', {}).get(id(block), 0)
+            if (anchor is None or anchor[0] is not e or anchor[1] is not block
+                    or anchor[2] != index or anchor[3] != epoch):
+                continue  # an integer definition slot must not have shifted
+            if not 0 <= index <= len(block.stmts) or not any(
+                    ins.ip == ip and ins.mnemonic == Mnemonic.CALL
+                    for ins in block.insns):
+                continue
+            if any(e.text in text for text in rendered):
+                continue  # no textual rewriting of another call's identity
+            seen.add(id(e))
+            captures.append((block, index, ip, e))
+        # Do not shift another pending call or a still-bindable phi source.
+        # Their legacy integer definition slots have no comparable native anchor.
+        selected = {id(e) for _b, _i, _ip, e in captures}
+        blocked = set()
+        for other, _ip, _asm in pending:
+            if id(other) not in selected and other._defpos is not None:
+                blocked.add(id(other._defpos[0]))
+        for other in source_values.values():
+            if (id(other) not in selected and other._defpos is not None
+                    and not re.fullmatch(r'\w+', other.text or '')):
+                blocked.add(id(other._defpos[0]))
+        captures = [item for item in captures if id(item[0]) not in blocked]
+        # Descending slots keep earlier definition anchors stable. Native IP
+        # breaks same-slot ties: two identical calls are still two effects.
+        for block, index, _ip, e in sorted(
+                captures, key=lambda item: (item[0].bid, item[1], item[2]),
+                reverse=True):
+            name = L.new_var()
+            block.stmts.insert(index, 'var %s = %s;' % (name, e.text))
+            self._var_types[name] = e.ty
+            L._var_types[name] = e.ty
+            e.text = name
+            e._prec = None
+            e._uses = 1
+
     def _build_phi_copies(self, blocks, phi, FLAGS):
         """A phi at block B for location k means "the value differs per path".
         Emit `phi = <value at end of P>;` on every edge P->B so the variable has
         a visible definition instead of appearing out of nowhere."""
+        self._materialize_pending_phi_calls(blocks, phi, FLAGS)
         perblk: Dict[int, Dict[str, Dict[int, str]]] = {}
         self.phi_bytes = {}
         L = self.L

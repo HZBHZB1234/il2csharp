@@ -1,0 +1,233 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source slice; not promoted; goal not achieved",
+  "baseline": "game_out26",
+  "candidate": "game_out28",
+  "source_parent": "e6d9acdcf1e52c9f3a7054a4342927b9ee19da55",
+  "proof_scope": [
+    "Capture an unrendered CLASS-return pending call at its real native CALL definition before phi destruction; only the identical pending Expr object flowing directly into a phi proves identity.",
+    "Require an owned native block, matching instruction address, a valid creation-time definition slot and an unchanged insertion epoch. Capture the call once into a typed temporary and leave phi copies pure.",
+    "Decline used, already rendered, unknown, byref, generic, non-class, nested-call, cast and raw/index/address argument spellings. Never equate calls by RHS text or rewrite other call identities.",
+    "Decline a capture block containing any uncaptured pending call or non-atomic uncaptured phi definition. Descending insertion slots and native instruction addresses preserve complete capture cohorts.",
+    "This is a local effect-placement repair, not general effect/lifetime/argument typing recovery, game-native execution or whole-method/game equivalence."
+  ],
+  "validation": {
+    "new_portable_cases": 69,
+    "new_game_cases": 2,
+    "portable": {
+      "passed": 2331,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1057.75,
+      "frozen_source_verified": true,
+      "passed": 2400,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 595.2820000000065,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "frozen_source_verified": true,
+    "clean_source_baseline": {
+      "clean_source_head": "e6d9acdcf1e52c9f3a7054a4342927b9ee19da55",
+      "exit_code": 1,
+      "seconds": 117.60900000005495,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 5,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5515,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_fingerprints_verified": true
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 5,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3797,
+          "after": 3797,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_fingerprints_verified": true
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "body_sentinel_true": 8,
+    "body_sentinel_false": 1,
+    "false_sentinel_assembly": "UniTask.Linq",
+    "near_zero_error_recompilation": false
+  },
+  "native_loop_placement": [
+    {
+      "mi": 70222,
+      "captures": 1,
+      "captured_native_blocks": [
+        2
+      ],
+      "captures_inside_native_loops": [
+        true
+      ],
+      "rendered_call_count": 1
+    },
+    {
+      "mi": 70238,
+      "captures": 1,
+      "captured_native_blocks": [
+        2
+      ],
+      "captures_inside_native_loops": [
+        true
+      ],
+      "rendered_call_count": 1
+    }
+  ],
+  "original_win64_synthetic_execution": [
+    {
+      "checked": "true",
+      "exit_code": 0,
+      "result": "checks=1005, old_mismatches=998, recovered_mismatches=0"
+    },
+    {
+      "checked": "false",
+      "exit_code": 0,
+      "result": "checks=1005, old_mismatches=998, recovered_mismatches=0"
+    }
+  ],
+  "rejected_attempts": [
+    {
+      "candidate": "game_out27",
+      "accepted": false,
+      "why": [
+        "Full diagnostic multiset added one UniTask CS1503 despite a lower total; a newly frozen object argument replaced the previous byte-to-Type error.",
+        "An independent mixed-cohort repro reversed two pending native effects sharing an integer slot. Out28 declines mixed cohorts and nested/raw argument spellings."
+      ],
+      "not_out28_evidence": true
+    }
+  ],
+  "limitations": [
+    "No game-wide semantic equivalence or speedup claim.",
+    "Complete selected compilations still contain thousands of errors; unchanged diagnostics do not establish runtime equivalence.",
+    "UniTask.Linq does not reach the body sentinel and remains syntax-gated.",
+    "Existing three baseline failures remain; no golden re-pin or output promotion.",
+    "Array-typed object SSA values can still render raw byte reads; a separate temporary probe only, not part of this slice."
+  ]
+}
