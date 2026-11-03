@@ -1,0 +1,11 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "<repo-root>/out/unitask/game_out14",
+  "files": 474,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0,
+  "details": {},
+  "elapsed_seconds": 5.406
+}

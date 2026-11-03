@@ -16,10 +16,13 @@ through the test, exits only to the miss arm or the join, holds the
 `0x138` entry fold and a `[k+0xB0]` table load, performs no store /
 call / non-GPR write, and every callee-saved register it writes is dead
 at the join (volatile ones are undefined after the miss arm's call).
+The slot-zero LEA alternative proves the complete four-block scan and
+its receiver/class/table/count/offset def-use chain, exact helper arguments,
+and a zero starting index. It does not broaden the legacy ADD matcher.
 Anything else declines and keeps the honest scan rendering.
 """
 from iced_x86 import (InstructionInfoFactory, OpAccess, RegisterExt, Mnemonic,
-                      OpKind, FlowControl, Register as IReg)
+                      OpKind, FlowControl, MemorySizeExt, Register as IReg)
 
 _VOL = {IReg.RAX, IReg.RCX, IReg.RDX, IReg.R8, IReg.R9, IReg.R10, IReg.R11}
 _ARGR = {IReg.RCX, IReg.RDX, IReg.R8, IReg.R9}
@@ -163,6 +166,208 @@ def _is_rr_mov(ins):
         and RegisterExt.is_gpr64(ins.op1_register)
 
 
+def _known_zero_before(blocks, bid, end, reg):
+    """All backward reaching definitions are full-width zero writes.
+
+    A repeated node is a definition-free cycle, not evidence of zero. At
+    least one zero definition is required and every entry/other write fails.
+    Calls preserve only the Win64 nonvolatile registers. Bounded and read-only.
+    """
+    todo, seen, found, budget = [(bid, end)], set(), False, 4000
+    while todo:
+        bid, end = todo.pop()
+        if (bid, end) in seen:
+            continue
+        seen.add((bid, end))
+        block = blocks[bid]
+        for ins in reversed(block.insns[:end]):
+            budget -= 1
+            if budget < 0:
+                return False
+            if ins.flow_control in (FlowControl.CALL, FlowControl.INDIRECT_CALL) \
+                    and reg in _VOL:
+                return False
+            writes = any(ur.access in _WR and RegisterExt.is_gpr(ur.register)
+                         and RegisterExt.full_register(ur.register) == reg
+                         for ur in _FAC.info(ins).used_registers())
+            if not writes:
+                continue
+            if ins.op0_kind != OpKind.REGISTER \
+                    or not RegisterExt.is_gpr(ins.op0_register) \
+                    or RegisterExt.size(ins.op0_register) < 4:
+                return False
+            zero = (ins.mnemonic == Mnemonic.XOR
+                    and ins.op1_kind == OpKind.REGISTER
+                    and ins.op0_register == ins.op1_register)
+            if not zero:
+                return False
+            found = True
+            break
+        else:
+            if not block.preds:
+                return False
+            todo.extend((p, len(blocks[p].insns)) for p in block.preds)
+    return found
+
+
+def _slot_zero_lea_fold(blocks, pb, bm, call_index, region, hits, res):
+    """Exact zero-slot LEA alternative, NOT an arbitrary klass+0x138 LEA.
+
+    Prove the whole four-block scan, the same receiver klass/count/table,
+    interface comparison and signed offset*16 def-use chain. Miss arguments
+    must be exactly (that receiver, that interface, 0). Existing outer purity,
+    entry/exit and callee-saved liveness gates still apply.
+    """
+    def body(block):
+        return [i for i in block.insns if i.mnemonic != Mnemonic.NOP]
+
+    def rr(i, mnemonic, a, b):
+        return (i.mnemonic == mnemonic and i.op0_kind == OpKind.REGISTER
+                and i.op1_kind == OpKind.REGISTER
+                and i.op0_register == a and i.op1_register == b)
+
+    def mem(i, base, index, scale, disp, size):
+        return (i.memory_base == base and i.memory_index == index
+                and i.memory_index_scale == scale
+                and i.memory_displacement == disp
+                and MemorySizeExt.size(i.memory_size) == size
+                and i.segment_prefix == IReg.NONE)
+
+    if len(region) != 4 or len(hits) != 1 or res != IReg.RAX:
+        return False
+    hit = blocks[hits[0]]
+    h = body(hit)
+    if len(h) != 7 or h[-1].mnemonic != Mnemonic.JMP:
+        return False
+    z, double, offset, lea, shift, add, _ = h
+    if z.mnemonic != Mnemonic.MOVZX or z.op0_kind != OpKind.REGISTER \
+            or z.op1_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr32(z.op0_register) \
+            or not RegisterExt.is_gpr16(z.op1_register):
+        return False
+    result = RegisterExt.full_register(z.op0_register)
+    counter = z.op1_register
+    if result != res or not rr(double, Mnemonic.ADD, result, result) \
+            or offset.mnemonic != Mnemonic.MOVSXD \
+            or offset.op0_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr64(offset.op0_register) \
+            or offset.op1_kind != OpKind.MEMORY \
+            or lea.mnemonic != Mnemonic.LEA or lea.op0_register != result \
+            or lea.op1_kind != OpKind.MEMORY:
+        return False
+    off, table, klass = offset.op0_register, offset.memory_base, lea.memory_base
+    if not all(RegisterExt.is_gpr64(r) for r in (table, klass)) \
+            or len({result, off, klass}) != 3 or result == table \
+            or not mem(offset, table, result, 8, 8, 4) \
+            or lea.memory_index != IReg.NONE or lea.memory_displacement != 0x138 \
+            or lea.segment_prefix != IReg.NONE \
+            or shift.mnemonic != Mnemonic.SHL or shift.op0_register != off \
+            or shift.op1_kind != OpKind.IMMEDIATE8 or shift.immediate8 != 4 \
+            or not rr(add, Mnemonic.ADD, result, off):
+        return False
+    if len(hit.preds) != 1:
+        return False
+    loop = blocks[hit.preds[0]]
+    q = body(loop)
+    if loop.bid not in region or len(q) != 4 or q[-1].mnemonic != Mnemonic.JE \
+            or not loop.term or len(loop.term) != 3 \
+            or loop.term[0:2] != ('jcc', hit.bid) \
+            or loop.term[2] not in region:
+        return False
+    zx, dbl, cmp, _ = q
+    if zx.mnemonic != Mnemonic.MOVZX or zx.op0_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr32(zx.op0_register) \
+            or zx.op1_kind != OpKind.REGISTER or zx.op1_register != counter:
+        return False
+    index = RegisterExt.full_register(zx.op0_register)
+    if not rr(dbl, Mnemonic.ADD, index, index) \
+            or cmp.mnemonic != Mnemonic.CMP or cmp.op0_kind != OpKind.MEMORY \
+            or cmp.op1_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr64(cmp.op1_register) \
+            or not mem(cmp, table, index, 8, 0, 8):
+        return False
+    iface = cmp.op1_register
+    step = blocks[loop.term[2]]
+    s = body(step)
+    if len(s) != 3 or s[0].mnemonic != Mnemonic.INC \
+            or s[0].op0_kind != OpKind.REGISTER or s[0].op0_register != counter \
+            or s[1].mnemonic != Mnemonic.CMP or s[1].op0_register != counter \
+            or s[1].op1_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr16(s[1].op1_register) \
+            or s[2].mnemonic != Mnemonic.JB \
+            or step.term != ('jcc', loop.bid, bm.bid):
+        return False
+    count = RegisterExt.full_register(s[1].op1_register)
+    loads = region - {hit.bid, loop.bid, step.bid}
+    if len(loads) != 1:
+        return False
+    load = blocks[next(iter(loads))]
+    t = body(load)
+    if len(t) != 1 or t[0].mnemonic != Mnemonic.MOV \
+            or t[0].op0_register != table or t[0].op1_kind != OpKind.MEMORY \
+            or not mem(t[0], klass, IReg.NONE, 1, 0xB0, 8) \
+            or load.term != ('fall', loop.bid) or load.preds != [pb.bid] \
+            or set(loop.preds) != {load.bid, step.bid} \
+            or step.preds != [loop.bid]:
+        return False
+    e = body(pb)
+    if len(e) < 5 or e[-1].mnemonic != Mnemonic.JAE \
+            or pb.term != ('jcc', bm.bid, load.bid):
+        return False
+    seed, cnt, cmp = e[-4:-1]
+    if seed.mnemonic != Mnemonic.MOVZX or seed.op0_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr32(seed.op0_register) \
+            or RegisterExt.full_register(seed.op0_register) != RegisterExt.full_register(counter) \
+            or seed.op1_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr16(seed.op1_register) \
+            or cnt.mnemonic != Mnemonic.MOVZX or cnt.op0_kind != OpKind.REGISTER \
+            or not RegisterExt.is_gpr32(cnt.op0_register) \
+            or RegisterExt.full_register(cnt.op0_register) != count \
+            or cnt.op1_kind != OpKind.MEMORY \
+            or not mem(cnt, klass, IReg.NONE, 1, 0x12E, 2) \
+            or not rr(cmp, Mnemonic.CMP, seed.op1_register, s[1].op1_register):
+        return False
+    miss = body(bm)
+    # No hidden preparations, reordered arguments, slot changes or copies.
+    if len(miss) != 4 or bm.insns[call_index] != miss[-1] \
+            or not rr(miss[0], Mnemonic.XOR, IReg.R8D, IReg.R8D) \
+            or not rr(miss[1], Mnemonic.MOV, IReg.RDX, iface) \
+            or not _is_rr_mov(miss[2]) or miss[2].op0_register != IReg.RCX:
+        return False
+    obj = miss[2].op1_register
+    # Respect the actual setup order: zeroing slot R8 must not destroy the
+    # interface/receiver, and MOV RDX,iface must not destroy the receiver.
+    if iface == IReg.R8 or obj in (IReg.R8, IReg.RDX):
+        return False
+    stable = {obj, klass, iface, count, table, RegisterExt.full_register(counter)}
+    if len(stable) != 6 or IReg.RSP in stable \
+            or index in stable or result in {klass, table}:
+        return False
+    # klass is freshly loaded from precisely the helper receiver. No later
+    # call/write may replace either before the test; table/count use that klass.
+    prefix = e[:-4]
+    for j in range(len(prefix) - 1, -1, -1):
+        ins = prefix[j]
+        writes = _gpr_writes(ins)
+        if writes is None:
+            return False
+        if klass in writes:
+            if ins.mnemonic != Mnemonic.MOV or ins.op0_register != klass \
+                    or ins.op1_kind != OpKind.MEMORY \
+                    or not mem(ins, obj, IReg.NONE, 1, 0, 8):
+                return False
+            break
+        if obj in writes:
+            return False
+    else:
+        return False
+    source = RegisterExt.full_register(seed.op1_register)
+    if source in stable or source == IReg.RSP:
+        return False
+    seed_index = next(i for i, ins in enumerate(pb.insns) if ins.ip == seed.ip)
+    return _known_zero_before(blocks, pb.bid, seed_index, source)
+
+
 def iface_fast_path_prune(blocks, names, stats=None, skip=None):
     """Rewrite every proved inline interface dispatch in `blocks` (see the
     module docstring); return the number of fast paths pruned. `names`
@@ -240,11 +445,13 @@ def iface_fast_path_prune(blocks, names, stats=None, skip=None):
                 note('d_joinpreds')
                 continue
             hits = [x for x in region if join in blocks[x].succs]
-            if not hits or not any(
-                    i.mnemonic == Mnemonic.ADD and i.op1_kind in (
-                        OpKind.IMMEDIATE32TO64, OpKind.IMMEDIATE32)
-                    and i.immediate32 == 0x138
-                    for x in hits for i in blocks[x].insns):
+            add_fold = any(
+                i.mnemonic == Mnemonic.ADD and i.op1_kind in (
+                    OpKind.IMMEDIATE32TO64, OpKind.IMMEDIATE32)
+                and i.immediate32 == 0x138
+                for x in hits for i in blocks[x].insns)
+            if not hits or (not add_fold and not _slot_zero_lea_fold(
+                    blocks, pb, bm, k, region, hits, res)):
                 note('d_hit')
                 continue
             if not any(i.op1_kind == OpKind.MEMORY and i.memory_displacement == 0xB0
