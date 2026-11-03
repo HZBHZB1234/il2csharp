@@ -50,7 +50,8 @@ def main(argv):
     try:
         with open(rep, encoding='utf-8') as fh:
             d = json.load(fh)
-        summary['brace'] = {k: d.get(k) for k in ('files', 'unbalanced')}
+        summary['brace'] = {k: d.get(k) for k in
+                            ('files', 'unbalanced_files')}
     except Exception:
         summary['brace'] = None
 

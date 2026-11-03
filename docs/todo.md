@@ -1,4 +1,32 @@
-## Current work: fix 202 verified on both fixtures (2026-11-03, on `main`)
+## Current work: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
+
+With fix 202 in, both complete trees were rebuilt and gated with the new
+`tools/gate_all.py` (one command: brace, per-image tree-sitter, whole-tree
+Roslyn against the exact closure, source comparison):
+
+| | unitask `full_u10` | survivors `full_s6` |
+|---|---|---|
+| type files / bodies | 3,596 / 23,756 | 7,523 / 80,091 |
+| brace | 3,547 files, **0 unbalanced** | 7,448 files, **0 unbalanced** |
+| tree-sitter (per image) | **0/0/0/0** | **0/0/0/0**, no image crashed |
+| whole-tree Roslyn | **19** (CS8701 x18 + CS0644 x1), `binding_masked: false` | **118**, `binding_masked: false` — CS0234 x61, CS0117 x16, CS8701 x14, CS0111 x7, CS0535 x6, CS0507 x4, CS0052 x2, CS0460 x2, CS8345/CS0100/CS0644/CS0115/CS0053/CS0051 x1 |
+| fidelity | call_f1 0.6168 / member_f1 0.3255 / shape 0.7915 | call_f1 0.6666 / member_f1 0.3619 / shape 0.5844 |
+| sources/switch (`switch (` / `else if (`) | 235 / 4,928 | 729 / 14,692 |
+
+fix 202's measured effect on the survivors whole tree: `switch (` **709 -> 729**,
+`else if (` **14,737 -> 14,692**, `goto` unchanged at 7,595 — so the gain is
+bigger than the Assembly-CSharp A/B suggested (+6 there, +14 in the engine
+images). Across both fixtures the fix is **+25 switches**.
+
+Compile tier: every remaining error is either a property of the one-assembly
+measurement (CS0234 doubled namespace x61, CS0111 cross-image scaffolding x7,
+CS0051/52/53 cross-assembly internals, CS8701 profile x14, CS0117 x16) or a
+generic-sharing body that is absent from the game's own metadata (CS0535 x6).
+No confirmed decompiler defect remains in that tier on either fixture.
+
+## Previous: fix 202 verified on both fixtures (2026-11-03, on `main`)
+
+## Previous: fix 202 verified on both fixtures (2026-11-03, on `main`)
 
 The switch synthesis landed and was re-measured on both fixtures with full
 rebuilds:

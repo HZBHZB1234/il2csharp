@@ -1,0 +1,57 @@
+{
+ "fixture": "survivors-roguelike-kit",
+ "label": "full_s6",
+ "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s6",
+ "brace": {
+  "files": 7448,
+  "unbalanced": null
+ },
+ "parse": {
+  "files": 7448,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0
+ },
+ "parse_crashed": [],
+ "compile": {
+  "source_files": 4413,
+  "files_with_errors": 59,
+  "errors": 118,
+  "errors_by_code": {
+   "CS0234": 61,
+   "CS0117": 16,
+   "CS8701": 14,
+   "CS0111": 7,
+   "CS0535": 6,
+   "CS0507": 4,
+   "CS0052": 2,
+   "CS0460": 2,
+   "CS8345": 1,
+   "CS0100": 1,
+   "CS0644": 1,
+   "CS0115": 1,
+   "CS0053": 1,
+   "CS0051": 1
+  },
+  "binding_masked": false
+ },
+ "fidelity": {
+  "call_precision": 0.6515,
+  "call_recall": 0.7381,
+  "call_f1": 0.6666,
+  "member_f1": 0.3619,
+  "shape_cos": 0.5844
+ },
+ "unmatched": {
+  "transformed": 134,
+  "type": 121,
+  "method": 18,
+  "empty": 38,
+  "empty_srcout": 36,
+  "inlined": 16,
+  "stub": 35,
+  "empty_src": 1,
+  "empty_out": 1
+ }
+}
