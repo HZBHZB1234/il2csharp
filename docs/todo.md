@@ -24,6 +24,41 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### FOUND: a declaration error suppresses ALL body binding (this changes every compile number)
+
+The binding question is answered, and the answer invalidates the compile tier as
+a quality metric.
+
+**Any declaration-level error in the compilation makes Roslyn skip method-body
+binding entirely.** Evidence: the 28-file `TMPro/Examples` folder compiled with
+a stub `__SharedBodyStubs` + `TMP_TextEventHandler` — i.e. declaration-clean —
+reports **4,636 errors**, including 18 rows for one file and my injected
+`int __probe = "x";`. The same folder *with* one declaration error reports
+**1 error** and no body diagnostics at all.
+
+Consequences:
+
+* `19 errors (unitask)` and `118 errors (survivors)` are **declaration-tier
+  counts**. They are NOT a measure of whether the emitted bodies compile; the
+  body tier is unmeasured in every number this project has quoted since the
+  fixture workstream began.
+* A single missing type (CS0246) anywhere in the compilation hides thousands of
+  body errors — the same masking rule already known for CS1519, but global.
+* The four earlier "anomalies" (silent `int -> Vector2`, appended probes
+  ignored, byte-verified edits not registering, `-errorlimit` runs reporting
+  nothing) are all explained by this one rule: every one of those compilations
+  carried declaration errors.
+
+Next step, precise and cheap: make the diagnostic compilation
+declaration-clean, then count the body tier —
+
+1. merge the per-image `__SharedBodyStubs` (already done by `compile_corpus`);
+2. loop: read the CS0234/CS0246 names from the report, emit
+   `internal class <Name> { }` stubs into a `__MissingStubs.cs`, recompile,
+   repeat until the declaration tier is empty;
+3. the remaining error count is the real body tier, and *that* is the number to
+   optimise.
+
 ### Binding scope: final evidence table, cause still unknown (do not re-open blind)
 
 Every experiment on the emitted trees reports DECLARATION-tier diagnostics and
