@@ -1227,8 +1227,10 @@ class _HighLevelMixin:
     def _compound_assign(self, lines: List[str]) -> List[str]:
         """`num1 = x + 1; x = num1;` -- the SSA temp hop -- and the direct
         `x = x + 1;` both fold to `x += 1;`. The hop temp must die at the
-        copy (exactly two occurrences body-wide) and nothing may write the
-        target between the two statements."""
+        copy (exactly two occurrences body-wide). Only blank lines may
+        intervene: a read, alias, call or receiver/index reassignment can
+        observe or change the target. Without an effect/alias proof, moving
+        the write across any statement is not a spelling-only rewrite."""
         for _ in range(8):
             st = [s.strip() for s in lines]
             counts = {}
@@ -1249,24 +1251,18 @@ class _HighLevelMixin:
                 m = self._HOP_DEF_RX.match(s)
                 if m and counts.get(m.group(1), 0) == 2 and '(' not in m.group(2):
                     t, x, op, c = m.groups()
-                    wrx = re.compile(r'^%s = ' % re.escape(x))
                     folded = False
                     for j in range(i + 1, min(i + 5, len(st))):
                         if j in drop or not st[j]:
                             continue
-                        if wrx.match(st[j]):
-                            if self._HOP_COPY_RX.match(st[j]) \
-                                    and self._HOP_COPY_RX.match(st[j]).group(2) == t:
-                                res.append('%s%s %s %s;' % (ind, x, self._COMP_OPS[op], c))
-                                drop.add(j)
-                                folded = True
-                            break
-                        if st[j] in ('{', '}') or st[j].endswith(':'):
-                            break       # brace/label: never fold across a scope
-                        if re.match(r'^%s(?![\w])' % re.escape(x), st[j]):
-                            break       # compound/member write to the target
-                        if re.search(r'(?<![\w.])%s(?![\w])' % re.escape(t), st[j]):
-                            break       # another use of the hop temp appears
+                        copy = self._HOP_COPY_RX.match(st[j])
+                        if copy and copy.groups() == (x, t):
+                            res.append('%s%s %s %s;' % (ind, x, self._COMP_OPS[op], c))
+                            drop.add(j)
+                            folded = True
+                        # Even a target-free statement can observe an alias,
+                        # throw, or change the receiver/index. Keep its order.
+                        break
                     if not folded:
                         res.append(lines[i])
                     continue
