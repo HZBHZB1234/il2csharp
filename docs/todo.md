@@ -73,6 +73,31 @@ Next probe: compile the exact 15-line region verbatim inside a copy of the
 enclosing type, then delete members of the real file one at a time until the
 behaviour flips.
 
+### The appended-probe harness is unreliable (corrects the previous note's probe plan)
+
+Trying to bisect the `int -> Vector2` anomaly with an extra probe file appended
+to an image compilation produces **no analysis of that file**:
+
+* an appended file whose content is `int x = "this must fail";` reports
+  nothing (the compile still reports only the image's own 2 errors);
+* an appended file that does not exist makes csc exit 1 with **no diagnostic
+  lines at all** (284 chars of output, both CS8701/CS0644 rows, and nothing
+  about the missing file);
+* the same machinery with the probe as the ONLY source works (that is how the
+  CS0029/CS0117/CS0029 probes in the previous rounds were run).
+
+So csc silently ignores the appended source in this invocation shape, and none
+of this round's `with_probe` results may be used as evidence. The image-level
+compilation the gates run (`compile_corpus`, `gate.py compile`) passes exactly
+the image's own file list, and those numbers stand.
+
+The original observation is unchanged and still unexplained: within the
+280-file `Assembly-CSharp` compilation, `TMP_UiFrameRateCounter.cs` gets no
+diagnostic although it contains `rectTransform1.pivot = num1;` with
+`int num1` — while a single-file probe with the same closure and the same
+assignment is CS0029. Next attempt should NOT append a probe file: copy the
+image directory, edit the *real* file there, and compile the copy.
+
 ## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 
