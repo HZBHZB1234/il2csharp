@@ -61,6 +61,14 @@ A text-level rewrite would have to *guess* the missing components, so the fix
 belongs in `_piece_value`/`_aggregate_load` (compose the sibling stores into one
 literal), not in a pass.
 
+The sub-case split matters: for a **float** temp (
+eal5 = 1065353216;) the
+assignment is LEGAL C# (implicit int->float) and silently yields 1.07e9 instead
+of 1.0f — a semantic defect with no diagnostic — while a **struct** temp
+(color1 = 4278255615; with Color color1) should be CS0029. Census of the
+float sub-case on Assembly-CSharp: only **2** sites, so the bulk of the 932 are
+struct-typed temps and belong to the composition work.
+
 Note the connection to the open anomaly: these store shapes are exactly what
 `TMP_UiFrameRateCounter.cs` contains, and that file is one where the compiler
 reports nothing although an `int -> Vector2` assignment is present. Whether the
