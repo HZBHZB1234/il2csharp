@@ -43,7 +43,6 @@ else-if chains.
 
 ## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
-## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 `out/survivors-roguelike-kit/full_s5` (fixes 198-201, 7,523 type files / 80,091
 bodies) is the first complete survivors tree whose compile number is not
