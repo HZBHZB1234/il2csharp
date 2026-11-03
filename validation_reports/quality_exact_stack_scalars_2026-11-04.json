@@ -1,0 +1,292 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact immediate stack scalar recovery; not promoted; goal not achieved",
+  "baseline": "game_out32",
+  "candidate": "game_out33",
+  "source_parent": "480eef7263e3b1d6e2eb181cfc2f37c5c191f54d",
+  "proof_scope": [
+    "Explicit PE/Windows x64 machine guard. Unique exact direct canonical nongeneric MethodDef on a nonnested reference owner. Reject byref, generic and aggregate/sret returns.",
+    "Use complete ABI positions, including the instance receiver and floating-point positions; only positions at least four are stack arguments. Never change slot types or type hints.",
+    "An existing nonunknown integer stack Expr must spell the exact printed literal. Independently scan the contiguous executed CFG block backward from the exact call for its most recent overlapping store.",
+    "Boolean accepts only byte immediate 0 or 1. Enum requires closed nonnested int32 metadata, the unique matching underlying field, agreeing optional element metadata, a named member, and a dword immediate.",
+    "Between the store and call allow only non-RSP-writing GPR MOV/LEA and nonoverlapping direct RSP writes. Calls, branches, unknown effects or alias writes, gaps, segment overrides, register-derived definitions and partial overlaps decline."
+  ],
+  "validation": {
+    "new_portable_cases": 119,
+    "new_game_cases": 1,
+    "focused_passed": 120,
+    "portable": {
+      "passed": 2710,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1090.2810000000754,
+      "frozen_source_verified": true,
+      "passed": 2783,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 591.4529999999795,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "480eef7263e3b1d6e2eb181cfc2f37c5c191f54d",
+      "exit_code": 1,
+      "seconds": 109.51500000001397,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5528,
+          "after": 5506,
+          "added": 0,
+          "removed": 22,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 22
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_delta_causality": {
+        "changed_files": 1,
+        "changed_lines": 16,
+        "changed_source_arguments": 23,
+        "native_argument_recoveries": 23,
+        "duplicate_source_arguments_from_identical_structured_lines": 0,
+        "native_by_kind": {
+          "bool": 8,
+          "enum": 15
+        },
+        "independent_native_and_metadata_checks": true,
+        "all_other_source_bytes_identical": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 2,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3791,
+          "after": 3783,
+          "added": 0,
+          "removed": 8,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 8
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_delta_causality": {
+        "changed_files": 2,
+        "changed_lines": 6,
+        "changed_source_arguments": 10,
+        "native_argument_recoveries": 8,
+        "duplicate_source_arguments_from_identical_structured_lines": 2,
+        "native_by_kind": {
+          "bool": 5,
+          "enum": 3
+        },
+        "independent_native_and_metadata_checks": true,
+        "all_other_source_bytes_identical": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 30,
+    "added_occurrences": 0,
+    "net_occurrences": -30,
+    "removed_codes": {
+      "CS1503": 30
+    },
+    "normalization_or_suppression": false
+  },
+  "synthetic_native_execution": {
+    "runtime": "installed .NET 10 / Windows x64",
+    "execution": {
+      "checked_false": {
+        "checks": 4800,
+        "mismatches": 0
+      },
+      "checked_true": {
+        "checks": 4800,
+        "mismatches": 0
+      }
+    },
+    "positions": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "bool_values": [
+      0,
+      1
+    ],
+    "int32_enum_values": [
+      -2147483648,
+      -1,
+      0,
+      1,
+      127,
+      2147483647
+    ],
+    "scope": "Original synthetic Win64 wrappers write exact byte/dword immediate stack homes and native callees read them; compare strongly typed managed bool/enum calls. NOT native game execution, whole-method/game equivalence or speed evidence."
+  },
+  "next_read_only_probe": {
+    "status": "read-only next-slice probe; no recovery implemented",
+    "typed_class_return_stores": 32,
+    "profiles": [
+      {
+        "count": 16,
+        "has_definition_anchor": true,
+        "has_read_sites": false,
+        "home_is_typed": false,
+        "kind": "obj",
+        "pending_identity": true,
+        "source_is_bound_after_store": false,
+        "source_is_rax": true,
+        "stack_copy_has_definition_anchor": false,
+        "stack_copy_has_type": true,
+        "stack_copy_is_same_identity": false,
+        "width": 8
+      },
+      {
+        "count": 16,
+        "has_definition_anchor": true,
+        "has_read_sites": false,
+        "home_is_typed": false,
+        "kind": "obj",
+        "pending_identity": true,
+        "source_is_bound_after_store": false,
+        "source_is_rax": false,
+        "stack_copy_has_definition_anchor": false,
+        "stack_copy_has_type": true,
+        "stack_copy_is_same_identity": false,
+        "width": 8
+      }
+    ],
+    "limits": "Measures loss of definition identity and type at known outgoing homes; no lifetime, alias or safe insertion proof, no production change."
+  },
+  "limitations": [
+    "Immediate-only proof deliberately leaves register-derived zeros unchanged, including eight bool arguments and one enum argument in the focused fixture.",
+    "Source has 33 changed argument occurrences from 31 native recoveries: one already-duplicated structured source line in survivors repeats two recovered arguments. No new duplication or other byte changes.",
+    "No stack-home global retyping, lifetime repair or call-result capture; known Type-valued stack homes remain object-typed.",
+    "UniTask.Linq remains blocked by 13 declaration diagnostics; its body sentinel is still unobserved and no body coverage is claimed.",
+    "Original synthetic native execution is not game-native/whole-method/whole-game equivalence or speed evidence.",
+    "No golden changes, output promotion, near-zero-error recompilation or speed improvement claim."
+  ]
+}

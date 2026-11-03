@@ -1,4 +1,5 @@
 from il2cpp.prelude import *  # noqa: F401,F403
+from il2cpp.lifter.stackscalars import recover_stack_scalars
 from il2cpp.common import csharp_type_name, u64
 from il2cpp.csharp import param_modifier
 from il2cpp.expr import Expr, _BARE_HINT_RX, _BARE_TOKEN_RX, _INT_TY, _byref_arg_render, _is_unresolved_gp, _mentions, _merge_arr_proof, _recv_fold
@@ -142,6 +143,8 @@ class _ValuesMixin:
             out[pos] = xe.text if xe is not None and xe.text else '_'
         while len(out) > gpr_want and out[-1] == '_':
             out.pop()
+        if len(out) > 4:
+            return recover_stack_scalars(self, m2, rty, out)
         return out
 
     def _hint_arg_types(self, args, arg_exprs, mi, rty):
