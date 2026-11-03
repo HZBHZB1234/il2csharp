@@ -2,6 +2,7 @@ from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.cfg import LBL, _ELSEIF_CMP_RX, _ITF_CALL_RX, _ITF_SLOT_RX, _ITF_TYPEOF_RX, _LOOP_HDR_RX, _can_fall, _construct_arms, _falls_to, _header_idx, _hoist_point, _match_brace, _split_args
 from il2cpp.expr import _recv_fold, _recv_shaped
 from il2cpp.text import mask_spans
+from il2cpp.names import safe_ident
 
 class _FlowMixin:
     def _resolve_labels(self, lines: List[str]) -> List[str]:
@@ -1857,6 +1858,20 @@ class _FlowMixin:
                                     continue
                                 seen.add(tok)
                                 local_toks.append(tok)
+                        # Alpha-renaming the same value must preserve its
+                        # existing facts. Keep each map separate (and thus its
+                        # lookup precedence); never infer from the new RHS.
+                        fact_maps = (self._var_types,
+                                     getattr(self.L, '_var_types', {}),
+                                     getattr(self.L, '_type_hints', {}))
+                        blocked = getattr(self.L, '_gp_blocked', set())
+                        reserved = set(blocked)
+                        for facts in fact_maps:
+                            reserved.update(facts)
+                        method = getattr(self.L, '_current_method', None)
+                        if method is not None:
+                            reserved.update(safe_ident(p.name) for p in
+                                            self.L.meta.method_params(method))
                         maxnum = {}
                         for ln in lines:
                             for tok in self._LOC_RX.findall(ln):
@@ -1877,7 +1892,17 @@ class _FlowMixin:
                             for t in local_toks:
                                 pre = t.rstrip('0123456789')
                                 maxnum[pre] = maxnum.get(pre, 0) + 1
-                                ren[t] = '%s%d' % (pre, maxnum[pre])
+                                fresh = '%s%d' % (pre, maxnum[pre])
+                                while fresh in reserved:
+                                    maxnum[pre] += 1
+                                    fresh = '%s%d' % (pre, maxnum[pre])
+                                reserved.add(fresh)
+                                ren[t] = fresh
+                                for facts in fact_maps:
+                                    if t in facts:
+                                        facts[fresh] = facts[t]
+                                if t in blocked:
+                                    blocked.add(fresh)
                             out.extend(
                                 self._LOC_RX.sub(
                                     lambda mm: ren.get(mm.group(1),

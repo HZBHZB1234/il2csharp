@@ -4,6 +4,58 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Shared-tail type facts and nested-type scope repair (2026-11-03)
+
+Accepted source candidate `game_out11` (not promoted). Tail duplication now
+copies each exact type-fact map entry independently; alpha-renaming no longer
+turns a known array into `object`. Conflicts/lookup precedence and generic-blocked
+membership survive; fresh tokens avoid fact-only names and metadata parameters.
+No RHS type inference or entry-byref alias/provenance is invented.
+
+The type-only intermediate `game_out10` reduced survivors Assembly-CSharp
+6,263 -> 4,281, but regressed UniTask 5,589 -> 5,663. Precise types exposed a
+scope-repair blind spot for nested generic members and raw state-machine names.
+The final candidate recognizes those declarations under the existing scope/LCA
+proof, hoisting **bare declarations**, never fabricating default assignments.
+
+Real Editor/BCL + original packages, original assembly simple names:
+
+| image | out9 | out10 (type only) | out11 |
+|---|---:|---:|---:|
+| unitask Assembly-CSharp | 1,989 | 1,985 | 1,973 |
+| UniTask | 5,589 | 5,663 | 5,515 |
+| UniTask.TextMeshPro | 222 | 222 | 209 |
+| survivors Assembly-CSharp | 6,263 | 4,281 | 4,276 |
+| survivors firstpass | 834 | 816 | 816 |
+
+Other selected images are unchanged. Survivors CS0021 609 -> 11, CS0019
+-1,034 and CS1061 -422, but CS0029 **+108**, CS0208 +6 and CS0212 +4.
+UniTask CS0103 -88 and CS1061 -26, but CS0029 **+15**, CS0165 **+20**,
+CS0266 +6. These are recorded error transfers/increases, not hidden successes.
+UniTask.Linq still has a false body sentinel; other selected images observe
+some body binding only. The compiler gate is not a zero-errors success gate.
+
+Strict builds again lift 2,227 / 1,857 bodies with zero failures, fallbacks or
+type-emit failures; brace/parse clean (474 / 293 C# files). Out9 -> out11:
+23 unitask files (-5,281/+6,061 lines), 36 survivors (-2,258/+2,273), no added
+or removed files. Portable **1,845 passed**; frozen-source full suite excluding
+parallel: **1,903 passed / 259 skipped / 1 non-strict xpassed**, **one failure**; separate parallel module **2 passed**.
+The sole failure is the unchanged Limbus `AddItem` return-number assertion
+(`test_inventory_add_item_uses_stack_room`, mi 154731): before local renaming,
+return identity is unchanged; final temporary family numbering moved. This
+limited proof does not establish equivalence of other changes. **No re-pin.**
+
+An original compiled synthetic nested-generic scope harness passes 50,000 checks,
+zero mismatches; a one-arm missing assignment still fails with CS0170. This is
+not game runtime equivalence or a speed result. Source freeze lifted only after
+both test runs finished. Aggregate-only evidence:
+`validation_reports/quality_shared_tail_type_facts_2026-11-03.json`.
+
+Next: investigate the 156 parameterless `Action<InputAction.CallbackContext>`
+construction errors in survivors; require exact interface-method/receiver proof
+before replacing a shared constructor. Wide SIMD/struct value recovery and
+external private BCL implementation references remain unresolved.
+
 ### Conservative recovery and real-Editor compile measurements
 
 Working candidate `game_out5` (not promoted): metadata Out-only byrefs now

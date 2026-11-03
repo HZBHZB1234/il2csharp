@@ -908,8 +908,11 @@ _HOIST_KW = frozenset((
     'return', 'goto', 'else', 'case', 'new', 'throw', 'await', 'yield',
     'using', 'var', 'ref', 'out', 'in', 'is', 'as', 'typeof', 'default',
     'checked', 'unchecked', 'lock', 'fixed', 'unsafe', 'const', 'static'))
+# Nested generic members (UniTask<T>.Awaiter) and raw compiler-generated
+# names (Owner.<Run>d__3) retain an identifier suffix after the final >.
+# Recognize their declarations before the emitter sanitizes type names.
 _HOIST_DECL_RX = re.compile(
-    r'^(?P<ind>\s*)(?P<ty>[A-Za-z_][\w.]*(?:<[^=;()]*>)?(?:\[,*\])*\**\??)'
+    r'^(?P<ind>\s*)(?P<ty>[A-Za-z_][\w.]*(?:<[^=;()]*>[\w.]*)?(?:\[,*\])*\**\??)'
     r' (?P<nm>[A-Za-z_]\w*\d)(?P<rest> = .*|);\s*$')
 _HOIST_ID_RX = re.compile(r'(?<![\w.@])([A-Za-z_]\w*)\b')
 _HOIST_STR_RX = re.compile(

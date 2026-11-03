@@ -1,0 +1,1622 @@
+{
+  "kind": "shared-tail exact type facts and nested-type scope repair",
+  "date": "2026-11-03",
+  "baseline": "game_out9",
+  "intermediate": "game_out10 (type facts only; not final candidate)",
+  "candidate": "game_out11",
+  "promoted": false,
+  "rules": [
+    "Alpha-renamed tail values copy exact entries in separate type-fact maps, preserving lookup precedence and conflicts.",
+    "Fresh names avoid existing fact-map keys, generic-blocked tokens and metadata parameter names.",
+    "Generic-blocked membership survives; entry-byref alias identity is not invented.",
+    "Nested generic member and compiler-generated declarations use existing scope/LCA proof; no default initialization is fabricated."
+  ],
+  "limits": [
+    "Selected images only, not complete rebuilt games.",
+    "Thousands of compiler errors remain, including new/exposed conversion and definite-assignment diagnostics.",
+    "Body sentinel proves some body binding only; UniTask.Linq sentinel is false.",
+    "Compile gate exit remains syntax-gated, not zero binding errors.",
+    "No game runtime equivalence or speed proof; no output promotion or golden/pin changes.",
+    "One reviewed Limbus exact temporary-number assertion fails; the full suite is not green."
+  ],
+  "fixtures": {
+    "unitask": {
+      "manifest": {
+        "files": 481,
+        "lifted": 2227,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 287008,
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp,TempAsm,UniTask",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "f9a51f9aad40213df5c6bb80f70f80d7caf5b4d8359ccbe5ed4a5f926cd032b8",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "bca8de9eca6b6bb0ea63f31415a3942686bd03cc18c439ba461100978a2c33b5",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "a6a5b6ab9a8e69dc65cb0e310ce0eae92d5ea6f5a3cfac0ed0406ea0a8e2f797",
+          "il2cpp/dec/build.py": "5934358c3cb62158a2437f89573f3817fc3b1bd0e132cf1fab115cb902c10ce0",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "5f2be9a2a2e3fc51b49ca566dd0a0581d0434cd8b36746df22eac929e341350e",
+          "il2cpp/dec/ifaceprune.py": "7ae48d2423ba6298382a2d19a237cb3dce6d1f2e3ebc91c30be799687ddcb5db",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "536ff1f4577df01b55c85a9eb7dc5e65f4e7bb2ad4f6da52fc3d77b9a1f06620",
+          "il2cpp/lifter/insn.py": "5b4b57773c76196aa7951e1add248b1097e8b197f9dc8c961b67f21524ecb7f7",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "9e38e360d7ce8a6d6bde4282f24bfbf4698a0a51da7a598909c20270e1497e43",
+          "il2cpp/lifter/values.py": "5935d9ecd0356fd17ed18f747160d667a7e5da1f081a4fbc38251d8722db8bea",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        }
+      },
+      "compile": {
+        "reference_source": "installed Unity 6000 Editor engine DLLs + Editor netstandard 2.1/BCL + original player packages, current image excluded",
+        "synthetic_stubs": false,
+        "original_assembly_simple_names": true,
+        "before": {
+          "Assembly-CSharp": {
+            "files": 16,
+            "syntax": 2,
+            "binding": 1987,
+            "top": [
+              [
+                "CS0103",
+                460
+              ],
+              [
+                "CS1061",
+                200
+              ],
+              [
+                "CS0019",
+                188
+              ],
+              [
+                "CS0029",
+                182
+              ],
+              [
+                "CS0208",
+                144
+              ],
+              [
+                "CS1503",
+                135
+              ],
+              [
+                "CS0122",
+                117
+              ],
+              [
+                "CS0119",
+                94
+              ],
+              [
+                "CS8917",
+                85
+              ],
+              [
+                "CS0030",
+                55
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0246": 41,
+              "CS1061": 200,
+              "CS0029": 182,
+              "CS8917": 85,
+              "CS0208": 144,
+              "CS0103": 460,
+              "CS0266": 48,
+              "CS0308": 3,
+              "CS7036": 11,
+              "CS0149": 17,
+              "CS1503": 135,
+              "CS0019": 188,
+              "CS0122": 117,
+              "CS0030": 55,
+              "CS0119": 94,
+              "CS1501": 50,
+              "CS0117": 48,
+              "CS1729": 2,
+              "CS0165": 53,
+              "CS7069": 9,
+              "CS0305": 1,
+              "CS0159": 35,
+              "CS0428": 1,
+              "CS1620": 9,
+              "CS0121": 1
+            },
+            "seconds": 5.329000000027008
+          },
+          "TempAsm": {
+            "files": 4,
+            "syntax": 0,
+            "binding": 6,
+            "top": [
+              [
+                "CS0103",
+                2
+              ],
+              [
+                "CS0208",
+                2
+              ],
+              [
+                "CS0266",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "TempAsm",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 2,
+              "CS0103": 2,
+              "CS0266": 2
+            },
+            "seconds": 2.8429999999934807
+          },
+          "UniTask": {
+            "files": 302,
+            "syntax": 11,
+            "binding": 5578,
+            "top": [
+              [
+                "CS1061",
+                1118
+              ],
+              [
+                "CS0103",
+                1103
+              ],
+              [
+                "CS0208",
+                777
+              ],
+              [
+                "CS0019",
+                672
+              ],
+              [
+                "CS0029",
+                414
+              ],
+              [
+                "CS1503",
+                221
+              ],
+              [
+                "CS0149",
+                209
+              ],
+              [
+                "CS0165",
+                171
+              ],
+              [
+                "CS0311",
+                154
+              ],
+              [
+                "CS0122",
+                128
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0029": 414,
+              "CS0208": 777,
+              "CS1061": 1118,
+              "CS0246": 20,
+              "CS1503": 221,
+              "CS0103": 1103,
+              "CS0266": 110,
+              "CS0149": 209,
+              "CS0122": 128,
+              "CS0161": 16,
+              "CS0117": 24,
+              "CS7036": 37,
+              "CS0030": 82,
+              "CS0019": 672,
+              "CS0571": 31,
+              "CS0177": 14,
+              "CS0165": 171,
+              "CS1501": 56,
+              "CS8917": 75,
+              "CS0119": 84,
+              "CS0159": 33,
+              "CS0173": 1,
+              "CS0214": 15,
+              "CS0212": 4,
+              "CS0163": 2,
+              "CS8070": 1,
+              "CS1729": 10,
+              "CS0311": 154,
+              "CS0308": 2,
+              "CS0023": 4,
+              "CS1929": 1
+            },
+            "seconds": 16.45299999997951
+          },
+          "UniTask.Addressables": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Addressables",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.562999999965541
+          },
+          "UniTask.DOTween": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.DOTween",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 2.172000000020489
+          },
+          "UniTask.Linq": {
+            "files": 143,
+            "syntax": 0,
+            "binding": 13,
+            "top": [
+              [
+                "CS0052",
+                7
+              ],
+              [
+                "CS7069",
+                5
+              ],
+              [
+                "CS0738",
+                1
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Linq",
+            "body_probe_observed": false,
+            "returncode": 1,
+            "codes": {
+              "CS0052": 7,
+              "CS7069": 5,
+              "CS0738": 1
+            },
+            "seconds": 4.467999999993481
+          },
+          "UniTask.TextMeshPro": {
+            "files": 5,
+            "syntax": 0,
+            "binding": 222,
+            "top": [
+              [
+                "CS1061",
+                60
+              ],
+              [
+                "CS0103",
+                59
+              ],
+              [
+                "CS0165",
+                17
+              ],
+              [
+                "CS0019",
+                16
+              ],
+              [
+                "CS1503",
+                15
+              ],
+              [
+                "CS0246",
+                13
+              ],
+              [
+                "CS0029",
+                9
+              ],
+              [
+                "CS0266",
+                6
+              ],
+              [
+                "CS0149",
+                5
+              ],
+              [
+                "CS7069",
+                4
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.TextMeshPro",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 59,
+              "CS0266": 6,
+              "CS0214": 2,
+              "CS1503": 15,
+              "CS0246": 13,
+              "CS0029": 9,
+              "CS1061": 60,
+              "CS0019": 16,
+              "CS0149": 5,
+              "CS8917": 2,
+              "CS0030": 2,
+              "CS0119": 2,
+              "CS1501": 1,
+              "CS0156": 1,
+              "CS0159": 2,
+              "CS0122": 2,
+              "CS7069": 4,
+              "CS0165": 17,
+              "CS0117": 1
+            },
+            "seconds": 4.125
+          }
+        },
+        "intermediate": {
+          "Assembly-CSharp": {
+            "diagnostics": 1985,
+            "codes": {
+              "CS0019": 190,
+              "CS0029": 185,
+              "CS0030": 55,
+              "CS0103": 468,
+              "CS0117": 48,
+              "CS0119": 94,
+              "CS0121": 1,
+              "CS0122": 118,
+              "CS0149": 17,
+              "CS0159": 35,
+              "CS0165": 53,
+              "CS0208": 144,
+              "CS0246": 41,
+              "CS0266": 46,
+              "CS0305": 1,
+              "CS0308": 3,
+              "CS0428": 1,
+              "CS1061": 191,
+              "CS1501": 50,
+              "CS1503": 128,
+              "CS1620": 9,
+              "CS1729": 2,
+              "CS7036": 11,
+              "CS7069": 9,
+              "CS8917": 85
+            }
+          },
+          "TempAsm": {
+            "diagnostics": 6,
+            "codes": {
+              "CS0103": 2,
+              "CS0208": 2,
+              "CS0266": 2
+            }
+          },
+          "UniTask": {
+            "diagnostics": 5663,
+            "codes": {
+              "CS0019": 667,
+              "CS0023": 4,
+              "CS0029": 425,
+              "CS0030": 82,
+              "CS0103": 1217,
+              "CS0117": 24,
+              "CS0119": 84,
+              "CS0122": 128,
+              "CS0149": 209,
+              "CS0159": 33,
+              "CS0161": 16,
+              "CS0163": 2,
+              "CS0165": 155,
+              "CS0173": 1,
+              "CS0177": 14,
+              "CS0208": 777,
+              "CS0212": 4,
+              "CS0214": 15,
+              "CS0246": 20,
+              "CS0266": 116,
+              "CS0308": 2,
+              "CS0311": 154,
+              "CS0571": 31,
+              "CS1061": 1091,
+              "CS1501": 56,
+              "CS1503": 212,
+              "CS1729": 10,
+              "CS1929": 1,
+              "CS7036": 37,
+              "CS8070": 1,
+              "CS8917": 75
+            }
+          },
+          "UniTask.Addressables": {
+            "diagnostics": 5,
+            "codes": {
+              "CS0103": 2,
+              "CS0208": 3
+            }
+          },
+          "UniTask.DOTween": {
+            "diagnostics": 5,
+            "codes": {
+              "CS0103": 2,
+              "CS0208": 3
+            }
+          },
+          "UniTask.Linq": {
+            "diagnostics": 13,
+            "codes": {
+              "CS0052": 7,
+              "CS0738": 1,
+              "CS7069": 5
+            }
+          },
+          "UniTask.TextMeshPro": {
+            "diagnostics": 222,
+            "codes": {
+              "CS0019": 16,
+              "CS0029": 9,
+              "CS0030": 2,
+              "CS0103": 59,
+              "CS0117": 1,
+              "CS0119": 2,
+              "CS0122": 2,
+              "CS0149": 5,
+              "CS0156": 1,
+              "CS0159": 2,
+              "CS0165": 17,
+              "CS0208": 3,
+              "CS0214": 2,
+              "CS0246": 13,
+              "CS0266": 6,
+              "CS1061": 60,
+              "CS1501": 1,
+              "CS1503": 15,
+              "CS7069": 4,
+              "CS8917": 2
+            }
+          }
+        },
+        "after": {
+          "Assembly-CSharp": {
+            "files": 16,
+            "syntax": 2,
+            "binding": 1971,
+            "top": [
+              [
+                "CS0103",
+                436
+              ],
+              [
+                "CS1061",
+                192
+              ],
+              [
+                "CS0019",
+                191
+              ],
+              [
+                "CS0029",
+                187
+              ],
+              [
+                "CS0208",
+                145
+              ],
+              [
+                "CS1503",
+                128
+              ],
+              [
+                "CS0122",
+                119
+              ],
+              [
+                "CS0119",
+                94
+              ],
+              [
+                "CS8917",
+                85
+              ],
+              [
+                "CS0165",
+                67
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0246": 41,
+              "CS1061": 192,
+              "CS0029": 187,
+              "CS0208": 145,
+              "CS0103": 436,
+              "CS0266": 46,
+              "CS8917": 85,
+              "CS0308": 3,
+              "CS7036": 11,
+              "CS1503": 128,
+              "CS0019": 191,
+              "CS0122": 119,
+              "CS0030": 55,
+              "CS0119": 94,
+              "CS1501": 50,
+              "CS0117": 48,
+              "CS1729": 2,
+              "CS0149": 17,
+              "CS0165": 67,
+              "CS7069": 9,
+              "CS0305": 1,
+              "CS0159": 35,
+              "CS0428": 1,
+              "CS1620": 9,
+              "CS0121": 1
+            },
+            "seconds": 5.327999999979511
+          },
+          "TempAsm": {
+            "files": 4,
+            "syntax": 0,
+            "binding": 6,
+            "top": [
+              [
+                "CS0103",
+                2
+              ],
+              [
+                "CS0208",
+                2
+              ],
+              [
+                "CS0266",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "TempAsm",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 2,
+              "CS0103": 2,
+              "CS0266": 2
+            },
+            "seconds": 2.0929999999934807
+          },
+          "UniTask": {
+            "files": 302,
+            "syntax": 11,
+            "binding": 5504,
+            "top": [
+              [
+                "CS1061",
+                1092
+              ],
+              [
+                "CS0103",
+                1015
+              ],
+              [
+                "CS0208",
+                778
+              ],
+              [
+                "CS0019",
+                676
+              ],
+              [
+                "CS0029",
+                429
+              ],
+              [
+                "CS0149",
+                212
+              ],
+              [
+                "CS1503",
+                212
+              ],
+              [
+                "CS0165",
+                191
+              ],
+              [
+                "CS0311",
+                154
+              ],
+              [
+                "CS0122",
+                128
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0029": 429,
+              "CS0208": 778,
+              "CS0103": 1015,
+              "CS0266": 116,
+              "CS0161": 16,
+              "CS1503": 212,
+              "CS0122": 128,
+              "CS1061": 1092,
+              "CS0149": 212,
+              "CS0246": 20,
+              "CS0019": 676,
+              "CS0117": 24,
+              "CS7036": 37,
+              "CS0030": 82,
+              "CS0571": 31,
+              "CS0177": 14,
+              "CS0165": 191,
+              "CS1501": 56,
+              "CS0173": 1,
+              "CS8917": 75,
+              "CS0119": 84,
+              "CS0159": 33,
+              "CS0214": 15,
+              "CS0163": 2,
+              "CS8070": 1,
+              "CS0212": 4,
+              "CS1729": 10,
+              "CS0308": 2,
+              "CS0311": 154,
+              "CS1929": 1,
+              "CS0023": 4
+            },
+            "seconds": 10.937999999965541
+          },
+          "UniTask.Addressables": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Addressables",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.6709999999729916
+          },
+          "UniTask.DOTween": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.DOTween",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.5940000000409782
+          },
+          "UniTask.Linq": {
+            "files": 143,
+            "syntax": 0,
+            "binding": 13,
+            "top": [
+              [
+                "CS0052",
+                7
+              ],
+              [
+                "CS7069",
+                5
+              ],
+              [
+                "CS0738",
+                1
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Linq",
+            "body_probe_observed": false,
+            "returncode": 1,
+            "codes": {
+              "CS0052": 7,
+              "CS7069": 5,
+              "CS0738": 1
+            },
+            "seconds": 2.155999999959022
+          },
+          "UniTask.TextMeshPro": {
+            "files": 5,
+            "syntax": 0,
+            "binding": 209,
+            "top": [
+              [
+                "CS1061",
+                60
+              ],
+              [
+                "CS0103",
+                40
+              ],
+              [
+                "CS0165",
+                21
+              ],
+              [
+                "CS0019",
+                17
+              ],
+              [
+                "CS1503",
+                15
+              ],
+              [
+                "CS0246",
+                13
+              ],
+              [
+                "CS0029",
+                9
+              ],
+              [
+                "CS0266",
+                6
+              ],
+              [
+                "CS0149",
+                5
+              ],
+              [
+                "CS7069",
+                4
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.TextMeshPro",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 40,
+              "CS0266": 6,
+              "CS0214": 2,
+              "CS1503": 15,
+              "CS0246": 13,
+              "CS0029": 9,
+              "CS1061": 60,
+              "CS0019": 17,
+              "CS0149": 5,
+              "CS8917": 2,
+              "CS0030": 2,
+              "CS0122": 3,
+              "CS0119": 2,
+              "CS1501": 1,
+              "CS0156": 1,
+              "CS0159": 2,
+              "CS7069": 4,
+              "CS0165": 21,
+              "CS0117": 1
+            },
+            "seconds": 3.047000000020489
+          }
+        },
+        "code_delta_out9_to_out11": {
+          "Assembly-CSharp": {
+            "CS0019": 3,
+            "CS0029": 5,
+            "CS0103": -24,
+            "CS0122": 2,
+            "CS0165": 14,
+            "CS0208": 1,
+            "CS0266": -2,
+            "CS1061": -8,
+            "CS1503": -7
+          },
+          "TempAsm": {},
+          "UniTask": {
+            "CS0019": 4,
+            "CS0029": 15,
+            "CS0103": -88,
+            "CS0149": 3,
+            "CS0165": 20,
+            "CS0208": 1,
+            "CS0266": 6,
+            "CS1061": -26,
+            "CS1503": -9
+          },
+          "UniTask.Addressables": {},
+          "UniTask.DOTween": {},
+          "UniTask.Linq": {},
+          "UniTask.TextMeshPro": {
+            "CS0019": 1,
+            "CS0103": -19,
+            "CS0122": 1,
+            "CS0165": 4
+          }
+        }
+      },
+      "tree_comparisons": {
+        "game_out9_game_out11": {
+          "changed_files": 23,
+          "removed_lines": 5281,
+          "added_lines": 6061,
+          "added_files": 0,
+          "removed_files": 0
+        },
+        "game_out10_game_out11": {
+          "changed_files": 15,
+          "removed_lines": 1023,
+          "added_lines": 1513,
+          "added_files": 0,
+          "removed_files": 0
+        }
+      },
+      "gates": {
+        "game_out10": {
+          "brace": {
+            "kind": "literal-aware brace audit",
+            "tree": "<repo-root>/out/unitask/game_out10",
+            "files": 474,
+            "unbalanced_files": 0,
+            "details": {}
+          },
+          "parse": {
+            "kind": "tree-sitter C# syntax gate",
+            "tree": "<repo-root>/out/unitask/game_out10",
+            "files": 474,
+            "bad_files": 0,
+            "errors": 0,
+            "missing": 0,
+            "recovery_nodes": 0,
+            "details": {},
+            "elapsed_seconds": 5.14
+          }
+        },
+        "game_out11": {
+          "brace": {
+            "kind": "literal-aware brace audit",
+            "tree": "<repo-root>/out/unitask/game_out11",
+            "files": 474,
+            "unbalanced_files": 0,
+            "details": {}
+          },
+          "parse": {
+            "kind": "tree-sitter C# syntax gate",
+            "tree": "<repo-root>/out/unitask/game_out11",
+            "files": 474,
+            "bad_files": 0,
+            "errors": 0,
+            "missing": 0,
+            "recovery_nodes": 0,
+            "details": {},
+            "elapsed_seconds": 2.985
+          }
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "manifest": {
+        "files": 295,
+        "lifted": 1857,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 321044,
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "f9a51f9aad40213df5c6bb80f70f80d7caf5b4d8359ccbe5ed4a5f926cd032b8",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "bca8de9eca6b6bb0ea63f31415a3942686bd03cc18c439ba461100978a2c33b5",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "a6a5b6ab9a8e69dc65cb0e310ce0eae92d5ea6f5a3cfac0ed0406ea0a8e2f797",
+          "il2cpp/dec/build.py": "5934358c3cb62158a2437f89573f3817fc3b1bd0e132cf1fab115cb902c10ce0",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "5f2be9a2a2e3fc51b49ca566dd0a0581d0434cd8b36746df22eac929e341350e",
+          "il2cpp/dec/ifaceprune.py": "7ae48d2423ba6298382a2d19a237cb3dce6d1f2e3ebc91c30be799687ddcb5db",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "536ff1f4577df01b55c85a9eb7dc5e65f4e7bb2ad4f6da52fc3d77b9a1f06620",
+          "il2cpp/lifter/insn.py": "5b4b57773c76196aa7951e1add248b1097e8b197f9dc8c961b67f21524ecb7f7",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "9e38e360d7ce8a6d6bde4282f24bfbf4698a0a51da7a598909c20270e1497e43",
+          "il2cpp/lifter/values.py": "5935d9ecd0356fd17ed18f747160d667a7e5da1f081a4fbc38251d8722db8bea",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        }
+      },
+      "compile": {
+        "reference_source": "installed Unity 6000 Editor engine DLLs + Editor netstandard 2.1/BCL + original player packages, current image excluded",
+        "synthetic_stubs": false,
+        "original_assembly_simple_names": true,
+        "before": {
+          "Assembly-CSharp": {
+            "files": 281,
+            "syntax": 192,
+            "binding": 6071,
+            "top": [
+              [
+                "CS1061",
+                1709
+              ],
+              [
+                "CS0019",
+                1274
+              ],
+              [
+                "CS0021",
+                609
+              ],
+              [
+                "CS0103",
+                527
+              ],
+              [
+                "CS0266",
+                463
+              ],
+              [
+                "CS0029",
+                419
+              ],
+              [
+                "CS0208",
+                220
+              ],
+              [
+                "CS1503",
+                185
+              ],
+              [
+                "CS0117",
+                163
+              ],
+              [
+                "CS1729",
+                163
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS1061": 1709,
+              "CS0208": 220,
+              "CS0266": 463,
+              "CS0029": 419,
+              "CS0117": 163,
+              "CS0103": 527,
+              "CS7036": 54,
+              "CS0571": 34,
+              "CS1503": 185,
+              "CS0212": 32,
+              "CS1501": 27,
+              "CS0149": 76,
+              "CS0019": 1274,
+              "CS0122": 60,
+              "CS0246": 73,
+              "CS0165": 74,
+              "CS0030": 9,
+              "CS0159": 29,
+              "CS1729": 163,
+              "CS1615": 29,
+              "CS0136": 4,
+              "CS0021": 609,
+              "CS0200": 12,
+              "CS0305": 1,
+              "CS8070": 1,
+              "CS8917": 1,
+              "CS0177": 1,
+              "CS0161": 2,
+              "CS0170": 2,
+              "CS0311": 5,
+              "CS0121": 1,
+              "CS0023": 4
+            },
+            "seconds": 14.422000000020489
+          },
+          "Assembly-CSharp-firstpass": {
+            "files": 12,
+            "syntax": 2,
+            "binding": 832,
+            "top": [
+              [
+                "CS1061",
+                418
+              ],
+              [
+                "CS0246",
+                105
+              ],
+              [
+                "CS0103",
+                85
+              ],
+              [
+                "CS1503",
+                65
+              ],
+              [
+                "CS0266",
+                37
+              ],
+              [
+                "CS0029",
+                34
+              ],
+              [
+                "CS0019",
+                31
+              ],
+              [
+                "CS0208",
+                19
+              ],
+              [
+                "CS0117",
+                17
+              ],
+              [
+                "CS0159",
+                7
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp-firstpass",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0019": 31,
+              "CS1729": 2,
+              "CS0571": 1,
+              "CS1503": 65,
+              "CS0208": 19,
+              "CS0266": 37,
+              "CS1061": 418,
+              "CS0246": 105,
+              "CS0103": 85,
+              "CS0029": 34,
+              "CS0117": 17,
+              "CS7036": 6,
+              "CS0159": 7,
+              "CS0165": 2,
+              "CS0149": 2,
+              "CS0122": 2,
+              "CS0212": 1
+            },
+            "seconds": 3.6570000000065193
+          }
+        },
+        "intermediate": {
+          "Assembly-CSharp": {
+            "diagnostics": 4281,
+            "codes": {
+              "CS0019": 240,
+              "CS0021": 11,
+              "CS0029": 527,
+              "CS0030": 9,
+              "CS0103": 527,
+              "CS0117": 163,
+              "CS0121": 1,
+              "CS0122": 60,
+              "CS0136": 4,
+              "CS0149": 76,
+              "CS0159": 29,
+              "CS0161": 2,
+              "CS0165": 74,
+              "CS0170": 2,
+              "CS0177": 1,
+              "CS0200": 12,
+              "CS0208": 226,
+              "CS0212": 36,
+              "CS0246": 73,
+              "CS0266": 429,
+              "CS0305": 1,
+              "CS0311": 5,
+              "CS0571": 34,
+              "CS1061": 1287,
+              "CS1501": 27,
+              "CS1503": 177,
+              "CS1615": 29,
+              "CS1729": 163,
+              "CS7036": 54,
+              "CS8070": 1,
+              "CS8917": 1
+            }
+          },
+          "Assembly-CSharp-firstpass": {
+            "diagnostics": 816,
+            "codes": {
+              "CS0019": 23,
+              "CS0029": 34,
+              "CS0103": 85,
+              "CS0117": 17,
+              "CS0122": 2,
+              "CS0149": 2,
+              "CS0159": 7,
+              "CS0165": 2,
+              "CS0208": 19,
+              "CS0212": 1,
+              "CS0246": 105,
+              "CS0266": 35,
+              "CS0571": 1,
+              "CS1061": 418,
+              "CS1503": 57,
+              "CS1729": 2,
+              "CS7036": 6
+            }
+          }
+        },
+        "after": {
+          "Assembly-CSharp": {
+            "files": 281,
+            "syntax": 192,
+            "binding": 4084,
+            "top": [
+              [
+                "CS1061",
+                1287
+              ],
+              [
+                "CS0029",
+                527
+              ],
+              [
+                "CS0103",
+                526
+              ],
+              [
+                "CS0266",
+                429
+              ],
+              [
+                "CS0019",
+                240
+              ],
+              [
+                "CS0208",
+                226
+              ],
+              [
+                "CS1503",
+                177
+              ],
+              [
+                "CS0117",
+                163
+              ],
+              [
+                "CS1729",
+                163
+              ],
+              [
+                "CS0149",
+                76
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS1061": 1287,
+              "CS0266": 429,
+              "CS0117": 163,
+              "CS0208": 226,
+              "CS0029": 527,
+              "CS7036": 54,
+              "CS1503": 177,
+              "CS0103": 526,
+              "CS0122": 60,
+              "CS0571": 34,
+              "CS0212": 36,
+              "CS1501": 27,
+              "CS0019": 240,
+              "CS0149": 76,
+              "CS0246": 73,
+              "CS0159": 29,
+              "CS0165": 74,
+              "CS0021": 11,
+              "CS1729": 163,
+              "CS0305": 1,
+              "CS0311": 5,
+              "CS0170": 2,
+              "CS0161": 2,
+              "CS0200": 12,
+              "CS8070": 1,
+              "CS1615": 29,
+              "CS0030": 9,
+              "CS0121": 1,
+              "CS0177": 1,
+              "CS8917": 1
+            },
+            "seconds": 7.828000000095926
+          },
+          "Assembly-CSharp-firstpass": {
+            "files": 12,
+            "syntax": 2,
+            "binding": 814,
+            "top": [
+              [
+                "CS1061",
+                418
+              ],
+              [
+                "CS0246",
+                105
+              ],
+              [
+                "CS0103",
+                85
+              ],
+              [
+                "CS1503",
+                57
+              ],
+              [
+                "CS0266",
+                35
+              ],
+              [
+                "CS0029",
+                34
+              ],
+              [
+                "CS0019",
+                23
+              ],
+              [
+                "CS0208",
+                19
+              ],
+              [
+                "CS0117",
+                17
+              ],
+              [
+                "CS0159",
+                7
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp-firstpass",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0019": 23,
+              "CS0208": 19,
+              "CS0266": 35,
+              "CS1061": 418,
+              "CS0246": 105,
+              "CS1729": 2,
+              "CS0571": 1,
+              "CS1503": 57,
+              "CS0103": 85,
+              "CS0029": 34,
+              "CS0117": 17,
+              "CS7036": 6,
+              "CS0159": 7,
+              "CS0165": 2,
+              "CS0149": 2,
+              "CS0122": 2,
+              "CS0212": 1
+            },
+            "seconds": 3.1869999999180436
+          }
+        },
+        "code_delta_out9_to_out11": {
+          "Assembly-CSharp": {
+            "CS0019": -1034,
+            "CS0021": -598,
+            "CS0023": -4,
+            "CS0029": 108,
+            "CS0103": -1,
+            "CS0136": -4,
+            "CS0208": 6,
+            "CS0212": 4,
+            "CS0266": -34,
+            "CS1061": -422,
+            "CS1503": -8
+          },
+          "Assembly-CSharp-firstpass": {
+            "CS0019": -8,
+            "CS0266": -2,
+            "CS1503": -8
+          }
+        }
+      },
+      "tree_comparisons": {
+        "game_out9_game_out11": {
+          "changed_files": 36,
+          "removed_lines": 2258,
+          "added_lines": 2273,
+          "added_files": 0,
+          "removed_files": 0
+        },
+        "game_out10_game_out11": {
+          "changed_files": 4,
+          "removed_lines": 11,
+          "added_lines": 17,
+          "added_files": 0,
+          "removed_files": 0
+        }
+      },
+      "gates": {
+        "game_out10": {
+          "brace": {
+            "kind": "literal-aware brace audit",
+            "tree": "<repo-root>/out/survivors-roguelike-kit/game_out10",
+            "files": 293,
+            "unbalanced_files": 0,
+            "details": {}
+          },
+          "parse": {
+            "kind": "tree-sitter C# syntax gate",
+            "tree": "<repo-root>/out/survivors-roguelike-kit/game_out10",
+            "files": 293,
+            "bad_files": 0,
+            "errors": 0,
+            "missing": 0,
+            "recovery_nodes": 0,
+            "details": {},
+            "elapsed_seconds": 1.859
+          }
+        },
+        "game_out11": {
+          "brace": {
+            "kind": "literal-aware brace audit",
+            "tree": "<repo-root>/out/survivors-roguelike-kit/game_out11",
+            "files": 293,
+            "unbalanced_files": 0,
+            "details": {}
+          },
+          "parse": {
+            "kind": "tree-sitter C# syntax gate",
+            "tree": "<repo-root>/out/survivors-roguelike-kit/game_out11",
+            "files": 293,
+            "bad_files": 0,
+            "errors": 0,
+            "missing": 0,
+            "recovery_nodes": 0,
+            "details": {},
+            "elapsed_seconds": 0.969
+          }
+        }
+      }
+    }
+  },
+  "validation": {
+    "portable": {
+      "passed": 1845,
+      "deselected": 321,
+      "seconds": 107.33
+    },
+    "targeted_portable": {
+      "passed": 35,
+      "seconds": 2.15
+    },
+    "full_without_parallel": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "259",
+      "tests": "2164",
+      "time": "1230.124",
+      "timestamp": "2026-11-03T19:49:39.462502+08:00",
+      "hostname": "DESKTOP-FLNM4EM",
+      "failure_set": [
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "pytest_summary": {
+        "passed": 1903,
+        "skipped": 259,
+        "non_strict_xpassed": 1,
+        "failed": 1
+      }
+    },
+    "parallel": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "2",
+      "time": "777.484",
+      "timestamp": "2026-11-03T19:49:39.538818+08:00",
+      "hostname": "DESKTOP-FLNM4EM",
+      "failure_set": []
+    }
+  },
+  "pin_review": {
+    "fixture": "limbus",
+    "method_row": 154731,
+    "return_tokens_before_local_rename_equal": true,
+    "baseline_final_returns": [
+      "return num19;",
+      "return 0;"
+    ],
+    "candidate_final_returns": [
+      "return num27;",
+      "return 0;"
+    ],
+    "baseline_has_return_pin": true,
+    "candidate_has_return_pin": false,
+    "scope_of_proof": "Pre-local-rename return tokens match in this method only; not whole-method or whole-corpus equivalence.",
+    "repinned": false
+  },
+  "synthetic_runtime": {
+    "kind": "original synthetic nested-generic scope repair compile/runtime proof",
+    "checks": 50000,
+    "mismatches": 0,
+    "incomplete_assignment_still_rejected": true,
+    "incomplete_assignment_codes": [
+      "CS0170"
+    ],
+    "game_runtime_equivalence_proved": false,
+    "performance_proved": false
+  }
+}

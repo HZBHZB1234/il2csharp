@@ -257,6 +257,15 @@ cross-check in a debugger or Ghidra.
    (`_collapse_arm`). After batch 15: `into_block` sites 56,657 → 21,322,
    and the remaining ones decompose into provably-blocked classes (the
    `work/lib/classify_into2.py` census, per-label, counts SOUND = 0).
+* **Shared-tail alpha-renaming preserves exact type facts (2026-11-03).**
+   The duplication fallback in `_hoist_shared_tails` copies existing facts in
+   the decompiler/lifter type maps and type-hint map independently, preserving
+   precedence/conflicts and `_gp_blocked`. Fresh names reserve map-only keys,
+   blocked tokens and metadata parameters. It does not infer new types or copy
+   entry-byref alias identity. `hoist_escaping_locals` recognizes nested generic
+   member suffixes and raw compiler-generated type names under its existing
+   scope/LCA proof; declarations remain bare so definite-assignment errors stay
+   visible. Evidence/known pin movement: `quality_shared_tail_type_facts_2026-11-03.json`.
 * **GPR arithmetic writes the flags it must (`il2cpp/lifter/insn.py`).** Only CMP/TEST (and SSE
   compares) used to set `L.flags`; a `jcc` after `sub rsi,1` (loop
   counter) therefore read the *stale* flags of an earlier `test`/`cmp`

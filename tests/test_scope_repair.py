@@ -2,6 +2,8 @@
 guards drop (il2cpp/dec/build.py)."""
 from types import SimpleNamespace as NS
 
+import pytest
+
 from il2cpp.dec.build import (drop_duplicate_raw_stores,
                               drop_empty_init_guards,
                               fold_sret_struct_copies,
@@ -270,3 +272,34 @@ def test_void_tail_strips_inline_return_only_after_a_statement():
     assert em._void_tail_strip(['Foo(); return;'], m) == ['Foo();']
     assert em._void_tail_strip(['} return;'], m) == ['}']
     assert em._void_tail_strip(['if (x) return;'], m) == ['if (x) return;']
+
+
+@pytest.mark.parametrize('ty', [
+    'UniTask<bool>.Awaiter',
+    'N.Outer<int>.Middle<string>.Leaf',
+    'N.Owner.<Run>d__3',
+    'N.Outer<int>.Leaf[][]',
+    'N.Outer<A<B>, C<D>>.Leaf*',
+])
+def test_nested_type_decl_escapes_without_fabricating_initialization(ty):
+    body = ['if (flag)', '{', '    %s value1 = Make();' % ty,
+            '}', 'Use(value1);']
+    out, n = hoist_escaping_locals(body)
+    assert n == 1 and out[0] == '%s value1;' % ty
+    assert '    value1 = Make();' in out
+    assert not any('default' in ln for ln in out)
+    assert out.count('Use(value1);') == 1
+    assert hoist_escaping_locals(out) == (out, 0)
+
+
+def test_nested_type_conflict_still_declines():
+    body = ['if (flag)', '{', '    Outer<int>.Leaf value1 = A();',
+            '}', 'else', '{', '    Outer<string>.Leaf value1 = B();',
+            '}', 'Use(value1);']
+    assert hoist_escaping_locals(body) == (body, 0)
+
+
+def test_well_scoped_nested_type_remains_unchanged():
+    body = ['if (flag)', '{', '    Outer<int>.Leaf value1 = Make();',
+            '    Use(value1);', '}']
+    assert hoist_escaping_locals(body) == (body, 0)
