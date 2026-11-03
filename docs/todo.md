@@ -1,4 +1,48 @@
-## Current work: the body tier's biggest family is an UNDECLARED TEMP (2026-11-03, on `main`)
+## Current work: body tier on BOTH fixtures, per image (2026-11-03, on `main`)
+
+Both fixtures now have a per-image body-tier measurement
+(`tools/body_tier_per_image.py`: each image compiled against the original
+closure minus its own dll, with the missing-name stub loop):
+
+| fixture | body-tier errors | declaration left | worst images |
+|---|---|---|---|
+| unitask `full_u10` | **78,104** | 324 | **Unity.TextMeshPro 68,111 (87%)**, CoreModule 3,893, Assembly-CSharp 2,384, UniTask **8** |
+| survivors `full_s6` | **30,750** | 582 | CoreModule 11,841, DOTween 5,984, Unity.2D.Common 2,860, ResourceManager 2,495 |
+
+The unitask total is a *one-image artifact*: `Unity.TextMeshPro` is 92 files
+carrying 68k errors, so quoting "78,104 for unitask" without that breakdown
+misleads — the other 48 images sum to **9,993**. survivors is much more evenly
+spread (no image above 12k).
+
+Top families (survivors): CS0030 5,068, CS0122 4,867, CS1061 3,803, CS0103
+3,420, CS0019 3,113, CS0029 1,813, CS0266 1,573, CS0208 1,475. Two of those are
+*known model artifacts of the per-image shape*: CS0122 (accessibility — our
+internal types used from another image; the `--publicize` gate flag exists for
+this) and part of CS0030/CS1061 (identity between our copy of a type and the
+closure's).
+
+### The `real*` declaration experiment (measured, reverted)
+
+The planning note's family is concentrated in `Unity.TextMeshPro` as `realN`
+names. I implemented a `real*`-ONLY variant of the declaration pass (float is
+the honest type for a `real` temp) and re-emitted that image:
+
+* before **68,111** (CS0103 35,564, all `real1..realN`)
+* after **68,034** (CS0103 35,430, names now `obj6`, `obj10`, `obj31`)
+
+A 0.1% move that only renames the missing identifier. So declaration coverage
+is NOT the limiting factor for this family either: the values themselves are
+unmodeled, and the `obj*` names that take over are the same read-only-slot
+problem. Reverted.
+
+**Conclusion for the next rounds**: the body tier is dominated by unmodeled
+native values (read-only slots whose callee outputs were never modeled) and by
+per-image identity/accessibility artifacts. Declaration-side text passes are
+exhausted; the next real gains are (a) `--publicize`-style measurement to strip
+CS0122 from the count, and (b) lifter-side modelling of the callee return that
+fills the read-only slots.
+
+## Previous: the body tier's biggest family is an UNDECLARED TEMP (2026-11-03, on `main`)
 
 With the declaration mask gone, CS0103 ("name does not exist") is 36,942 of the
 78,104 unitask errors. A census of `UnityEngine.CoreModule`'s 364 CS0103 rows
