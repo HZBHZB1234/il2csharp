@@ -24,6 +24,52 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### The goto residue: the shape is `if { work; goto L; } else { ... }` with L far below
+
+Dumping `_tidy_gotos`'s INPUT for `ResolveUnityBackgroundScaleMode`
+(UIElements, 367 lines, 16 gotos in, 8 out) shows the actual shape:
+
+```
+if (s_30 != BackgroundPositionKeyword.Center)
+{
+    v158 = t1012;
+    v159 = v95;
+    goto L_181eb9012;          <- last statement of the if arm
+}
+else
+{
+    s_30 = 0;
+    s_30.ctor(0f);
+    ...
+    if (!t1015)
+    {
+        v158 = t1015;
+        v159 = v95;
+        goto L_181eb9012;      <- and one nested inside the else
+    }
+    ...
+}
+... more code ...
+L_181eb9012:
+```
+
+Three text-level attempts were measured and all declined or had no effect:
+
+1. duplicating a PURE `return ...;` label body at the jump site — these labels
+   are not returns (they build and assign a value), gotos 562 -> 562;
+2. inverting a single-statement guard — the arms carry work before the goto;
+3. dropping a `goto L;` whose label immediately follows the enclosing if/else —
+   the label is NOT adjacent; more code and other statements sit between.
+
+So the shared tail genuinely is shared, and reaching it means restructuring the
+CFG so the tail is emitted once after the chain and each arm *falls through* to
+it: `_seq` must recognise the "all arms converge on block T" case (which is a
+join, not a jump) instead of emitting a goto to a label. That is structurer
+work; the text layer cannot see the join.
+
+Measured cost of leaving it: 7,595 gotos tree-wide on the survivors fixture
+(562 in UIElements, 29 in Assembly-CSharp).
+
 ## Previous: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
 
 ## Previous: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
