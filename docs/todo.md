@@ -23,7 +23,6 @@ and ~43 are real defects in emitted members.
 
 ## Previous: consolidated state of the two fixtures (2026-11-03, on `main`)
 
-## Previous: consolidated state of the two fixtures (2026-11-03, on `main`)
 
 The measurement that decides "near-complete recovery and near-recompilable" is
 per fixture, and both are close. All numbers below are from trees built with
