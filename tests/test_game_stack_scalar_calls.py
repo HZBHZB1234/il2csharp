@@ -13,6 +13,10 @@ pytestmark = pytest.mark.game('unitask')
 
 def test_playerloop_stack_immediates_have_exact_native_and_abi_evidence(
         raw_game_decompiler, monkeypatch):
+    # This test isolates the older immediate-store proof; register origins
+    # have their own independent native/ABI and byte-exact delta tests.
+    from il2cpp.lifter import stackscalars
+    monkeypatch.setattr(stackscalars, '_zero_register_bool_home', lambda *a: False)
     il, dec = raw_game_decompiler
     td = find_type(il, 'Cysharp.Threading.Tasks.PlayerLoopHelper')
     methods = [il.meta.methods[i]

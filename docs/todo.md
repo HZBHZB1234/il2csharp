@@ -4,6 +4,59 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Exact false stack homes from native zero registers (2026-11-04)
+
+Accepted `game_out37` (not promoted), versus out36. The existing immediate-only
+stack scalar proof now has a separate **false-byte-only** path: exact MOV from a
+byte GPR into the outgoing RSP home, with a same-register **32/64-bit self-XOR**
+earlier in the same contiguous executed CFG block. The backward walk is bounded
+at 512 instructions. Only Win64 preserved registers may carry zero across
+canonical ordinary direct metadata calls before the store; **every CALL after
+the store is a barrier**. Copies, partial zeros, true, register-derived enums,
+unknown instructions/aliases, source clobbers, gaps, segments, RSP changes and
+cross-block paths decline. Existing Win64 PE, unique canonical consumer,
+signature, ABI and nonunknown literal-agreement checks remain unchanged.
+
+Independent forward native analysis over both selected corpora proves **ten
+additional false arguments / three methods** (UniTask eight, survivors two).
+The full C# delta is **three files / ten lines**, each exactly one `0` -> `false`
+argument replacement. No retyping, renaming, Expr/hint/slot mutation, call-count
+change or effect reordering; reversing only those replacements restores all
+prior selected C# source bytes.
+
+Nine complete real-reference diagnostic multisets: UniTask **5,444 -> 5,436**;
+survivors Assembly-CSharp **3,783 -> 3,781**. Exactly **ten CS1503 removed / zero
+added**, all attributed to exact changed argument lines; the other seven
+assemblies are unchanged. Real Editor/BCL/package references, original assembly
+simple names, no self-reference or type stubs. UniTask.Linq still has 13
+declaration errors and no observed body sentinel.
+
+Strict builds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit failures;
+brace/parse clean (**474 / 293 C# files**), source fingerprints verified.
+**166 additional portable / two new game cases**; focused **290 synthetic +
+three game passed**, portable **3,252 passed**. Frozen full excluding parallel:
+**3,329 passed / 259 skipped / 1 non-strict xpassed / 3 existing failures**;
+parallel **2 passed**. Scoped stash proof on clean `d1efa42` reproduces exactly
+the same three failures and restores all four candidate files byte-exact.
+Goldens/pins unchanged; no output promotion.
+
+An authored Win64 synthetic native/.NET 10 harness compares the zero/store
+sequences with managed false across all 15 non-RSP GPRs, 32/64-bit self-XOR,
+six stack positions, zero/one/three ABI-preserving calls that clobber volatile
+GPRs, and post-store source clobbers: **148,800 checks / zero mismatches**,
+checked and unchecked. This is not execution of IL2CPP/game-native methods,
+whole-method/game semantic equivalence or performance evidence. The goal
+remains far from near-zero-error recompilation.
+
+Next **TEMP-only**, not accepted: two exact two-instruction small-struct returns
+currently print just an inner field. An initializer prototype finds both, but
+original target fields are private (one initonly), so that rendering is declined
+rather than relying on publicized output. A follow-up must prove an accessible
+constructor's exact native copy semantics, layout, ABI and absence of added
+initialization effects; no production change or compiler-gated result yet.
+Aggregate-only evidence:
+`validation_reports/quality_zero_register_stack_bool_2026-11-04.json`.
+
 ### Type-handle setup with a saved preceding result (2026-11-04)
 
 Accepted `game_out36` (not promoted), versus out35. The exact same-block native

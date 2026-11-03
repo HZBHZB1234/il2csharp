@@ -1,0 +1,295 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact false byte stack homes from native zero registers; not promoted; goal not achieved",
+  "baseline": "game_out36",
+  "candidate": "game_out37",
+  "source_parent": "d1efa42c6875b988427980ba5030d60ed2d1f274",
+  "proof_scope": [
+    "Existing explicit Win64 PE, unique canonical direct MethodDef consumer, exact signature and ABI, nonunknown argument literal and executed same-block requirements remain unchanged.",
+    "Only a literal zero at a bool parameter may gain the separate native proof: exact byte MOV from a GPR into the outgoing RSP home, and an earlier 32/64-bit self-XOR of that same full register in the same contiguous executed block. The backward walk is bounded to 512 instructions.",
+    "Before the home store, canonical ordinary direct metadata calls may be crossed only with zero in a Win64 preserved GPR; after the store every CALL is a barrier. Copies, partial zeros, true, enum registers, unknown instructions or aliases, source clobbers, gaps, segments, RSP changes and cross-block paths decline.",
+    "No argument Expr, type hint, slot/variable type, statement, declaration, call count or effect order is mutated. Every selected source difference is exactly one 0-to-false argument replacement."
+  ],
+  "validation": {
+    "additional_portable_cases": 166,
+    "new_game_cases": 2,
+    "focused_synthetic_passed": 290,
+    "focused_game_passed": 3,
+    "portable": {
+      "passed": 3252,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1235.515000000014,
+      "frozen_source_verified": true,
+      "passed": 3329,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 694.6089999999385,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "d1efa42c6875b988427980ba5030d60ed2d1f274",
+      "exit_code": 1,
+      "seconds": 115.46799999999348,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5444,
+          "after": 5436,
+          "added": 0,
+          "removed": 8,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 8
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 474,
+        "changed_files": 1,
+        "changed_lines": 8,
+        "source_false_arguments": 8,
+        "native_argument_proofs": 8,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 8,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep with independent forward native proof",
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "additional_native_arguments": 8,
+        "methods": 1,
+        "positions": {
+          "5": 8
+        },
+        "seconds": 236.75,
+        "independent_forward_zero_and_home_proof": true,
+        "input_arguments_hints_and_slot_types_unchanged": true,
+        "production": true,
+        "strict_build_evidence_recorded_separately": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 2,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3783,
+          "after": 3781,
+          "added": 0,
+          "removed": 2,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 2
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 293,
+        "changed_files": 2,
+        "changed_lines": 2,
+        "source_false_arguments": 2,
+        "native_argument_proofs": 2,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 2,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep with independent forward native proof",
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "additional_native_arguments": 2,
+        "methods": 2,
+        "positions": {
+          "4": 2
+        },
+        "seconds": 212.2970000000205,
+        "independent_forward_zero_and_home_proof": true,
+        "input_arguments_hints_and_slot_types_unchanged": true,
+        "production": true,
+        "strict_build_evidence_recorded_separately": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 10,
+    "added_occurrences": 0,
+    "net_occurrences": -10,
+    "removed_codes": {
+      "CS1503": 10
+    },
+    "normalization_or_suppression": false,
+    "all_removed_at_exact_changed_argument_lines": true
+  },
+  "authored_synthetic_native_runtime": {
+    "runtime": "installed .NET 10 / original synthetic Win64 x64 machine code",
+    "scope": "32/64-bit self-XOR to low-byte outgoing homes at all six ABI positions; 15 non-RSP GPRs; zero/one/three intervening ABI-preserving volatile-clobber calls; after-store source clobbers; original synthetic native result vs managed false",
+    "runs": [
+      {
+        "checked": "true",
+        "checks": 74400,
+        "mismatches": 0
+      },
+      {
+        "checked": "false",
+        "checks": 74400,
+        "mismatches": 0
+      }
+    ],
+    "checks": 148800,
+    "mismatches": 0,
+    "game_native_execution": false,
+    "whole_method_equivalence": false,
+    "speed_evidence": false
+  },
+  "next_temp_only_probe": {
+    "unitask": {
+      "status": "TEMP-only leaf return probe; not production or accepted",
+      "fixture": "unitask",
+      "selected_native_methods": 2242,
+      "candidate_methods": 2,
+      "seconds": 185.0779999999795,
+      "each_source_delta_exact_return_only": true,
+      "strict_rebuild": false,
+      "compiler_gate": false,
+      "complete_negative_suite": false
+    },
+    "survivors-roguelike-kit": {
+      "status": "TEMP-only leaf return probe; not production or accepted",
+      "fixture": "survivors-roguelike-kit",
+      "selected_native_methods": 1936,
+      "candidate_methods": 0,
+      "seconds": 140.68700000003446,
+      "each_source_delta_exact_return_only": true,
+      "strict_rebuild": false,
+      "compiler_gate": false,
+      "complete_negative_suite": false
+    },
+    "object_initializer_declined": "Both original target fields are private, and one is initonly. The candidate object-initializer rendering lacks an original-accessibility/initonly proof and must not rely on publicized output. An exact native-copy-constructor TEMP prototype finds both returns and passes 68 fixture mutation cases; it is not a production or compiler-gated recovery."
+  },
+  "limitations": [
+    "Only ten false arguments in three sample methods are recovered; all other selected C# bytes remain unchanged.",
+    "Nine selected assemblies still have many real compiler errors. UniTask.Linq retains 13 declaration errors with no observed body sentinel.",
+    "Runtime checks execute authored synthetic native Win64 snippets against managed false, not IL2CPP/game-native methods. They do not establish whole-method/game equivalence or performance.",
+    "No golden changes, output promotion, near-zero-error recompilation, or speed improvement claim.",
+    "The next leaf-return probe is TEMP-only and its initializer spelling was declined for inaccessible/readonly fields. A native-copy-constructor TEMP prototype finds both returns and passes 68 fixture mutation cases; no production change or compiler-gated result exists for that slice."
+  ]
+}

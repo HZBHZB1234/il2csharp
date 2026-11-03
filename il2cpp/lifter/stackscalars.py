@@ -44,6 +44,78 @@ def _immediate_home_write(block, call, offset, width, value):
     return False
 
 
+
+def _zero_register_bool_home(il, block, call, offset):
+    """Prove one false byte home from a same-block full-register self-XOR.
+
+    No copies, partial zeros or cross-block facts. Before the byte store only
+    Win64 preserved registers may carry zero across canonical managed calls;
+    after the store every call is a barrier (it can write incoming homes).
+    """
+    from iced_x86 import RegisterExt
+    from il2cpp.lifter.stackrefs import _plain_method
+    if call.segment_prefix != IReg.NONE:
+        return False
+    preserved = (IReg.RBX, IReg.RBP, IReg.RSI, IReg.RDI,
+                 IReg.R12, IReg.R13, IReg.R14, IReg.R15)
+    source = None
+    following = call.ip
+    for ins in reversed([x for x in block.insns if x.ip < call.ip][-512:]):
+        if ins.next_ip != following or ins.segment_prefix != IReg.NONE:
+            return False
+        following = ins.ip
+        if ins.mnemonic == Mnemonic.CALL:
+            if source not in preserved or _plain_method(il, ins) is None:
+                return False
+            continue
+        if ins.mnemonic == Mnemonic.XOR and ins.op_count == 2 \
+                and ins.op0_kind == ins.op1_kind == OpKind.REGISTER \
+                and ins.op0_register == ins.op1_register \
+                and RegisterExt.is_gpr(ins.op0_register):
+            dest = RegisterExt.full_register(ins.op0_register)
+            if dest == IReg.RSP:
+                return False
+            if dest == source:
+                return RegisterExt.size(ins.op0_register) in (4, 8)
+            continue
+        if ins.mnemonic not in (Mnemonic.MOV, Mnemonic.LEA) or ins.op_count != 2:
+            return False
+        if ins.op0_kind == OpKind.REGISTER:
+            dest = ins.op0_register
+            if not RegisterExt.is_gpr(dest) or RegisterExt.full_register(dest) == IReg.RSP:
+                return False
+            if ins.mnemonic == Mnemonic.LEA:
+                if ins.op1_kind != OpKind.MEMORY or RegisterExt.full_register(dest) == source:
+                    return False
+                continue
+            if ins.op1_kind == OpKind.REGISTER:
+                if not RegisterExt.is_gpr(ins.op1_register):
+                    return False
+            elif ins.op1_kind != OpKind.MEMORY and ins.op1_kind not in IMM_OPS:
+                return False
+            if RegisterExt.full_register(dest) == source:
+                return False
+            continue
+        if ins.mnemonic != Mnemonic.MOV or ins.op0_kind != OpKind.MEMORY \
+                or ins.memory_base != IReg.RSP or ins.memory_index != IReg.NONE:
+            return False
+        size = MemorySizeExt.size(ins.memory_size)
+        disp = ins.memory_displacement
+        if size not in (1, 2, 4, 8):
+            return False
+        if ins.op1_kind == OpKind.REGISTER:
+            if not RegisterExt.is_gpr(ins.op1_register):
+                return False
+        elif ins.op1_kind not in IMM_OPS:
+            return False
+        if source is None and disp < offset + 1 and offset < disp + size:
+            if disp != offset or size != 1 or ins.op1_kind != OpKind.REGISTER \
+                    or RegisterExt.size(ins.op1_register) != 1:
+                return False
+            source = RegisterExt.full_register(ins.op1_register)
+    return False
+
+
 def _int32_enum(il, ty):
     if il._type_enum(ty) != 0x11 or ty[1] & (1 << 29) \
             or not 0 <= ty[0] < len(il.meta.typedefs):
@@ -69,8 +141,9 @@ def recover_stack_scalars(lift, method, rty, args):
     """Render only literal bool/int32-enum homes proved at a unique direct call.
 
     This does not type a stack local or infer a value from the signature. Sret,
-    generic targets, tails, register-sourced stores, unknown values, intervening
-    calls/branches/unknown writes and mixed/partial homes keep today's spelling.
+    generic targets, tails, unknown values and mixed/partial homes stay raw.
+    Register stores need a separate exact false-byte origin proof; no true or
+    enum value is inferred from a register or from the consumer signature.
     """
     if not HAVE_ICED or len(args) <= 4:
         return args
@@ -133,7 +206,9 @@ def recover_stack_scalars(lift, method, rty, args):
                     continue
                 width = 4
                 text = '%s.%s' % (il.type_name(pt), members[value])
-            if _immediate_home_write(block, call, offset, width, value):
+            if _immediate_home_write(block, call, offset, width, value) or (
+                    te == 0x02 and value == 0
+                    and _zero_register_bool_home(il, block, call, offset)):
                 if out is args:
                     out = list(args)
                 out[pos] = text
