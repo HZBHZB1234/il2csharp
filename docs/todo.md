@@ -43,6 +43,35 @@ Actionable plan (next round, bounded):
 This is the first body-tier family with a plausible single cause, and at ~28k
 of 36.9k CS0103 rows it is worth more than every fidelity slice combined.
 
+### The undeclared-temp family is TYPE loss, not declaration coverage (measured, reverted)
+
+I implemented the planning note's pass — declare every method-scope temp the body
+uses but never declares, with the house types (`num*`->`int`, `real*`->`float`,
+`flag*`->`bool`, `obj*`->`object`) — and measured it on
+`UnityEngine.CoreModule` (442 files, re-emitted with the pass):
+
+| | before | after |
+|---|---|---|
+| CS0103 rows | **364** | **92** |
+| CS0103 "temp" rows | 285 | **13** |
+| total errors | 3,893 | **3,913** |
+
+So the declarations do remove the name errors — and the total goes slightly
+**up**: 292 errors were converted into CS0266 (+47), CS1061 (+31), CS0019 (+12)
+and friends. Declaring `object obj14` where the call expects something else, or
+`int num1` where the value is a float, trades one error family for another.
+
+Conclusion, and why it matters: **the CS0103 family is a symptom of the lifter
+losing a temp's TYPE, not of a missing declaration.** By the time the text is
+rendered, nothing knows what the temp was; a house-type guess cannot recover it.
+The pass was reverted (net negative, and it would have obscured the real cause).
+
+Redirect for the next attempt: make the temp carry its type at MINT time — i.e.
+`_bind` must declare the temp with the `Expr.ty` it already holds, and every
+path that renames or re-homes a temp must keep the declaration with it. That is
+a lifter-side fix, and it also explains the `(float2)`/struct-bit-pattern
+families: the same type is dropped in three different places.
+
 ## Previous: the body tier measured — 78,104 errors on unitask
 
 ## Previous: the body tier measured — 78,104 errors on unitask, and every model has artifacts (2026-11-03, on `main`)
