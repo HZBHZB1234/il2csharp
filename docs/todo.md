@@ -119,6 +119,37 @@ inserted text is present with single CRLF, then compile. If the error still does
 not appear, dump the compiler's file list (`-errorlog` / a deliberate duplicate)
 to see which physical path it used.
 
+### Anomaly status: OPEN, low value, do not chase
+
+The `int -> Vector2` silence is now measured with a clean edit and still
+unexplained:
+
+* a COPY of the `Assembly-CSharp` image had `int __bad = "x";` inserted right
+  after `rectTransform1.pivot = num1;`, with the bytes read back and asserted
+  (marker exactly once, insertion exactly once, no doubled CR), the file
+  confirmed in the compiler's source list — and the compile still reports the
+  same **63 errors, none for that file**, although `int __bad = "x";` alone is
+  CS0029;
+* replacing the same file's content with `class {` DOES report 2 errors for it
+  (CS1001/CS1513), so the file is read and the parse tier is reached.
+
+So the compiler analyses the file's *syntax* but not its *semantics*. The most
+plausible remaining explanation is a type-identity conflict with the reference
+closure (the emitted `TMPro.Examples.TMP_UiFrameRateCounter` may collide with a
+type the closure also exposes), but no probe has confirmed it and the practical
+impact is nil: the tree-wide counts come from the same gate for every file, and
+one silent file does not change any family.
+
+**Decision: stop investigating.** Recorded here so the next session does not
+re-open it without new evidence. If it ever matters, the cleanest probe is to
+compile that ONE file with `-errorendlocation` plus a deliberate duplicate-type
+declaration to see which copy the compiler binds.
+
+The consequence worth keeping in mind: the *wide struct store*
+(`num1 = 1008981770; rectTransform1.pivot = num1;`) is a fidelity defect whose
+*compilability* impact cannot be demonstrated while this anomaly stands — so any
+fix for it must be justified by fidelity alone, not by gate numbers.
+
 ## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 
