@@ -24,6 +24,36 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### The binding-scope question is OPEN and the probe method is unreliable
+
+Trying to size how many files have their method bodies bound went badly, and
+the honest record is that the probe method itself is not trustworthy:
+
+* injecting `int __probe = "x";` into the first method body of every 10th file
+  (27 files, insertion verified in one by reading the file back) produced **2 of
+  27** reported, with the total error count unchanged at 63;
+* swapping the probe for a missing-member call (`this.__probe_missing();`)
+  produced the **same 2 of 27**, so it is not error-kind-specific;
+* recompiling with `-errorlimit:9999` reported **0 errors** and 0 probes --
+  i.e. that run silently did nothing, exactly like the earlier "appended file"
+  and "nonexistent file" experiments.
+
+So the harness has a failure mode where csc exits without diagnostics, and I
+cannot tell a genuine "body not bound" from that mode. Two independent
+probe shapes agreeing (2 of 27) argues for a real phenomenon, but a run that
+reports zero errors proves the driver is fragile.
+
+Important corollary: **all 118 reported errors appear to be declaration-level**
+(CS0234, CS0117 from const initializers, CS8701, CS0111, CS0535, CS0507,
+CS0051/52/53, CS0460, CS8345, CS0100, CS0644, CS0115). If bodies really are
+mostly unbound, the binding tier is under-reporting substantially -- and the
+"19 / 118" figures describe declarations only.
+
+Next step, precise: stop using raw `csc` with a response file. Write a minimal
+`.csproj` (`<Compile Include="**/*.cs"/>`, `<NoWarn>` set, `<AllowUnsafeBlocks>`)
+next to the tree copy and run `dotnet build`, then read the MSBuild output.
+That removes the response-file/option layer that keeps producing silent no-ops.
+
 ### Measurement caveat: some files' METHOD BODIES are not bound (unexplained)
 
 Four experiments, all on `Assembly-CSharp/TMPro/Examples/TMP_UiFrameRateCounter.cs`:
