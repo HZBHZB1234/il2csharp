@@ -1,0 +1,34 @@
+{
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\full_u10",
+  "source_files": 2220,
+  "merged_stubs": 426,
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\Roslyn\\bincore\\csc.dll",
+  "inventory_sha256": "c650839aec6199dc50773353b29ed23a4289db24a39d9b4589a59c413623c643",
+  "log": "validation_reports\\unitask\\full_u10.whole.compile.log.gz",
+  "references": null,
+  "reference_closure": [
+    "managed-refs fixtures/unitask/build: 4 (excluded 45 tree images)"
+  ],
+  "closure_refs": 4,
+  "exit_code": 1,
+  "files_with_errors": 6,
+  "errors": 19,
+  "errors_by_code": {
+    "CS8701": 18,
+    "CS0644": 1
+  },
+  "first_error_by_code": {
+    "CS8701": {
+      "file": "out\\unitask\\full_u10\\__Generated\\IActivationFactory.cs",
+      "line": 7,
+      "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002\r"
+    },
+    "CS0644": {
+      "file": "out\\unitask\\full_u10\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+      "line": 8,
+      "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f\r"
+    }
+  },
+  "binding_masked": false,
+  "scope": "Single diagnostic assembly; original project wiring is not tested"
+}

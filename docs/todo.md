@@ -1,4 +1,26 @@
-## Current work: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
+## Current work: fix 202 verified on both fixtures (2026-11-03, on `main`)
+
+The switch synthesis landed and was re-measured on both fixtures with full
+rebuilds:
+
+| fixture | `switch (` | `else if (` | gates |
+|---|---|---|---|
+| unitask `full_u9` -> `full_u10` | 230 -> **235** | 4,940 -> **4,928** | brace 0, tree-sitter 0/0/0/0, whole-tree compile **19** (CS8701 x18 + CS0644 x1, `binding_masked: false`) |
+| survivors `Assembly-CSharp` (same 293 files) | 5 -> **6** | 152 -> **150** | n/a (image-level A/B) |
+
+So the fix is worth +11 switches across the two fixtures (`Set_FrameCounter_
+Position` on the survivors side, five more on unitask), every one of them a
+chain over an enum that the source itself wrote as a `switch`. unitask's
+fidelity is unchanged to four decimals (call_f1 0.6168 / member_f1 0.3255 /
+shape 0.7915), which is expected: swapping an if-ladder for a switch keeps the
+call/member sequences and barely moves the construct histogram.
+
+The survivors full rebuild (`full_s6`, 4 workers) was still running at the end
+of the round; its gates are the next measurement.
+
+## Previous: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
+
+## Previous: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
 
 The switch slice needed **both** halves; either alone measures as no change
 (5 -> 5 switches on Assembly-CSharp, the previous round's negative result).
