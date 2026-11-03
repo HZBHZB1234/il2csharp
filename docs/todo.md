@@ -98,6 +98,27 @@ diagnostic although it contains `rectTransform1.pivot = num1;` with
 assignment is CS0029. Next attempt should NOT append a probe file: copy the
 image directory, edit the *real* file there, and compile the copy.
 
+### The bisect is inconclusive (both halves measured)
+
+Two halves of the same experiment, on a COPY of the `Assembly-CSharp` image:
+
+* replacing `TMP/Examples/TMP_UiFrameRateCounter.cs` with `class {` DOES report
+  **2 errors for that file** (CS1001/CS1513) — so the file is read and analysed,
+  and the parse tier is reached (note the total dropped to 2: the syntax errors
+  suppress every binding diagnostic, the masking rule again);
+* inserting `int __bad = "x";` after `rectTransform1.pivot = num1;` in the same
+  file reports **nothing** (63 errors, identical to the unmodified image).
+
+Both cannot be true unless the second edit did not reach the compiler: the copy
+was written with `newline='\r\n'` on content that already carried `\r\n`, which
+doubles the CR bytes; csc tolerates that for parsing but the experiment is
+therefore not clean. The anomaly (`int -> Vector2` accepted) stays **open**.
+
+Next attempt: after editing the copy, read the bytes back and assert the
+inserted text is present with single CRLF, then compile. If the error still does
+not appear, dump the compiler's file list (`-errorlog` / a deliberate duplicate)
+to see which physical path it used.
+
 ## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 
