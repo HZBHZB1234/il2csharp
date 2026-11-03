@@ -1,0 +1,78 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\mscorlib",
+  "assembly": "mscorlib",
+  "files": 1340,
+  "syntax": 0,
+  "binding": 41456,
+  "top": [
+    [
+      "CS0518",
+      41053
+    ],
+    [
+      "CS0592",
+      370
+    ],
+    [
+      "CS0115",
+      33
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0518": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\Runtime\\CompilerServices\\CompilationRelaxationsAttribute.cs",
+        "line": 21,
+        "message": "\u9884\u5b9a\u4e49\u7c7b\u578b\u201cSystem.Int32\u201d\u672a\u5b9a\u4e49\u6216\u5bfc\u5165"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\Runtime\\CompilerServices\\CompilationRelaxationsAttribute.cs",
+        "line": 21,
+        "message": "\u9884\u5b9a\u4e49\u7c7b\u578b\u201cSystem.Void\u201d\u672a\u5b9a\u4e49\u6216\u5bfc\u5165"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\Runtime\\CompilerServices\\CompilationRelaxationsAttribute.cs",
+        "line": 26,
+        "message": "\u9884\u5b9a\u4e49\u7c7b\u578b\u201cSystem.Object\u201d\u672a\u5b9a\u4e49\u6216\u5bfc\u5165"
+      }
+    ],
+    "CS0115": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\Microsoft\\Win32\\RegistryKey.cs",
+        "line": 770,
+        "message": "\u201cRegistryKey.ToString()\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\AppDomain.cs",
+        "line": 316,
+        "message": "\u201cAppDomain.ToString()\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\Collections\\Generic\\ByteEqualityComparer.cs",
+        "line": 87,
+        "message": "\u201cByteEqualityComparer.GetHashCode()\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      }
+    ],
+    "CS0592": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\Attribute.cs",
+        "line": 11,
+        "message": "\u7279\u6027\u201cSerializable\u201d\u5bf9\u6b64\u58f0\u660e\u7c7b\u578b\u65e0\u6548\u3002\u5b83\u4ec5\u5bf9\u201c\u201d\u58f0\u660e\u6709\u6548\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\Mono\\Globalization\\Unicode\\MSCompatUnicodeTable.cs",
+        "line": 1115,
+        "message": "\u7279\u6027\u201cSerializable\u201d\u5bf9\u6b64\u58f0\u660e\u7c7b\u578b\u65e0\u6548\u3002\u5b83\u4ec5\u5bf9\u201c\u201d\u58f0\u660e\u6709\u6548\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\mscorlib\\System\\AccessViolationException.cs",
+        "line": 8,
+        "message": "\u7279\u6027\u201cSerializable\u201d\u5bf9\u6b64\u58f0\u660e\u7c7b\u578b\u65e0\u6548\u3002\u5b83\u4ec5\u5bf9\u201c\u201d\u58f0\u660e\u6709\u6548\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

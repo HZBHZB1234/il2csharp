@@ -1,0 +1,116 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule",
+  "assembly": "UnityEngine.UIElementsModule",
+  "files": 856,
+  "syntax": 0,
+  "binding": 87,
+  "top": [
+    [
+      "CS0122",
+      68
+    ],
+    [
+      "CS8701",
+      12
+    ],
+    [
+      "CS0117",
+      3
+    ],
+    [
+      "CS0535",
+      2
+    ],
+    [
+      "CS0208",
+      1
+    ],
+    [
+      "CS0460",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS8701": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ITextEdition.cs",
+        "line": 28,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ITextEdition.cs",
+        "line": 37,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ITextEdition.cs",
+        "line": 47,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ATGTextJobSystem.cs",
+        "line": 469,
+        "message": "\u201cATGMeshInfo\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ATGTextJobSystem.cs",
+        "line": 811,
+        "message": "\u201cNativeTextInfo\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\BaseVisualElementPanel.cs",
+        "line": 40,
+        "message": "\u201cEventInterests\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\WorldSpaceInput.cs",
+        "line": 110,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\Layout\\LayoutNode.cs",
+        "line": 1738,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cNaN\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\Layout\\LayoutNode.cs",
+        "line": 1738,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cNaN\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0535": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\InlineStyleAccessPropertyBag.cs",
+        "line": 13,
+        "message": "\u201cInlineStyleAccessPropertyBag\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cINamedProperties<InlineStyleAccess>.TryGetProperty(ref InlineStyleAccess, string, out IProperty<InlineStyleAccess>)\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\ResolvedStyleAccessPropertyBag.cs",
+        "line": 13,
+        "message": "\u201cResolvedStyleAccessPropertyBag\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cINamedProperties<ResolvedStyleAccess>.TryGetProperty(ref ResolvedStyleAccess, string, out IProperty<ResolvedStyleAccess>)\u201d"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\Layout\\LayoutList.cs",
+        "line": 79,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cT\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0460": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UIElementsModule\\UnityEngine\\UIElements\\Internal\\AutoCompletePathVisitor.cs",
+        "line": 61,
+        "message": "\u91cd\u5199\u548c\u663e\u5f0f\u63a5\u53e3\u5b9e\u73b0\u65b9\u6cd5\u7684\u7ea6\u675f\u662f\u4ece\u57fa\u65b9\u6cd5\u7ee7\u627f\u7684\uff0c\u56e0\u6b64\u4e0d\u80fd\u76f4\u63a5\u6307\u5b9a\u8fd9\u4e9b\u7ea6\u675f\uff0c\u9664\u975e\u6307\u5b9a \"class\" \u6216 \"struct\" \u7ea6\u675f\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

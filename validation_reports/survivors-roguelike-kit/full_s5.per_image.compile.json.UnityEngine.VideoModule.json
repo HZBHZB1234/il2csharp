@@ -1,0 +1,111 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule",
+  "assembly": "UnityEngine.VideoModule",
+  "files": 11,
+  "syntax": 0,
+  "binding": 35,
+  "top": [
+    [
+      "CS1061",
+      16
+    ],
+    [
+      "CS0030",
+      8
+    ],
+    [
+      "CS0122",
+      8
+    ],
+    [
+      "CS0029",
+      1
+    ],
+    [
+      "CS0103",
+      1
+    ],
+    [
+      "CS0571",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Experimental\\Video\\VideoClipPlayable.cs",
+        "line": 18,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Playables.PlayableHandle\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 27,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Video.VideoPlayer.EventHandler\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 39,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Video.VideoPlayer.FrameReadyEventHandler\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 51,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Video.VideoPlayer.EventHandler\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 27,
+        "message": "\u201cVideoPlayer.EventHandler\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVideoPlayer.EventHandler\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 27,
+        "message": "\u201cVideoPlayer.EventHandler\u201d\u672a\u5305\u542b\u201cmethod\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVideoPlayer.EventHandler\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 39,
+        "message": "\u201cVideoPlayer.FrameReadyEventHandler\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVideoPlayer.FrameReadyEventHandler\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Video\\VideoPlayer.cs",
+        "line": 112,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj3\u201d"
+      }
+    ],
+    "CS0571": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Experimental\\Video\\VideoClipPlayable.cs",
+        "line": 25,
+        "message": "\u201cPlayableHandle.operator ==(PlayableHandle, PlayableHandle)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Experimental\\Video\\VideoClipPlayable.cs",
+        "line": 25,
+        "message": "\u201cPlayableHandle.m_Handle\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Experimental\\Video\\VideoClipPlayable.cs",
+        "line": 25,
+        "message": "\u201cPlayableHandle.m_Handle\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VideoModule\\UnityEngine\\Experimental\\Video\\VideoClipPlayable.cs",
+        "line": 25,
+        "message": "\u201cPlayableHandle.m_Version\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ]
+  },
+  "returncode": 1
+}

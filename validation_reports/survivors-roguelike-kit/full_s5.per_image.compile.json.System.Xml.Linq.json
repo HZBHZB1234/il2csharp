@@ -1,0 +1,372 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq",
+  "assembly": "System.Xml.Linq",
+  "files": 31,
+  "syntax": 45,
+  "binding": 904,
+  "top": [
+    [
+      "CS0030",
+      230
+    ],
+    [
+      "CS1061",
+      226
+    ],
+    [
+      "CS0122",
+      86
+    ],
+    [
+      "CS0266",
+      71
+    ],
+    [
+      "CS0208",
+      63
+    ],
+    [
+      "CS0019",
+      55
+    ],
+    [
+      "CS1729",
+      45
+    ],
+    [
+      "CS0103",
+      41
+    ],
+    [
+      "CS0029",
+      25
+    ],
+    [
+      "CS7036",
+      24
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 20,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cfloat\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.NamespaceResolver\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\NamespaceCache.cs",
+        "line": 19,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.NamespaceCache\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.XNamespace\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObject.cs",
+        "line": 51,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.XContainer\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.XElement\u201d"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.ElementWriter\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Text\\StringBuilderCache.cs",
+        "line": 19,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Text\\StringBuilderCache.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS7036": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\LineInfoEndElementAnnotation.cs",
+        "line": 9,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cLineInfoAnnotation.LineInfoAnnotation(int, int)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201clineNumber\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObjectChangeEventArgs.cs",
+        "line": 23,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cXObjectChangeEventArgs.XObjectChangeEventArgs(XObjectChange)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cobjectChange\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObjectChangeEventArgs.cs",
+        "line": 26,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cXObjectChangeEventArgs.XObjectChangeEventArgs(XObjectChange)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cobjectChange\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\NamespaceCache.cs",
+        "line": 15,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cstring\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 125,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 165,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XAttribute.cs",
+        "line": 20,
+        "message": "\u201cXName._ns\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XAttribute.cs",
+        "line": 21,
+        "message": "\u201cXName._ns\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XAttribute.cs",
+        "line": 23,
+        "message": "\u201cXName._localName\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\Unity\\ThrowStub.cs",
+        "line": 8,
+        "message": "\u201cObjectDisposedException\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XCData.cs",
+        "line": 19,
+        "message": "\u201cXText\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XCData.cs",
+        "line": 27,
+        "message": "\u201cXText\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XCData.cs",
+        "line": 45,
+        "message": "\u201cXNode\u201d\u672a\u5305\u542b\u201ctext\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cXNode\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201ctext\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XComment.cs",
+        "line": 68,
+        "message": "\u201cXNode\u201d\u672a\u5305\u542b\u201cvalue\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cXNode\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cvalue\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XDocumentType.cs",
+        "line": 88,
+        "message": "\u201cXNode\u201d\u672a\u5305\u542b\u201c_name\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cXNode\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201c_name\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0411": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XDocument.cs",
+        "line": 41,
+        "message": "\u65e0\u6cd5\u4ece\u7528\u6cd5\u4e2d\u63a8\u65ad\u51fa\u65b9\u6cd5\u201cXDocument.GetFirstNode<T>()\u201d\u7684\u7c7b\u578b\u53c2\u6570\u3002\u8bf7\u5c1d\u8bd5\u663e\u5f0f\u6307\u5b9a\u7c7b\u578b\u53c2\u6570\u3002"
+      }
+    ],
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XElement.cs",
+        "line": 25,
+        "message": "\u8fd0\u7b97\u7b26\u201c>\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cXAttribute\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XElement.cs",
+        "line": 33,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XDeclaration.cs",
+        "line": 82,
+        "message": "\u8fd0\u7b97\u7b26\u201c!=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cstring\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 118,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.XContainer\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.XElement\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 121,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.XNode\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.XElement\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 60,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Xml.Linq.XHashtable<System.Xml.Linq.XName>.ExtractKeyDelegate\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Xml.Linq.XHashtable<TValue>.ExtractKeyDelegate\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XElement.cs",
+        "line": 68,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cstring\u201d\u8f6c\u6362\u4e3a\u201cint\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XName.cs",
+        "line": 74,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cint\u201d\u8f6c\u6362\u4e3a\u201cchar\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XName.cs",
+        "line": 87,
+        "message": "\u53c2\u6570 3: \u65e0\u6cd5\u4ece\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cint\u201d"
+      }
+    ],
+    "CS0165": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObject.cs",
+        "line": 32,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cbaseUriAnnotation1\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 175,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cobj14\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 202,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cxContainer1\u201d"
+      }
+    ],
+    "CS0246": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 60,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cTValue\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 157,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cTValue\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObject.cs",
+        "line": 126,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XName.cs",
+        "line": 137,
+        "message": "\u201cXName\u201d\u672a\u5305\u542b\u201cctor\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0159": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 74,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_1815e095d\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 460,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_1815dbe58\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\ElementWriter.cs",
+        "line": 465,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_1815dbe58\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      }
+    ],
+    "CS0173": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XAttribute.cs",
+        "line": 107,
+        "message": "\u65e0\u6cd5\u786e\u5b9a\u6761\u4ef6\u8868\u8fbe\u5f0f\u7684\u7c7b\u578b\uff0c\u56e0\u4e3a\u201cstring\u201d\u548c\u201c\u76ee\u6807\u7c7b\u578b\u7684\u6761\u4ef6\u8868\u8fbe\u5f0f\u201d\u4e4b\u95f4\u6ca1\u6709\u9690\u5f0f\u8f6c\u6362"
+      }
+    ],
+    "CS1620": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 207,
+        "message": "\u53c2\u6570 1 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cref\u201d\u4e00\u8d77\u4f20\u9012"
+      }
+    ],
+    "CS0571": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XAttribute.cs",
+        "line": 150,
+        "message": "\u201cstring.operator !=(string, string)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObject.cs",
+        "line": 186,
+        "message": "\u201cType.operator ==(Type, Type)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XObject.cs",
+        "line": 187,
+        "message": "\u201cType.operator ==(Type, Type)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 105,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj11\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 105,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj12\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XNamespace.cs",
+        "line": 249,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj17\u201d"
+      }
+    ],
+    "CS0023": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XDocument.cs",
+        "line": 96,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\NamespaceResolver.cs",
+        "line": 151,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\NamespaceResolver.cs",
+        "line": 215,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0163": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 1694,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 4:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 1705,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 7:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Xml.Linq\\System\\Xml\\Linq\\XContainer.cs",
+        "line": 1711,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 8:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      }
+    ]
+  },
+  "returncode": 1
+}

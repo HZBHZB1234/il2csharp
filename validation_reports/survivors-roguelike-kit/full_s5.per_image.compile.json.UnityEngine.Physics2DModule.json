@@ -1,0 +1,57 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule",
+  "assembly": "UnityEngine.Physics2DModule",
+  "files": 49,
+  "syntax": 0,
+  "binding": 22,
+  "top": [
+    [
+      "CS0122",
+      16
+    ],
+    [
+      "CS0117",
+      6
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Physics2D.cs",
+        "line": 616,
+        "message": "\u201cBlittableArrayWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Physics2D.cs",
+        "line": 626,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Physics2D.cs",
+        "line": 636,
+        "message": "\u201cBlittableListWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Physics2D.cs",
+        "line": 213,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Rigidbody2D.cs",
+        "line": 1989,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.Physics2DModule\\UnityEngine\\Rigidbody2D.cs",
+        "line": 2030,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      }
+    ]
+  },
+  "returncode": 1
+}

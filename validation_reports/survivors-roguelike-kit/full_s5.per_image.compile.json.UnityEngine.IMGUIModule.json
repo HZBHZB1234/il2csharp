@@ -1,0 +1,36 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.IMGUIModule",
+  "assembly": "UnityEngine.IMGUIModule",
+  "files": 36,
+  "syntax": 0,
+  "binding": 19,
+  "top": [
+    [
+      "CS0122",
+      19
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.IMGUIModule\\UnityEngine\\GUIUtility.cs",
+        "line": 691,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.IMGUIModule\\UnityEngine\\GUIUtility.cs",
+        "line": 696,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.IMGUIModule\\UnityEngine\\GUIUtility.cs",
+        "line": 726,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ]
+  },
+  "returncode": 1
+}

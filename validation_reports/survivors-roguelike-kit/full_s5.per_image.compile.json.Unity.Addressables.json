@@ -1,0 +1,57 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables",
+  "assembly": "Unity.Addressables",
+  "files": 41,
+  "syntax": 0,
+  "binding": 33,
+  "top": [
+    [
+      "CS0122",
+      30
+    ],
+    [
+      "CS0538",
+      3
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 165,
+        "message": "\u201cBinaryStorageBuffer\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 31,
+        "message": "\u201cBinaryStorageBuffer\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 220,
+        "message": "\u201cBinaryStorageBuffer\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0538": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 864,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cBinaryStorageBuffer.ISerializationAdapter\u201d\u4e0d\u662f\u63a5\u53e3"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 873,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cBinaryStorageBuffer.ISerializationAdapter\u201d\u4e0d\u662f\u63a5\u53e3"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Addressables\\UnityEngine\\AddressableAssets\\ResourceLocators\\ContentCatalogData.cs",
+        "line": 886,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cBinaryStorageBuffer.ISerializationAdapter\u201d\u4e0d\u662f\u63a5\u53e3"
+      }
+    ]
+  },
+  "returncode": 1
+}

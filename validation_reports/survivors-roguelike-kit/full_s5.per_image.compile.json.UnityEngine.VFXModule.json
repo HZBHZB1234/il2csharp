@@ -1,0 +1,263 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule",
+  "assembly": "UnityEngine.VFXModule",
+  "files": 14,
+  "syntax": 4,
+  "binding": 100,
+  "top": [
+    [
+      "CS0122",
+      31
+    ],
+    [
+      "CS0208",
+      11
+    ],
+    [
+      "CS1061",
+      11
+    ],
+    [
+      "CS0029",
+      10
+    ],
+    [
+      "CS0266",
+      9
+    ],
+    [
+      "CS0030",
+      8
+    ],
+    [
+      "CS0103",
+      6
+    ],
+    [
+      "CS0149",
+      5
+    ],
+    [
+      "CS1729",
+      4
+    ],
+    [
+      "CS0019",
+      3
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXOutputEventArgs.cs",
+        "line": 15,
+        "message": "\u201cVFXOutputEventArgs\u201d\u672a\u5305\u542b\u201cnameId\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVFXOutputEventArgs\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cnameId\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXOutputEventArgs.cs",
+        "line": 16,
+        "message": "\u201cVFXOutputEventArgs\u201d\u672a\u5305\u542b\u201ceventAttribute\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVFXOutputEventArgs\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201ceventAttribute\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 72,
+        "message": "\u201cVisualEffectAsset\u201d\u672a\u5305\u542b\u201cm_CachedPtr\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cVisualEffectAsset\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cm_CachedPtr\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0188": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXOutputEventArgs.cs",
+        "line": 15,
+        "message": "\u5728\u5206\u914d\u201cthis\u201d\u5bf9\u8c61\u7684\u6240\u6709\u5b57\u6bb5\u4e4b\u524d\uff0c\u65e0\u6cd5\u4f7f\u7528\u8be5\u5bf9\u8c61\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u672a\u5206\u914d\u7684\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXManager.cs",
+        "line": 13,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.VFX.VFXCameraXRSettings\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 36,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.VFX.VisualEffectAsset\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 72,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.VFX.VFXEventAttribute\u201d"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cVisualEffectAsset\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 35,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cVisualEffectAsset\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 71,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cVFXEventAttribute\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS7036": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 32,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cVFXEventAttribute.VFXEventAttribute(IntPtr, bool, VisualEffectAsset)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cptr\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 26,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cVFXSpawnerState.VFXSpawnerState(IntPtr, bool)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cptr\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 55,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cVFXEventAttribute.VFXEventAttribute(IntPtr, bool, VisualEffectAsset)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cptr\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 33,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.IntPtr\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 27,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.IntPtr\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 70,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.IntPtr\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 29,
+        "message": "\u201cVFXEventAttribute\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 43,
+        "message": "\u201cVFXEventAttribute\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 75,
+        "message": "\u201cVFXEventAttribute\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 30,
+        "message": "\u201cVFXEventAttribute.m_VfxAsset\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 31,
+        "message": "\u201cVFXEventAttribute.m_Ptr\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXSpawnerState.cs",
+        "line": 32,
+        "message": "\u201cVFXEventAttribute.m_Owner\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 67,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cMarshalledUnityObject\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 89,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cMarshalledUnityObject\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 31,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cnum3\u201d"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 68,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 90,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 34,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS0149": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 70,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 92,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 36,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      }
+    ],
+    "CS0023": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 44,
+        "message": "\u8fd0\u7b97\u7b26\u201c~\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cIntPtr\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 44,
+        "message": "\u201cGCHandle\u201d\u672a\u5305\u542b\u201cGetTarget\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VFXEventAttribute.cs",
+        "line": 123,
+        "message": "\u8fd0\u7b97\u7b26\u201c!=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cIntPtr\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 102,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cAction<VFXOutputEventArgs>\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VFXModule\\UnityEngine\\VFX\\VisualEffect.cs",
+        "line": 106,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cVFXEventAttribute\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ]
+  },
+  "returncode": 1
+}

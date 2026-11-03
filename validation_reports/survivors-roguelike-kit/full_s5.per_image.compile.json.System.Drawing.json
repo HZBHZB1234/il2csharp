@@ -1,0 +1,174 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Drawing",
+  "assembly": "System.Drawing",
+  "files": 11,
+  "syntax": 0,
+  "binding": 92,
+  "top": [
+    [
+      "CS0030",
+      33
+    ],
+    [
+      "CS0019",
+      18
+    ],
+    [
+      "CS1061",
+      14
+    ],
+    [
+      "CS0103",
+      11
+    ],
+    [
+      "CS0266",
+      7
+    ],
+    [
+      "CS0122",
+      6
+    ],
+    [
+      "CS0029",
+      1
+    ],
+    [
+      "CS0212",
+      1
+    ],
+    [
+      "CS1503",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201clong\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 29,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201clong\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 37,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201clong\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 53,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbool\u201d"
+      }
+    ],
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\KnownColorTable.cs",
+        "line": 13,
+        "message": "\u8fd0\u7b97\u7b26\u201c!=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cint[]\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Point.cs",
+        "line": 31,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cPoint\u201d\u548c\u201cPoint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Point.cs",
+        "line": 33,
+        "message": "\u8fd0\u7b97\u7b26\u201c>>\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cPoint\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 67,
+        "message": "\u201cKnownColorTable.s_colorNameTable\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 69,
+        "message": "\u201cKnownColorTable.InitColorNameTable()\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 71,
+        "message": "\u201cKnownColorTable.s_colorNameTable\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Numerics\\Hashing\\HashHelpers.cs",
+        "line": 20,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj3\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 48,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cmono_object_unbox_internal\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Point.cs",
+        "line": 48,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cmono_object_unbox_internal\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 44,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201cgetClass\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cgetClass\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 48,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201cgetClass\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cgetClass\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Point.cs",
+        "line": 44,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201cgetClass\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cgetClass\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 47,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Type\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 49,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Size.cs",
+        "line": 51,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\RectangleF.cs",
+        "line": 91,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cSystem.Drawing.RectangleF\u201d\u8f6c\u6362\u4e3a\u201cfloat\u201d"
+      }
+    ],
+    "CS0212": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Drawing\\System\\Drawing\\Color.cs",
+        "line": 187,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      }
+    ]
+  },
+  "returncode": 1
+}

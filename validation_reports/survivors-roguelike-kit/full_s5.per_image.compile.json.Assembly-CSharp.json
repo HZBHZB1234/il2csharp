@@ -1,0 +1,52 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp",
+  "assembly": "Assembly-CSharp",
+  "files": 280,
+  "syntax": 0,
+  "binding": 63,
+  "top": [
+    [
+      "CS0234",
+      61
+    ],
+    [
+      "CS0535",
+      2
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0535": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp\\GameInput.cs",
+        "line": 12,
+        "message": "\u201cGameInput\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIInputActionCollection2.FindBinding(InputBinding, out InputAction)\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp\\RGame\\RoguelikeKit\\GameInput.cs",
+        "line": 15,
+        "message": "\u201cGameInput\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIInputActionCollection2.FindBinding(InputBinding, out InputAction)\u201d"
+      }
+    ],
+    "CS0234": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp\\RGame\\RoguelikeKit\\BaseBulletShootState.cs",
+        "line": 112,
+        "message": "\u547d\u540d\u7a7a\u95f4\u201cRGame.RoguelikeKit.RGame.RoguelikeKit\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cBaseBulletShootState\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp\\RGame\\RoguelikeKit\\CharacterItem.cs",
+        "line": 23,
+        "message": "\u547d\u540d\u7a7a\u95f4\u201cRGame.RoguelikeKit.RGame.RoguelikeKit\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cCharacterItem\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Assembly-CSharp\\RGame\\RoguelikeKit\\CharacterItem.cs",
+        "line": 24,
+        "message": "\u547d\u540d\u7a7a\u95f4\u201cRGame.RoguelikeKit.RGame.RoguelikeKit\u201d\u4e2d\u4e0d\u5b58\u5728\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cCharacterItem\u201d(\u662f\u5426\u7f3a\u5c11\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ]
+  },
+  "returncode": 1
+}

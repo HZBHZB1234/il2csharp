@@ -1,0 +1,42 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Newtonsoft.Json",
+  "assembly": "Newtonsoft.Json",
+  "files": 273,
+  "syntax": 0,
+  "binding": 3,
+  "top": [
+    [
+      "CS0535",
+      2
+    ],
+    [
+      "CS0115",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0535": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Newtonsoft.Json\\Newtonsoft\\Json\\Utilities\\DictionaryWrapper.cs",
+        "line": 10,
+        "message": "\u201cDictionaryWrapper<TKey, TValue>\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<TKey, TValue>.TryGetValue(TKey, out TValue)\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Newtonsoft.Json\\Newtonsoft\\Json\\Linq\\JObject.cs",
+        "line": 23,
+        "message": "\u201cJObject\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, JToken>.TryGetValue(string, out JToken)\u201d"
+      }
+    ],
+    "CS0115": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Newtonsoft.Json\\Newtonsoft\\Json\\Serialization\\DefaultSerializationBinder.cs",
+        "line": 196,
+        "message": "\u201cDefaultSerializationBinder.BindToName(Type, ref string, ref string)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      }
+    ]
+  },
+  "returncode": 1
+}

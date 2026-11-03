@@ -1,0 +1,36 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.Burst",
+  "assembly": "Unity.Burst",
+  "files": 42,
+  "syntax": 0,
+  "binding": 15,
+  "top": [
+    [
+      "CS0208",
+      15
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Burst\\Unity\\Burst\\Intrinsics\\X86.cs",
+        "line": 7005,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cT\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Burst\\Unity\\Burst\\Intrinsics\\X86.cs",
+        "line": 7005,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cU\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Burst\\Unity\\Burst\\Intrinsics\\X86.cs",
+        "line": 7009,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cT\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ]
+  },
+  "returncode": 1
+}

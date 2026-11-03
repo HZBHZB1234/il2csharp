@@ -1,0 +1,226 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule",
+  "assembly": "UnityEngine.XRModule",
+  "files": 26,
+  "syntax": 0,
+  "binding": 137,
+  "top": [
+    [
+      "CS0030",
+      38
+    ],
+    [
+      "CS0103",
+      35
+    ],
+    [
+      "CS1061",
+      26
+    ],
+    [
+      "CS0122",
+      9
+    ],
+    [
+      "CS0208",
+      8
+    ],
+    [
+      "CS1503",
+      7
+    ],
+    [
+      "CS0029",
+      6
+    ],
+    [
+      "CS0031",
+      2
+    ],
+    [
+      "CS0117",
+      2
+    ],
+    [
+      "CS0019",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0031": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevice.cs",
+        "line": 19,
+        "message": "\u5e38\u91cf\u503c\u201c-1\u201d\u65e0\u6cd5\u8f6c\u6362\u4e3a\u201culong\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevice.cs",
+        "line": 53,
+        "message": "\u5e38\u91cf\u503c\u201c-1\u201d\u65e0\u6cd5\u8f6c\u6362\u4e3a\u201culong\u201d"
+      }
+    ],
+    "CS0221": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevice.cs",
+        "line": 19,
+        "message": "\u5e38\u91cf\u503c\u201c-1\u201d\u65e0\u6cd5\u8f6c\u6362\u4e3a\u201culong\u201d(\u4f7f\u7528 \"unchecked\" \u8bed\u6cd5\u91cd\u5199)"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 28,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<UnityEngine.XR.InputDevice>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 39,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<UnityEngine.XR.InputDevice>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 53,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<UnityEngine.XR.InputDevice>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 28,
+        "message": "\u201cAction<InputDevice>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<InputDevice>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 28,
+        "message": "\u201cAction<InputDevice>\u201d\u672a\u5305\u542b\u201cmethod\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<InputDevice>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 39,
+        "message": "\u201cAction<InputDevice>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<InputDevice>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 28,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 39,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 53,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 28,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj8\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 39,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj12\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevices.cs",
+        "line": 53,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj20\u201d"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\XRNodeState.cs",
+        "line": 41,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cbool\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cint\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevice.cs",
+        "line": 42,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201culong\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputDevice.cs",
+        "line": 52,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201culong\u201d"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\XRInputSubsystem.cs",
+        "line": 18,
+        "message": "\u201cSubsystemManager\u201d\u672a\u5305\u542b\u201cGetIntegratedSubsystemByPtr\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\XRInputSubsystem.cs",
+        "line": 44,
+        "message": "\u201cSubsystemManager\u201d\u672a\u5305\u542b\u201cGetIntegratedSubsystemByPtr\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshId.cs",
+        "line": 40,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201culong\u201d\u548c\u201cbool\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\InputFeatureUsage.cs",
+        "line": 67,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cUnityEngine.XR.InputFeatureType*\u201d\u8f6c\u6362\u4e3a\u201cobject\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 75,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cUnityEngine.Vector3\u201d\u8f6c\u6362\u4e3a\u201cfloat\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 75,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cUnityEngine.Vector3\u201d\u8f6c\u6362\u4e3a\u201cfloat\u201d"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 57,
+        "message": "\u201cMeshId.m_SubId1\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 62,
+        "message": "\u201cMeshId.m_SubId1\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 62,
+        "message": "\u201cMeshId.m_SubId1\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0165": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 60,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201creal2\u201d"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.XRModule\\UnityEngine\\XR\\MeshGenerationResult.cs",
+        "line": 147,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.XR.MeshVertexAttributes\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.XR.MeshGenerationStatus\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ]
+  },
+  "returncode": 1
+}

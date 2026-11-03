@@ -1,0 +1,321 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule",
+  "assembly": "UnityEngine.AccessibilityModule",
+  "files": 15,
+  "syntax": 0,
+  "binding": 380,
+  "top": [
+    [
+      "CS0122",
+      100
+    ],
+    [
+      "CS0030",
+      63
+    ],
+    [
+      "CS1061",
+      57
+    ],
+    [
+      "CS0103",
+      31
+    ],
+    [
+      "CS0019",
+      29
+    ],
+    [
+      "CS0029",
+      20
+    ],
+    [
+      "CS0165",
+      19
+    ],
+    [
+      "CS0266",
+      15
+    ],
+    [
+      "CS1503",
+      13
+    ],
+    [
+      "CS0208",
+      12
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AssistiveSupport.cs",
+        "line": 24,
+        "message": "\u201cAccessibilityHierarchyService.s_ActiveHierarchy\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 17,
+        "message": "\u201cAccessibilityManager.Nested\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 25,
+        "message": "\u201cAccessibilityManager.Nested\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 19,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cUnityEngine.Accessibility.AccessibilityManager.NotificationContext\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 27,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cUnityEngine.Accessibility.AccessibilityManager.NotificationContext\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 35,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cobject\u201d\u8f6c\u6362\u4e3a\u201cUnityEngine.Accessibility.AccessibilityManager.NotificationContext\u201d"
+      }
+    ],
+    "CS1620": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeManager.cs",
+        "line": 13,
+        "message": "\u53c2\u6570 1 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cref\u201d\u4e00\u8d77\u4f20\u9012"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeManager.cs",
+        "line": 23,
+        "message": "\u53c2\u6570 2 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cref\u201d\u4e00\u8d77\u4f20\u9012"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 27,
+        "message": "\u53c2\u6570 2 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cout\u201d\u4e00\u8d77\u4f20\u9012"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeDataTests.cs",
+        "line": 15,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj4\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 45,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj6\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 45,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj7\u201d"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeDataTests.cs",
+        "line": 23,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Array\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cint[]\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeDataTests.cs",
+        "line": 30,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cint\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNode.cs",
+        "line": 72,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cfloat\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS0246": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeDataTests.cs",
+        "line": 25,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cfloat2\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 203,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 208,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeManager.cs",
+        "line": 32,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Accessibility.AccessibilityNode\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.Accessibility.AccessibilityManager.NotificationContext\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AssistiveSupport.cs",
+        "line": 32,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Accessibility.AssistiveSupport.ScreenReaderStatusOverride\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbool\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNode.cs",
+        "line": 107,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Rect\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d"
+      }
+    ],
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AssistiveSupport.cs",
+        "line": 33,
+        "message": "\u8fd0\u7b97\u7b26\u201c!=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cbool\u201d\u548c\u201cAssistiveSupport.ScreenReaderStatusOverride\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AssistiveSupport.cs",
+        "line": 35,
+        "message": "\u8fd0\u7b97\u7b26\u201c!=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cbool\u201d\u548c\u201cAssistiveSupport.ScreenReaderStatusOverride\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 34,
+        "message": "\u8fd0\u7b97\u7b26\u201c<=\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cRuntimePlatform\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 45,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<float>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 60,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<bool>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 73,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<bool>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 45,
+        "message": "\u201cAction<float>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<float>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 45,
+        "message": "\u201cAction<float>\u201d\u672a\u5305\u542b\u201cmethod\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<float>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilitySettings.cs",
+        "line": 60,
+        "message": "\u201cAction<bool>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<bool>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNode.cs",
+        "line": 91,
+        "message": "\u201cRect\u201d\u672a\u5305\u542b\u201ckZero\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNode.cs",
+        "line": 92,
+        "message": "\u201cRect\u201d\u672a\u5305\u542b\u201ckZero\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 96,
+        "message": "\u201cRect\u201d\u672a\u5305\u542b\u201ckZero\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeData.cs",
+        "line": 150,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cstring\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeData.cs",
+        "line": 152,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cstring\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 45,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cIEnumerator<AccessibilityNode>\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0171": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeData.cs",
+        "line": 159,
+        "message": "\u5fc5\u987b\u5148\u5b8c\u5168\u5206\u914d\u5b57\u6bb5 'AccessibilityNodeData.__field_nodeId' \uff0c\u7136\u540e\u624d\u80fd\u5c06\u63a7\u4ef6\u8fd4\u56de\u7ed9\u8c03\u7528\u65b9\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u5b57\u6bb5\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeData.cs",
+        "line": 159,
+        "message": "\u5fc5\u987b\u5148\u5b8c\u5168\u5206\u914d\u5b57\u6bb5 'AccessibilityNodeData.__field_parentId' \uff0c\u7136\u540e\u624d\u80fd\u5c06\u63a7\u4ef6\u8fd4\u56de\u7ed9\u8c03\u7528\u65b9\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u5b57\u6bb5\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityNodeData.cs",
+        "line": 159,
+        "message": "\u5fc5\u987b\u5148\u5b8c\u5168\u5206\u914d\u5b57\u6bb5 'AccessibilityNodeData.__field_state' \uff0c\u7136\u540e\u624d\u80fd\u5c06\u63a7\u4ef6\u8fd4\u56de\u7ed9\u8c03\u7528\u65b9\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS0165": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 66,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cenumerator8\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 67,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cenumerator9\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityHierarchy.cs",
+        "line": 92,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cobj22\u201d"
+      }
+    ],
+    "CS0023": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AssistiveSupport.cs",
+        "line": 129,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS8917": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 408,
+        "message": "\u65e0\u6cd5\u63a8\u65ad\u59d4\u6258\u7c7b\u578b\u3002"
+      }
+    ],
+    "CS0149": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 420,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      }
+    ],
+    "CS0221": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.AccessibilityModule\\UnityEngine\\Accessibility\\AccessibilityManager.cs",
+        "line": 487,
+        "message": "\u5e38\u91cf\u503c\u201c4294967295\u201d\u65e0\u6cd5\u8f6c\u6362\u4e3a\u201cint\u201d(\u4f7f\u7528 \"unchecked\" \u8bed\u6cd5\u91cd\u5199)"
+      }
+    ]
+  },
+  "returncode": 1
+}

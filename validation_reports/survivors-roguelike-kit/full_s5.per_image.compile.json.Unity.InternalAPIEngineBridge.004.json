@@ -1,0 +1,58 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004",
+  "assembly": "Unity.InternalAPIEngineBridge.004",
+  "files": 3,
+  "syntax": 0,
+  "binding": 5,
+  "top": [
+    [
+      "CS0208",
+      2
+    ],
+    [
+      "CS0266",
+      2
+    ],
+    [
+      "CS1061",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004\\TMPro\\ObjectUtilsBridge.cs",
+        "line": 13,
+        "message": "\u201cObject\u201d\u672a\u5305\u542b\u201cMarkDirty\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cObject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cMarkDirty\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 14,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 15,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 18,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Array\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte[]\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InternalAPIEngineBridge.004\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Array\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte[]\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ]
+  },
+  "returncode": 1
+}

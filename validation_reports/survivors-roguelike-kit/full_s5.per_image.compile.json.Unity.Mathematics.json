@@ -1,0 +1,36 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.Mathematics",
+  "assembly": "Unity.Mathematics",
+  "files": 80,
+  "syntax": 0,
+  "binding": 4,
+  "top": [
+    [
+      "CS0117",
+      4
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Mathematics\\Unity\\Mathematics\\math.cs",
+        "line": 25,
+        "message": "\u201cdouble\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Mathematics\\Unity\\Mathematics\\math.cs",
+        "line": 26,
+        "message": "\u201cdouble\u201d\u672a\u5305\u542b\u201cNaN\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Mathematics\\Unity\\Mathematics\\math.cs",
+        "line": 42,
+        "message": "\u201cfloat\u201d\u672a\u5305\u542b\u201cPositiveInfinity\u201d\u7684\u5b9a\u4e49"
+      }
+    ]
+  },
+  "returncode": 1
+}

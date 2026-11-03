@@ -1,0 +1,58 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule",
+  "assembly": "UnityEngine.UnityConsentModule",
+  "files": 4,
+  "syntax": 0,
+  "binding": 6,
+  "top": [
+    [
+      "CS0030",
+      4
+    ],
+    [
+      "CS0171",
+      1
+    ],
+    [
+      "CS1620",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0171": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule\\UnityEngine\\UnityConsent\\ConsentState.cs",
+        "line": 13,
+        "message": "\u5fc5\u987b\u5148\u5b8c\u5168\u5206\u914d\u5b57\u6bb5 'ConsentState.AnalyticsIntent' \uff0c\u7136\u540e\u624d\u80fd\u5c06\u63a7\u4ef6\u8fd4\u56de\u7ed9\u8c03\u7528\u65b9\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS1620": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule\\UnityEngine\\UnityConsent\\EndUserConsent.cs",
+        "line": 33,
+        "message": "\u53c2\u6570 1 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cref\u201d\u4e00\u8d77\u4f20\u9012"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule\\UnityEngine\\UnityConsent\\ConsentState.cs",
+        "line": 25,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject[]\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule\\UnityEngine\\UnityConsent\\ConsentState.cs",
+        "line": 31,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject[]\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityConsentModule\\UnityEngine\\UnityConsent\\ConsentState.cs",
+        "line": 36,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject[]\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ]
+  },
+  "returncode": 1
+}

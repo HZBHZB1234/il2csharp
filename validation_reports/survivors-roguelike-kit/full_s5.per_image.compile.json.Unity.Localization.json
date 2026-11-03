@@ -1,0 +1,79 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.Localization",
+  "assembly": "Unity.Localization",
+  "files": 260,
+  "syntax": 0,
+  "binding": 10,
+  "top": [
+    [
+      "CS0115",
+      4
+    ],
+    [
+      "CS0535",
+      4
+    ],
+    [
+      "CS0122",
+      1
+    ],
+    [
+      "CS0460",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0115": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\LocalizedReference.cs",
+        "line": 371,
+        "message": "\u201cLocalizedReference.OnActivated(ref BindingActivationContext)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\LocalizedReference.cs",
+        "line": 382,
+        "message": "\u201cLocalizedReference.OnDeactivated(ref BindingActivationContext)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\LocalizedAsset.cs",
+        "line": 123,
+        "message": "\u201cLocalizedAsset<TObject>.Update(ref BindingContext)\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      }
+    ],
+    "CS0460": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\LocalizedAsset.cs",
+        "line": 63,
+        "message": "\u91cd\u5199\u548c\u663e\u5f0f\u63a5\u53e3\u5b9e\u73b0\u65b9\u6cd5\u7684\u7ea6\u675f\u662f\u4ece\u57fa\u65b9\u6cd5\u7ee7\u627f\u7684\uff0c\u56e0\u6b64\u4e0d\u80fd\u76f4\u63a5\u6307\u5b9a\u8fd9\u4e9b\u7ea6\u675f\uff0c\u9664\u975e\u6307\u5b9a \"class\" \u6216 \"struct\" \u7ea6\u675f\u3002"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\Operations\\LocalizationGroupOperation.cs",
+        "line": 12,
+        "message": "\u201cGroupOperation\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0535": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\LocalizedString.cs",
+        "line": 27,
+        "message": "\u201cLocalizedString\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, IVariable>.TryGetValue(string, out IVariable)\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\Tables\\DetailedLocalizationTable.cs",
+        "line": 11,
+        "message": "\u201cDetailedLocalizationTable<TEntry>\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<long, TEntry>.TryGetValue(long, out TEntry)\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Localization\\UnityEngine\\Localization\\SmartFormat\\PersistentVariables\\VariablesGroupAsset.cs",
+        "line": 14,
+        "message": "\u201cVariablesGroupAsset\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, IVariable>.TryGetValue(string, out IVariable)\u201d"
+      }
+    ]
+  },
+  "returncode": 1
+}

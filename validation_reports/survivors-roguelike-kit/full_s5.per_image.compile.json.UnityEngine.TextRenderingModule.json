@@ -1,0 +1,36 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.TextRenderingModule",
+  "assembly": "UnityEngine.TextRenderingModule",
+  "files": 16,
+  "syntax": 0,
+  "binding": 8,
+  "top": [
+    [
+      "CS0122",
+      8
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.TextRenderingModule\\UnityEngine\\TextMesh.cs",
+        "line": 375,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.TextRenderingModule\\UnityEngine\\Font.cs",
+        "line": 610,
+        "message": "\u201cBlittableArrayWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.TextRenderingModule\\UnityEngine\\Font.cs",
+        "line": 615,
+        "message": "\u201cManagedSpanWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ]
+  },
+  "returncode": 1
+}

@@ -1,0 +1,47 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.2D.Animation.Runtime",
+  "assembly": "Unity.2D.Animation.Runtime",
+  "files": 55,
+  "syntax": 0,
+  "binding": 7,
+  "top": [
+    [
+      "CS0122",
+      6
+    ],
+    [
+      "CS0100",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.2D.Animation.Runtime\\UnityEngine\\U2D\\Animation\\SpriteResolver.cs",
+        "line": 14,
+        "message": "\u201cIPreviewable\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.2D.Animation.Runtime\\UnityEngine\\U2D\\Animation\\SpriteResolver.cs",
+        "line": 14,
+        "message": "\u201cIAnimationPreviewable\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.2D.Animation.Runtime\\UnityEngine\\U2D\\Animation\\SpriteSkin.cs",
+        "line": 20,
+        "message": "\u201cIPreviewable\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0100": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.2D.Animation.Runtime\\UnityEngine\\U2D\\Animation\\SpriteLibCategoryOverride.cs",
+        "line": 145,
+        "message": "\u53c2\u6570\u540d\u201c_\u201d\u91cd\u590d"
+      }
+    ]
+  },
+  "returncode": 1
+}

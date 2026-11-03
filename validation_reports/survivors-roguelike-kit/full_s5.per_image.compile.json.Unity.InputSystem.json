@@ -1,0 +1,57 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem",
+  "assembly": "Unity.InputSystem",
+  "files": 343,
+  "syntax": 0,
+  "binding": 52,
+  "top": [
+    [
+      "CS0208",
+      47
+    ],
+    [
+      "CS0122",
+      5
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\LowLevel\\InputEvent.cs",
+        "line": 19,
+        "message": "\u201cNativeInputEvent\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\LowLevel\\NativeInputRuntime.cs",
+        "line": 372,
+        "message": "\u201cNativeInputUpdateType\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\LowLevel\\NativeInputRuntime.cs",
+        "line": 389,
+        "message": "\u201cNativeInputUpdateType\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\InputRemoting.cs",
+        "line": 1098,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cInputEvent\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\InputActionState.cs",
+        "line": 2832,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cInputEvent\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.InputSystem\\UnityEngine\\InputSystem\\LowLevel\\ActionEvent.cs",
+        "line": 158,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cActionEvent\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ]
+  },
+  "returncode": 1
+}

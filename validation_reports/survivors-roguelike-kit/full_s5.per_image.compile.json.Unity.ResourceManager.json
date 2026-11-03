@@ -1,0 +1,563 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager",
+  "assembly": "Unity.ResourceManager",
+  "files": 98,
+  "syntax": 10,
+  "binding": 2485,
+  "top": [
+    [
+      "CS0030",
+      627
+    ],
+    [
+      "CS1061",
+      479
+    ],
+    [
+      "CS0103",
+      225
+    ],
+    [
+      "CS0122",
+      196
+    ],
+    [
+      "CS0208",
+      176
+    ],
+    [
+      "CS1503",
+      158
+    ],
+    [
+      "CS0019",
+      149
+    ],
+    [
+      "CS0266",
+      141
+    ],
+    [
+      "CS0029",
+      93
+    ],
+    [
+      "CS0165",
+      71
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\WebRequestQueueOperation.cs",
+        "line": 22,
+        "message": "\u8fd0\u7b97\u7b26\u201c>\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cUnityWebRequestAsyncOperation\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GetDownloadSizeOperation.cs",
+        "line": 23,
+        "message": "\u8fd0\u7b97\u7b26\u201c+\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cGetDownloadSizeOperation\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 33,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cint\u201d\u548c\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\MonoBehaviourCallbackHooks.cs",
+        "line": 25,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Delegate\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\MonoBehaviourCallbackHooks.cs",
+        "line": 29,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Delegate\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Action<float>\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\MonoBehaviourCallbackHooks.cs",
+        "line": 33,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Delegate\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cSystem.Action<float>\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 14,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnitySourceGeneratedAssemblyMonoScriptTypes_v1.cs",
+        "line": 15,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cUnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 146,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cList<IUpdateReceiver>\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\WebRequestQueueOperation.cs",
+        "line": 60,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<UnityEngine.Networking.UnityWebRequestAsyncOperation>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GetDownloadSizeOperation.cs",
+        "line": 24,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.ResourceManagement.AsyncOperations.GetDownloadSizeOperation\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 27,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Type\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\WebRequestQueueOperation.cs",
+        "line": 60,
+        "message": "\u201cAction<UnityWebRequestAsyncOperation>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<UnityWebRequestAsyncOperation>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\WebRequestQueueOperation.cs",
+        "line": 60,
+        "message": "\u201cAction<UnityWebRequestAsyncOperation>\u201d\u672a\u5305\u542b\u201cmethod\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<UnityWebRequestAsyncOperation>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 28,
+        "message": "\u201cGroupOperation\u201d\u672a\u5305\u542b\u201cUnityEngine\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cGroupOperation\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cUnityEngine\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\AsyncOperationHandle_2.cs",
+        "line": 52,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj1\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\AsyncOperationHandle_2.cs",
+        "line": 76,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj1\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 28,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cmono_object_unbox_internal\u201d"
+      }
+    ],
+    "CS0571": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\UnityWebRequestOperation.cs",
+        "line": 26,
+        "message": "\u201cAsyncOperation.completed.add\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 55,
+        "message": "\u201cDictionary<IOperationCacheKey, IAsyncOperation>.Count.get\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceLocations\\ResourceLocationBase.cs",
+        "line": 130,
+        "message": "\u201cType.operator ==(Type, Type)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      }
+    ],
+    "CS0246": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 43,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT1\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 43,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT1\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 44,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT2\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0212": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 44,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 45,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Profiling\\AssetFrameData.cs",
+        "line": 46,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      }
+    ],
+    "CS7036": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Exceptions\\RemoteProviderException.cs",
+        "line": 25,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cProviderException.ProviderException(string, IResourceLocation, Exception)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cinnerException\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\WebRequestQueue.cs",
+        "line": 27,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cWebRequestQueueOperation.WebRequestQueueOperation(UnityWebRequest)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201crequest\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\DelayedActionManager.cs",
+        "line": 65,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cLinkedListNode<DelayedActionManager.DelegateInfo>.LinkedListNode(DelayedActionManager.DelegateInfo)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201cvalue\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      }
+    ],
+    "CS0200": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Exceptions\\RemoteProviderException.cs",
+        "line": 29,
+        "message": "\u65e0\u6cd5\u4e3a\u5c5e\u6027\u6216\u7d22\u5f15\u5668\u201cProviderException.Location\u201d\u8d4b\u503c - \u5b83\u662f\u53ea\u8bfb\u7684"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Exceptions\\ResourceManagerException.cs",
+        "line": 24,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cSystem.Runtime.Serialization.SerializationInfo\u201d\u8f6c\u6362\u4e3a\u201cstring\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Exceptions\\UnknownResourceProviderException.cs",
+        "line": 63,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cSystem.Runtime.Serialization.SerializationInfo\u201d\u8f6c\u6362\u4e3a\u201cstring\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleProvider.cs",
+        "line": 48,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201cSystem.Collections.Generic.IEnumerable<TSource>\u201d\u8f6c\u6362\u4e3a\u201cSystem.Collections.Generic.IEnumerable<UnityEngine.AssetBundle>\u201d"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\UnityWebRequestUtilities.cs",
+        "line": 15,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cUnityEngine.ResourceManagement.Util.UnityWebRequestResult\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\TextDataProvider.cs",
+        "line": 123,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbool\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\TextDataProvider.cs",
+        "line": 143,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbool\u201d"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\TextDataProvider.cs",
+        "line": 30,
+        "message": "\u201cProvideHandle.m_Version\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 65,
+        "message": "\u201cAsyncOperationHandle.m_LocationName\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 72,
+        "message": "\u201cAsyncOperationHandle.m_LocationName\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS1955": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Exceptions\\UnknownResourceProviderException.cs",
+        "line": 34,
+        "message": "\u4e0d\u53ef\u8c03\u7528\u7684\u6210\u5458\u201cUnknownResourceProviderException.Location\u201d\u4e0d\u80fd\u50cf\u65b9\u6cd5\u4e00\u6837\u4f7f\u7528\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\AsyncOperationHandle_2.cs",
+        "line": 315,
+        "message": "\u4e0d\u53ef\u8c03\u7528\u7684\u6210\u5458\u201cAsyncOperationHandle.m_InternalOp\u201d\u4e0d\u80fd\u50cf\u65b9\u6cd5\u4e00\u6837\u4f7f\u7528\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\BundledAssetProvider.cs",
+        "line": 111,
+        "message": "\u4e0d\u53ef\u8c03\u7528\u7684\u6210\u5458\u201cIGenericProviderOperation.Location\u201d\u4e0d\u80fd\u50cf\u65b9\u6cd5\u4e00\u6837\u4f7f\u7528\u3002"
+      }
+    ],
+    "CS0176": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\UnityWebRequestResult.cs",
+        "line": 27,
+        "message": "\u65e0\u6cd5\u4f7f\u7528\u5b9e\u4f8b\u5f15\u7528\u6765\u8bbf\u95ee\u6210\u5458\u201cUnityWebRequest.Result.DataProcessingError\u201d\uff1b\u8bf7\u6539\u7528\u7c7b\u578b\u540d\u6765\u9650\u5b9a\u5b83"
+      }
+    ],
+    "CS0023": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\TextDataProvider.cs",
+        "line": 173,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 577,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 594,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0165": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 205,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201creal7\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 206,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201cobj31\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\AsyncOperations\\GroupOperation.cs",
+        "line": 224,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201ctype2\u201d"
+      }
+    ],
+    "CS0159": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\UnityWebRequestResult.cs",
+        "line": 95,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_181c464e7\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleRequestOptions.cs",
+        "line": 210,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_181c2c0b6\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleRequestOptions.cs",
+        "line": 221,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_181c2c0b6\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      }
+    ],
+    "CS1929": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\ResourceManagerConfig.cs",
+        "line": 43,
+        "message": "\u201cobject\u201d\u4e0d\u5305\u542b\u201cIndexOf\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u6700\u4f73\u6269\u5c55\u65b9\u6cd5\u91cd\u8f7d\u201cMemoryExtensions.IndexOf<int>(Span<int>, int)\u201d\u9700\u8981\u7c7b\u578b\u4e3a\u201cSpan<int>\u201d\u7684\u63a5\u6536\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\BundledAssetProvider.cs",
+        "line": 246,
+        "message": "\u201cobject\u201d\u4e0d\u5305\u542b\u201cIndexOf\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u6700\u4f73\u6269\u5c55\u65b9\u6cd5\u91cd\u8f7d\u201cMemoryExtensions.IndexOf<int>(Span<int>, int)\u201d\u9700\u8981\u7c7b\u578b\u4e3a\u201cSpan<int>\u201d\u7684\u63a5\u6536\u5668"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleProvider.cs",
+        "line": 98,
+        "message": "\u201cFunc<UnityWebRequestResult, bool>\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleProvider.cs",
+        "line": 190,
+        "message": "\u201cIdCacheKey\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\BinaryStorageBuffer.cs",
+        "line": 1249,
+        "message": "\u201cSpanAction<char, BinaryStorageBuffer.Reader.StringCreationState>\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ],
+    "CS0305": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\ResourceManagerConfig.cs",
+        "line": 202,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cList<T>\u201d\u9700\u8981 1 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 455,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cProviderOperation<TObject>\u201d\u9700\u8981 1 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 580,
+        "message": "\u4f7f\u7528\u6cdb\u578b \u7c7b\u578b\u201cProviderOperation<TObject>\u201d\u9700\u8981 1 \u4e2a\u7c7b\u578b\u53c2\u6570"
+      }
+    ],
+    "CS0149": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\ObjectInitializationData.cs",
+        "line": 203,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\ObjectInitializationData.cs",
+        "line": 206,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 442,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      }
+    ],
+    "CS1501": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\LRUCacheAllocationStrategy.cs",
+        "line": 99,
+        "message": "\u201cRemoveAt\u201d\u65b9\u6cd5\u6ca1\u6709\u91c7\u7528 2 \u4e2a\u53c2\u6570\u7684\u91cd\u8f7d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 441,
+        "message": "\u201cIncrementReferenceCount\u201d\u65b9\u6cd5\u6ca1\u6709\u91c7\u7528 1 \u4e2a\u53c2\u6570\u7684\u91cd\u8f7d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 557,
+        "message": "\u201cIncrementReferenceCount\u201d\u65b9\u6cd5\u6ca1\u6709\u91c7\u7528 1 \u4e2a\u53c2\u6570\u7684\u91cd\u8f7d"
+      }
+    ],
+    "CS0021": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\LRUCacheAllocationStrategy.cs",
+        "line": 102,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cint\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\LRUCacheAllocationStrategy.cs",
+        "line": 109,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cint\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\LRUCacheAllocationStrategy.cs",
+        "line": 120,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cint\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      }
+    ],
+    "CS0272": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\DelayedActionManager.cs",
+        "line": 115,
+        "message": "\u5c5e\u6027\u6216\u7d22\u5f15\u5668\u201cDelayedActionManager.DelegateInfo.InvocationTime\u201d\u4e0d\u80fd\u7528\u5728\u6b64\u4e0a\u4e0b\u6587\u4e2d\uff0c\u56e0\u4e3a set \u8bbf\u95ee\u5668\u4e0d\u53ef\u8bbf\u95ee"
+      }
+    ],
+    "CS0311": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 467,
+        "message": "\u7c7b\u578b\u201cobject\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cResourceManager.CreateOperation<T>(Type, int, IOperationCacheKey, Action<IAsyncOperation>)\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cobject\u201d\u5230\u201cUnityEngine.ResourceManagement.AsyncOperations.IAsyncOperation\u201d\u7684\u9690\u5f0f\u5f15\u7528\u8f6c\u6362\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 480,
+        "message": "\u7c7b\u578b\u201cobject\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cResourceManager.CreateOperation<T>(Type, int, IOperationCacheKey, Action<IAsyncOperation>)\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cobject\u201d\u5230\u201cUnityEngine.ResourceManagement.AsyncOperations.IAsyncOperation\u201d\u7684\u9690\u5f0f\u5f15\u7528\u8f6c\u6362\u3002"
+      }
+    ],
+    "CS1620": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\BinaryStorageBuffer.cs",
+        "line": 211,
+        "message": "\u53c2\u6570 2 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cout\u201d\u4e00\u8d77\u4f20\u9012"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstanceProvider.cs",
+        "line": 37,
+        "message": "\u53c2\u6570 2 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cout\u201d\u4e00\u8d77\u4f20\u9012"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\BinaryStorageBuffer.cs",
+        "line": 276,
+        "message": "\u53c2\u6570 2 \u5fc5\u987b\u4e0e\u5173\u952e\u5b57\u201cref\u201d\u4e00\u8d77\u4f20\u9012"
+      }
+    ],
+    "CS0171": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\DelayedActionManager.cs",
+        "line": 326,
+        "message": "\u5fc5\u987b\u5148\u5b8c\u5168\u5206\u914d\u5b57\u6bb5 'DelayedActionManager.DelegateInfo.__field_InvocationTime' \uff0c\u7136\u540e\u624d\u80fd\u5c06\u63a7\u4ef6\u8fd4\u56de\u7ed9\u8c03\u7528\u65b9\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS0411": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\BinaryStorageBuffer.cs",
+        "line": 303,
+        "message": "\u65e0\u6cd5\u4ece\u7528\u6cd5\u4e2d\u63a8\u65ad\u51fa\u65b9\u6cd5\u201cBinaryStorageBuffer.Reader.ReadValue<T>(uint, ref uint)\u201d\u7684\u7c7b\u578b\u53c2\u6570\u3002\u8bf7\u5c1d\u8bd5\u663e\u5f0f\u6307\u5b9a\u7c7b\u578b\u53c2\u6570\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceManager.cs",
+        "line": 1254,
+        "message": "\u65e0\u6cd5\u4ece\u7528\u6cd5\u4e2d\u63a8\u65ad\u51fa\u65b9\u6cd5\u201cResourceManager.ProvideResource<TObject>(IResourceLocation)\u201d\u7684\u7c7b\u578b\u53c2\u6570\u3002\u8bf7\u5c1d\u8bd5\u663e\u5f0f\u6307\u5b9a\u7c7b\u578b\u53c2\u6570\u3002"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstantiationParameters.cs",
+        "line": 72,
+        "message": "\u201cVector3\u201d\u672a\u5305\u542b\u201czeroVector\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstantiationParameters.cs",
+        "line": 73,
+        "message": "\u201cVector3\u201d\u672a\u5305\u542b\u201czeroVector\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstantiationParameters.cs",
+        "line": 74,
+        "message": "\u201cQuaternion\u201d\u672a\u5305\u542b\u201cidentityQuaternion\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0188": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstantiationParameters.cs",
+        "line": 73,
+        "message": "\u5728\u5206\u914d\u201cthis\u201d\u5bf9\u8c61\u7684\u6240\u6709\u5b57\u6bb5\u4e4b\u524d\uff0c\u65e0\u6cd5\u4f7f\u7528\u8be5\u5bf9\u8c61\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u672a\u5206\u914d\u7684\u5b57\u6bb5\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\InstantiationParameters.cs",
+        "line": 89,
+        "message": "\u5728\u5206\u914d\u201cthis\u201d\u5bf9\u8c61\u7684\u6240\u6709\u5b57\u6bb5\u4e4b\u524d\uff0c\u65e0\u6cd5\u4f7f\u7528\u8be5\u5bf9\u8c61\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u672a\u5206\u914d\u7684\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS0173": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleResource.cs",
+        "line": 859,
+        "message": "\u65e0\u6cd5\u786e\u5b9a\u6761\u4ef6\u8868\u8fbe\u5f0f\u7684\u7c7b\u578b\uff0c\u56e0\u4e3a\u201cbool\u201d\u548c\u201cint\u201d\u4e4b\u95f4\u6ca1\u6709\u9690\u5f0f\u8f6c\u6362"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleResource.cs",
+        "line": 885,
+        "message": "\u65e0\u6cd5\u786e\u5b9a\u6761\u4ef6\u8868\u8fbe\u5f0f\u7684\u7c7b\u578b\uff0c\u56e0\u4e3a\u201cUnityEngine.ResourceManagement.ResourceLocations.IResourceLocation\u201d\u548c\u201cint\u201d\u4e4b\u95f4\u6ca1\u6709\u9690\u5f0f\u8f6c\u6362"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\ResourceProviders\\AssetBundleResource.cs",
+        "line": 891,
+        "message": "\u65e0\u6cd5\u786e\u5b9a\u6761\u4ef6\u8868\u8fbe\u5f0f\u7684\u7c7b\u578b\uff0c\u56e0\u4e3a\u201cUnityEngine.Networking.DownloadHandler\u201d\u548c\u201cint\u201d\u4e4b\u95f4\u6ca1\u6709\u9690\u5f0f\u8f6c\u6362"
+      }
+    ],
+    "CS8917": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.ResourceManager\\UnityEngine\\ResourceManagement\\Util\\BinaryStorageBuffer.cs",
+        "line": 922,
+        "message": "\u65e0\u6cd5\u63a8\u65ad\u59d4\u6258\u7c7b\u578b\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

@@ -1,0 +1,73 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule",
+  "assembly": "UnityEngine.SharedInternalsModule",
+  "files": 28,
+  "syntax": 0,
+  "binding": 11,
+  "top": [
+    [
+      "CS0122",
+      6
+    ],
+    [
+      "CS1061",
+      3
+    ],
+    [
+      "CS0208",
+      2
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\FreeFunctionAttribute.cs",
+        "line": 11,
+        "message": "\u201cNativeMethodAttribute.__field_IsFreeFunction\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\FreeFunctionAttribute.cs",
+        "line": 16,
+        "message": "\u201cNativeMethodAttribute.__field_IsFreeFunction\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\FreeFunctionAttribute.cs",
+        "line": 21,
+        "message": "\u201cNativeMethodAttribute.__field_IsFreeFunction\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\AssetFileNameExtensionAttribute.cs",
+        "line": 18,
+        "message": "\u201cAssetFileNameExtensionAttribute\u201d\u672a\u5305\u542b\u201cpreferredExtension\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAssetFileNameExtensionAttribute\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cpreferredExtension\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\AssetFileNameExtensionAttribute.cs",
+        "line": 19,
+        "message": "\u201cAssetFileNameExtensionAttribute\u201d\u672a\u5305\u542b\u201cotherExtensions\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAssetFileNameExtensionAttribute\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cotherExtensions\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\UnityMarshalAsAttribute.cs",
+        "line": 14,
+        "message": "\u201cUnityMarshalAsAttribute\u201d\u672a\u5305\u542b\u201cNativeType\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cUnityMarshalAsAttribute\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cNativeType\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\NativeTypeAttribute.cs",
+        "line": 58,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cstring\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.SharedInternalsModule\\UnityEngine\\Bindings\\NativeTypeAttribute.cs",
+        "line": 68,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cstring\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ]
+  },
+  "returncode": 1
+}

@@ -1,0 +1,95 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Configuration",
+  "assembly": "System.Configuration",
+  "files": 10,
+  "syntax": 1,
+  "binding": 22,
+  "top": [
+    [
+      "CS1503",
+      12
+    ],
+    [
+      "CS0161",
+      7
+    ],
+    [
+      "CS0571",
+      2
+    ],
+    [
+      "CS0117",
+      1
+    ],
+    [
+      "CS1729",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationSection.cs",
+        "line": 15,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201c\u65b9\u6cd5\u7ec4\u201d\u8f6c\u6362\u4e3a\u201cobject\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationElement.cs",
+        "line": 21,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201c\u65b9\u6cd5\u7ec4\u201d\u8f6c\u6362\u4e3a\u201cobject\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationSection.cs",
+        "line": 20,
+        "message": "\u53c2\u6570 1: \u65e0\u6cd5\u4ece\u201c\u65b9\u6cd5\u7ec4\u201d\u8f6c\u6362\u4e3a\u201cobject\u201d"
+      }
+    ],
+    "CS0571": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\IgnoreSection.cs",
+        "line": 17,
+        "message": "\u201cIgnoreSection.Properties.get\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationElement.cs",
+        "line": 15,
+        "message": "\u201cConfigurationElement.Properties.get\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      }
+    ],
+    "CS0161": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\IgnoreSection.cs",
+        "line": 15,
+        "message": "\u201cIgnoreSection.Properties.get\u201d: \u5e76\u975e\u6240\u6709\u7684\u4ee3\u7801\u8def\u5f84\u90fd\u8fd4\u56de\u503c"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationElement.cs",
+        "line": 13,
+        "message": "\u201cConfigurationElement.Properties.get\u201d: \u5e76\u975e\u6240\u6709\u7684\u4ee3\u7801\u8def\u5f84\u90fd\u8fd4\u56de\u503c"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\ConfigurationElement.cs",
+        "line": 19,
+        "message": "\u201cConfigurationElement.IsModified()\u201d: \u5e76\u975e\u6240\u6709\u7684\u4ee3\u7801\u8def\u5f84\u90fd\u8fd4\u56de\u503c"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\System\\Configuration\\IgnoreSection.cs",
+        "line": 23,
+        "message": "\u201cIgnoreSection\u201d\u672a\u5305\u542b\u201cctor\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Configuration\\Unity\\ThrowStub.cs",
+        "line": 8,
+        "message": "\u201cObjectDisposedException\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ]
+  },
+  "returncode": 1
+}

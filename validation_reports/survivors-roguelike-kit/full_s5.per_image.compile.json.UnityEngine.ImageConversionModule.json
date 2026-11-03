@@ -1,0 +1,26 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.ImageConversionModule",
+  "assembly": "UnityEngine.ImageConversionModule",
+  "files": 2,
+  "syntax": 0,
+  "binding": 1,
+  "top": [
+    [
+      "CS0122",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.ImageConversionModule\\UnityEngine\\ImageConversion.cs",
+        "line": 49,
+        "message": "\u201cBlittableArrayWrapper\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ]
+  },
+  "returncode": 1
+}

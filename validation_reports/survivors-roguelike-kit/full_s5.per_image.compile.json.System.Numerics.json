@@ -1,0 +1,26 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Numerics",
+  "assembly": "System.Numerics",
+  "files": 9,
+  "syntax": 0,
+  "binding": 1,
+  "top": [
+    [
+      "CS8345",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS8345": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Numerics\\System\\Text\\ValueStringBuilder.cs",
+        "line": 14,
+        "message": "\u5b57\u6bb5\u6216\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u4e0d\u80fd\u662f\u7c7b\u578b\u201cSpan<char>\u201d\uff0c\u9664\u975e\u5b83\u662f ref \u7ed3\u6784\u7684\u5b9e\u4f8b\u6210\u5458\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

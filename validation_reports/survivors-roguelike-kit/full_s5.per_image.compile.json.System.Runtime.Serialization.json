@@ -1,0 +1,13 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Runtime.Serialization",
+  "assembly": "System.Runtime.Serialization",
+  "files": 4,
+  "syntax": 0,
+  "binding": 0,
+  "top": [],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {},
+  "returncode": 0
+}

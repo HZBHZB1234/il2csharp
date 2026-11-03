@@ -1,0 +1,485 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\DOTween",
+  "assembly": "DOTween",
+  "files": 102,
+  "syntax": 28,
+  "binding": 5956,
+  "top": [
+    [
+      "CS0030",
+      1363
+    ],
+    [
+      "CS1061",
+      1055
+    ],
+    [
+      "CS0103",
+      967
+    ],
+    [
+      "CS0019",
+      519
+    ],
+    [
+      "CS0029",
+      345
+    ],
+    [
+      "CS0117",
+      259
+    ],
+    [
+      "CS0208",
+      255
+    ],
+    [
+      "CS0122",
+      251
+    ],
+    [
+      "CS0266",
+      241
+    ],
+    [
+      "CS1503",
+      199
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0019": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 20,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cPureQuaternionPlugin\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\Debugger.cs",
+        "line": 28,
+        "message": "\u8fd0\u7b97\u7b26\u201c==\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cFunc<LogType, object, bool>\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOCurve.cs",
+        "line": 41,
+        "message": "\u8fd0\u7b97\u7b26\u201c/\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cfloat\u201d\u548c\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ],
+    "CS0117": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 154,
+        "message": "\u201cSequence\u201d\u672a\u5305\u542b\u201cLogAddToNullSequence\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 159,
+        "message": "\u201cSequence\u201d\u672a\u5305\u542b\u201cLogAddToInactiveSequence\u201d\u7684\u5b9a\u4e49"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 164,
+        "message": "\u201cSequence\u201d\u672a\u5305\u542b\u201cLogAddToLockedSequence\u201d\u7684\u5b9a\u4e49"
+      }
+    ],
+    "CS0029": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 155,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cDG.Tweening.Sequence\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 106,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cUnityEngine.Quaternion\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cbyte\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 191,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cint\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cDG.Tweening.Sequence\u201d"
+      }
+    ],
+    "CS1503": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 36,
+        "message": "\u53c2\u6570 2: \u65e0\u6cd5\u4ece\u201cint\u201d\u8f6c\u6362\u4e3a\u201cDG.Tweening.Tween\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 40,
+        "message": "\u53c2\u6570 2: \u65e0\u6cd5\u4ece\u201cint\u201d\u8f6c\u6362\u4e3a\u201cSystem.Reflection.BindingFlags\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 41,
+        "message": "\u53c2\u6570 2: \u65e0\u6cd5\u4ece\u201cint\u201d\u8f6c\u6362\u4e3a\u201cobject[]\u201d"
+      }
+    ],
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 46,
+        "message": "\u201cDebugger._logPriority\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 87,
+        "message": "\u201cDOTween.ApplyTo<T1, T2, TPlugOptions>(DOGetter<T1>, DOSetter<T1>, T2, float, ABSTweenPlugin<T1, T2, TPlugOptions>)\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 106,
+        "message": "\u201cDebugger._logPriority\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 22,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201conVirtualUpdate\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201conVirtualUpdate\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 23,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201cval\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cval\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 24,
+        "message": "\u201cobject\u201d\u672a\u5305\u542b\u201c_Float_b__0\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cobject\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201c_Float_b__0\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 26,
+        "message": "\u201cTweenCallback\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 30,
+        "message": "\u201cTweenCallback\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 63,
+        "message": "\u201cTweenCallback\u201d\u4e0d\u5305\u542b\u91c7\u7528 0 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ],
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 27,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201c\u65b9\u6cd5\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 39,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201c\u65b9\u6cd5\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 40,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cDG.Tweening.Core.TweenerCore<UnityEngine.Quaternion, UnityEngine.Quaternion, DG.Tweening.Plugins.Options.NoOptions>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 46,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cdata_180003e10\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 49,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cdata_180003db0\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 49,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201creal5\u201d"
+      }
+    ],
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 41,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 63,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 79,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cobject\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS0266": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 46,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cobject\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cfloat\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 118,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cDG.Tweening.Tween\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cDG.Tweening.Sequence\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 223,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cfloat\u201d\u9690\u5f0f\u8f6c\u6362\u4e3a\u201cint\u201d\u3002\u5b58\u5728\u4e00\u4e2a\u663e\u5f0f\u8f6c\u6362(\u662f\u5426\u7f3a\u5c11\u5f3a\u5236\u8f6c\u6362?)"
+      }
+    ],
+    "CS0165": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 63,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201creal12\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 63,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201creal13\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\CustomPlugins\\PureQuaternionPlugin.cs",
+        "line": 63,
+        "message": "\u4f7f\u7528\u4e86\u672a\u8d4b\u503c\u7684\u5c40\u90e8\u53d8\u91cf\u201creal14\u201d"
+      }
+    ],
+    "CS0571": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenUtils.cs",
+        "line": 63,
+        "message": "\u201cQuaternion.operator *(Quaternion, Quaternion)\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 650,
+        "message": "\u201cList<Tween>.Capacity.set\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 662,
+        "message": "\u201cList<Tween>.Capacity.set\u201d: \u65e0\u6cd5\u663e\u5f0f\u8c03\u7528\u8fd0\u7b97\u7b26\u6216\u8bbf\u95ee\u5668"
+      }
+    ],
+    "CS0246": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\Easing\\Flash.cs",
+        "line": 55,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cfloat2\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\Easing\\Flash.cs",
+        "line": 137,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cfloat2\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\ShortcutExtensions.cs",
+        "line": 44,
+        "message": "\u672a\u80fd\u627e\u5230\u7c7b\u578b\u6216\u547d\u540d\u7a7a\u95f4\u540d\u201cT\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ],
+    "CS0311": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOVirtual.cs",
+        "line": 359,
+        "message": "\u7c7b\u578b\u201cobject\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cTweenSettingsExtensions.SetAutoKill<T>(T, bool)\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cobject\u201d\u5230\u201cDG.Tweening.Tween\u201d\u7684\u9690\u5f0f\u5f15\u7528\u8f6c\u6362\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOTween.cs",
+        "line": 562,
+        "message": "\u7c7b\u578b\u201cobject\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cExtensions.SetSpecialStartupMode<T>(T, SpecialStartupMode)\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cobject\u201d\u5230\u201cDG.Tweening.Tween\u201d\u7684\u9690\u5f0f\u5f15\u7528\u8f6c\u6362\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOTween.cs",
+        "line": 923,
+        "message": "\u7c7b\u578b\u201cobject\u201d\u4e0d\u80fd\u7528\u4f5c\u6cdb\u578b\u7c7b\u578b\u6216\u65b9\u6cd5\u201cTweenSettingsExtensions.SetTarget<T>(T, object)\u201d\u4e2d\u7684\u7c7b\u578b\u53c2\u6570\u201cT\u201d\u3002\u6ca1\u6709\u4ece\u201cobject\u201d\u5230\u201cDG.Tweening.Tween\u201d\u7684\u9690\u5f0f\u5f15\u7528\u8f6c\u6362\u3002"
+      }
+    ],
+    "CS7036": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 276,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cDOTweenComponent._WaitForCompletion_d__17._WaitForCompletion_d__17(int)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201c__1__state\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 298,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cDOTweenComponent._WaitForKill_d__19._WaitForKill_d__19(int)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201c__1__state\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 310,
+        "message": "\u672a\u63d0\u4f9b\u4e0e\u201cDOTweenComponent._WaitForElapsedLoops_d__20._WaitForElapsedLoops_d__20(int)\u201d\u7684\u5fc5\u9700\u5f62\u53c2\u201c__1__state\u201d\u5bf9\u5e94\u7684\u5b9e\u53c2"
+      }
+    ],
+    "CS8917": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 610,
+        "message": "\u65e0\u6cd5\u63a8\u65ad\u59d4\u6258\u7c7b\u578b\u3002"
+      }
+    ],
+    "CS0149": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\TweenSettingsExtensions.cs",
+        "line": 611,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOTween.cs",
+        "line": 431,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOTween.cs",
+        "line": 443,
+        "message": "\u5e94\u8f93\u5165\u65b9\u6cd5\u540d\u79f0"
+      }
+    ],
+    "CS0159": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 657,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_1804446b1\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenComponent.cs",
+        "line": 664,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_1804446b1\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenUtils.cs",
+        "line": 140,
+        "message": "goto \u8bed\u53e5\u8303\u56f4\u5185\u6ca1\u6709\u201cL_18043a2a2\u201d\u8fd9\u6837\u7684\u6807\u7b7e"
+      }
+    ],
+    "CS0723": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenUtils.cs",
+        "line": 94,
+        "message": "\u65e0\u6cd5\u58f0\u660e\u9759\u6001\u7c7b\u578b\u201cDOTweenUtils\u201d\u7684\u53d8\u91cf"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\DOTweenUtils.cs",
+        "line": 118,
+        "message": "\u65e0\u6cd5\u58f0\u660e\u9759\u6001\u7c7b\u578b\u201cDOTweenUtils\u201d\u7684\u53d8\u91cf"
+      }
+    ],
+    "CS0170": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\DOTween.cs",
+        "line": 722,
+        "message": "\u4f7f\u7528\u4e86\u53ef\u80fd\u672a\u8d4b\u503c\u7684\u5b57\u6bb5\u201cx\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\PathPlugin.cs",
+        "line": 626,
+        "message": "\u4f7f\u7528\u4e86\u53ef\u80fd\u672a\u8d4b\u503c\u7684\u5b57\u6bb5\u201cx\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\PathPlugin.cs",
+        "line": 627,
+        "message": "\u4f7f\u7528\u4e86\u53ef\u80fd\u672a\u8d4b\u503c\u7684\u5b57\u6bb5\u201cy\u201d"
+      }
+    ],
+    "CS0157": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Tween.cs",
+        "line": 440,
+        "message": "\u63a7\u5236\u6d41\u4e0d\u80fd\u4ece finally \u5b50\u53e5\u4e2d\u79bb\u5f00"
+      }
+    ],
+    "CS0188": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\Core\\PathCore\\ControlPoint.cs",
+        "line": 20,
+        "message": "\u5728\u5206\u914d\u201cthis\u201d\u5bf9\u8c61\u7684\u6240\u6709\u5b57\u6bb5\u4e4b\u524d\uff0c\u65e0\u6cd5\u4f7f\u7528\u8be5\u5bf9\u8c61\u3002\u8bf7\u8003\u8651\u66f4\u65b0\u5230\u8bed\u8a00\u7248\u672c 'preview' \u4ee5\u81ea\u52a8\u9ed8\u8ba4\u672a\u5206\u914d\u7684\u5b57\u6bb5\u3002"
+      }
+    ],
+    "CS0163": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 1834,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 8:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 1839,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 9:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Core\\TweenManager.cs",
+        "line": 1844,
+        "message": "\u63a7\u5236\u4e0d\u80fd\u4ece\u4e00\u4e2a case \u6807\u7b7e(\u201ccase 10:\u201d)\u8d2f\u7a7f\u5230\u53e6\u4e00\u4e2a case \u6807\u7b7e"
+      }
+    ],
+    "CS0021": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Sequence.cs",
+        "line": 470,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Sequence.cs",
+        "line": 490,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Sequence.cs",
+        "line": 503,
+        "message": "\u65e0\u6cd5\u5c06\u5e26 [] \u7684\u7d22\u5f15\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u8868\u8fbe\u5f0f"
+      }
+    ],
+    "CS0212": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\Core\\PathCore\\ControlPoint.cs",
+        "line": 49,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\Core\\PathCore\\Path.cs",
+        "line": 1216,
+        "message": "\u53ea\u80fd\u83b7\u53d6 fixed \u8bed\u53e5\u521d\u59cb\u503c\u8bbe\u5b9a\u9879\u5185\u7684\u672a\u56fa\u5b9a\u8868\u8fbe\u5f0f\u7684\u5730\u5740"
+      }
+    ],
+    "CS0034": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\UlongPlugin.cs",
+        "line": 49,
+        "message": "\u8fd0\u7b97\u7b26\u201c+\u201d\u5bf9\u4e8e\u201culong\u201d\u548c\u201cint\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570\u5177\u6709\u4e8c\u4e49\u6027"
+      }
+    ],
+    "CS1501": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Plugins\\PathPlugin.cs",
+        "line": 300,
+        "message": "\u201cConvertToConstantPathPerc\u201d\u65b9\u6cd5\u6ca1\u6709\u91c7\u7528 2 \u4e2a\u53c2\u6570\u7684\u91cd\u8f7d"
+      }
+    ],
+    "CS0173": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Sequence.cs",
+        "line": 1866,
+        "message": "\u65e0\u6cd5\u786e\u5b9a\u6761\u4ef6\u8868\u8fbe\u5f0f\u7684\u7c7b\u578b\uff0c\u56e0\u4e3a\u201cbool\u201d\u548c\u201cint\u201d\u4e4b\u95f4\u6ca1\u6709\u9690\u5f0f\u8f6c\u6362"
+      }
+    ],
+    "CS0023": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\DOTween\\DG\\Tweening\\Sequence.cs",
+        "line": 2149,
+        "message": "\u8fd0\u7b97\u7b26\u201c!\u201d\u65e0\u6cd5\u5e94\u7528\u4e8e\u201cobject\u201d\u7c7b\u578b\u7684\u64cd\u4f5c\u6570"
+      }
+    ]
+  },
+  "returncode": 1
+}

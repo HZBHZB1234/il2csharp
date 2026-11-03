@@ -1,0 +1,48 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System.Core",
+  "assembly": "System.Core",
+  "files": 309,
+  "syntax": 0,
+  "binding": 3,
+  "top": [
+    [
+      "CS0122",
+      1
+    ],
+    [
+      "CS0535",
+      1
+    ],
+    [
+      "CS0539",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Core\\System\\Security\\Cryptography\\AesTransform.cs",
+        "line": 10,
+        "message": "\u201cSymmetricTransform\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0539": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Core\\System\\Dynamic\\ExpandoObject.cs",
+        "line": 413,
+        "message": "\u5728\u53ef\u5b9e\u73b0\u7684\u63a5\u53e3\u7684\u6210\u5458\u4e2d\u627e\u4e0d\u5230\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684 \"ExpandoObject.TryGetValue(string, ref object)\""
+      }
+    ],
+    "CS0535": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System.Core\\System\\Dynamic\\ExpandoObject.cs",
+        "line": 18,
+        "message": "\u201cExpandoObject\u201d\u4e0d\u5b9e\u73b0\u63a5\u53e3\u6210\u5458\u201cIDictionary<string, object>.TryGetValue(string, out object)\u201d"
+      }
+    ]
+  },
+  "returncode": 1
+}

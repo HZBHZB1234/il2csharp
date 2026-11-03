@@ -1,0 +1,42 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VRModule",
+  "assembly": "UnityEngine.VRModule",
+  "files": 1,
+  "syntax": 0,
+  "binding": 3,
+  "top": [
+    [
+      "CS1061",
+      2
+    ],
+    [
+      "CS0030",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0030": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VRModule\\UnityEngine\\XR\\XRDevice.cs",
+        "line": 21,
+        "message": "\u65e0\u6cd5\u5c06\u7c7b\u578b\u201cSystem.Action<string>\u201d\u8f6c\u6362\u4e3a\u201cbyte*\u201d"
+      }
+    ],
+    "CS1061": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VRModule\\UnityEngine\\XR\\XRDevice.cs",
+        "line": 21,
+        "message": "\u201cAction<string>\u201d\u672a\u5305\u542b\u201cmethod_code\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<string>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod_code\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.VRModule\\UnityEngine\\XR\\XRDevice.cs",
+        "line": 21,
+        "message": "\u201cAction<string>\u201d\u672a\u5305\u542b\u201cmethod\u201d\u7684\u5b9a\u4e49\uff0c\u5e76\u4e14\u627e\u4e0d\u5230\u53ef\u63a5\u53d7\u7b2c\u4e00\u4e2a\u201cAction<string>\u201d\u7c7b\u578b\u53c2\u6570\u7684\u53ef\u8bbf\u95ee\u6269\u5c55\u65b9\u6cd5\u201cmethod\u201d(\u662f\u5426\u7f3a\u5c11 using \u6307\u4ee4\u6216\u7a0b\u5e8f\u96c6\u5f15\u7528?)"
+      }
+    ]
+  },
+  "returncode": 1
+}

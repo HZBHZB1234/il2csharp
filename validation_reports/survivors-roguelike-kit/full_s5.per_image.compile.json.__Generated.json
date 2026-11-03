@@ -1,0 +1,37 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\__Generated",
+  "assembly": "__Generated",
+  "files": 6,
+  "syntax": 0,
+  "binding": 2,
+  "top": [
+    [
+      "CS0644",
+      1
+    ],
+    [
+      "CS8701",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 74,
+  "samples": {
+    "CS8701": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\__Generated\\IActivationFactory.cs",
+        "line": 7,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      }
+    ],
+    "CS0644": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\__Generated\\Unity\\IL2CPP\\Metadata\\Il2CppFullySharedGenericType.cs",
+        "line": 8,
+        "message": "\u201c__Il2CppFullySharedGenericType\u201d\u65e0\u6cd5\u4ece\u7279\u6b8a\u7c7b\u201cValueType\u201d\u6d3e\u751f"
+      }
+    ]
+  },
+  "returncode": 1
+}

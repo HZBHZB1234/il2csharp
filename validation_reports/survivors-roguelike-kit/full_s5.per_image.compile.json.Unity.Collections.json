@@ -1,0 +1,47 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\Unity.Collections",
+  "assembly": "Unity.Collections",
+  "files": 199,
+  "syntax": 0,
+  "binding": 56,
+  "top": [
+    [
+      "CS0208",
+      55
+    ],
+    [
+      "CS8701",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0208": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Collections\\Unity\\Collections\\AllocatorHelper.cs",
+        "line": 10,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cT\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Collections\\Unity\\Collections\\LowLevel\\Unsafe\\HashMapHelper.cs",
+        "line": 12,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cTKey\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Collections\\Unity\\Collections\\SortJob.cs",
+        "line": 12,
+        "message": "\u65e0\u6cd5\u83b7\u53d6\u6258\u7ba1\u7c7b\u578b(\u201cT\u201d)\u7684\u5730\u5740\u548c\u5927\u5c0f\uff0c\u6216\u8005\u58f0\u660e\u6307\u5411\u5b83\u7684\u6307\u9488"
+      }
+    ],
+    "CS8701": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\Unity.Collections\\Unity\\Collections\\AllocatorManager.cs",
+        "line": 723,
+        "message": "\u76ee\u6807\u8fd0\u884c\u65f6\u4e0d\u652f\u6301\u9ed8\u8ba4\u63a5\u53e3\u5b9e\u73b0\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

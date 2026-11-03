@@ -1,0 +1,137 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\System",
+  "assembly": "System",
+  "files": 536,
+  "syntax": 2,
+  "binding": 77,
+  "top": [
+    [
+      "CS0122",
+      44
+    ],
+    [
+      "CS0115",
+      23
+    ],
+    [
+      "CS0538",
+      5
+    ],
+    [
+      "CS0012",
+      2
+    ],
+    [
+      "CS0534",
+      2
+    ],
+    [
+      "CS1715",
+      2
+    ],
+    [
+      "CS8345",
+      1
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0122": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\IOSelectorJob.cs",
+        "line": 8,
+        "message": "\u201cIThreadPoolWorkItem\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\IOSelectorJob.cs",
+        "line": 25,
+        "message": "\u201cIThreadPoolWorkItem\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\IOSelectorJob.cs",
+        "line": 33,
+        "message": "\u201cIThreadPoolWorkItem\u201d\u4e0d\u53ef\u8bbf\u95ee\uff0c\u56e0\u4e3a\u5b83\u5177\u6709\u4e00\u5b9a\u7684\u4fdd\u62a4\u7ea7\u522b"
+      }
+    ],
+    "CS0538": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\IOSelectorJob.cs",
+        "line": 25,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cIThreadPoolWorkItem\u201d\u4e0d\u662f\u63a5\u53e3"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\IOSelectorJob.cs",
+        "line": 33,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cIThreadPoolWorkItem\u201d\u4e0d\u662f\u63a5\u53e3"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\SystemCertificateProvider.cs",
+        "line": 125,
+        "message": "'\u663e\u5f0f\u63a5\u53e3\u58f0\u660e\u4e2d\u7684\u201cISystemCertificateProvider\u201d\u4e0d\u662f\u63a5\u53e3"
+      }
+    ],
+    "CS0115": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\MonoBtlsProvider.cs",
+        "line": 65,
+        "message": "\u201cMonoBtlsProvider.SupportsCleanShutdown\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\X509CertificateImplBtls.cs",
+        "line": 20,
+        "message": "\u201cX509CertificateImplBtls.IsValid\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\X509CertificateImplBtls.cs",
+        "line": 58,
+        "message": "\u201cX509CertificateImplBtls.HasPrivateKey\u201d: \u6ca1\u6709\u627e\u5230\u9002\u5408\u7684\u65b9\u6cd5\u6765\u91cd\u5199"
+      }
+    ],
+    "CS1715": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\MonoBtlsProvider.cs",
+        "line": 73,
+        "message": "\u201cMonoBtlsProvider.SupportedProtocols\u201d: \u7c7b\u578b\u5fc5\u987b\u662f\u201cSslProtocols\u201d\u624d\u80fd\u4e0e\u91cd\u5199\u6210\u5458\u201cMonoTlsProvider.SupportedProtocols\u201d\u5339\u914d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Unity\\UnityTlsProvider.cs",
+        "line": 73,
+        "message": "\u201cUnityTlsProvider.SupportedProtocols\u201d: \u7c7b\u578b\u5fc5\u987b\u662f\u201cSslProtocols\u201d\u624d\u80fd\u4e0e\u91cd\u5199\u6210\u5458\u201cMonoTlsProvider.SupportedProtocols\u201d\u5339\u914d"
+      }
+    ],
+    "CS0012": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\MonoBtlsProvider.cs",
+        "line": 73,
+        "message": "\u7c7b\u578b\u201cSslProtocols\u201d\u5728\u672a\u5f15\u7528\u7684\u7a0b\u5e8f\u96c6\u4e2d\u5b9a\u4e49\u3002\u5fc5\u987b\u6dfb\u52a0\u5bf9\u7a0b\u5e8f\u96c6\u201cSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e\u201d\u7684\u5f15\u7528\u3002"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Unity\\UnityTlsProvider.cs",
+        "line": 73,
+        "message": "\u7c7b\u578b\u201cSslProtocols\u201d\u5728\u672a\u5f15\u7528\u7684\u7a0b\u5e8f\u96c6\u4e2d\u5b9a\u4e49\u3002\u5fc5\u987b\u6dfb\u52a0\u5bf9\u7a0b\u5e8f\u96c6\u201cSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e\u201d\u7684\u5f15\u7528\u3002"
+      }
+    ],
+    "CS0534": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Btls\\MonoBtlsProvider.cs",
+        "line": 17,
+        "message": "\u201cMonoBtlsProvider\u201d\u4e0d\u5b9e\u73b0\u7ee7\u627f\u7684\u62bd\u8c61\u6210\u5458\u201cMonoTlsProvider.SupportsCleanShutdown.get\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\Mono\\Unity\\UnityTlsProvider.cs",
+        "line": 17,
+        "message": "\u201cUnityTlsProvider\u201d\u4e0d\u5b9e\u73b0\u7ee7\u627f\u7684\u62bd\u8c61\u6210\u5458\u201cMonoTlsProvider.SupportsCleanShutdown.get\u201d"
+      }
+    ],
+    "CS8345": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\System\\System\\Collections\\Generic\\ValueListBuilder.cs",
+        "line": 10,
+        "message": "\u5b57\u6bb5\u6216\u81ea\u52a8\u5b9e\u73b0\u7684\u5c5e\u6027\u4e0d\u80fd\u662f\u7c7b\u578b\u201cSpan<T>\u201d\uff0c\u9664\u975e\u5b83\u662f ref \u7ed3\u6784\u7684\u5b9e\u4f8b\u6210\u5458\u3002"
+      }
+    ]
+  },
+  "returncode": 1
+}

@@ -1,0 +1,57 @@
+{
+  "kind": "roslyn compile gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule",
+  "assembly": "UnityEngine.UnityAnalyticsCommonModule",
+  "files": 34,
+  "syntax": 46,
+  "binding": 81,
+  "top": [
+    [
+      "CS0103",
+      81
+    ],
+    [
+      "CS1729",
+      46
+    ]
+  ],
+  "tool_error": null,
+  "refs": 73,
+  "samples": {
+    "CS0103": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEngine\\Analytics\\VRDeviceUserAnalytic.cs",
+        "line": 15,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201cobj2\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEditor\\Analytics\\VCProviderAnalytics.cs",
+        "line": 14,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201ctext1\u201d"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEditor\\Analytics\\AssetImportStatusAnalytic.cs",
+        "line": 23,
+        "message": "\u5f53\u524d\u4e0a\u4e0b\u6587\u4e2d\u4e0d\u5b58\u5728\u540d\u79f0\u201ctext1\u201d"
+      }
+    ],
+    "CS1729": [
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEngine\\Analytics\\VRDeviceUserAnalytic.cs",
+        "line": 15,
+        "message": "\u201cVRDeviceUserAnalytic\u201d\u4e0d\u5305\u542b\u91c7\u7528 4 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEditor\\Analytics\\AssetDatabaseRefreshAnalytic.cs",
+        "line": 41,
+        "message": "\u201cAssetDatabaseRefreshAnalytic\u201d\u4e0d\u5305\u542b\u91c7\u7528 4 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      },
+      {
+        "file": "out\\survivors-roguelike-kit\\full_s5\\UnityEngine.UnityAnalyticsCommonModule\\UnityEditor\\Analytics\\BuildAssetBundleAnalytic.cs",
+        "line": 22,
+        "message": "\u201cBuildAssetBundleAnalytic\u201d\u4e0d\u5305\u542b\u91c7\u7528 4 \u4e2a\u53c2\u6570\u7684\u6784\u9020\u51fd\u6570"
+      }
+    ]
+  },
+  "returncode": 1
+}
