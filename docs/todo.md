@@ -4,6 +4,42 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Byte-bounded aggregate slice projection (2026-11-04)
+
+Accepted source guardrail `game_out23` (not promoted), versus `game_out20`.
+`_piece_value` cannot project bytes outside any nested native slice, including
+zero-offset slices; `_scalar_parts` clips to copied coverage. The guard only
+checks bounds: it preserves captured display names rather than re-reading an
+origin field. Negative offsets, invalid widths, cycles and excessive nesting
+decline; type/phi/literal evidence cannot expand a copy.
+
+Strict selected rebuilds: **2,227 / 1,857 bodies**, zero failures/fallbacks/
+type-emit failures; source fingerprints verified; brace/parse clean. Both
+selected C# trees are **byte-identical to out20 (474 + 293 files)**. Full
+compiler diagnostic multisets, not merely code counts, match across all nine
+selected assemblies with real Editor/BCL/package references and exact assembly
+simple names. Survivors main **3,802**, firstpass **816**; unitask counts stay
+unchanged. UniTask.Linq sentinel remains false; this is still syntax-gated.
+This is a correctness guardrail, **not a measured game-output improvement**.
+
+**24 new tests**, including **114,000** independent byte-coverage queries;
+portable **2,180 passed**. Frozen-source full excluding parallel: **2,240
+passed / 259 skipped / 1 non-strict xpassed / 3 failed**; parallel **2 passed**.
+Failure IDs exactly match the out20 full-suite baseline; no re-pin. Isolated
+lift performance is mixed under contention: a 200-sample/mode recheck gives
+process CPU totals about **+0.3% / +9.0%** on the two probed vector methods;
+there is **no speedup or zero-overhead claim**, nor whole-tree/runtime evidence.
+
+Rejected out21 rerooted zero-offset snapshots and changed unrelated consumers.
+Rejected out22 published bounded packed field-prefix parts but damaged existing
+aggregate consumers (**3,802 -> 3,811** survivors diagnostics). Their canceled
+full suites are not passing evidence; synthetic arithmetic checks do not prove
+those aggregate consumers. Next: distinguish copied byte coverage, materialized
+snapshot identity and candidate whole-container type; do not publish a whole
+struct without independent full coverage. A scalar-consumer-only local probe
+is exploratory, not accepted evidence. Aggregate-only record:
+`validation_reports/quality_aggregate_slice_bounds_2026-11-04.json`.
+
 ### Closed native uint32 string-fold proof (2026-11-04)
 
 Accepted source candidate `game_out20` (not promoted), versus `game_out19`.

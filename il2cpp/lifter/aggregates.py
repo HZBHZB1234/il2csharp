@@ -119,8 +119,32 @@ class _AggregatesMixin:
                 return False
         return True
 
+    @staticmethod
+    def _slice_width(origin, offset, width, depth):
+        """Bound a byte request without replacing a captured value's name.
+
+        A zero-offset slice can still name its whole container for legacy
+        consumers. Its type is not evidence that bytes outside the native
+        copy were read. Follow nested bounds only, never re-root display text
+        (which could bypass a materialized snapshot and re-read a field).
+        """
+        if offset < 0 or width <= 0:
+            return 0
+        for _ in range(max(0, 9 - depth)):
+            sl = getattr(origin, '_slice', None)
+            if sl is None:
+                return width
+            if sl[1] < 0:
+                return 0
+            width = min(width, sl[2] - offset)
+            if width <= 0:
+                return 0
+            offset += sl[1]
+            origin = sl[0]
+        return 0
+
     def _piece_value(self, origin, offset, width, expected, depth=0):
-        if depth > 8:
+        if depth > 8 or width <= 0 or self._slice_width(origin, offset, width, depth) != width:
             return None
         sources = getattr(self, '_aggregate_phi_sources', {}).get(origin.text)
         if expected is not None and sources and all(v is not None for v in sources):
@@ -213,6 +237,9 @@ class _AggregatesMixin:
 
     def _scalar_parts(self, origin, offset, width, depth=0):
         """Split a copied value at metadata field boundaries before CFG merging."""
+        width = self._slice_width(origin, offset, width, depth)
+        if width <= 0:
+            return []
         if depth > 8:
             return [(0, origin, offset, width)]
         if offset == 0 and origin.ty is not None \

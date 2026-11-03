@@ -1,0 +1,232 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source guardrail; not promoted; goal not achieved",
+  "baseline": "game_out20",
+  "candidate": "game_out23",
+  "source_parent": "7e694e220be81ec8a11e706bd720d03c5ce6f14a",
+  "proof_scope": [
+    "Nested _slice bounds, including zero-offset slices, limit byte projection and scalar-part splitting.",
+    "The guard does not reroot captured display names; snapshot.x is not replaced by a fresh owner.field.x access.",
+    "Negative offsets, nonpositive widths and overdeep or cyclic slice chains decline. Partial types, literal bytes and phi hints cannot bypass the guard.",
+    "Not a full partial-aggregate publication or lifetime fix."
+  ],
+  "validation": {
+    "portable": {
+      "passed": 2180,
+      "failed": 0,
+      "deselected": 325
+    },
+    "new_cases": 24,
+    "independent_nested_byte_coverage_queries": 114000,
+    "full_without_parallel": {
+      "passed": 2240,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1,
+      "exit_code": 1,
+      "seconds": 919.155999999959,
+      "frozen_source_verified": true
+    },
+    "parallel": {
+      "passed": 2,
+      "failed": 0,
+      "exit_code": 0,
+      "seconds": 496.0470000000205,
+      "frozen_source_verified": true
+    },
+    "compileall": true,
+    "diff_check": true,
+    "frozen_source_verified": true
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 0,
+      "added_files": 0,
+      "removed_files": 0,
+      "source_fingerprints_verified": true,
+      "compiler": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "full_diagnostic_multiset_equal": true
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "full_diagnostic_multiset_equal": true
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "full_diagnostic_multiset_equal": true
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5515,
+          "full_diagnostic_multiset_equal": true
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "full_diagnostic_multiset_equal": true
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "full_diagnostic_multiset_equal": true
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "full_diagnostic_multiset_equal": true
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 0,
+      "added_files": 0,
+      "removed_files": 0,
+      "source_fingerprints_verified": true,
+      "compiler": {
+        "Assembly-CSharp-firstpass": {
+          "before": 816,
+          "after": 816,
+          "full_diagnostic_multiset_equal": true
+        },
+        "Assembly-CSharp": {
+          "before": 3802,
+          "after": 3802,
+          "full_diagnostic_multiset_equal": true
+        }
+      }
+    }
+  },
+  "real_compilation": {
+    "references": "Installed Unity 6000 Editor engine/BCL/netstandard2.1 reference assemblies and original player packages; original assembly simple names; self references excluded. No synthetic missing-type stubs.",
+    "body_gate": "syntax-gated, not zero binding errors; UniTask.Linq sentinel remains false",
+    "diagnostics_comparison": "Full diagnostic multisets equal across all nine selected assemblies; concurrent diagnostic order is not significant."
+  },
+  "performance": {
+    "initial_interleaved": {
+      "fixture": "survivors-roguelike-kit",
+      "isolated_lifts_only": true,
+      "interleaved_samples": [
+        {
+          "mi": 69686,
+          "body_hash_equal": true,
+          "body_sha256": "ad7a47d9a475ba866f86a83fa8f90abf3c06daf8c7a52f59e3d56b40fc3962ea",
+          "samples_each": 40,
+          "median_ms": {
+            "baseline": 78.25655,
+            "candidate": 86.344
+          },
+          "min_ms": {
+            "baseline": 53.3054,
+            "candidate": 59.0059
+          }
+        },
+        {
+          "mi": 70677,
+          "body_hash_equal": true,
+          "body_sha256": "2356ada3f6faae92a5d848b875532f4877b000070dae5fb435d4a4914bddedc3",
+          "samples_each": 40,
+          "median_ms": {
+            "baseline": 39.14325,
+            "candidate": 40.8959
+          },
+          "min_ms": {
+            "baseline": 27.7785,
+            "candidate": 27.8981
+          }
+        },
+        {
+          "mi": 85900,
+          "body_hash_equal": true,
+          "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f",
+          "samples_each": 40,
+          "median_ms": {
+            "baseline": 0.443,
+            "candidate": 0.4407
+          },
+          "min_ms": {
+            "baseline": 0.1344,
+            "candidate": 0.1673
+          }
+        }
+      ],
+      "external_cpu_contention": true,
+      "whole_tree_or_game_speed_claim": false
+    },
+    "recheck": {
+      "isolated_lift_only": true,
+      "external_cpu_contention": true,
+      "whole_tree_or_game_speed_claim": false,
+      "rows": [
+        {
+          "mi": 69686,
+          "samples_each": 200,
+          "output_hash_equal": true,
+          "wall_median_ms": {
+            "baseline": 74.99225,
+            "candidate": 73.92875000000001
+          },
+          "process_cpu_sum_ms": {
+            "baseline": 15921.875,
+            "candidate": 15968.75
+          },
+          "process_clock_resolution_seconds": 1e-07
+        },
+        {
+          "mi": 70677,
+          "samples_each": 200,
+          "output_hash_equal": true,
+          "wall_median_ms": {
+            "baseline": 38.044399999999996,
+            "candidate": 42.4465
+          },
+          "process_cpu_sum_ms": {
+            "baseline": 7828.125,
+            "candidate": 8531.25
+          },
+          "process_clock_resolution_seconds": 1e-07
+        }
+      ]
+    },
+    "interpretation": "Mixed measurements under external contention. Recheck process CPU sums are about +0.3% and +9.0%; no speedup or zero-overhead claim. Isolated lifts only, not whole-tree or game runtime."
+  },
+  "rejected_experiments": [
+    {
+      "candidate": "game_out21",
+      "reason": "Zero-offset reroot can bypass materialized snapshot lifetimes; broad unrelated tree changes. Canceled full suite is not passing evidence."
+    },
+    {
+      "candidate": "game_out22",
+      "reason": "Bounded packed Vector3 prefix helped scalar consumers but broke existing aggregate consumers; survivors diagnostics 3802 -> 3811. Full suite canceled, not passing evidence. Synthetic 440000 arithmetic checks do not validate the damaged aggregate consumers."
+    }
+  ],
+  "next_work": "Separate actual copied byte range, bound snapshot and candidate whole-container type. Whole-type publication and stack/register aggregate consumers need independent complete coverage. A temporary scalar-consumer-only probe exists locally; it has not passed build, compiler, runtime or complete regression gates.",
+  "limits": [
+    "Both selected C# trees are byte-identical, 767 files total; this slice closes synthetic demonstrated invalid projections but claims no game output/compiler-count improvement.",
+    "Thousands of compiler errors remain; no end-to-end semantic equivalence.",
+    "No promotion, golden re-pin, snapshot regeneration or licensed body/disassembly publication."
+  ]
+}
