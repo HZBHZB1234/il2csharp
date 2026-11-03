@@ -348,7 +348,7 @@ _REFARG_RX = re.compile(
     r'(?:\[[^\[\]]*\])?$')
 
 
-def _byref_arg_render(at, is_byref, is_byval_struct, trust):
+def _byref_arg_render(at, is_byref, is_byval_struct, trust, modifier='ref '):
     """fix 54 (batch 48): how a `&X` call argument should render given
     what the callee DECLARES at that position. Returns the replacement
     text, or None to keep the raw `&` untouched.
@@ -362,11 +362,8 @@ def _byref_arg_render(at, is_byref, is_byval_struct, trust):
     VALUE) and `lea r8,[rsp+60h]` (out RaycastHit) -- three identical
     leas, and only the byref bit tells them apart.
 
-      byref param            -> `ref X`   (metadata carries no
-                                ParamAttributes in v31, so `out` is not
-                                separable from `ref`; the DECLARATION
-                                side spells both `ref ` too, so the
-                                tree stays self-consistent)
+      byref param            -> `ref X` / `out X`, using the callee's
+                                ParamAttributes (see param_modifier)
       non-byref value type   -> `X`       (the & is ABI noise)
       anything else          -> None
 
@@ -382,7 +379,7 @@ def _byref_arg_render(at, is_byref, is_byval_struct, trust):
     if not _REFARG_RX.match(inner):
         return None
     if is_byref:
-        return 'ref ' + inner
+        return modifier + inner
     if is_byval_struct:
         return inner
     return None

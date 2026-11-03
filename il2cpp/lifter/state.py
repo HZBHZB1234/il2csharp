@@ -2059,6 +2059,9 @@ class _StateMixin:
         # reset per method/pass: t-names repeat across methods and v-names
         # differ between the two analysis passes, so leftovers mis-type
         self._var_types = {}
+        # Only these metadata entry names denote C# managed aliases. A phi
+        # can inherit the byref type without being emitted as a ref local.
+        self._entry_byrefs = {}
         # this method executed `mov rbp,rsp`: a per-method FACT, so unlike
         # the register value it survives the pass-2 phi merge's Expr('?').
         self._rbp_frame = False
@@ -2142,6 +2145,8 @@ class _StateMixin:
             is_float = te in (0x0c, 0x0d) and not ((bits >> 29) & 1)
             slot = base + pi
             pname = safe_ident(p.name)
+            if (bits >> 29) & 1:
+                self._entry_byrefs[pname] = pt
             if slot > 3:
                 # Win64 stack parameters begin above the return address and
                 # the 32-byte shadow space. Track them by their real source

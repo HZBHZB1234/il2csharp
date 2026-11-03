@@ -1,4 +1,5 @@
 from il2cpp.prelude import *  # noqa: F401,F403
+from il2cpp.csharp import param_modifier
 from il2cpp.common import csharp_type_name
 from il2cpp.expr import acc_get, acc_lhs, acc_set
 from il2cpp.expr import Expr, _BARE_TOKEN_RX, _R4_TY, _R8_TY, _REFARG_RX, _USE_BIND_MIN, _byref_arg_render, _is_unresolved_gp, _recv_fold, _recv_shaped
@@ -3658,7 +3659,7 @@ class _CallsMixin:
                         rest[ai2],
                         bool(((bits2 >> 29) & 1)
                              or (bits2 >> 16) & 0xFF == 0x10),
-                        self._byval_struct(pt2), True)
+                        self._byval_struct(pt2), True, param_modifier(pt2) or 'ref ')
                     if rep2 is not None:
                         rest[ai2] = rep2
                 mbase2 = m2.name.rpartition('.')[2] if '.' in m2.name else m2.name
@@ -4187,24 +4188,34 @@ class _CallsMixin:
                 if not base.startswith('get_'):
                     self._bind(result)
                     return
-            # An ignored non-void result would otherwise vanish: the call
-            # runs for effect, so hold it pending and flush a bare statement
-            # at the next emit when no use renders it first. Used calls keep
-            # their inline render (use-counted by _RegState reads); getters
-            # stay lazy since a bare `obj.Prop;` is noise. Short texts cannot
-            # be use-traced, so they keep the old drop behavior.
+            # A reference factory has identity and effects. Field/condition
+            # expressions copy its text, not its Expr object; binding after
+            # such a copy can execute the call again. Materialize a proven
+            # static nullary, non-generic own-class factory at the native
+            # call site, before any consumer can snapshot the text.
+            # Broader reference returns need consumer/stack type propagation
+            # repaired first: early binding there can freeze stale T/object.
             if not getattr(self, 'dry', False) and mi is not None and not \
-                    self.meta.methods[mi].name.rpartition('.')[2].startswith('get_') \
-                    and len(call) >= _USE_BIND_MIN:
-                if self._dead_shared_forwarder(target, ins):
+                    self.meta.methods[mi].name.rpartition('.')[2].startswith('get_'):
+                if len(call) >= _USE_BIND_MIN and self._dead_shared_forwarder(target, ins):
                     ret = self._dead_shared_forwarder_return(target, ins, call, rty)
                     if ret is not None:
                         self.emit(ins.ip, ret, asm)
                     return
-                pc = getattr(self, '_pending_calls', None)
-                if pc is None:
-                    pc = self._pending_calls = []
-                pc.append((result, ins.ip, asm))
+                factory = self.meta.methods[mi]
+                if te == 0x12 and not (rty[1] & (1 << 29)) \
+                        and factory.is_static and factory.param_count == 0 \
+                        and factory.generic_container == -1 \
+                        and self._td_of(rty) == factory.declaring:
+                    self._bind(result)
+                    return
+                # Scalar ignored results still run for effect; used scalars
+                # retain their lazy render. Short texts cannot be use-traced.
+                if len(call) >= _USE_BIND_MIN:
+                    pc = getattr(self, '_pending_calls', None)
+                    if pc is None:
+                        pc = self._pending_calls = []
+                    pc.append((result, ins.ip, asm))
             return
         # unresolved-return calls cannot be emitted bare AND kept as a
         # value: the next store/read would re-render the entire call text

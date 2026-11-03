@@ -1,5 +1,6 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.common import csharp_type_name, u64
+from il2cpp.csharp import param_modifier
 from il2cpp.expr import Expr, _BARE_HINT_RX, _BARE_TOKEN_RX, _INT_TY, _byref_arg_render, _is_unresolved_gp, _mentions, _merge_arr_proof, _recv_fold
 from il2cpp.text import _int_lit, disp_add, strip_outer
 from il2cpp.x64 import ARG_XMM, KLASS_ELEMENT_CLASS, KLASS_INITIALIZED, KLASS_STATIC_FIELDS, KLASS_VTABLE
@@ -302,9 +303,17 @@ class _ValuesMixin:
                 # regardless of the signature.
                 rep = _byref_arg_render(
                     at, bool(((bits >> 29) & 1) or (bits >> 16) & 0xFF == 0x10),
-                    self._byval_struct(pt), trust)
+                    self._byval_struct(pt), trust, param_modifier(pt) or 'ref ')
                 if rep is not None:
                     args[ai] = rep
+                continue
+            # An entry-seeded ref/out param is already an address even
+            # though its C# spelling has no ampersand. Forward it only with
+            # both the callee and the live expression proving byref, never
+            # from the target signature alone (a stale scalar may sit here).
+            mod = param_modifier(pt)
+            if trust and mod and self._is_entry_byref(e) and e.text == at:
+                args[ai] = mod + at
                 continue
             if not _BARE_TOKEN_RX.match(at):
                 continue
@@ -469,6 +478,11 @@ class _ValuesMixin:
             return e
         if e.text.startswith('&'):
             return e
+        if e.text == lv and self._is_entry_byref(e):
+            # A managed byref register holds the variable's ADDRESS. A store
+            # changes its value, not that address; freezing it would read an
+            # unassigned out parameter and lose subsequent stores to it.
+            return e
         if not _mentions(e.text, lv):
             return e
         t = seen.get(e.text)
@@ -584,8 +598,43 @@ class _ValuesMixin:
         td_idx = self._td_of(ty)
         return td_idx is not None and self.meta.typedefs[td_idx].is_valuetype
 
+    _BYREF_VALUE_WIDTHS = {
+        0x02: 1, 0x03: 2, 0x04: 1, 0x05: 1, 0x06: 2, 0x07: 2,
+        0x08: 4, 0x09: 4, 0x0a: 8, 0x0b: 8, 0x0c: 4, 0x0d: 8,
+        0x0e: 8, 0x12: 8, 0x14: 8, 0x18: 8, 0x19: 8, 0x1c: 8, 0x1d: 8,
+    }
+
+    def _is_entry_byref(self, base):
+        """Require the original metadata parameter, not a byref-typed phi."""
+        return (base is not None and not base._unk and base.ty is not None
+                and bool((base.ty[1] >> 29) & 1)
+                and getattr(self, '_entry_byrefs', {}).get(base.text) == base.ty)
+
+    def _byref_value(self, base, disp, size):
+        """An exact scalar/reference dereference of a named managed byref.
+
+        Entry expressions spell ref/out addresses as their parameter name.
+        Native [address] is that variable's VALUE, not an object header or
+        a raw byte address. Offset/partial/wide accesses, structs, generic
+        layouts, unmanaged pointers and unknown registers keep the raw path.
+        """
+        if disp != 0 or not self._is_entry_byref(base):
+            return None
+        te = (base.ty[1] >> 16) & 0xff
+        if self._BYREF_VALUE_WIDTHS.get(te) != size:
+            return None
+        # ParamAttributes belong to the address's parameter, not its value.
+        ty = (base.ty[0], base.ty[1] & ~((1 << 29) | 0xffff))
+        kind = ('float' if te in (0x0c, 0x0d) else
+                'str' if te == 0x0e else 'arr' if te in (0x14, 0x1d) else
+                'obj' if te in (0x12, 0x1c) else 'int')
+        return Expr(base.text, ty, kind)
+
     def _field_expr(self, base: Expr, disp: int, size: int, elem_fold=False,
                     load=False) -> Expr:
+        value = self._byref_value(base, disp, size)
+        if value is not None:
+            return value
         _ifm = getattr(base, '_ifm', None)
         if _ifm is not None and len(_ifm) == 4 and disp in (0, 8) and size == 8:
             # fix 139: VirtualInvokeData.{methodPtr, method} of a resolved

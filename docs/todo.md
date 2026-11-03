@@ -1,10 +1,74 @@
-## PAUSED (2026-11-03, goal round 54)
+## Current work — ACTIVE, resumed 2026-11-03
 
-The goal is paused on user request. Read docs/handoff-2026-11-03.md first: it
-has the three compile tiers, the publicize correction (unitask body tier
-**9,619**, not 78,104), what shipped, the five measured-and-reverted attempts
-with their numbers, the read-only-slot root cause, and the ranked open work with
-exact commands.
+The user resumed the goal. The pause at round 54 below is historical, not
+current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
+The goal is **not achieved**; no output promotion or golden re-pin is authorized.
+
+### Conservative recovery and real-Editor compile measurements
+
+Working candidate `game_out5` (not promoted): metadata Out-only byrefs now
+render `out`, rather than `ref`, in declarations and calls; known root
+namespaces shadowed by a child namespace retain `global::`; exact scalar
+loads/stores through **actual entry byref aliases** become variable reads/writes.
+Byref-typed synthetic phi locals do NOT qualify. Closed generic scalar slices
+recover their precise field only after natural layout is proved through nested
+valuetype dependencies; explicit/packed/open/unproved layouts decline.
+
+Compile against the installed real Editor engine and BCL plus original player
+packages, excluding the current image. `tools/gate.py compile` now supports
+`--unity`, `--managed-refs`, and `--body-probe`. Reference filenames merge
+case-insensitively, with explicit refs overriding defaults. Compiler-global
+errors are counted. The temporary missing-name sentinel checks whether Roslyn
+binds **some** method body; it is NOT proof of whole-tree body coverage.
+The compile command still exits by the pre-existing syntax gate, not by zero
+binding errors; consult both counts and the probe result.
+
+Important phase change: survivors Assembly-CSharp baseline has 63 diagnostics
+and sentinel **false**; after declaration fixes it reaches body binding and
+has 7,025 diagnostics, sentinel **true**. Do not present this as a 63-to-7,025
+regression or compare it to the older stubbed body-tier number. Within the
+same observed-body phase, `game_out3` -> `game_out5` is 7,017 -> 7,025;
+UniTask is 5,640 -> 5,594. External private/runtime layout references remain
+an obstacle; these totals are not pure native-lifting defect counts.
+
+Strict selected-image builds: unitask 481 type emits / 2,227 bodies;
+survivors 295 / 1,857; both zero failures, fallbacks and type-emit failures.
+Candidate brace/parse gates clean (474 and 293 C# files). Portable baseline
+for this slice: 1,731 passed; five targeted game regressions passed. Final frozen
+source suite: 1,807 passed / 259 skipped / 1 non-strict xpassed, zero failures
+(1,581.67 s), excluding the separately rerun parallel module: 2 passed, zero
+failures (958.68 s). No runtime/speed claim is made.
+Aggregate-only evidence: `validation_reports/quality_resume_2026-11-03.json`.
+
+Rejected: treating synthetic byref-typed locals as true aliases erased a real
+indirect write; publishing whole ref-struct stack values regressed a Vector2
+scalar lane. Both were reverted. Honesty takes priority over error count.
+
+Factory identity candidate `game_out8`: early binding is restricted to resolved,
+non-getter **static nullary nongeneric own-class CLASS returns**, with byrefs
+excluded. Native decoding proves one factory call in UniTask rows 21473/21474;
+the output now has one call instead of three. Row 21475 stays at one. The full
+selected-image comparison changes only two unitask files (5 removed / 4 added
+lines), zero survivors files. All per-image compile code counts and body-probe
+results are identical to `game_out5`; brace/parse gates are clean. The broader
+reference-return rules were rejected: UniTask 5,594 -> 5,677 or 5,644, and the
+broadest survivors firstpass 834 -> 927. Repair generic/stack consumer type
+propagation before extending this scope. The 154 CS0311 diagnostics already
+existed in the baseline. Factory portable tests: 21 passed. Aggregate evidence:
+`validation_reports/quality_factory_identity_2026-11-03.json`.
+
+Validation source freeze: an earlier full suite had identical serial/parallel
+output bytes but mismatched source fingerprints because calls.py was edited
+between the two builds. It is NOT a clean pass and not an accepted source
+regression (`quality_resume_suite_interference_2026-11-03.json`). The final suite
+without parallel tests and the separate parallel module both passed on frozen
+core sources (counts above); the source freeze is now lifted.
+
+Next temporary probe (not accepted source): indexed array folding still uses hardware scale rather
+than element stride. Survivors mi 69643 reads a 376-byte element's 4-byte enum
+and 2-byte character fields as whole `TMP_CharacterInfo` elements at byte-scaled
+indices. Exact stride normalization plus exact-width member recovery is being
+probed in a temporary monkeypatch only; no source change is accepted yet.
 
 ## Previous: 87% of the unitask body tier was ACCESSIBILITY — the real number is 9,619 (2026-11-03, on `main`)
 

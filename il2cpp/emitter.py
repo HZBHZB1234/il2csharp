@@ -3,6 +3,7 @@ from il2cpp.arm64 import Arm64Lifter, is_arm64_binary
 import re
 from il2cpp.common import compressed_int, csharp_type_name, i32, i64, read_compressed_uint, u16, u32, u64
 from il2cpp.csharp import FA_INITONLY, FA_LITERAL, FA_STATIC, FIELD_VIS, METH_VIS, TYPE_VIS, UsingTracker, field_attrs, nameof_sugar, strip_namespaces, collision_heads, source_field_name
+from il2cpp.csharp import param_modifier
 from il2cpp.lifter import Lifter
 from il2cpp.metadata import ImageDef, MethodDef, TypeDef
 from il2cpp.names import (ident_name, repr_f32, repr_f64, safe_ident, sanitize,
@@ -978,8 +979,7 @@ class Emitter:
         for k, p in enumerate(params):
             pt = self.il.types[p.type] if 0 <= p.type < len(self.il.types) else None
             tn = self.il.type_name(pt) if pt else 'object'
-            byref = (pt[1] >> 29) & 1 if pt else 0
-            pmod = 'ref ' if byref else ''
+            pmod = param_modifier(pt)
             suf, seen_opt = self._param_default_suffix(m, k, p, pt, seen_opt)
             ps.append('%s%s %s%s' % (pmod, tn, ident_name(p.name), suf))
             info.append(bool(suf))
@@ -1001,7 +1001,7 @@ class Emitter:
                 _conv = None
             if _conv is not None:
                 _umods = mods
-                _ops = [s[4:] if s.startswith('ref ') else s for s in ps]
+                _ops = [s[4:] if s.startswith(('ref ', 'out ')) else s for s in ps]
                 if '*' in rtname or any('*' in s for s in _ops):
                     _umods += 'unsafe '
                 return '%s%s operator %s(%s)' % (_umods, _conv, rtname, ', '.join(_ops))
@@ -1126,8 +1126,7 @@ class Emitter:
                 pt = self.il.types[p.type] \
                     if 0 <= p.type < len(self.il.types) else None
                 tn = self.il.type_name(pt) if pt else 'object'
-                byref = (pt[1] >> 29) & 1 if pt else 0
-                ps.append('%s%s %s' % ('ref ' if byref else '', tn,
+                ps.append('%s%s %s' % (param_modifier(pt), tn,
                                        ident_name(p.name)))
             nm = self._type_ident(td.name) + \
                 self._type_generic_params(td)
@@ -1338,8 +1337,7 @@ class Emitter:
         for k, p in enumerate(params):
             pt = self.il.types[p.type] if 0 <= p.type < len(self.il.types) else None
             tn = self.il.type_name(pt) if pt else 'object'
-            byref = (pt[1] >> 29) & 1 if pt else 0
-            pmod = 'ref ' if byref else ''
+            pmod = param_modifier(pt)
             suf, seen_opt = self._param_default_suffix(m, k, p, pt, seen_opt)
             ps.append('%s%s %s%s' % (pmod, tn, ident_name(p.name), suf))
             info.append(bool(suf))
@@ -1950,7 +1948,8 @@ class Emitter:
                 pass
             dup = collision_heads('\n'.join(buf), ns, uses_set,
                                   self._short_ns_index(), declared)
-            buf = strip_namespaces(buf, uses_set, ns, dup)
+            buf = strip_namespaces(buf, uses_set, ns, dup,
+                                   getattr(self.il, "all_namespaces", ()))
         members = self._nameof_members(uses_set)
         if members:
             # the enum must be referenced elsewhere in the file too:

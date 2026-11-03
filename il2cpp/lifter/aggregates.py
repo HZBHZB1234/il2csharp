@@ -1,6 +1,7 @@
 """Byte-range provenance for stack copies of metadata-proven value types."""
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.expr import Expr
+from il2cpp.csharp import FA_STATIC, FA_LITERAL, field_attrs
 from il2cpp.text import sdisp, reg_name, _int_lit
 from il2cpp.names import repr_f32, repr_f64
 
@@ -72,6 +73,52 @@ class _AggregatesMixin:
                 return False
         return True
 
+    def _piece_layout_proven(self, ty, seen=frozenset()):
+        """Natural-layout inference needs every nested value layout proved.
+
+        The runtime path walker also serves older permissive consumers. Do
+        not widen their contract here: only this scalar-slice recovery
+        requires default packing/size throughout the field dependency tree.
+        A packed nested field can move a later scalar even when the outer
+        struct has default packing, so checking only the root is insufficient.
+        """
+        if ty is None or len(seen) > 6 or (ty[1] >> 29) & 1:
+            return False
+        te = self.il._type_enum(ty)
+        if te not in (0x11, 0x15):
+            return self.il._sf_field_size(ty, 0) is not None
+        td = self._td_of(ty)
+        if td is None:
+            return False
+        definition = self.meta.typedefs[td]
+        if not definition.is_valuetype:
+            return True  # a generic reference has fixed pointer-sized storage
+        key = self.il._closed_type_key(ty)
+        if key is None or key in seen or (definition.flags & 0x18) == 0x10:
+            return False
+        fields = [self.meta.fields[fi]
+                  for fi in range(definition.field_start,
+                                  definition.field_start + definition.field_count)
+                  if not field_attrs(self.il, self.meta.fields[fi])
+                  & (FA_STATIC | FA_LITERAL)]
+        if (definition.bitfield & 0xc00) != 0xc00:
+            # Empty non-generic leaves (e.g. AsyncUnit, Size=1) have
+            # native-proved size and alignment one; no field placement is
+            # inferred. Do not generalize this to sized/packed field lists.
+            sizes = getattr(self.il, 'type_sizes', ())
+            if not (seen and te == 0x11 and not fields and td < len(sizes)
+                    and sizes[td] is not None and sizes[td] > 0):
+                return False
+        args = self.il._generic_inst_args(ty) if te == 0x15 else None
+        for field in fields:
+            ft = self.il._sf_subst(self.il.types[field.type], args)
+            if ft is not None and self.il._type_enum(ft) == 0x15 \
+                    and self.il._closed_type_key(ft) is None:
+                ft = self.il._subst_closed(ft, args, None)
+            if not self._piece_layout_proven(ft, seen | {key}):
+                return False
+        return True
+
     def _piece_value(self, origin, offset, width, expected, depth=0):
         if depth > 8:
             return None
@@ -136,6 +183,24 @@ class _AggregatesMixin:
         td = self._td_of(ty)
         if td is None or not self.meta.typedefs[td].is_valuetype:
             return None
+        # Closed generic value types can have no native field-offset row.
+        # Use the runtime's substituted layout rather than the open typedef
+        # (whose offsets collapse onto zero). Only an exact scalar member
+        # may name a fragment; padding, partial/spanning loads and uncertain
+        # layouts keep their byte provenance without a fabricated field.
+        if self.il._type_enum(ty) == 0x15 and not origin._unk \
+                and not origin.text.startswith('&'):
+            path = getattr(self.il, '_sf_field_path', None)
+            key = getattr(self.il, '_closed_type_key', lambda t: None)
+            if path is not None and key(ty) is not None \
+                    and self._piece_layout_proven(ty):
+                got = path(ty, offset + 0x10, 0, set())
+                if got is not None:
+                    name, ft = got
+                    if self.il._type_enum(ft) not in (0x11, 0x15) \
+                            and self.il._sf_field_size(ft, 0) == width \
+                            and (expected is None or key(ft) == key(expected)):
+                        return Expr(origin.text + '.' + name, ft, self._ty_kind(ft))
         chain = self.il.instance_field_chain(td) or {}
         for field_offset, (name, ti) in sorted(chain.items()):
             start = field_offset - 0x10

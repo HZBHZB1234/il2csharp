@@ -1,0 +1,751 @@
+{
+  "kind": "2026-11-03 scoped factory identity recovery",
+  "date": "2026-11-03",
+  "baseline_commit": "d6ab0ae602c1326256960fba3ca251ccd55aa832",
+  "candidate": "game_out8",
+  "comparison": "game_out5",
+  "rule": "Materialize resolved non-getter static nullary nongeneric own-class CLASS returns at their native call site; retain lazy binding outside this proof.",
+  "limits": [
+    "A native count and rendered count are not runtime equivalence.",
+    "Body sentinel proves some binding only; UniTask.Linq remains masked.",
+    "No speed improvement is measured.",
+    "Earlier broad reference-return candidates were rejected, not landed."
+  ],
+  "fixtures": {
+    "unitask": {
+      "manifest": {
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "f9a51f9aad40213df5c6bb80f70f80d7caf5b4d8359ccbe5ed4a5f926cd032b8",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "bca8de9eca6b6bb0ea63f31415a3942686bd03cc18c439ba461100978a2c33b5",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "a6a5b6ab9a8e69dc65cb0e310ce0eae92d5ea6f5a3cfac0ed0406ea0a8e2f797",
+          "il2cpp/dec/build.py": "34bd0c8578c8864d2574a072e4301e9d769eff3fecc981ab38dde24d189b4f83",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "a5419b2eb7350e46c4524b05f252367e8a520437e9b04013c61918a30b713177",
+          "il2cpp/dec/highlevel.py": "5f2be9a2a2e3fc51b49ca566dd0a0581d0434cd8b36746df22eac929e341350e",
+          "il2cpp/dec/ifaceprune.py": "7ae48d2423ba6298382a2d19a237cb3dce6d1f2e3ebc91c30be799687ddcb5db",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/calls.py": "536ff1f4577df01b55c85a9eb7dc5e65f4e7bb2ad4f6da52fc3d77b9a1f06620",
+          "il2cpp/lifter/insn.py": "0f95df0fbf9003ce934ce2e14b0e7aea9a614ad94d1d3fc8c7f16208762b346e",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "9e38e360d7ce8a6d6bde4282f24bfbf4698a0a51da7a598909c20270e1497e43",
+          "il2cpp/lifter/values.py": "5935d9ecd0356fd17ed18f747160d667a7e5da1f081a4fbc38251d8722db8bea",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        },
+        "metadata_sha256": "447bfa59d619e6737225dcc30a0e7d742aeaa09d4ca313976ec4caa625a9a4de",
+        "binary_sha256": "b072436c43500dac794c8a138cd0beb6a76240aaa8a22b4fa953b69f7e952836",
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp,TempAsm,UniTask",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "files": 481,
+        "lifted": 2227,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 244606
+      },
+      "compilations": {
+        "Assembly-CSharp": {
+          "files": 16,
+          "syntax": 2,
+          "binding": 1987,
+          "top": [
+            [
+              "CS0103",
+              460
+            ],
+            [
+              "CS1061",
+              200
+            ],
+            [
+              "CS0019",
+              188
+            ],
+            [
+              "CS0029",
+              182
+            ],
+            [
+              "CS0208",
+              144
+            ],
+            [
+              "CS1503",
+              135
+            ],
+            [
+              "CS0122",
+              117
+            ],
+            [
+              "CS0119",
+              94
+            ],
+            [
+              "CS8917",
+              85
+            ],
+            [
+              "CS0030",
+              55
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0246": 41,
+            "CS1061": 200,
+            "CS0029": 182,
+            "CS0208": 144,
+            "CS0103": 460,
+            "CS0266": 48,
+            "CS8917": 85,
+            "CS0308": 3,
+            "CS7036": 11,
+            "CS1503": 135,
+            "CS0019": 188,
+            "CS0122": 117,
+            "CS0030": 55,
+            "CS0119": 94,
+            "CS1501": 50,
+            "CS0117": 48,
+            "CS0149": 17,
+            "CS0159": 35,
+            "CS7069": 9,
+            "CS0165": 53,
+            "CS1729": 2,
+            "CS0305": 1,
+            "CS1620": 9,
+            "CS0428": 1,
+            "CS0121": 1
+          }
+        },
+        "TempAsm": {
+          "files": 4,
+          "syntax": 0,
+          "binding": 6,
+          "top": [
+            [
+              "CS0103",
+              2
+            ],
+            [
+              "CS0208",
+              2
+            ],
+            [
+              "CS0266",
+              2
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0208": 2,
+            "CS0103": 2,
+            "CS0266": 2
+          }
+        },
+        "UniTask": {
+          "files": 302,
+          "syntax": 11,
+          "binding": 5583,
+          "top": [
+            [
+              "CS1061",
+              1117
+            ],
+            [
+              "CS0103",
+              1107
+            ],
+            [
+              "CS0208",
+              777
+            ],
+            [
+              "CS0019",
+              672
+            ],
+            [
+              "CS0029",
+              415
+            ],
+            [
+              "CS1503",
+              221
+            ],
+            [
+              "CS0149",
+              211
+            ],
+            [
+              "CS0165",
+              171
+            ],
+            [
+              "CS0311",
+              154
+            ],
+            [
+              "CS0122",
+              128
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0208": 777,
+            "CS0103": 1107,
+            "CS0266": 110,
+            "CS0029": 415,
+            "CS1503": 221,
+            "CS0122": 128,
+            "CS1061": 1117,
+            "CS0161": 16,
+            "CS0149": 211,
+            "CS0019": 672,
+            "CS0246": 20,
+            "CS0571": 30,
+            "CS7036": 37,
+            "CS0177": 14,
+            "CS0165": 171,
+            "CS0117": 24,
+            "CS1501": 56,
+            "CS0030": 82,
+            "CS0173": 1,
+            "CS8917": 75,
+            "CS0119": 84,
+            "CS0159": 33,
+            "CS0212": 4,
+            "CS0214": 15,
+            "CS1729": 10,
+            "CS0163": 2,
+            "CS8070": 1,
+            "CS0308": 2,
+            "CS0311": 154,
+            "CS1929": 1,
+            "CS0023": 4
+          }
+        },
+        "UniTask.Addressables": {
+          "files": 2,
+          "syntax": 0,
+          "binding": 5,
+          "top": [
+            [
+              "CS0208",
+              3
+            ],
+            [
+              "CS0103",
+              2
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0208": 3,
+            "CS0103": 2
+          }
+        },
+        "UniTask.DOTween": {
+          "files": 2,
+          "syntax": 0,
+          "binding": 5,
+          "top": [
+            [
+              "CS0208",
+              3
+            ],
+            [
+              "CS0103",
+              2
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0208": 3,
+            "CS0103": 2
+          }
+        },
+        "UniTask.Linq": {
+          "files": 143,
+          "syntax": 0,
+          "binding": 13,
+          "top": [
+            [
+              "CS0122",
+              7
+            ],
+            [
+              "CS7069",
+              5
+            ],
+            [
+              "CS0738",
+              1
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": false,
+          "returncode": 1,
+          "codes": {
+            "CS0122": 7,
+            "CS7069": 5,
+            "CS0738": 1
+          }
+        },
+        "UniTask.TextMeshPro": {
+          "files": 5,
+          "syntax": 0,
+          "binding": 235,
+          "top": [
+            [
+              "CS1061",
+              60
+            ],
+            [
+              "CS0103",
+              59
+            ],
+            [
+              "CS0165",
+              17
+            ],
+            [
+              "CS0019",
+              16
+            ],
+            [
+              "CS0122",
+              15
+            ],
+            [
+              "CS1503",
+              15
+            ],
+            [
+              "CS0246",
+              13
+            ],
+            [
+              "CS0029",
+              9
+            ],
+            [
+              "CS0266",
+              6
+            ],
+            [
+              "CS0149",
+              5
+            ]
+          ],
+          "tool_error": null,
+          "refs": 213,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0208": 3,
+            "CS0103": 59,
+            "CS0266": 6,
+            "CS0214": 2,
+            "CS1503": 15,
+            "CS0246": 13,
+            "CS0029": 9,
+            "CS1061": 60,
+            "CS0122": 15,
+            "CS0019": 16,
+            "CS0149": 5,
+            "CS8917": 2,
+            "CS0030": 2,
+            "CS0119": 2,
+            "CS1501": 1,
+            "CS0156": 1,
+            "CS0159": 2,
+            "CS7069": 4,
+            "CS0165": 17,
+            "CS0117": 1
+          }
+        }
+      },
+      "all_compile_codes_unchanged_vs_out5": true,
+      "changed_files": 2,
+      "removed_lines": 5,
+      "added_lines": 4,
+      "brace": {
+        "kind": "literal-aware brace audit",
+        "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\game_out8",
+        "files": 474,
+        "unbalanced_files": 0,
+        "details": {}
+      },
+      "parse": {
+        "kind": "tree-sitter C# syntax gate",
+        "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\game_out8",
+        "files": 474,
+        "bad_files": 0,
+        "errors": 0,
+        "missing": 0,
+        "recovery_nodes": 0,
+        "details": {},
+        "elapsed_seconds": 3.14
+      }
+    },
+    "survivors-roguelike-kit": {
+      "manifest": {
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "f9a51f9aad40213df5c6bb80f70f80d7caf5b4d8359ccbe5ed4a5f926cd032b8",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "bca8de9eca6b6bb0ea63f31415a3942686bd03cc18c439ba461100978a2c33b5",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "a6a5b6ab9a8e69dc65cb0e310ce0eae92d5ea6f5a3cfac0ed0406ea0a8e2f797",
+          "il2cpp/dec/build.py": "34bd0c8578c8864d2574a072e4301e9d769eff3fecc981ab38dde24d189b4f83",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "a5419b2eb7350e46c4524b05f252367e8a520437e9b04013c61918a30b713177",
+          "il2cpp/dec/highlevel.py": "5f2be9a2a2e3fc51b49ca566dd0a0581d0434cd8b36746df22eac929e341350e",
+          "il2cpp/dec/ifaceprune.py": "7ae48d2423ba6298382a2d19a237cb3dce6d1f2e3ebc91c30be799687ddcb5db",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/calls.py": "536ff1f4577df01b55c85a9eb7dc5e65f4e7bb2ad4f6da52fc3d77b9a1f06620",
+          "il2cpp/lifter/insn.py": "0f95df0fbf9003ce934ce2e14b0e7aea9a614ad94d1d3fc8c7f16208762b346e",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "9e38e360d7ce8a6d6bde4282f24bfbf4698a0a51da7a598909c20270e1497e43",
+          "il2cpp/lifter/values.py": "5935d9ecd0356fd17ed18f747160d667a7e5da1f081a4fbc38251d8722db8bea",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        },
+        "metadata_sha256": "10b2e9ef1fe0783e4a0bac6ebf8ebd1c94a194917e307d67ed78fd7c25094dc0",
+        "binary_sha256": "2a5cf4a8681497d9bd64aebc0bb0343268a212438a3a44344ea2305d7389482a",
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "files": 295,
+        "lifted": 1857,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 288217
+      },
+      "compilations": {
+        "Assembly-CSharp": {
+          "files": 281,
+          "syntax": 192,
+          "binding": 6833,
+          "top": [
+            [
+              "CS0019",
+              2515
+            ],
+            [
+              "CS1061",
+              1694
+            ],
+            [
+              "CS0029",
+              554
+            ],
+            [
+              "CS0103",
+              527
+            ],
+            [
+              "CS0266",
+              420
+            ],
+            [
+              "CS0208",
+              220
+            ],
+            [
+              "CS1503",
+              180
+            ],
+            [
+              "CS0117",
+              164
+            ],
+            [
+              "CS1729",
+              163
+            ],
+            [
+              "CS0149",
+              76
+            ]
+          ],
+          "tool_error": null,
+          "refs": 225,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS1061": 1694,
+            "CS0208": 220,
+            "CS0266": 420,
+            "CS0029": 554,
+            "CS7036": 54,
+            "CS0117": 164,
+            "CS0571": 34,
+            "CS1503": 180,
+            "CS0122": 64,
+            "CS0103": 527,
+            "CS0019": 2515,
+            "CS0212": 32,
+            "CS1501": 27,
+            "CS0149": 76,
+            "CS0246": 73,
+            "CS0159": 29,
+            "CS0165": 74,
+            "CS0021": 53,
+            "CS1729": 163,
+            "CS0200": 12,
+            "CS8070": 1,
+            "CS0305": 1,
+            "CS0311": 5,
+            "CS1615": 29,
+            "CS0170": 2,
+            "CS0161": 2,
+            "CS0030": 9,
+            "CS0121": 1,
+            "CS0136": 4,
+            "CS0177": 1,
+            "CS8917": 1,
+            "CS0023": 4
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "files": 12,
+          "syntax": 2,
+          "binding": 832,
+          "top": [
+            [
+              "CS1061",
+              418
+            ],
+            [
+              "CS0246",
+              105
+            ],
+            [
+              "CS0103",
+              85
+            ],
+            [
+              "CS1503",
+              67
+            ],
+            [
+              "CS0029",
+              36
+            ],
+            [
+              "CS0266",
+              35
+            ],
+            [
+              "CS0019",
+              31
+            ],
+            [
+              "CS0117",
+              17
+            ],
+            [
+              "CS0208",
+              17
+            ],
+            [
+              "CS0159",
+              7
+            ]
+          ],
+          "tool_error": null,
+          "refs": 225,
+          "body_probe_observed": true,
+          "returncode": 1,
+          "codes": {
+            "CS0019": 31,
+            "CS1729": 2,
+            "CS0571": 1,
+            "CS0208": 17,
+            "CS0266": 35,
+            "CS0246": 105,
+            "CS1061": 418,
+            "CS1503": 67,
+            "CS0029": 36,
+            "CS0103": 85,
+            "CS0117": 17,
+            "CS7036": 6,
+            "CS0159": 7,
+            "CS0165": 2,
+            "CS0149": 2,
+            "CS0122": 2,
+            "CS0212": 1
+          }
+        }
+      },
+      "all_compile_codes_unchanged_vs_out5": true,
+      "changed_files": 0,
+      "removed_lines": 0,
+      "added_lines": 0,
+      "brace": {
+        "kind": "literal-aware brace audit",
+        "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\game_out8",
+        "files": 293,
+        "unbalanced_files": 0,
+        "details": {}
+      },
+      "parse": {
+        "kind": "tree-sitter C# syntax gate",
+        "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\survivors-roguelike-kit\\game_out8",
+        "files": 293,
+        "bad_files": 0,
+        "errors": 0,
+        "missing": 0,
+        "recovery_nodes": 0,
+        "details": {},
+        "elapsed_seconds": 2.703
+      }
+    }
+  },
+  "validation": {
+    "portable_factory_tests": 21,
+    "full_suite_without_parallel": {
+      "passed": 1807,
+      "skipped": 259,
+      "xpassed": 1,
+      "failed": 0,
+      "seconds": 1581.67
+    },
+    "parallel_suite": {
+      "passed": 2,
+      "failed": 0,
+      "seconds": 958.68
+    },
+    "source_freeze_completed": true,
+    "note": "Non-strict XPASS is reported separately, not counted as a failure. No core source changed during either final run."
+  },
+  "native_factory_proof": {
+    "fixture": "unitask",
+    "methods": [
+      21473,
+      21474,
+      21475
+    ],
+    "factory_method": 21472,
+    "native_direct_calls_per_method": 1,
+    "rendered_before": [
+      3,
+      3,
+      1
+    ],
+    "rendered_after": [
+      1,
+      1,
+      1
+    ]
+  },
+  "rejected_experiments": {
+    "game_out6": {
+      "scope": "all resolved non-getter reference results",
+      "unitask_UniTask_errors": 5677,
+      "survivors_firstpass_errors": 927
+    },
+    "game_out7": {
+      "scope": "nongeneric method, simple reference-return enums",
+      "unitask_UniTask_errors": 5644
+    },
+    "accepted_baseline": {
+      "unitask_UniTask_errors": 5594,
+      "survivors_firstpass_errors": 834
+    },
+    "CS0311_note": "154 UniTask CS0311 diagnostics already existed in baseline; not introduced by the rejected identity experiments."
+  }
+}

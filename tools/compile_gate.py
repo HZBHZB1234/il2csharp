@@ -21,6 +21,21 @@ import tempfile
 ERR_RX = re.compile(
     r"^(.*)\((\d+)(?:,(\d+))?\):\s+(error|warning)\s+(CS\d+)\s*:\s*(.*)$")
 
+GLOBAL_ERR_RX = re.compile(
+    r"^(?:(?:csc|CSC)(?:\.exe)?\s*:\s*)?(error|warning)\s+(CS\d+)\s*:\s*(.*)$")
+
+
+def diagnostics(output):
+    """Yield located and compiler-wide diagnostics in one stable shape."""
+    for line in (output or '').splitlines():
+        m = ERR_RX.match(line.strip())
+        if m:
+            yield m.group(4), m.group(5), m.group(1), int(m.group(2)), m.group(6)
+            continue
+        m = GLOBAL_ERR_RX.match(line.strip())
+        if m:
+            yield m.group(1), m.group(2), '<compiler>', 0, m.group(3)
+
 
 def first_samples(output, limit=3):
     """One sample diagnostics line per code, for triage.
@@ -31,18 +46,12 @@ def first_samples(output, limit=3):
     report stays readable and the JSON stays diffable.
     """
     seen = {}
-    for ln in (output or "").splitlines():
-        m = ERR_RX.match(ln.strip())
-        if not m or m.group(4) != "error":
+    for severity, code, file, line, message in diagnostics(output):
+        if severity != 'error':
             continue
-        code = m.group(5)
         bucket = seen.setdefault(code, [])
         if len(bucket) < limit:
-            bucket.append({
-                "file": m.group(1),
-                "line": int(m.group(2)),
-                "message": m.group(6)[:240],
-            })
+            bucket.append({"file": file, "line": line, "message": message[:240]})
     return seen
 
 
@@ -165,16 +174,12 @@ def classify(output):
     syntax = 0
     binding = 0
     counts = {}
-    for ln in (output or "").splitlines():
-        m = ERR_RX.match(ln.strip())
-        if not m or m.group(4) != "error":
+    for severity, code, _, _, _ in diagnostics(output):
+        if severity != 'error':
             continue
-        try:
-            num = int(m.group(5)[2:])
-        except Exception:
-            continue
-        counts[m.group(5)] = counts.get(m.group(5), 0) + 1
-        if 1000 <= num < 2000 and m.group(5) not in BINDING_BAND:
+        num = int(code[2:])
+        counts[code] = counts.get(code, 0) + 1
+        if 1000 <= num < 2000 and code not in BINDING_BAND:
             syntax += 1
         else:
             binding += 1
@@ -182,8 +187,15 @@ def classify(output):
     return syntax, binding, top
 
 
-def run_gate(tree, csc_dll=None, timeout=600, refs=None):
+def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
     """Compile every .cs under tree; return dict report. Never raises.
+
+    `body_probe` injects an isolated missing-name method in a temporary file.
+    Seeing its CS0103 proves that Roslyn reached method-body binding in this
+    compilation, NOT that it bound every emitted method. An absent diagnostic
+    warns that declaration errors (or an incomplete run) may mask body errors.
+    The synthetic diagnostic is excluded from counts/samples; sources stay
+    untouched and the probe is removed even on compiler failure.
 
     `refs` is an optional list of assembly paths to reference (roadmap P5
     slice C, the game-vs-engine gate). Without it the compile has NO
@@ -218,7 +230,20 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None):
     rep["refs"] = len(refs or [])
     rsp = None
     out_dll = None
+    probe_path = None
+    probe_name = None
+    if body_probe:
+        rep['body_probe_observed'] = None
     try:
+        if body_probe:
+            import uuid
+            probe_name = '__il2csharp_missing_' + uuid.uuid4().hex
+            fd, probe_path = tempfile.mkstemp(prefix='gateprobe_', suffix='.cs')
+            source = ('internal static class Probe_%s { '
+                      'static int Check() { return %s; } }' % (probe_name, probe_name))
+            with os.fdopen(fd, 'wb') as probe:
+                probe.write(source.encode('utf-8'))
+            sources = sources + [probe_path]
         fd, rsp = tempfile.mkstemp(prefix="gateresp_", suffix=".rsp")
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             for r in (refs or []):
@@ -246,6 +271,22 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None):
         env = dict(os.environ, VSLANG="1033", DOTNET_CLI_UI_LANGUAGE="en")
         pr = subprocess.run(cmd, capture_output=True, timeout=timeout, env=env)
         text = _decode(pr.stdout) + "\n" + _decode(pr.stderr)
+        if body_probe:
+            # Match BOTH the private probe path and its unique identifier;
+            # never hide a real program diagnostic with the same CS code.
+            kept = []
+            observed = False
+            for line in text.splitlines():
+                m = ERR_RX.match(line.strip())
+                if m and m.group(4) == 'error' and m.group(5) == 'CS0103' \
+                        and os.path.normcase(os.path.abspath(m.group(1))) == \
+                        os.path.normcase(os.path.abspath(probe_path)) \
+                        and probe_name in m.group(6):
+                    observed = True
+                else:
+                    kept.append(line)
+            rep['body_probe_observed'] = observed
+            text = '\n'.join(kept)
         s, b, top = classify(text)
         rep["syntax"], rep["binding"], rep["top"] = s, b, top
         rep["samples"] = first_samples(text)
@@ -255,7 +296,7 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None):
     except Exception as e:
         rep["tool_error"] = "run: %r" % (e,)
     finally:
-        for p in (rsp, out_dll):
+        for p in (rsp, out_dll, probe_path):
             try:
                 if p and os.path.isfile(p):
                     os.remove(p)
@@ -328,12 +369,36 @@ def unity_framework_refs(root=None):
     return out
 
 
+def merge_refs(*groups, exclude=()):
+    """One DLL per case-insensitive basename; later groups override earlier.
+
+    For a game-vs-Editor gate pass player packages, then Editor engine/BCL,
+    then any explicit overrides. This prevents two netstandard/mscorlib or
+    UnityEngine identities from silently entering the same invocation.
+    It is filename precedence, NOT proof of binary/API compatibility.
+    Exclusions apply after merging, including to Editor/explicit references.
+    """
+    def name(path):
+        return os.fspath(path).replace('\\', '/').rsplit('/', 1)[-1].casefold()
+    skipped = {name(p) for p in exclude}
+    refs = {}
+    for group in groups:
+        for path in group:
+            key = name(path)
+            if key not in skipped:
+                refs[key] = os.fspath(path)
+    return [refs[key] for key in sorted(refs)]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--tree", required=True)
     ap.add_argument("--assembly", default="?")
     ap.add_argument("--csc-dll", default=None)
     ap.add_argument("--timeout", type=int, default=600)
+    ap.add_argument("--body-probe", action="store_true",
+                    help="check that Roslyn reaches method-body binding; "
+                         "exclude the synthetic error from counts")
     ap.add_argument("--unity", default=None,
                     help="Unity Editor install root or its "
                          "Data/Managed/UnityEngine dir; reference those "
@@ -358,25 +423,31 @@ def main():
         print("no engine assemblies under %s" % args.unity)
         return 2
     fw = [] if args.no_framework else unity_framework_refs(args.unity)
+    extra = []
     for d in (args.refs_dir or []):
         if not os.path.isdir(d):
             print("no such refs dir: %s" % d)
             return 2
-        refs.extend(os.path.join(d, f) for f in sorted(os.listdir(d))
+        extra.extend(os.path.join(d, f) for f in sorted(os.listdir(d))
                     if f.lower().endswith('.dll'))
+    got = []
     if args.managed_refs:
-        got = managed_refs(args.managed_refs, args.exclude or ())
+        got = managed_refs(args.managed_refs)
         if not got:
             print("no Managed backup folder under %s" % args.managed_refs)
             return 2
-        refs.extend(got)
-    rep = run_gate(args.tree, args.csc_dll, args.timeout, refs + fw)
+    refs = merge_refs(got, refs, fw, extra, exclude=args.exclude or ())
+    rep = run_gate(args.tree, args.csc_dll, args.timeout, refs,
+                   body_probe=args.body_probe)
     if rep.get("tool_error"):
         print("tool error: %s" % rep["tool_error"])
         return 2
-    print("%s: %d files, syntax=%d binding=%d (refs=%d + %d bcl)" % (
-        args.assembly, rep["files"], rep["syntax"], rep["binding"],
-        len(refs), len(fw)))
+    print("%s: %d files, syntax=%d binding=%d (refs=%d, merged)" % (
+        args.assembly, rep["files"], rep["syntax"], rep["binding"], len(refs)))
+    if args.body_probe:
+        print("  method-body probe: " + (
+            "observed (not proof of full coverage)" if rep['body_probe_observed']
+            else "NOT observed; declaration errors may mask body diagnostics"))
     for code, n in rep["top"]:
         print("  %s x%d" % (code, n))
     for code, rows in sorted((rep.get("samples") or {}).items()):

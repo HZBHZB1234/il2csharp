@@ -1,0 +1,22 @@
+{
+  "kind": "diagnosis of concurrent-source validation contamination",
+  "date": "2026-11-03",
+  "suite": {
+    "passed": 1773,
+    "failed": 1,
+    "skipped": 259,
+    "xpassed": 1,
+    "seconds": 2595.07
+  },
+  "failure": "tests/test_game_parallel_build.py::test_parallel_build_is_byte_identical_to_serial",
+  "output_file_hash_comparison": "passed",
+  "stable_manifest_failure": "source fingerprints changed between serial and parallel subprocess builds",
+  "source_fingerprint_differences": {
+    "il2cpp/lifter/calls.py": {
+      "serial": "246a425672c0c9ba526e5601b37fc114cdfb15c9446a3f03577c7aea0235ab73",
+      "parallel": "8cece05e398a63820301ad33ba1aa3b1876c37e8fc2d4df607f16da189de01fe"
+    }
+  },
+  "attribution": "validation scheduling error: source was edited while the determinism test ran; NOT an accepted source regression and NOT a clean full-suite result",
+  "required_followup": "rerun against frozen source"
+}

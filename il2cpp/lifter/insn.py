@@ -1928,6 +1928,10 @@ class _InsnMixin:
                 and base != 'RBP':
             # indexed store through a frame copy: unknown-base shape.
             return 'mem[%d]' % sdisp(disp)
+        value = self._byref_value(be, disp, size) if idxr is None else None
+        if value is not None:
+            self._lv_ty = value.ty
+            return value.text
         if be.kind == 'klass':
             return None                # static/klass bookkeeping
         if idxr is not None:

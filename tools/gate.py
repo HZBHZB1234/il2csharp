@@ -92,7 +92,8 @@ def gate_sweep(args):
 
 
 def gate_compile(args):
-    from compile_gate import managed_refs, run_gate
+    from compile_gate import (managed_refs, merge_refs, run_gate,
+                              unity_refs, unity_framework_refs)
     tree = args.tree or _tree_for(args)
     only = args.only
     if only and not args.tree:
@@ -115,15 +116,18 @@ def gate_compile(args):
         if not Path(d).is_dir():
             raise FixtureError('no such refs dir: %s' % d)
         refs.extend(str(p) for p in sorted(Path(d).glob('*.dll')))
+    engine = unity_refs(args.unity)
+    if args.unity and not engine:
+        raise FixtureError('no engine assemblies under %s' % args.unity)
+    framework = [] if args.no_framework else unity_framework_refs(args.unity)
+    original = []
+    excludes = list(args.exclude or [])
     if args.managed_refs:
         fx = resolve(args.fixture)
-        excludes = list(args.exclude or [])
         # the image under test is emitted by the tree; referencing its
         # original build would resolve exactly the names recovery missed
-        if only:
-            excludes.append(only + '.dll')
-        else:
-            excludes.append(Path(tree).name + '.dll')
+        # 'only' can be a substring filter, so use the resolved image.
+        excludes.append(Path(tree).name + '.dll')
         got = managed_refs(str(fx.game_dir), excludes)
         if not got:
             raise FixtureError(
@@ -131,8 +135,9 @@ def gate_compile(args):
                 'build keeps one under <Player>_BackUpThisFolder_'
                 'ButDontShipItWithYourGame; a shipped game usually has '
                 'none)' % fx.game_dir)
-        refs.extend(got)
-    rep = run_gate(tree, timeout=args.timeout, refs=refs)
+        original = got
+    refs = merge_refs(original, engine, framework, refs, exclude=excludes)
+    rep = run_gate(tree, timeout=args.timeout, refs=refs, body_probe=args.body_probe)
     payload = {'kind': 'roslyn compile gate', 'tree': str(Path(tree).resolve()),
                'assembly': only or Path(tree).name, **rep}
     path = Path(_report_path(args, 'compile'))
@@ -144,6 +149,9 @@ def gate_compile(args):
     if rep.get('tool_error'):
         print('  tool error:', rep['tool_error'])
         return 2
+    if args.body_probe:
+        print('  method-body probe:', rep.get('body_probe_observed'),
+              '(not proof of full coverage)')
     for code, row in sorted((rep.get('samples') or {}).items()):
         if row:
             print('  %s: %s(%s): %s' % (code, Path(row[0]['file']).name,
@@ -198,13 +206,16 @@ def _normalize_argv(argv):
     ``brace --fixture X`` and ``--fixture X brace`` -- then work.
     """
     shared_flags = {'--fixture', '--label', '--tree', '--only',
-                    '--timeout', '--report'}
+                    '--timeout', '--report', '--unity', '--refs-dir', '--exclude'}
+    switches = {'--managed-refs', '--body-probe', '--no-framework'}
     hoisted, rest = [], []
     i = 0
     while i < len(argv):
         tok = argv[i]
         key = tok.split('=', 1)[0]
-        if key in shared_flags:
+        if key in switches:
+            hoisted.append(tok)
+        elif key in shared_flags:
             hoisted.append(tok)
             if '=' not in tok and i + 1 < len(argv):
                 hoisted.append(argv[i + 1])
@@ -227,6 +238,11 @@ def main(argv=None):
     ap.add_argument('--only', help='assembly/image filter')
     ap.add_argument('--timeout', type=int, default=900)
     ap.add_argument('--report', help='explicit report path')
+    ap.add_argument('--unity', help='compile gate: installed Unity Editor root')
+    ap.add_argument('--no-framework', action='store_true',
+                    help='compile gate: do not add Editor BCL shims')
+    ap.add_argument('--body-probe', action='store_true',
+                    help='compile gate: detect whether Roslyn binds method bodies')
     ap.add_argument('--managed-refs', action='store_true',
                     help='compile gate: reference the exact managed closure '
                          'of the fixture build (its BackUpThisFolder/Managed '

@@ -18,6 +18,18 @@ FA_LITERAL = 0x0040
 FA_HASRVA = 0x0100
 
 
+def param_modifier(ty) -> str:
+    """C# parameter modifier from context-specific Il2CppType attrs.
+
+    Low 16 bits are ParamAttributes HERE (not FieldAttributes). Out-only
+    byrefs are `out`; [In, Out] and [In] ref remain `ref`. The In flag alone
+    does not prove C# readonly `in` semantics. Non-byrefs ignore these flags.
+    """
+    if ty is None or not (ty[1] >> 29) & 1:
+        return ''
+    return 'out ' if ty[1] & 3 == 2 else 'ref '
+
+
 def field_attrs(il, f) -> int:
     """FieldAttributes of a field row. IL2CPP does not carry field flags
     in the field table -- they live in the low 16 bits of the field's
@@ -249,12 +261,25 @@ def collision_heads(buf_text, file_ns, uses, short_to_ns, declared=()):
     return dup
 
 
-def strip_namespaces(lines: List[str], uses: set, file_ns="", dup=()) -> List[str]:
+def strip_namespaces(lines: List[str], uses: set, file_ns="", dup=(), namespaces=()) -> List[str]:
     """Drop the namespace prefix of every dotted reference the file's own
     using set imports (longest imported prefix wins), so a body carrying
     `UnityEngine.Transform` under `using UnityEngine;` reads `Transform`.
     String literals and // comments are left untouched."""
     order = sorted(uses, key=lambda u: (-len(u), u))
+    known = set(namespaces)
+    parts = file_ns.split('.') if file_ns else []
+    scopes = ['.'.join(parts[:k]) for k in range(len(parts), 0, -1)]
+
+    def qualified(chain):
+        # Even a fully spelled namespace is relative in C#. A child
+        # namespace N.Game.N shadows root N inside namespace N.Game.
+        # Only retained, namespace-proven chains need global rooting;
+        # never change ordinary dotted member/variable expressions.
+        head = chain.split('.')[0]
+        if any(scope + '.' + head in known for scope in scopes):
+            return 'global::' + chain
+        return chain
 
     def rewrite(s: str) -> str:
         out = []
@@ -290,9 +315,9 @@ def strip_namespaces(lines: List[str], uses: set, file_ns="", dup=()) -> List[st
                         # the namespace instead of the nested owner, so the
                         # full chain stays.
                         if rest.split('.')[0] == u.split('.')[-1]:
-                            return chain
+                            return qualified(chain)
                         if rest.split('.')[0] in dup:
-                            return chain
+                            return qualified(chain)
                         return rest
                 return chain
 
