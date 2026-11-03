@@ -750,6 +750,17 @@ class _ValuesMixin:
                     return Expr('%s.%s' % (_recv_fold(base.text), name), ty, self._ty_kind(ty))
         ty = base.ty
         text = base.text
+        # Entry STRING parameters are currently seated as generic GPR values
+        # ('int'); the metadata parameter identity still proves the managed
+        # object. Recover only its dword length LOAD, not other header reads
+        # or lvalues. A tuple alone is insufficient: _arty can preserve a
+        # reference type through address arithmetic, and a phi can inherit a
+        # type from just one known predecessor. Neither is a string proof.
+        if load and disp == 0x10 and size == 4 \
+                and base.kind in ('?', 'int', 'obj') and not base._unk \
+                and ty is not None \
+                and getattr(self, '_entry_strings', {}).get(text) == ty:
+            return Expr('%s.Length' % _recv_fold(text), _INT_TY, 'int')
         # type inference, live: a bare temp hinted by an earlier call/store
         # resolves this deref to a real member instead of *(tok + 0x18)
         if ty is None and text and getattr(self, '_type_hints', None):

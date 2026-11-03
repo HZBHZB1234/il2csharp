@@ -2062,6 +2062,9 @@ class _StateMixin:
         # Only these metadata entry names denote C# managed aliases. A phi
         # can inherit the byref type without being emitted as a ref local.
         self._entry_byrefs = {}
+        # Read-only metadata identity for narrow string header recovery.
+        # Generic GPR/phi types alone do not prove a managed string receiver.
+        self._entry_strings = {}
         # this method executed `mov rbp,rsp`: a per-method FACT, so unlike
         # the register value it survives the pass-2 phi merge's Expr('?').
         self._rbp_frame = False
@@ -2147,6 +2150,8 @@ class _StateMixin:
             pname = safe_ident(p.name)
             if (bits >> 29) & 1:
                 self._entry_byrefs[pname] = pt
+            elif te == 0x0e:
+                self._entry_strings[pname] = pt
             if slot > 3:
                 # Win64 stack parameters begin above the return address and
                 # the 32-byte shadow space. Track them by their real source

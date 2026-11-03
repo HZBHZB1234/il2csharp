@@ -1,0 +1,7 @@
+{
+  "kind": "literal-aware brace audit",
+  "tree": "<repo-root>/out/survivors-roguelike-kit/game_out17",
+  "files": 293,
+  "unbalanced_files": 0,
+  "details": {}
+}

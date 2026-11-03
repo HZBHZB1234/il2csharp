@@ -1079,6 +1079,13 @@ class _HighLevelMixin:
                 i += 1
                 continue
             idx, arr = m.group(1), m.group(2)
+            # This pass proves array indexing, not string enumeration. Newly
+            # recovered entry-string lengths must retain their native loop:
+            # the array element-typing path would invent object characters,
+            # and a foreach also snapshots a parameter reassigned in the body.
+            if arr in getattr(self.L, '_entry_strings', {}):
+                i += 1
+                continue
             body = lines[i + 2:close]
             p1 = re.compile(r'\*\(%s \+ %s\*\d+ \+ 0x[0-9a-fA-F]+\)' % (
                 re.escape(arr), re.escape(idx)))
