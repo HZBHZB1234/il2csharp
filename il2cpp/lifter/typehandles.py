@@ -1,9 +1,10 @@
 """Small native/metadata proof for a constant RuntimeTypeHandle consumer."""
 from il2cpp.prelude import *  # noqa: F401,F403
+from il2cpp.lifter.abi import is_win64_pe
 
 
 def recover_type_handle_call(il, call, mi, value, block=None):
-    """Return typeof(T) only for the exact corelib call and adjacent kind-2 load.
+    """Return typeof(T) only for an exact Win64 corelib call and kind-2 load.
 
     Il2CppClass* (usage kind 1), slot addresses, arithmetic, spills and phi
     merges do not prove RuntimeTypeHandle. Re-decode the bounded local setup
@@ -14,6 +15,8 @@ def recover_type_handle_call(il, call, mi, value, block=None):
     if not HAVE_ICED or proof is None or value._unk:
         return None
     try:
+        if not is_win64_pe(il.bin):
+            return None
         start, slot, ty, text = proof
         # Equal-text CFG joins may reuse one predecessor Expr, including its
         # tag. Adjacency in the binary alone does not prove that every path

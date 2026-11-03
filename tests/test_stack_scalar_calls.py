@@ -207,3 +207,25 @@ def test_non_windows_x64_or_malformed_binary_does_not_assume_this_abi(shape):
         struct.pack_into('<I', data, 0x3c, len(data) - 2)
         binary.d = bytes(data)
     assert recover(state) is state[3]
+
+
+@pytest.mark.parametrize('shape', ['elf64', 'x86', 'truncated-machine',
+                                  'missing-data', 'truncated-offset'])
+def test_stack_scalar_shared_abi_guard_keeps_unsupported_shapes_raw(shape):
+    from il2cpp.binary import ELF
+    state = setup()
+    binary = state[0].il.bin
+    assert recover(state)[-1] == 'true'
+    if shape == 'elf64':
+        other = ELF.__new__(ELF)
+        other.is64 = True
+        other.d = b'\x7fELF' + bytes(124)
+        state[0].il.bin = other
+    elif shape == 'x86':
+        data = bytearray(binary.d)
+        struct.pack_into('<H', data, 0x44, 0x14c)
+        binary.d = bytes(data)
+    elif shape == 'truncated-machine':binary.d = binary.d[:0x45]
+    elif shape == 'truncated-offset':binary.d = binary.d[:0x3e]
+    else:del binary.d
+    assert recover(state) is state[3]

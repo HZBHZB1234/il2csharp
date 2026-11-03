@@ -6,6 +6,7 @@ import pytest
 from iced_x86 import Decoder, Register
 
 from il2cpp import Lifter
+from il2cpp.binary import PE
 from il2cpp.expr import Expr
 from il2cpp.lifter.typehandles import recover_type_handle_call
 
@@ -32,8 +33,15 @@ def setup(*, suffix=b'\x33\xd2', prefix=b'\x48\x8b\x0d', ty=INT, text='typeof(in
               images=[NS(name='mscorlib.dll', type_start=0, type_count=3)],
               method_params=lambda m: params)
     usage = {'kind': 2, 'type': ty, 'text': text}
-    binary = NS(read=lambda p, n: raw[p - START:p - START + n],
-                qword=lambda p: None, va2off=lambda p: None)
+    binary = PE.__new__(PE)
+    image = bytearray(0x80)
+    struct.pack_into('<I', image, 0x3c, 0x40)
+    image[0x40:0x46] = b'PE\x00\x00\x64\x86'
+    binary.d = bytes(image)
+    binary.is64 = True
+    binary.read = lambda p, n: raw[p - START:p - START + n]
+    binary.qword = lambda p: None
+    binary.va2off = lambda p: None
     il = NS(meta=meta, types=[TYPE, HANDLE], addr_candidates={TARGET: [('method', 0)]},
             decode_slot=lambda p: usage if p == SLOT else None, bin=binary,
             _type_enum=lambda t: (t[1] >> 16) & 0xff,
@@ -195,4 +203,37 @@ def test_adjacent_bytes_without_same_executed_cfg_block_decline(shape):
 @pytest.mark.parametrize('index', [-1, 3, 1000000])
 def test_out_of_range_represented_type_definition_declines(index):
     state = setup(ty=(index, 0x12 << 16), text='typeof(Example.Sample)')
+    assert recover(state) is None
+
+
+@pytest.mark.parametrize('shape', ['elf64', 'unknown', 'pe32', 'arm64', 'x86',
+                                  'bad-header', 'empty', 'truncated-offset',
+                                  'bad-offset', 'truncated-machine', 'no-data'])
+def test_win64_type_handle_proof_does_not_cross_binary_abi_boundaries(shape):
+    from il2cpp.binary import ELF
+    state = setup()
+    binary = state[0].bin
+    assert recover(state) == 'typeof(int)'
+    if shape == 'elf64':
+        other = ELF.__new__(ELF)
+        other.is64 = True
+        other.d = b'\x7fELF' + bytes(124)
+        other.read = binary.read
+        state[0].bin = other
+    elif shape == 'unknown':
+        state[0].bin = NS(is64=True, d=binary.d, read=binary.read)
+    elif shape == 'pe32':binary.is64 = False
+    elif shape in ('arm64', 'x86'):
+        data = bytearray(binary.d)
+        struct.pack_into('<H', data, 0x44, 0xaa64 if shape == 'arm64' else 0x14c)
+        binary.d = bytes(data)
+    elif shape == 'bad-header':binary.d = bytes(len(binary.d))
+    elif shape == 'empty':binary.d = b''
+    elif shape == 'truncated-offset':binary.d = binary.d[:0x3e]
+    elif shape == 'bad-offset':
+        data = bytearray(binary.d)
+        struct.pack_into('<I', data, 0x3c, len(data) - 2)
+        binary.d = bytes(data)
+    elif shape == 'truncated-machine':binary.d = binary.d[:0x45]
+    else:del binary.d
     assert recover(state) is None

@@ -1,6 +1,6 @@
 """Narrow Win64 stack scalar recovery with a same-block native write proof."""
 from il2cpp.prelude import *  # noqa: F401,F403
-from il2cpp.binary import PE
+from il2cpp.lifter.abi import is_win64_pe
 from il2cpp.runtime.meta import IMM_OPS
 from il2cpp.text import _int_lit
 
@@ -76,11 +76,7 @@ def recover_stack_scalars(lift, method, rty, args):
         return args
     try:
         il = lift.il
-        if not isinstance(il.bin, PE) or not il.bin.is64:
-            return args
-        pe = struct.unpack_from('<I', il.bin.d, 0x3c)[0]
-        if il.bin.d[pe:pe + 4] != b'PE\x00\x00' \
-                or struct.unpack_from('<H', il.bin.d, pe + 4)[0] != 0x8664:
+        if not is_win64_pe(il.bin):
             return args
         if method.generic_container != -1 or not 0 <= method.declaring < len(il.meta.typedefs):
             return args
