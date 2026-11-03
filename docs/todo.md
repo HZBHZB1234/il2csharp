@@ -20,7 +20,6 @@ of the round; its gates are the next measurement.
 
 ## Previous: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
 
-## Previous: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
 
 The switch slice needed **both** halves; either alone measures as no change
 (5 -> 5 switches on Assembly-CSharp, the previous round's negative result).
