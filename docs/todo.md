@@ -1,4 +1,39 @@
-## Current work: the body tier is measurable, and it is large (2026-11-03, on `main`)
+## Current work: the body tier measured — 78,104 errors on unitask, and every model has artifacts (2026-11-03, on `main`)
+
+With the declaration mask removed, `tools/body_tier_per_image.py` (per image,
+stub loop, closure minus the image under test) gives the first body-tier number:
+
+| | value |
+|---|---|
+| unitask, all 49 images | **78,104 errors**, 324 declaration-tier left |
+| top codes | CS0103 36,942 (name does not exist), CS0266 12,627 (cannot convert), CS0841 11,678 (unassigned local), CS0030 3,784, CS1061 2,476, CS0019 2,452, CS0122 1,942, CS0029 1,838 |
+
+That is the honest state of the emitted bodies — three orders of magnitude away
+from the "19 errors" the declaration tier was reporting, and it must replace
+that number in every claim about recompilability.
+
+Two model artifacts are already visible in these numbers and must be understood
+before the number is optimised:
+
+* **per image**: our image may declare types the closure ALSO ships (unitask's
+  `Assembly-CSharp` contains copies of `TMPro/Examples/*` that
+  `Unity.TextMeshPro.dll` also provides) — that is CS0030/CS0433 identity noise,
+  and it inflates the AC image to 2,384 errors on 15 files;
+* **whole tree**: cross-image duplicates (CS0101/CS0102/CS0111) are declaration
+  errors and mask again.
+
+The clean measurement therefore needs a third model: compile our whole tree as
+ONE assembly against a *stub-only* closure (every external name stubbed, no
+real assembly whose types we also emit). That is a scaffolding job of its own
+and is the next measurement task.
+
+What is already actionable from the top codes: CS0103 (36,942, nearly half) and
+CS0841 (11,678) are *name resolution* families — a bounded investigation of the
+missing names should be the first fidelity pass now that the mask is gone.
+
+## Previous: the body tier is measurable, and it is large
+
+## Previous: the body tier is measurable, and it is large (2026-11-03, on `main`)
 
 Last round found that **a declaration error suppresses ALL body binding**. This
 round built the driver that removes that mask and took the first measurement.
