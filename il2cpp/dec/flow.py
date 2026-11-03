@@ -392,10 +392,34 @@ class _FlowMixin:
     _SWITCH_SUBJ_RX = re.compile(r'^[A-Za-z_@][\w@]*(?:\.[A-Za-z_@][\w@]*)*$')
     _SWITCH_CONST_RX = re.compile(
         r"^(?:-?0[xX][0-9a-fA-F]+[uUlL]*|-?\d+[uUlL]*|'(?:\\.|[^'\\])')$")
+    # an enum member is a compile-time constant too, and a same-subject chain
+    # over one is exactly a `switch (subject)` -- see _switch_const_ok for the
+    # metadata proof that keeps a plain static field (CS0150) out.
+    _SWITCH_ENUM_RX = re.compile(
+        r'^([A-Za-z_@][\w@]*)\.([A-Za-z_@][\w@]*)$')
     _SWITCH_CMP_RX = re.compile(r'^(.+?)\s*==\s*(.+)$')
     _SWITCH_GOTO_RX = re.compile(r'(?<![\w.])goto\b')
     _SWITCH_LBL_RX = re.compile(r'^L_[0-9a-fA-F]+:')
     _SWITCH_BREAK_RX = re.compile(r'(?<![\w.])break\s*;')
+
+    def _switch_const_ok(self, text):
+        """True for a legal `case` label: a numeric/char literal, or an enum
+        member PROVED by metadata (the struct/enum table, not a name shape)."""
+        t = (text or '').strip()
+        if self._SWITCH_CONST_RX.match(t):
+            return True
+        m = self._SWITCH_ENUM_RX.match(t)
+        if not m:
+            return False
+        enum_short, member = m.group(1), m.group(2)
+        try:
+            maps = self._enum_value_maps()
+        except Exception:
+            return False
+        for by_name, _members in maps.get(enum_short) or ():
+            if member in by_name:
+                return True
+        return False
 
     def _switch_synth(self, lines: List[str]) -> List[str]:
         """Synthesize a real C# `switch` from a flat same-subject
@@ -437,7 +461,7 @@ class _FlowMixin:
             subj = cm.group(1).strip()
             c0 = cm.group(2).strip()
             if not self._SWITCH_SUBJ_RX.match(subj) \
-                    or not self._SWITCH_CONST_RX.match(c0):
+                    or not self._switch_const_ok(c0):
                 out.append(lines[i])
                 i += 1
                 continue
@@ -506,7 +530,7 @@ class _FlowMixin:
                         break
                     s2 = cmm.group(1).strip()
                     if s2 != subj \
-                            or not self._SWITCH_CONST_RX.match(cmm.group(2).strip()):
+                            or not self._switch_const_ok(cmm.group(2).strip()):
                         okchain = False
                         break
                     k = nxt + 1

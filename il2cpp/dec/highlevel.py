@@ -360,10 +360,14 @@ class _HighLevelMixin:
                 return True
         return False
 
+    # MSVC lowers a switch dispatch as a CHAIN of shifts, so the same subject
+    # can appear as `x - 1`, `x - 1 - 1`, ... -- the single-shift form left
+    # three of the four arms of TMP_UiFrameRateCounter.Set_FrameCounter_Position
+    # unfolded, which is also what made _switch_synth see two different
+    # subjects and refuse to synthesize the switch.
     _ENUM_SHIFT_RX = re.compile(
         r'(?<![\w.])'
-        r'(?P<lhs>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)'
-        r' - (?P<n>\d+)'
+        r'(?P<lhs>(?:[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)(?: - \d+)+)'
         r' (?P<op>==|!=|>=|<=|>|<) '
         r'(?P<rhs>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+|\d+)')
 
@@ -410,10 +414,12 @@ class _HighLevelMixin:
             return lines
 
         def fix(m):
-            lhs, n, op, rhs = (m.group('lhs'), int(m.group('n')),
-                               m.group('op'), m.group('rhs'))
+            lhs, op, rhs = m.group('lhs'), m.group('op'), m.group('rhs')
+            parts = lhs.split(' - ')
+            base = parts[0]
+            n = sum(int(p) for p in parts[1:])
             if rhs.isdigit():
-                return '%s %s %d' % (lhs, op, int(rhs) + n)
+                return '%s %s %d' % (base, op, int(rhs) + n)
             owners = rhs.split('.')[:-1]
             member = rhs.split('.')[-1]
             short = owners[-1] if owners else ''
@@ -433,7 +439,7 @@ class _HighLevelMixin:
                     return m.group(0)          # ambiguous across enums
             if named is None:
                 return m.group(0)
-            return '%s %s %s.%s' % (lhs, op, '.'.join(owners), named)
+            return '%s %s %s.%s' % (base, op, '.'.join(owners), named)
 
         out = []
         for line in lines:
