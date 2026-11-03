@@ -1,4 +1,24 @@
-## Current work: the shape-delta census — what the fidelity gap actually is (2026-11-03, on `main`)
+## Current work: current-source state of both fixtures re-measured (2026-11-03, on main)
+
+The unitask tree was rebuilt with the current source (fixes 198-201) and gated
+end to end, so both fixtures now have a same-source measurement:
+
+| fixture | brace | tree-sitter | whole-tree compile | fidelity |
+|---|---|---|---|---|
+| unitask ull_u9 (3,547 files) | 0 unbalanced | 0/0/0/0 | **19 errors** (CS8701 x18 default-interface-method artifact + CS0644 x1 IL2CPP-internal ValueType subclass), inding_masked: false | call_f1 0.6168 / member_f1 0.3255 / shape 0.7915 |
+| survivors ull_s5 (7,448 files) | 0 unbalanced | 0/0/0/0 | **118 errors**, all traced to the one-assembly model or tracked families (CS0234 x61 doubled namespace, CS0117 x16 profile, CS8701 x14, CS0111 x7 cross-image scaffolding, CS0051/52/53 x4, CS0535 x6 generic-sharing) | call_f1 0.6666 / member_f1 0.3614 / shape 0.5844 |
+
+unitask's fidelity is bit-identical to the pre-200/201 tree, which is the
+expected result: those fixes change specific body shapes (struct fragments,
+second-branch conditions) that these aggregates do not weight, and the compile
+tier is declaration-driven.
+
+source_compare also gained a fix: its worst-delta sort compared dicts when
+two magnitudes tied (a TypeError on the unitask tree).
+
+## Previous: the shape-delta census — what the fidelity gap actually is (2026-11-03, on main)
+
+## Previous: the shape-delta census — what the fidelity gap actually is (2026-11-03, on `main`)
 
 `shape_cos` (0.584 on survivors, 0.792 on unitask) collapses the structural
 difference into one number. `source_compare` now also records a per-construct
