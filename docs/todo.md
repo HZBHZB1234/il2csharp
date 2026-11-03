@@ -1,4 +1,12 @@
-## Current work: 87% of the unitask body tier was ACCESSIBILITY — the real number is 9,619 (2026-11-03, on `main`)
+## PAUSED (2026-11-03, goal round 54)
+
+The goal is paused on user request. Read docs/handoff-2026-11-03.md first: it
+has the three compile tiers, the publicize correction (unitask body tier
+**9,619**, not 78,104), what shipped, the five measured-and-reverted attempts
+with their numbers, the read-only-slot root cause, and the ranked open work with
+exact commands.
+
+## Previous: 87% of the unitask body tier was ACCESSIBILITY — the real number is 9,619 (2026-11-03, on `main`)
 
 `--publicize` exists as a compile-gate mode (every member public, fields lose
 `readonly`); rebuilding unitask with it and re-running the per-image body tier
