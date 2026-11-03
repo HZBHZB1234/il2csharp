@@ -30,7 +30,6 @@ triple, 457 sites), which no decompiler can un-inline honestly.
 
 ## Previous: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
 
-## Previous: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
 
 Both come from one 33-line method on the survivors fixture,
 `RGame.ScriptableCoreKit.SetScaleStateNode.Validate`, whose source is
