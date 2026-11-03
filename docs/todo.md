@@ -1,4 +1,34 @@
-## Current work: the whole suite is green on the current source (2026-11-03, on `main`)
+## Current work: the body tier is measurable, and it is large (2026-11-03, on `main`)
+
+Last round found that **a declaration error suppresses ALL body binding**. This
+round built the driver that removes that mask and took the first measurement.
+
+`tools/body_tier.py` copies the source list, compiles, reads the CS0234/CS0246
+names out of the report, appends `internal class <Name> { }` stubs (in their
+namespace) and recompiles, up to N rounds.
+
+Two results:
+
+1. on a declaration-CLEAN 28-file folder the compile went from **1 error to
+   4,636** — including the injected probe that had been invisible for five
+   rounds. The mask is real and total.
+2. on the whole unitask tree, once CS0234/CS0246 are stubbed away, the count is
+   **357 errors**, dominated by CS0111 (273), CS0102 (36) and CS0101 (29):
+   duplicate types and members, i.e. the *cross-image* artifact of compiling 49
+   assemblies as one (CS8701 18 + CS0644 1 as before).
+
+So the whole-tree number cannot be the body tier either — the duplicate
+families are themselves declaration-tier and mask again. The measurement has to
+be **per image** (no duplicate types, the closure supplies the siblings, which
+is exactly what `gate.py compile --managed-refs` already does).
+
+Plan for the next round: run the stub loop per image (49 for unitask, 75 for
+survivors), sum the remaining errors, and *that* is the number worth optimising
+and quoting.
+
+## Previous: FOUND — a declaration error suppresses ALL body binding
+
+## Previous: the whole suite is green on the current source (2026-11-03, on `main`)
 
 `PYTHONHASHSEED=0 python -m pytest -q` with the game fixture registered:
 

@@ -1,0 +1,19 @@
+{
+ "fixture": "unitask",
+ "label": "full_u10",
+ "sources": 2253,
+ "rounds": [
+  {
+   "round": 0,
+   "errors": 357,
+   "declaration": 0,
+   "codes": {
+    "CS0111": 273,
+    "CS0102": 36,
+    "CS0101": 29,
+    "CS8701": 18,
+    "CS0644": 1
+   }
+  }
+ ]
+}
