@@ -24,6 +24,50 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### The largest remaining expression family: structs built field-wise from bit patterns
+
+Census of `<temp> = <9-10 digit literal>;` across both trees:
+
+| tree | sites | files |
+|---|---|---|
+| survivors `full_s6` | **932** | 158 |
+| unitask `full_u10` | **471** | 64 |
+
+Sampled shapes show three variants, all "a struct assembled component by
+component, one component written as a float bit pattern":
+
+```csharp
+// Vector3 (MeleeEnemy)
+real5 = 1065353216;                 // 1.0f
+real3 = real5;
+this.transform.localScale = vector31;
+
+// Vector3 (Benchmark02)
+vector32 = 1036831949;              // 0.1f
+vector31 = vector32;
+gameObject3.transform.localScale = vector32;
+
+// Color (Benchmark02)
+color1 = 4278255615;                // 0xFF00FF00
+color1 = 255 / 255.0f;
+tmpText1.color = color1;
+```
+
+This is the same aggregate/composition area the audit already deferred as
+"value-type fragment discard": the lifter sometimes merges the parts
+(`obj5 = (float2)(1.0f, 1.0f)` does appear) and sometimes leaves them as raw
+bit-pattern stores into a temp that is then assigned to a struct-typed member.
+A text-level rewrite would have to *guess* the missing components, so the fix
+belongs in `_piece_value`/`_aggregate_load` (compose the sibling stores into one
+literal), not in a pass.
+
+Note the connection to the open anomaly: these store shapes are exactly what
+`TMP_UiFrameRateCounter.cs` contains, and that file is one where the compiler
+reports nothing although an `int -> Vector2` assignment is present. Whether the
+family's compilability is real cannot be settled while that anomaly stands —
+which raises its value from "curiosity" to "blocks a 1,400-site family's
+assessment".
+
 ### The goto residue: the shape is `if { work; goto L; } else { ... }` with L far below
 
 Dumping `_tidy_gotos`'s INPUT for `ResolveUnityBackgroundScaleMode`
