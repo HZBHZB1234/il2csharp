@@ -4,6 +4,47 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Closed native uint32 string-fold proof (2026-11-04)
+
+Accepted source candidate `game_out20` (not promoted), versus `game_out19`.
+A complete 28-instruction Win64 proof now recovers one xor/multiply loop over
+UTF-16 code units with explicit unchecked uint32 arithmetic. All branch targets,
+operand widths, ABI saves/restores, disjoint caller homes and three distinct
+nonvolatile register roles must match. The exact core-library String getter
+must resolve uniquely; null returns the native-proven zero. Seed/multiplier are
+extracted, not hard-coded fingerprints; method names are not consulted. Extra
+instructions, EH, skipped guards, mismatched identities and other ABIs decline.
+Assembly-comment mode retains ordinary lifting. This does **not** repair general
+integer width/wrap/signedness/phi provenance.
+
+Strict selected rebuilds: 2,227 / 1,857 bodies, zero failures/fallbacks/type-emit
+failures; brace/parse clean (474 / 293 C# files), source fingerprints verified.
+The unitask selected tree is byte-identical. Survivors changes exactly one
+method in one file; all other bytes match. With real Editor/BCL/package DLLs
+and original assembly names, survivors Assembly-CSharp **3,805 -> 3,802**
+(**CS0266 -3**, no other code delta), firstpass **816**. Every selected unitask
+code count is unchanged; UniTask.Linq body sentinel remains false. This is
+still syntax-gated, not a zero-error compile.
+
+Portable **2,156 passed**; focused **137 passed** (135 new portable cases plus
+two real methods). Frozen-source full excluding parallel: **2,216 passed /
+259 skipped / 1 non-strict xpassed / 3 failed**; separate parallel **2 passed**.
+The exact failure set is unchanged: two callback count pins and Limbus AddItem's
+temporary-number pin. No re-pin. Original synthetic native loops/getters versus
+actual recovered C# and an independent masked reference: **2,503,584 checks /
+zero mismatches**, checked compilation on and off, 18 seed/multiplier/register
+variants, every UTF-16 singleton, surrogate cases and randomized strings. The
+getter deliberately clobbers volatile argument registers and poisons high return
+bits. No game native body/getter or end-to-end game runtime is executed.
+
+Interleaved isolated lift audit (40 samples/mode, load/warmup excluded): unitask
+mi 30307 median **27.531 -> 0.435 ms**, survivors mi 85900 **23.939 -> 0.348 ms**.
+External CPU contention and coarse process-CPU resolution limit interpretation;
+this is neither whole-tree acceleration nor game-speed evidence. Ten audited
+hash copies match the proof; only the one selected-tree method is rebuilt here.
+General integer provenance and lifetime-aware aggregate recovery remain open.
+Aggregate: `validation_reports/quality_native_string_fold_2026-11-04.json`.
+
 ### Globally rooted native sqrt intrinsics (2026-11-03)
 
 Accepted source candidate `game_out19` (not promoted), compared with `game_out17`.

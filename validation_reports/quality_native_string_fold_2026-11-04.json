@@ -1,0 +1,496 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source candidate; not promoted; goal not achieved",
+  "candidate": "game_out20",
+  "baseline": "game_out19",
+  "source_parent": "84033158f458ba856b80c6c9ca41b37f835f292f",
+  "proof_scope": [
+    "Complete contiguous prefix-free 28-instruction Win64 AMD64 loop, every CFG edge and ABI save/restore checked; no skipped guards or EH.",
+    "Static nongeneric method: exact STRING parameter/UInt32 return; uniquely resolved ordinary core-library System.String.get_Chars(Int32):Char with matching declaring identity.",
+    "Seed and multiplier are instruction operands, not algorithm fingerprints. Three distinct nonvolatile roles, disjoint caller homes, signed index, dword length, MOVZX and low-dword XOR/IMUL required.",
+    "Generated uint arithmetic is explicitly unchecked under either checked compilation setting; null returns native-proven zero; failed proof and assembly-comment mode retain ordinary lifting.",
+    "Not a repair of general _arty, phi signedness, arbitrary integer widths or aggregate lifetime provenance."
+  ],
+  "validation": {
+    "portable": {
+      "passed": 2156,
+      "failed": 0,
+      "skipped": 0
+    },
+    "focused": {
+      "passed": 137,
+      "new_portable_cases": 135,
+      "real_game_methods": 2
+    },
+    "full_without_parallel": {
+      "passed": 2216,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1,
+      "seconds": 1165.943
+    },
+    "parallel": {
+      "passed": 2,
+      "failed": 0,
+      "seconds": 624.07
+    },
+    "compileall": true,
+    "diff_check": true
+  },
+  "real_compilation": {
+    "reference_source": "Installed Unity 6000 Editor engine/BCL/netstandard2.1 reference assemblies and original player packages; original assembly simple names; self references excluded. No missing-type stubs.",
+    "body_gate": "syntax-gated, not zero binding errors; UniTask.Linq sentinel remains false"
+  },
+  "fixtures": {
+    "unitask": {
+      "cs_files": 474,
+      "changes": [],
+      "compiler_delta": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "code_delta": {},
+          "body_probe_observed": true
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "code_delta": {},
+          "body_probe_observed": true
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5515,
+          "code_delta": {},
+          "body_probe_observed": true
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "code_delta": {},
+          "body_probe_observed": true
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "code_delta": {},
+          "body_probe_observed": true
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "code_delta": {},
+          "body_probe_observed": false
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "code_delta": {},
+          "body_probe_observed": true
+        }
+      },
+      "manifest": {
+        "kind": "build manifest",
+        "fixture": "unitask",
+        "label": "game_out20",
+        "out": "<repo-root>/out/unitask/game_out20",
+        "source_commit": "84033158f458ba856b80c6c9ca41b37f835f292f",
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "3914727e40af1eb0e58aa25e0882d9619821fa591f166b8698f6897556913769",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "6cf28d27c7c5144d093d9491cf5c1b5c09bbc92df28bc2071ef97c953844713b",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "17ab948caedba6a37e3da6bd3ec0e86b06812e3fe4f95f92c843b7b58ab8f253",
+          "il2cpp/dec/build.py": "a76b85943cc17d61e3ed419df884e52c82e60b05cdb01b657b9679e9568c0b65",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "c0f94e58e3c9f091ec6b71642fabd3f2576884d8865e7079c302fdbdcad68682",
+          "il2cpp/dec/ifaceprune.py": "0e6210b00c0feaa6dc1d0d91801e2d05336cdc4a52790b2fc1a0d965ab1fb34d",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/stringfold.py": "17dbd3450db7cb2dbc1f073a85e2a45bcf23d62ebf132cebcdf87952b5785b64",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "fcd6a405cb27035738406636c3cd04bf1c2e16c4de0376996bfce809b406e4a2",
+          "il2cpp/lifter/insn.py": "025cb160fbc538126b589d92eb7586d2b23edb9ce719e08e444b542aaf328fd5",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "df132d4444a8fbb8c1991abaf59369ef21e7ae4845181995c02515f1083a1537",
+          "il2cpp/lifter/values.py": "229fcf8c3b37a4101f2671a3f867935b4e2f426588c431b2635e9b6868a3f93f",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        },
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp,TempAsm,UniTask",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "metadata": "<repo-root>/fixtures/unitask/build/UniTask_Data/il2cpp_data/Metadata/global-metadata.dat",
+        "binary": "<repo-root>/fixtures/unitask/build/GameAssembly.dll",
+        "metadata_sha256": "447bfa59d619e6737225dcc30a0e7d742aeaa09d4ca313976ec4caa625a9a4de",
+        "binary_sha256": "b072436c43500dac794c8a138cd0beb6a76240aaa8a22b4fa953b69f7e952836",
+        "files": 481,
+        "lifted": 2227,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 213450,
+        "bodies": null
+      },
+      "fingerprints_verified": true,
+      "gates": {
+        "brace": {
+          "kind": "literal-aware brace audit",
+          "tree": "<repo-root>/out/unitask/game_out20",
+          "files": 474,
+          "unbalanced_files": 0,
+          "details": {}
+        },
+        "parse": {
+          "kind": "tree-sitter C# syntax gate",
+          "tree": "<repo-root>/out/unitask/game_out20",
+          "files": 474,
+          "bad_files": 0,
+          "errors": 0,
+          "missing": 0,
+          "recovery_nodes": 0,
+          "details": {},
+          "elapsed_seconds": 2.515
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "cs_files": 293,
+      "changes": [
+        {
+          "file": "Assembly-CSharp/PrivateImplementationDetails.cs",
+          "before_sha256": "66e69253cbbad4e5c91c6566f6419f6e115f9f61f2c13e0152a30cb19b7cc827",
+          "after_sha256": "6c41316bb30b480bcef5d2d0f98da568eb185806155420e2b9379a03964d575f",
+          "changed_methods": 1,
+          "all_other_file_bytes_identical": true
+        }
+      ],
+      "compiler_delta": {
+        "Assembly-CSharp": {
+          "before": 3805,
+          "after": 3802,
+          "code_delta": {
+            "CS0266": -3
+          },
+          "body_probe_observed": true
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 816,
+          "after": 816,
+          "code_delta": {},
+          "body_probe_observed": true
+        }
+      },
+      "manifest": {
+        "kind": "build manifest",
+        "fixture": "survivors-roguelike-kit",
+        "label": "game_out20",
+        "out": "<repo-root>/out/survivors-roguelike-kit/game_out20",
+        "source_commit": "84033158f458ba856b80c6c9ca41b37f835f292f",
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "3914727e40af1eb0e58aa25e0882d9619821fa591f166b8698f6897556913769",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "6cf28d27c7c5144d093d9491cf5c1b5c09bbc92df28bc2071ef97c953844713b",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "17ab948caedba6a37e3da6bd3ec0e86b06812e3fe4f95f92c843b7b58ab8f253",
+          "il2cpp/dec/build.py": "a76b85943cc17d61e3ed419df884e52c82e60b05cdb01b657b9679e9568c0b65",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "c0f94e58e3c9f091ec6b71642fabd3f2576884d8865e7079c302fdbdcad68682",
+          "il2cpp/dec/ifaceprune.py": "0e6210b00c0feaa6dc1d0d91801e2d05336cdc4a52790b2fc1a0d965ab1fb34d",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/stringfold.py": "17dbd3450db7cb2dbc1f073a85e2a45bcf23d62ebf132cebcdf87952b5785b64",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "fcd6a405cb27035738406636c3cd04bf1c2e16c4de0376996bfce809b406e4a2",
+          "il2cpp/lifter/insn.py": "025cb160fbc538126b589d92eb7586d2b23edb9ce719e08e444b542aaf328fd5",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "df132d4444a8fbb8c1991abaf59369ef21e7ae4845181995c02515f1083a1537",
+          "il2cpp/lifter/values.py": "229fcf8c3b37a4101f2671a3f867935b4e2f426588c431b2635e9b6868a3f93f",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        },
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "metadata": "<repo-root>/fixtures/survivors-roguelike-kit/build/RoguelikeKit_Data/il2cpp_data/Metadata/global-metadata.dat",
+        "binary": "<repo-root>/fixtures/survivors-roguelike-kit/build/GameAssembly.dll",
+        "metadata_sha256": "10b2e9ef1fe0783e4a0bac6ebf8ebd1c94a194917e307d67ed78fd7c25094dc0",
+        "binary_sha256": "2a5cf4a8681497d9bd64aebc0bb0343268a212438a3a44344ea2305d7389482a",
+        "files": 295,
+        "lifted": 1857,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 241041,
+        "bodies": null
+      },
+      "fingerprints_verified": true,
+      "gates": {
+        "brace": {
+          "kind": "literal-aware brace audit",
+          "tree": "<repo-root>/out/survivors-roguelike-kit/game_out20",
+          "files": 293,
+          "unbalanced_files": 0,
+          "details": {}
+        },
+        "parse": {
+          "kind": "tree-sitter C# syntax gate",
+          "tree": "<repo-root>/out/survivors-roguelike-kit/game_out20",
+          "files": 293,
+          "bad_files": 0,
+          "errors": 0,
+          "missing": 0,
+          "recovery_nodes": 0,
+          "details": {},
+          "elapsed_seconds": 0.672
+        }
+      }
+    }
+  },
+  "synthetic_runtime": {
+    "runs": [
+      {
+        "checks": 1251792,
+        "mismatches": 0,
+        "code_units": 21958488,
+        "variants": 18,
+        "all_utf16_singletons": 65536,
+        "random_strings": 4000,
+        "native": "original synthetic Win64 loop and UTF16 getter",
+        "actual_game_binary_executed": false,
+        "register_allocations": 3,
+        "poisoned_upper_return_bits": true,
+        "clobbered_volatile_argument_registers": true,
+        "checked_compilation": true
+      },
+      {
+        "checks": 1251792,
+        "mismatches": 0,
+        "code_units": 21958488,
+        "variants": 18,
+        "all_utf16_singletons": 65536,
+        "random_strings": 4000,
+        "native": "original synthetic Win64 loop and UTF16 getter",
+        "actual_game_binary_executed": false,
+        "register_allocations": 3,
+        "poisoned_upper_return_bits": true,
+        "clobbered_volatile_argument_registers": true,
+        "checked_compilation": false
+      }
+    ],
+    "checks": 2503584,
+    "mismatches": 0,
+    "limitations": [
+      "Synthetic native code only, not the game native getter/body.",
+      "Valid managed strings and a matching synthetic UTF16 layout.",
+      "No end-to-end game runtime or speed equivalence claim."
+    ]
+  },
+  "isolated_cost_audit": {
+    "observations": [
+      {
+        "fixture": "unitask",
+        "mi": 9780,
+        "image": "mscorlib.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "unitask",
+        "mi": 29822,
+        "image": "System.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "unitask",
+        "mi": 30307,
+        "image": "UnityEngine.IMGUIModule.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "unitask",
+        "mi": 30307,
+        "isolated_lift_cost": {
+          "baseline": {
+            "samples": 40,
+            "median_wall_ms": 27.53065,
+            "median_process_cpu_ms": 15.625
+          },
+          "candidate": {
+            "samples": 40,
+            "median_wall_ms": 0.43515,
+            "median_process_cpu_ms": 0.0
+          }
+        },
+        "not_game_execution_or_whole_tree_speed_proof": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 12481,
+        "image": "mscorlib.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 37109,
+        "image": "System.Xml.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 42076,
+        "image": "System.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 60845,
+        "image": "Newtonsoft.Json.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 71258,
+        "image": "Assembly-CSharp.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 76732,
+        "image": "Unity.Localization.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 85900,
+        "image": "Mono.Security.dll",
+        "native_instruction_count": 28,
+        "proof": true,
+        "body_sha256": "cfd6e2d5a58eb9ac03bc43ab4888831f627c52ffbe246b89aefb146d3b6de14f"
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 85900,
+        "isolated_lift_cost": {
+          "baseline": {
+            "samples": 40,
+            "median_wall_ms": 23.93875,
+            "median_process_cpu_ms": 15.625
+          },
+          "candidate": {
+            "samples": 40,
+            "median_wall_ms": 0.34825,
+            "median_process_cpu_ms": 0.0
+          }
+        },
+        "not_game_execution_or_whole_tree_speed_proof": true
+      }
+    ],
+    "scope": "Methods selected by name for the audit only; implementation does not consult method names. Timing is interleaved single-method lift cost under external CPU contention, not game speed."
+  },
+  "pin_review": {
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ],
+    "same_as_baseline": true
+  },
+  "limits": [
+    "Only selected trees rebuilt: unitask 474 C# files byte-identical; survivors 293 C# files, exactly one method changed. Other hash copies were directly lifted, not whole-tree rebuilt.",
+    "Real survivors Assembly-CSharp diagnostics 3805 -> 3802 (CS0266 -3); firstpass 816 unchanged; all selected unitask code counts unchanged.",
+    "Synthetic native Win64 loop/getter versus actual recovered C# and independent masked reference only. No actual game native body/getter executed.",
+    "Single-method interleaved lift timings exclude loading and warmups, under external CPU contention. Process CPU resolution yields zero for the short path. Not a whole-tree or game-speed proof.",
+    "Thousands of compiler errors remain. No end-to-end game equivalence, output promotion, snapshot regeneration or golden/pin update."
+  ]
+}

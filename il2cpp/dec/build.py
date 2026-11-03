@@ -292,6 +292,13 @@ class _BuildMixin:
         insns, skip = self._decode(m)
         if not insns:
             return ['/* no code */']
+        # A closed native integer-loop proof avoids lossy char/phi typing.
+        # Failure leaves the general symbolic pipeline completely unchanged.
+        from il2cpp.dec.stringfold import lift_u32_string_fold
+        folded = (lift_u32_string_fold(L.il, m, td, insns, skip, self.eh)
+                  if not getattr(L, 'asm_comments', False) else None)
+        if folded is not None:
+            return folded
         L._sqrt_low_sites = self._sqrt_low_lane_sites(
             insns, getattr(L, 'rt_sqrt', None))
         L._xor_twin_loads = self._xor_twin_load_sites(insns, getattr(L, 'bin', None))
