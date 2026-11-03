@@ -16,6 +16,27 @@ tier is declaration-driven.
 source_compare also gained a fix: its worst-delta sort compared dicts when
 two magnitudes tied (a TypeError on the unitask tree).
 
+### Switch synthesis on enum chains: the const gate is not the blocker
+
+`_switch_synth` accepts only int/hex/char literals as case labels, so a chain
+over an ENUM can never synthesize. I opened that gate with a metadata proof
+(an enum member is a compile-time constant; a plain static field is not, CS0150)
+and measured the result on `Assembly-CSharp`: **switch count 5 -> 5, else-if
+152 -> 152** — no change, so the const gate was not the blocker and the patch was
+reverted rather than kept as dead code.
+
+Instrumenting the pass on `TMP_UiFrameRateCounter.Set_FrameCounter_Position`
+shows the first arm passes EVERY early gate (`_SWITCH_CMP_RX` matches,
+`_SWITCH_SUBJ_RX` accepts `anchor_position`, and the enum-constant check accepts
+`FpsCounterAnchorPositions.TopLeft`), so the decline happens in the arm scan
+that follows: `_match_brace(lines, pos)` or the `bad` predicate (break/goto/label
+inside an arm) or the `else if` continuation.
+
+Next step: instrument `okchain` and the per-arm `bad` flag inside
+`_switch_synth` on that method and read the first `okchain = False` reason. Only
+then re-open the const gate — both changes are needed together, and neither is
+worth shipping alone.
+
 ## Previous: the shape-delta census — what the fidelity gap actually is (2026-11-03, on main)
 
 ## Previous: the shape-delta census — what the fidelity gap actually is (2026-11-03, on `main`)
