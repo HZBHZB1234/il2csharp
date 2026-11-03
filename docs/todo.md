@@ -4,6 +4,57 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Exact stack reference consumers (2026-11-04)
+
+Accepted `game_out35` (not promoted), versus out34. A bare outgoing stack home
+may be cast **only at an exact reference-class parameter use**. Canonical unique
+direct nongeneric MethodDef, explicit Win64 PE, closed nonnested nongeneric
+class type, exact nonsret/nonbyref return and exact receiver/float ABI positions
+are required. The nonunknown object Expr and its printed home must agree. An
+independent native backward walk in the same contiguous executed CFG block
+proves a full-width home store and GPR copy chain from a unique canonical CALL
+returning the **exact same class**. The walk is bounded at 128 instructions.
+Before the store, ordinary canonical calls may be crossed only with the source
+in a Win64 preserved register; after the store, **every CALL is a barrier**.
+Partial/alias writes, source clobbers, unknown instructions, gaps, segments and
+RSP changes decline. No statement insertion, capture, repeated call, effect
+reordering, home rename, global slot retyping or type-hint mutation.
+
+**32 native reference arguments / 16 lines / one file**, all independently
+checked by a separate **forward** native register/home analysis over both selected
+sample corpora. Reversing only those casts restores every prior source byte;
+call count and statement order remain unchanged. Survivors is byte-identical to
+out34. Nine complete real-reference diagnostic multisets: UniTask **5,506 ->
+5,476**, exactly **30 CS1503 removed / zero added**; all eight other assemblies
+unchanged. Every removed occurrence is attributed to an exact changed argument
+line, not normalized or suppressed. Real Editor/BCL/package references, original
+assembly simple names, no self-reference or type stubs; UniTask.Linq still has
+13 declaration errors and no observed body sentinel.
+
+Strict selected builds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit
+failures; brace/parse clean (**474 / 293 C# files**), fingerprints verified.
+**155 new portable / one new game case**; focused **156 passed**, portable
+**2,881 passed**. Frozen full excluding parallel: **2,955 passed / 259 skipped /
+1 non-strict xpassed / 3 existing failures**; parallel **2 passed**. Scoped stash
+proof on clean `a6d0c38` reproduces the exact same three failures and restores all
+four candidate files byte-exact. Goldens/pins unchanged; no output promotion.
+
+An independently authored managed .NET 10 harness checks null/base/derived
+values, producer/consumer exceptions, reused homes, call count and event order:
+**40,000 cases / zero mismatches**, checked and unchecked configurations. This
+is not game-native execution, whole-method/game equivalence or speed evidence.
+The goal remains far from near-zero-error recompilation.
+
+Next **TEMP-only**, not accepted: 32 more tagged type-handle consumers have the
+same-block RCX metadata load and EDX zeroing separated from the CALL only by a
+full-width RAX-to-preserved-GPR save. A narrow in-memory prototype recovers those
+32 sites in one method without crossing a branch or call; 78 new synthetic
+cases plus 127 existing metadata/ABI cases with that setup pass. The 19 probed
+cross-block declines remain untouched. No production relaxation, native rebuilt
+out36 or compiler gate for that next slice yet.
+Aggregate-only evidence:
+`validation_reports/quality_exact_stack_references_2026-11-04.json`.
+
 ### Explicit Win64 recovery boundary (2026-11-04)
 
 Accepted `game_out34` (not promoted), versus out33. Type-handle consumer recovery
