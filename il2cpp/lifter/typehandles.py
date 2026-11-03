@@ -82,13 +82,13 @@ def recover_type_handle_call(il, call, mi, value, block=None):
                 or usage.get('text') != text or text != 'typeof(%s)' % il.type_name(ty):
             return None
         size = call.ip - start
-        if not 7 <= size <= 10:
+        if not 7 <= size <= 13:
             return None
         raw = il.bin.read(start, size)
         if raw is None or len(raw) != size:
             return None
         insns = list(Decoder(64, raw, ip=start))
-        if len(insns) not in (1, 2) or insns[-1].next_ip != call.ip:
+        if len(insns) not in (1, 2, 3) or insns[-1].next_ip != call.ip:
             return None
         load = insns[0]
         if load.mnemonic != Mnemonic.MOV or load.op_count != 2 \
@@ -98,11 +98,22 @@ def recover_type_handle_call(il, call, mi, value, block=None):
                 or MemorySizeExt.size(load.memory_size) != 8 \
                 or load.ip_rel_memory_address != slot:
             return None
-        if len(insns) == 2:
+        if len(insns) >= 2:
             zero = insns[1]
             if zero.mnemonic != Mnemonic.XOR or zero.op_count != 2 \
                     or zero.op0_kind != OpKind.REGISTER or zero.op1_kind != OpKind.REGISTER \
                     or zero.op0_register != IReg.EDX or zero.op1_register != IReg.EDX:
+                return None
+        if len(insns) == 3:
+            # A save of the preceding return value does not change RCX, EDX,
+            # memory or flags. Deliberately not a general instruction walk.
+            copy = insns[2]
+            if copy.mnemonic != Mnemonic.MOV or copy.op_count != 2 \
+                    or copy.op0_kind != OpKind.REGISTER or copy.op1_kind != OpKind.REGISTER \
+                    or copy.segment_prefix != IReg.NONE \
+                    or copy.op0_register not in (IReg.RBX, IReg.RBP, IReg.RSI, IReg.RDI,
+                                                IReg.R12, IReg.R13, IReg.R14, IReg.R15) \
+                    or copy.op1_register != IReg.RAX:
                 return None
         return text
     except (AttributeError, IndexError, KeyError, TypeError, ValueError, OverflowError):

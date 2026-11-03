@@ -3844,8 +3844,8 @@ class _CallsMixin:
             args = args[:1]
 
         # --- trim args to the known signature; instance-style rendering
-        # Only an adjacent native Il2CppType load plus the exact core-library
-        # signature proves typeof(T). Rendered argument text alone never does.
+        # Only a bounded same-block native Il2CppType setup plus the exact
+        # core-library signature proves typeof(T); rendered text never does.
         short = recover_type_handle_call(
             self.il, ins, mi, arg_exprs[0] if arg_exprs else None,
             block=getattr(getattr(self, 'out', None), 'block', None))

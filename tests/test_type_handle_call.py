@@ -51,6 +51,20 @@ def setup(*, suffix=b'\x33\xd2', prefix=b'\x48\x8b\x0d', ty=INT, text='typeof(in
     return il, call, value, usage, params
 
 
+@pytest.fixture(autouse=True, params=[False, True], ids=['adjacent', 'saved-return'])
+def _exercise_both_exact_setups(request, monkeypatch):
+    # Re-run the metadata/ABI/staleness guards with the added native save.
+    # Explicit instruction-shape tests retain their own suffixes.
+    original = setup
+
+    def with_save(**kwargs):
+        kwargs.setdefault('suffix', b'\x33\xd2\x48\x89\xc7')
+        return original(**kwargs)
+
+    if request.param:
+        monkeypatch.setitem(globals(), 'setup', with_save)
+
+
 def recover(state):
     il, call, value, _, _ = state
     return recover_type_handle_call(il, call, 0, value, block=il._proof_block)

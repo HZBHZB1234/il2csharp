@@ -4,6 +4,60 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Type-handle setup with a saved preceding result (2026-11-04)
+
+Accepted `game_out36` (not promoted), versus out35. The exact same-block native
+kind-2 RCX load + XOR EDX,EDX setup may now include **one full-width MOV from RAX
+to a Win64 preserved GPR** (RBX/RBP/RSI/RDI/R12..15), in that order. The bounded
+setup is at most 13 bytes. All existing explicit Win64 PE, exact core-library
+signature, canonical unique direct MethodDef, closed type, usage identity and
+executed CFG requirements remain. Partial saves, volatile/RSP destinations,
+other sources, memory writes, segments, other/reordered/extra instructions,
+spills, branches and cross-block paths decline. This is not general register
+tracing, call capture or statement surgery.
+
+Independent whole-method native decoding across both selected corpora proves
+**32 additional consumers / one method**, all with 12-byte setups; survivors has
+zero additions. Source review: **one file / 48 lines**, comprising 32 wrapper
+removals and the existing inference's **two one-to-one home retypes/renames**.
+Every one of their 32 definitions is a proved typeof value. Reversing just those
+changes restores all prior source bytes, including statement order; survivors
+is byte-identical to out35. Existing reference consumer casts remain intact.
+The separately executed cross-block type-handle wrapper is still unrecovered.
+
+Nine complete real-reference diagnostic multisets: UniTask **5,476 -> 5,444**,
+exactly **32 CS1503 removed / zero added**, each attributed to its changed
+assignment line; the other eight assemblies are unchanged. Real Editor/BCL/
+package references, original simple assembly names, no self-reference or stubs.
+UniTask.Linq still has 13 declaration errors and no observed body sentinel.
+Strict builds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit failures;
+brace/parse clean (**474 / 293 C# files**), source fingerprints verified.
+
+**205 additional portable cases / one new game case**: 78 exact instruction
+cases plus 127 additional fixture cases. The existing suite exercises adjacent
+and saved-return defaults; explicit instruction-shape cases retain their bytes.
+Focused **332 synthetic + three game passed**; portable **3,086 passed**.
+Frozen full excluding parallel: **3,161 passed / 259 skipped / 1 non-strict
+xpassed / 3 existing failures**; parallel **2 passed**. Scoped stash proof on
+clean `62514de` reproduces exactly the same three failures and restores all five
+candidate files byte-exact. No golden/pin changes or output promotion.
+An authored managed .NET 10 harness checks typeof/RuntimeTypeHandle conversions,
+previous null/base/derived results, exceptions and effect order: **128,000 cases /
+zero mismatches**, checked and unchecked. Not game-native execution, whole-game
+semantic equivalence or performance evidence; the goal remains unmet.
+
+Next **TEMP-only**, not accepted: eight remaining literal-false byte homes in
+that method are stored from a preserved register independently zeroed earlier
+in the same block. A bounded native prototype traces that zero across canonical
+calls only in preserved registers and declines every call after the home store.
+**80 synthetic cases pass**. A separate TEMP selected-corpus sweep finds ten
+arguments in three methods (unitask eight, survivors two), independently checked
+by a forward zero-register/home analysis, with argument and type state unchanged.
+No production implementation, complete metadata negative suite, strict rebuild
+or compiler gate for this next slice yet.
+Aggregate-only evidence:
+`validation_reports/quality_type_handle_saved_return_2026-11-04.json`.
+
 ### Exact stack reference consumers (2026-11-04)
 
 Accepted `game_out35` (not promoted), versus out34. A bare outgoing stack home
