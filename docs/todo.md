@@ -1,4 +1,36 @@
-## Current work: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
+## Current work: consolidated state of the two fixtures (2026-11-03, on `main`)
+
+The measurement that decides "near-complete recovery and near-recompilable" is
+per fixture, and both are close. All numbers below are from trees built with
+the current source unless noted.
+
+### unitask (49 images, 3,596 type files, 23,756 bodies) — `full_u8`
+
+| gate | result |
+|---|---|
+| brace | 3,547 files, **0 unbalanced** |
+| tree-sitter | **0 bad / 0 ERROR / 0 MISSING / 0 recovery** |
+| whole-tree Roslyn (2,220 sources, exact closure) | **19 errors**: CS8701 x18 (default-interface-method artifact of the netstandard2.0 closure), CS0644 x1 (`Il2CppFullySharedGenericType : ValueType`, an IL2CPP-internal type C# forbids) |
+| source comparison | 1,327 matched methods, call_f1 0.617, member_f1 0.325, shape 0.792 |
+| unmatched population | every category explained: `stub` 2,283 (generic definitions with `addr=0`), `transformed` 544, `type` 121 (editor/package types absent from the player build), `inlined` 55, `empty_src` 28 / `empty_srcout` 32 / `empty_out` 4 (`[Conditional]` and `#if`-stripped bodies) |
+
+### survivors-roguelike-kit (75 images, 7,523 type files, 80,091 bodies)
+
+| gate | result |
+|---|---|
+| brace | 7,448 files, **0 unbalanced** |
+| tree-sitter, per image | 7,448 files, **0 bad / 0 ERROR / 0 MISSING / 0 recovery** (two images kill the single-process parser; both are 0/0/0/0 in batches) |
+| whole-tree Roslyn | `full_s3` read "4 errors, all CS1519" — **masked** (a syntax error suppresses every binding diagnostic), and fix 199 removed that family; the unmasked number comes from `full_s5` |
+| source comparison | 810 matched methods, call_f1 0.667, member_f1 0.361, shape 0.584 |
+
+Both fixtures' remaining *text* differences are dominated by IL2CPP inlining
+(`Bounds.Equals` expanded into `IsNaN` comparisons, `TrySetResult` inlined into
+promise `MoveNext`, `List<T>.Add` inlined to the `_version`/`_size`/`AddWithResize`
+triple, 457 sites), which no decompiler can un-inline honestly.
+
+## Previous: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
+
+## Previous: fixes 200/201 — struct fragments and the two-branch float compare (2026-11-03, on `main`)
 
 Both come from one 33-line method on the survivors fixture,
 `RGame.ScriptableCoreKit.SetScaleStateNode.Validate`, whose source is
