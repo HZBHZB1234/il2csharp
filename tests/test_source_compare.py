@@ -147,7 +147,7 @@ def test_inlined_state_machine_output_is_not_scored(tmp_path):
         'class C { int M() { '
         'object b = AsyncUniTaskMethodBuilder<int>.Start<C.<M>d__0>; '
         'return 0; } }', encoding='utf-8')
-    rows, unmatched, _samples = compare(index_cs(str(src)),
+    rows, unmatched, _samples, _shape = compare(index_cs(str(src)),
                               index_tree(str(out), ['Asm']))
     assert not rows
     assert unmatched['inlined'] == 1
@@ -156,7 +156,7 @@ def test_inlined_state_machine_output_is_not_scored(tmp_path):
         'class C { int M() { '
         'object b = new C._M_d__0(); '
         'return 0; } }', encoding='utf-8')
-    rows, unmatched, _samples = compare(index_cs(str(src)),
+    rows, unmatched, _samples, _shape = compare(index_cs(str(src)),
                               index_tree(str(out), ['Asm']))
     assert not rows
     assert unmatched['inlined'] == 1
@@ -166,7 +166,7 @@ def test_matching_reports_full_recall_and_skips_transformed(tmp_path):
     src, out = _trees(tmp_path)
     src_idx = index_cs(str(src))
     tree_idx = index_tree(str(out), ['Asm'])
-    rows, unmatched, _samples = compare(src_idx, tree_idx)
+    rows, unmatched, _samples, _shape = compare(src_idx, tree_idx)
     by_name = {(r['type'], r['method']): r for r in rows}
     assert ('N.C', 'M') in by_name
     assert by_name[('N.C', 'M')]['call_recall'] == 1.0
