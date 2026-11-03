@@ -187,8 +187,29 @@ def classify(output):
     return syntax, binding, top
 
 
-def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
+def assembly_simple_name(name):
+    """Accept a simple assembly name (or DLL filename), never an output path."""
+    if not isinstance(name, str) or not name or name[-1] in ' .':
+        raise ValueError('assembly name must be a nonempty simple name')
+    if name.casefold().endswith('.dll'):
+        name = name[:-4]
+    if not name or name in ('.', '..') or name[-1] in ' .' \
+            or re.search(r'[\x00-\x1f<>:"/\\|?*]', name):
+        raise ValueError('assembly name must not contain a path or invalid filename characters')
+    stem = name.split('.')[0].casefold()
+    if stem in {'con', 'prn', 'aux', 'nul'} or re.fullmatch(r'(?:com|lpt)[1-9]', stem):
+        raise ValueError('assembly name must not be a reserved device name')
+    return name
+
+
+def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False,
+             assembly_name=None):
     """Compile every .cs under tree; return dict report. Never raises.
+
+    `assembly_name` preserves the original simple name in a private temporary
+    output directory. This matters to InternalsVisibleTo checks in references.
+    None deliberately keeps the legacy anonymous output identity: a tree label
+    alone does not prove an image name. Version/key/signing are not recovered.
 
     `body_probe` injects an isolated missing-name method in a temporary file.
     Seeing its CS0103 proves that Roslyn reached method-body binding in this
@@ -214,6 +235,13 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
     """
     rep = {"files": 0, "syntax": 0, "binding": 0, "top": [],
            "tool_error": None, "refs": len(refs or [])}
+    rep['assembly_name'] = None
+    if assembly_name is not None:
+        try:
+            rep['assembly_name'] = assembly_simple_name(assembly_name)
+        except ValueError as e:
+            rep['tool_error'] = str(e)
+            return rep
     try:
         sources = iter_sources(tree)
     except Exception as e:
@@ -230,6 +258,7 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
     rep["refs"] = len(refs or [])
     rsp = None
     out_dll = None
+    output_dir = None
     probe_path = None
     probe_name = None
     if body_probe:
@@ -250,8 +279,12 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
                 f.write('/r:"%s"\n' % r)
             for s in sources:
                 f.write('"%s"\n' % s)
-        fd2, out_dll = tempfile.mkstemp(prefix="gateout_", suffix=".dll")
-        os.close(fd2)
+        if rep['assembly_name'] is not None:
+            output_dir = tempfile.TemporaryDirectory(prefix='gateout_')
+            out_dll = os.path.join(output_dir.name, rep['assembly_name'] + '.dll')
+        else:
+            fd2, out_dll = tempfile.mkstemp(prefix="gateout_", suffix=".dll")
+            os.close(fd2)
         if csc.lower().endswith("csc.dll"):
             cmd = ["dotnet", csc, "/t:library", "/nologo", "/unsafe",
                    "/langversion:latest", "/utf8output",
@@ -302,6 +335,11 @@ def run_gate(tree, csc_dll=None, timeout=600, refs=None, body_probe=False):
                     os.remove(p)
             except Exception:
                 pass
+        if output_dir is not None:
+            try:
+                output_dir.cleanup()
+            except OSError as e:
+                rep['tool_error'] = rep['tool_error'] or 'cleanup: %r' % (e,)
     return rep
 
 
@@ -393,7 +431,8 @@ def merge_refs(*groups, exclude=()):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--tree", required=True)
-    ap.add_argument("--assembly", default="?")
+    ap.add_argument("--assembly", help="original simple assembly name (not a path); "
+                    "preserves friend-assembly accessibility checks")
     ap.add_argument("--csc-dll", default=None)
     ap.add_argument("--timeout", type=int, default=600)
     ap.add_argument("--body-probe", action="store_true",
@@ -438,12 +477,12 @@ def main():
             return 2
     refs = merge_refs(got, refs, fw, extra, exclude=args.exclude or ())
     rep = run_gate(args.tree, args.csc_dll, args.timeout, refs,
-                   body_probe=args.body_probe)
+                   body_probe=args.body_probe, assembly_name=args.assembly)
     if rep.get("tool_error"):
         print("tool error: %s" % rep["tool_error"])
         return 2
     print("%s: %d files, syntax=%d binding=%d (refs=%d, merged)" % (
-        args.assembly, rep["files"], rep["syntax"], rep["binding"], len(refs)))
+        rep.get("assembly_name") or "?", rep["files"], rep["syntax"], rep["binding"], len(refs)))
     if args.body_probe:
         print("  method-body probe: " + (
             "observed (not proof of full coverage)" if rep['body_probe_observed']

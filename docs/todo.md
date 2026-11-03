@@ -70,6 +70,28 @@ and 2-byte character fields as whole `TMP_CharacterInfo` elements at byte-scaled
 indices. Exact stride normalization plus exact-width member recovery is being
 probed in a temporary monkeypatch only; no source change is accepted yet.
 
+### Follow-up: preserve compile assembly identity (2026-11-03)
+
+`tools/compile_gate.py::run_gate(..., assembly_name=...)` now compiles to an
+isolated temporary `<original-name>.dll`, not an anonymous gateout DLL. This is
+required for real reference assemblies' `InternalsVisibleTo` checks. A minimal
+original test library proves anonymous -> exact identity changes CS0122 1 -> 0,
+with the body sentinel observed in both. `tools/gate.py compile --only <filter>`
+passes the **resolved image name**, never the filter substring; explicit trees
+need `--assembly <name>` to assert identity. Both CLIs expose this; the report
+records `assembly_name` (null retains legacy anonymous behavior). Output names
+are validated as simple names and temporary files cleaned on success/failure.
+No assembly version, public key, or signing identity is reconstructed.
+
+On unchanged `game_out8` with real Editor/package DLLs, UniTask.TextMeshPro
+235 -> 222 diagnostics (CS0122 15 -> 2), sentinel true both times. UniTask.Linq
+still has 13 diagnostics and sentinel false: seven CS0122 become seven CS0052
+(publicized fields exposing an internal external type); BCL identity errors
+remain. This is measurement repair, not a native-lifting improvement or proof
+of body coverage. Portable 1,783 passed; targeted gate tests 40 passed. Core
+full-suite evidence above predates only this tools-only change. Aggregate:
+`validation_reports/quality_assembly_identity_2026-11-03.json`.
+
 ## Previous: 87% of the unitask body tier was ACCESSIBILITY — the real number is 9,619 (2026-11-03, on `main`)
 
 `--publicize` exists as a compile-gate mode (every member public, fields lose

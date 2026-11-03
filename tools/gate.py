@@ -96,6 +96,7 @@ def gate_compile(args):
                               unity_refs, unity_framework_refs)
     tree = args.tree or _tree_for(args)
     only = args.only
+    assembly = args.assembly
     if only and not args.tree:
         # scope to one image directory inside the tree
         base = Path(tree)
@@ -111,6 +112,10 @@ def gate_compile(args):
                 raise FixtureError(
                     'image %r not found under %s (candidates: %s)'
                     % (only, base, ', '.join(p.name for p in hits[:8])))
+        # The selected directory is an actual resolved image, not a filter
+        # substring or a build label. Explicit trees require --assembly.
+        if assembly is None:
+            assembly = Path(tree).name
     refs = []
     for d in (args.refs_dir or []):
         if not Path(d).is_dir():
@@ -137,9 +142,10 @@ def gate_compile(args):
                 'none)' % fx.game_dir)
         original = got
     refs = merge_refs(original, engine, framework, refs, exclude=excludes)
-    rep = run_gate(tree, timeout=args.timeout, refs=refs, body_probe=args.body_probe)
+    rep = run_gate(tree, timeout=args.timeout, refs=refs, body_probe=args.body_probe,
+                   assembly_name=assembly)
     payload = {'kind': 'roslyn compile gate', 'tree': str(Path(tree).resolve()),
-               'assembly': only or Path(tree).name, **rep}
+               'assembly': assembly or only or Path(tree).name, **rep}
     path = Path(_report_path(args, 'compile'))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
@@ -206,7 +212,7 @@ def _normalize_argv(argv):
     ``brace --fixture X`` and ``--fixture X brace`` -- then work.
     """
     shared_flags = {'--fixture', '--label', '--tree', '--only',
-                    '--timeout', '--report', '--unity', '--refs-dir', '--exclude'}
+                    '--timeout', '--report', '--unity', '--refs-dir', '--exclude', '--assembly'}
     switches = {'--managed-refs', '--body-probe', '--no-framework'}
     hoisted, rest = [], []
     i = 0
@@ -236,6 +242,8 @@ def main(argv=None):
     ap.add_argument('--label', help='output label under out/<fixture>/')
     ap.add_argument('--tree', help='explicit tree, bypassing the fixture')
     ap.add_argument('--only', help='assembly/image filter')
+    ap.add_argument('--assembly', help='compile gate: exact output assembly name; '
+                    'required for friend checks on an explicit tree')
     ap.add_argument('--timeout', type=int, default=900)
     ap.add_argument('--report', help='explicit report path')
     ap.add_argument('--unity', help='compile gate: installed Unity Editor root')

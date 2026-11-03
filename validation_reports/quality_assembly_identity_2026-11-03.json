@@ -1,0 +1,170 @@
+{
+  "kind": "real compiler assembly-simple-name recovery evidence",
+  "date": "2026-11-03",
+  "baseline_commit": "d525a71",
+  "core_sources_changed": false,
+  "synthetic_product_stubs": false,
+  "rule": "Preserve only an explicit simple name, or the exact resolved image directory for fixture --only. Never infer identity from an arbitrary output label. Temporary outputs remain isolated and cleaned.",
+  "limits": [
+    "Simple name only: does not recover assembly version, strong name or signing keys.",
+    "Correct identity changes accessibility checks; lower counts are not by themselves lifting or semantic progress.",
+    "Sentinel proves some body binding only. Existing syntax-only exit policy unchanged."
+  ],
+  "portable_tests": {
+    "passed": 1783,
+    "deselected": 317,
+    "seconds": 42.41
+  },
+  "targeted_gate_tests_passed": 40,
+  "minimal_friend_assembly_repro": {
+    "random_output_name": {
+      "files": 1,
+      "syntax": 0,
+      "binding": 1,
+      "top": [
+        [
+          "CS0122",
+          1
+        ]
+      ],
+      "tool_error": null,
+      "refs": 122,
+      "assembly_name": null,
+      "body_probe_observed": true,
+      "returncode": 1
+    },
+    "exact_output_name": {
+      "files": 1,
+      "syntax": 0,
+      "binding": 0,
+      "top": [],
+      "tool_error": null,
+      "refs": 122,
+      "assembly_name": "Expected.Friend",
+      "body_probe_observed": true,
+      "returncode": 1
+    }
+  },
+  "real_reference_measurements": {
+    "engine": "installed Unity 6000 Editor",
+    "bcl": "Editor framework refs",
+    "packages": "original player backup assemblies",
+    "unitask_Linq_before": {
+      "errors": 13,
+      "codes": {
+        "CS0122": 7,
+        "CS7069": 5,
+        "CS0738": 1
+      },
+      "body_probe_observed": false
+    },
+    "unitask_Linq_after": {
+      "files": 143,
+      "syntax": 0,
+      "binding": 13,
+      "top": [
+        [
+          "CS0052",
+          7
+        ],
+        [
+          "CS7069",
+          5
+        ],
+        [
+          "CS0738",
+          1
+        ]
+      ],
+      "tool_error": null,
+      "refs": 213,
+      "assembly_name": "UniTask.Linq",
+      "body_probe_observed": false,
+      "returncode": 1,
+      "codes": {
+        "CS0052": 7,
+        "CS7069": 5,
+        "CS0738": 1
+      }
+    },
+    "unitask_TMP_before": {
+      "errors": 235,
+      "body_probe_observed": true,
+      "CS0122": 15
+    },
+    "unitask_TMP_after": {
+      "files": 5,
+      "syntax": 0,
+      "binding": 222,
+      "top": [
+        [
+          "CS1061",
+          60
+        ],
+        [
+          "CS0103",
+          59
+        ],
+        [
+          "CS0165",
+          17
+        ],
+        [
+          "CS0019",
+          16
+        ],
+        [
+          "CS1503",
+          15
+        ],
+        [
+          "CS0246",
+          13
+        ],
+        [
+          "CS0029",
+          9
+        ],
+        [
+          "CS0266",
+          6
+        ],
+        [
+          "CS0149",
+          5
+        ],
+        [
+          "CS7069",
+          4
+        ]
+      ],
+      "tool_error": null,
+      "refs": 213,
+      "assembly_name": "UniTask.TextMeshPro",
+      "body_probe_observed": true,
+      "returncode": 1,
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 59,
+        "CS0266": 6,
+        "CS0214": 2,
+        "CS1503": 15,
+        "CS0246": 13,
+        "CS0029": 9,
+        "CS1061": 60,
+        "CS0019": 16,
+        "CS0149": 5,
+        "CS8917": 2,
+        "CS0030": 2,
+        "CS0119": 2,
+        "CS1501": 1,
+        "CS0156": 1,
+        "CS0159": 2,
+        "CS0122": 2,
+        "CS7069": 4,
+        "CS0165": 17,
+        "CS0117": 1
+      }
+    }
+  }
+}
