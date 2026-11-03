@@ -1,4 +1,36 @@
-## Current work: current-source state of both fixtures re-measured (2026-11-03, on main)
+## Current work: fix 202 — switch synthesis restored for enum chains (2026-11-03, on `main`)
+
+The switch slice needed **both** halves; either alone measures as no change
+(5 -> 5 switches on Assembly-CSharp, the previous round's negative result).
+
+1. **Repeated index shifts.** MSVC lowers a switch dispatch as a CHAIN of
+   shifts, so one subject appears as `x - 1`, `x - 1 - 1`, ... across arms.
+   fix 197's `_enum_shift_fold` only matched a single `X - N` (its left side had
+   to be a plain dotted identifier), so three of the four arms kept the shifted
+   spelling — and `_switch_synth` then saw *different subjects* and refused the
+   chain. The fold now accepts `X - a - b - ...` and shifts by the sum.
+2. **Enum case constants.** `_switch_synth` accepted only int/hex/char labels.
+   An enum member IS a compile-time constant (`case Enum.Member:`), and the
+   proof comes from metadata through fix 197's enum table — a plain static field
+   is not (CS0150) and still declines.
+
+Measured on `Assembly-CSharp` (same 293 type files):
+
+| | before | after |
+|---|---|---|
+| `switch (` | 5 | **6** |
+| `else if (` | 152 | **150** |
+
+and `TMP_UiFrameRateCounter.Set_FrameCounter_Position` — a 33-line source
+switch over four anchor positions — now emits as one, where it was four
+`else if (anchor_position == FpsCounterAnchorPositions.X)` arms.
+
+Portable 1,656 passed (the fix-197 tests still cover the single-shift form);
+game pins 5 passed.
+
+## Previous: switch synthesis on enum chains — the const gate is not the blocker (2026-11-03, on `main`)
+
+## Previous: current-source state of both fixtures re-measured (2026-11-03, on main)
 
 The unitask tree was rebuilt with the current source (fixes 198-201) and gated
 end to end, so both fixtures now have a same-source measurement:
