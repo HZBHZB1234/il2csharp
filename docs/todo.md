@@ -1,4 +1,32 @@
-## Current work: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
+## Current work: the whole suite is green on the current source (2026-11-03, on `main`)
+
+`PYTHONHASHSEED=0 python -m pytest -q` with the game fixture registered:
+
+```
+1705 passed, 259 skipped, 1 xpassed in 1610.93s (0:26:50)
+```
+
+That covers the portable unit tests, the game-declaration/golden tests and the
+fixture-backed pins, on the source that carries fixes 195-202. It is the first
+full-suite run since the fixture-based measurement workstream started, so it is
+the broadest regression evidence in this arc.
+
+### The last structural slice is not reachable by a text pass (measured)
+
+`_tidy_gotos` already collapses four goto shapes; the residue in the engine
+images is `if (cond) { goto L_xxx; }` where `L_xxx` is a shared block WITH SIDE
+EFFECTS (`BackgroundPropertyHelper`: the label body builds and assigns a
+`BackgroundPositionKeyword`). I added a branch that duplicates a label's body at
+the jump site when the body is a single PURE `return ...;` — sound, since a
+`goto` jumps straight there — and measured **UIElements gotos 562 -> 562,
+labels 457 -> 457**: no effect, because these labels are not returns. Reverted.
+Recovering them means teaching `_seq` the *early-return* shape (the source's
+`if (cond) return X;` that the structurer turned into a jump to a trailing
+block), not post-processing text.
+
+## Previous: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
+
+## Previous: both fixtures on one source revision, measured end to end (2026-11-03, on `main`)
 
 With fix 202 in, both complete trees were rebuilt and gated with the new
 `tools/gate_all.py` (one command: brace, per-image tree-sitter, whole-tree
