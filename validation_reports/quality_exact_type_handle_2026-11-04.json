@@ -1,0 +1,252 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact native/metadata consumer recovery; not promoted; goal not achieved",
+  "baseline": "game_out30",
+  "candidate": "game_out32",
+  "source_parent": "10d77e3b1df011ad936f252ac52af7f2f47a59d2",
+  "proof_scope": [
+    "Tag only full-width MOV of metadata usage kind 2 (Il2CppType), never kind 1 (Il2CppClass). Existing producer spelling and type classification stay unchanged.",
+    "Require a unique ordinary MethodDef at the exact direct-call target, an exact static nongeneric core-library System.Type.GetTypeFromHandle(RuntimeTypeHandle) signature, and matching canonical usage/type/text.",
+    "Independently decode a 7..10 byte RCX RIP-relative full-width load plus optional XOR EDX,EDX, immediately before CALL. Decline all other intermediate instructions, including truncations, moves, arithmetic, branches and spills.",
+    "Require the tagged load and the exact current call instruction in the same executed CFG block. Equal-text joins can reuse one predecessor Expr; binary adjacency alone was insufficient.",
+    "Allow only simple closed primitive/class/value types with bounded TypeDef indices; generic/array/pointer/byref/open types decline. No game-specific type names or native addresses control recovery."
+  ],
+  "validation": {
+    "new_portable_cases": 116,
+    "new_game_cases": 1,
+    "focused_passed": 117,
+    "portable": {
+      "passed": 2591,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1231.3279999999795,
+      "frozen_source_verified": true,
+      "passed": 2663,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 641.5779999999795,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "10d77e3b1df011ad936f252ac52af7f2f47a59d2",
+      "exit_code": 1,
+      "seconds": 124.25,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 4,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5528,
+          "added": 60,
+          "removed": 47,
+          "added_codes": {
+            "CS1503": 60
+          },
+          "removed_codes": {
+            "CS1503": 47
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_delta_causality": {
+        "changed_files": 4,
+        "changed_lines": 47,
+        "all_changes_exact_one_proven_call_to_typeof": true,
+        "all_other_source_bytes_identical": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3829,
+          "after": 3791,
+          "added": 0,
+          "removed": 38,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 38
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_delta_causality": {
+        "changed_files": 1,
+        "changed_lines": 38,
+        "all_changes_exact_one_proven_call_to_typeof": true,
+        "all_other_source_bytes_identical": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 85,
+    "added_occurrences": 60,
+    "net_occurrences": -25,
+    "unmasked_existing_later_parameter_errors": {
+      "added_occurrences": 60,
+      "affected_call_lines": 15,
+      "added_codes": {
+        "CS1503": 60
+      },
+      "unchanged_later_arguments_per_call": 4,
+      "all_added_at_same_lines_as_removed_inner_type_handle_error": true,
+      "only_source_edit_per_call": "replace proven GetTypeFromHandle with typeof(T); all later arguments unchanged",
+      "compiler_diagnostic_masking_independently_reproduced": true,
+      "diagnostics_normalized_or_suppressed": false
+    },
+    "independent_authored_compiler_masking_example": {
+      "synthetic_csharp_compiler_experiment": [
+        {
+          "version": "old",
+          "errors": 1,
+          "codes": [
+            "CS1503"
+          ]
+        },
+        {
+          "version": "recovered",
+          "errors": 3,
+          "codes": [
+            "CS1503",
+            "CS1503",
+            "CS1503"
+          ]
+        }
+      ],
+      "scope": "Compiler diagnostic masking only; authored example with real framework types, not game-native equivalence."
+    },
+    "normalization_or_suppression": false
+  },
+  "managed_identity_execution": {
+    "runtime": "installed .NET 10",
+    "checks": 19000,
+    "mismatches": 0,
+    "default_handle_null_verified": true,
+    "scope": "Managed Type.GetTypeFromHandle(t.TypeHandle) identity for 19 closed simple types; NOT game-native execution, native metadata-layout proof, whole-game equivalence or speed evidence."
+  },
+  "rejected_intermediate": {
+    "label": "game_out31",
+    "reason": "Binary adjacency alone did not exclude an alternate CFG entry between the load and call. Equal-text merges can retain a predecessor tag. Final out32 requires both sites in the same executed block.",
+    "full_suite": "intentionally interrupted before completion; NOT a passed validation"
+  },
+  "limitations": [
+    "The unchanged UniTask.Linq body sentinel remains unobserved; the same declaration gate blocks body coverage.",
+    "Many unsupported type-token paths remain, including kind-1 class-pointer arithmetic, nonadjacent loads, arrays and generic types.",
+    "Managed identity checks do not execute IL2CPP/game-native methods, prove whole-game equivalence, or measure game performance.",
+    "60 genuine compiler-diagnostic occurrences become visible at unchanged later arguments; do not describe this as zero-added errors or a per-assembly improvement for UniTask.",
+    "No golden changes, output promotion, near-zero-error recompilation or speed improvement claim."
+  ]
+}

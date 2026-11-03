@@ -6,6 +6,11 @@ class Expr:
                  # until first set, so creation stays allocation-free
                  '_uses', '_use_ip', '_defpos', '_prec', '_usg_idx',
                  '_sites',
+                 # Exact Il2CppType usage load: (IP, slot, type, text).
+                 # Consumer re-decodes adjacent native setup before use;
+                 # ordinary copies/new phis do not propagate it; the consumer
+                 # also requires the load and call in one executed CFG block.
+                 '_type_handle',
                  # fix 58: minted by the entry seed or by _fresh_unknowns,
                  # i.e. this register has NOT been written since. Set only
                  # at those two mint sites; any instruction that writes the
@@ -85,7 +90,7 @@ class Expr:
             return None
         if name == '_unk':
             return False
-        if name == '_aprop':
+        if name in ('_aprop', '_type_handle'):
             return None
         if name == '_mi':
             return None

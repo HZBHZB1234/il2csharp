@@ -4,6 +4,58 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Exact native type-handle consumers (2026-11-04)
+
+Accepted `game_out32` (not promoted), versus out30. A full-width metadata usage
+kind-2 load carries a small origin tag; only the exact unique direct core-library
+`System.Type.GetTypeFromHandle(System.RuntimeTypeHandle)` consumer may recover
+`typeof(T)`. The helper independently decodes the adjacent RCX load plus optional
+EDX zeroing, rechecks canonical usage/type/text and the complete method identity,
+and requires the load and call in **the same executed CFG block**. Simple closed
+primitive/class/value types only; bounded TypeDef indices. Arrays, generics,
+byrefs, pointers, spills, truncations, intervening moves/arithmetic/branches and
+kind-1 klass-pointer arithmetic all decline. Flat lifting without a CFG block
+also declines. No fixture-specific type name or native address controls it.
+
+Important rejected intermediate: out31's adjacency-only check was insufficient.
+An equal-text merge can retain a predecessor Expr and its origin tag, even when
+an alternate entry bypasses the nearby load. Out32 adds the block proof; the
+full out31 run was intentionally interrupted, **not** counted as passing. Both
+final sample trees retain exactly the reviewed out31 C# bytes, with the stronger
+gate protecting unsupported control-flow shapes.
+
+**85 exact source-line recoveries / five files** (47 unitask, 38 survivors).
+Each changed line differs only by replacing one proven call with its canonical
+`typeof(T)`; every other source byte is identical. Nine real-reference compiler
+multisets: survivors main **3,829 -> 3,791**, firstpass **814 unchanged**; unitask
+UniTask **5,515 -> 5,528**; the seven other images are unchanged. Overall **85 removed /
+60 added / net -25 diagnostic occurrences**. The 60 added CS1503 occurrences
+are real, not normalized away: four unchanged later-argument errors at each of
+15 InsertLoop calls become visible after the invalid inner type-handle argument
+is fixed. Exact source/line attribution plus an independent authored Roslyn
+example reproduces the diagnostic masking. Do not claim zero added errors or a
+per-assembly UniTask improvement. Real Editor/BCL/package references, original
+assembly names, no self-reference or type stubs; UniTask.Linq still misses its
+body sentinel.
+
+Strict selected rebuilds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit
+failures; brace/parse clean (**474 / 293 C# files**), source fingerprints verified.
+**116 new portable / 1 new game tests**; focused **117 passed**, portable
+**2,591 passed**. Frozen-source full excluding parallel: **2,663 passed / 259
+skipped / 1 non-strict xpassed / 3 existing failures**; parallel **2 passed**.
+Scoped stash proof on clean `10d77e3` reproduces the same three failures and
+restores all six candidate files byte-exact. No golden re-pin or promotion.
+
+Installed .NET 10 independently checks TypeHandle identity across 19 simple
+closed types (**19,000 checks / zero mismatches**) and a null default handle.
+This is not execution of IL2CPP/game-native methods, whole-game equivalence, or
+speed evidence. Next probe: stack-passed bool/enum arguments are skipped by the
+register-only hint walk; InsertLoop exposes unchanged 0/1 bool literals and
+known Type-valued stack homes. Any recovery must preserve exact ABI positions,
+value evidence and slot lifetime, not blindly cast by callee signature.
+Aggregate-only evidence:
+`validation_reports/quality_exact_type_handle_2026-11-04.json`.
+
 ### Preserve compound-assignment snapshot order (2026-11-04)
 
 Accepted correctness guard `game_out30` (not promoted), versus out29. Hop-folding

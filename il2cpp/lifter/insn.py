@@ -1760,6 +1760,12 @@ class _InsnMixin:
                     e = Expr(usg.get('text', '?'), ty, 'klass')
                     if usg.get('td') is not None:
                         e._td = usg['td']
+                    if k == 2 and getattr(ins, 'mnemonic', None) == Mnemonic.MOV \
+                            and MemorySizeExt.size(ins.memory_size) == 8 \
+                            and ins.op0_kind == OpKind.REGISTER \
+                            and _reg_size(ins.op0_register) == 8 \
+                            and ins.segment_prefix == IReg.NONE:
+                        e._type_handle = (ins.ip, slot, ty, e.text)
                     return e
                 # fix 66: an icall thunk cell holds the NATIVE function
                 # pointer for `Type::Method`, resolved once from the

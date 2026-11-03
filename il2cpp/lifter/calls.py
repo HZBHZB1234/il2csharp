@@ -7,6 +7,7 @@ from il2cpp.runtime.meta import IMM_OPS
 from il2cpp.text import _int_lit, _deref_spans_all, _norm_twin, _paren_spans_all, _term_up, disp_add, reg_name, rty_has_value, strip_outer
 from il2cpp.x64 import ARG_REGS, ARG_XMM, KLASS_VTABLE, VOLATILE
 from il2cpp.entrylive import entry_live_args, xmm0_result_width
+from il2cpp.lifter.typehandles import recover_type_handle_call
 
 def _fp32_arg_ok(text):
     """True when an argument text is spellable enough to print.
@@ -3843,7 +3844,11 @@ class _CallsMixin:
             args = args[:1]
 
         # --- trim args to the known signature; instance-style rendering
-        short = None
+        # Only an adjacent native Il2CppType load plus the exact core-library
+        # signature proves typeof(T). Rendered argument text alone never does.
+        short = recover_type_handle_call(
+            self.il, ins, mi, arg_exprs[0] if arg_exprs else None,
+            block=getattr(getattr(self, 'out', None), 'block', None))
         if mi is not None and 0 <= mi < len(self.meta.methods):
             m2 = self.meta.methods[mi]
             want = m2.param_count + (0 if m2.is_static else 1)
