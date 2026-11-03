@@ -1,4 +1,51 @@
-## Current work: the body tier measured — 78,104 errors on unitask, and every model has artifacts (2026-11-03, on `main`)
+## Current work: the body tier's biggest family is an UNDECLARED TEMP (2026-11-03, on `main`)
+
+With the declaration mask gone, CS0103 ("name does not exist") is 36,942 of the
+78,104 unitask errors. A census of `UnityEngine.CoreModule`'s 364 CS0103 rows
+(quoted name extracted from the localized message) splits them:
+
+| kind | rows |
+|---|---|
+| **temp** (`obj7`, `num1`, `real6`, ...) | **285 (78%)** |
+| runtime helper leaked (`mono_object_unbox_internal`) | 34 |
+| the `unknown` marker as a name | 31 |
+| other | 14 |
+
+And the temp sites are genuinely undeclared — a full-file search finds no
+declaration at all:
+
+```csharp
+// ProfilerCategory.cs:29 -- num1 is used three times, declared nowhere
+byte[] byteArray1 = (byte[])sub_1801c0840(typeof(byte[]), num1 >> 32);
+Marshal.Copy(obj3, byteArray1, 0, num1 >> 32);
+return encoding1.GetString(byteArray1, 0, num1 >> 32);
+
+// Application.cs:160 -- obj14 appears only inside a call argument list
+object obj13 = sub_1801c07d0(obj12, typeof(Func<bool>), obj14, obj15);
+```
+
+So the pipeline renders a temp it never declares. The house convention already
+has the shapes needed (`int numN;`, `object objN;`, `float realN;` at method
+scale), which makes this look like a *coverage* bug in the declaration passes
+rather than a design gap: some lifter-minted temp escapes `_bind`'s
+declaration because its first use is inside a nested expression, and nothing
+later notices.
+
+Actionable plan (next round, bounded):
+
+1. a final-pass census per method body: temp-shaped tokens
+   (`num|real|obj|flag|vector|color` + digits) used but never declared;
+2. declare them at method scope with the house types — `num*` -> `int`,
+   `real*` -> `float`, `flag*` -> `bool`, `obj*` -> `object`; `vector*`/`color*`
+   are NOT safe (their use sites expect a struct) and should decline;
+3. measure the CS0103 delta on the per-image body tier.
+
+This is the first body-tier family with a plausible single cause, and at ~28k
+of 36.9k CS0103 rows it is worth more than every fidelity slice combined.
+
+## Previous: the body tier measured — 78,104 errors on unitask
+
+## Previous: the body tier measured — 78,104 errors on unitask, and every model has artifacts (2026-11-03, on `main`)
 
 With the declaration mask removed, `tools/body_tier_per_image.py` (per image,
 stub loop, closure minus the image under test) gives the first body-tier number:
