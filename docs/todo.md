@@ -41,6 +41,38 @@ So the fidelity ceiling on these fixtures is dominated by inlining, and the
 remaining actionable slices are the wide struct store and switch synthesis on
 else-if chains.
 
+### Unresolved anomaly: one int -> Vector2 assignment the compiler accepts
+
+`Assembly-CSharp/TMPro/Examples/TMP_UiFrameRateCounter.cs` contains
+
+```csharp
+int num1;
+...
+num1 = 0;
+rectTransform1.pivot = num1;      // rectTransform1 : RectTransform, pivot : Vector2
+...
+num1 = 1008981770;
+rectTransform1.anchorMin = num1;
+```
+
+and no compile of that image (280 files, original `UnityEngine.CoreModule` in
+the closure) reports anything for the file — verified by compiling the image
+directly and grepping every diagnostic line for the file name: **0 lines**.
+Yet a minimal probe with the same closure and the same assignment
+(`int n; r.pivot = n;`) is **CS0029**, and `RectTransform` in the emitted tree
+declares `public Vector2 pivot`.
+
+So either the file that the compiler sees differs from the one on disk (nothing
+in the harness suggests that: the same 280 files were passed), or some aspect
+of the enclosing `partial` type changes the member lookup. Until this is
+understood, treat "this file compiles clean" as unproven; the tree-wide counts
+(118 errors on survivors, 19 on unitask) are unaffected either way, but the
+*reason* a given file is silent is not always "it is correct".
+
+Next probe: compile the exact 15-line region verbatim inside a copy of the
+enclosing type, then delete members of the real file one at a time until the
+behaviour flips.
+
 ## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 
