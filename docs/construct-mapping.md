@@ -221,15 +221,18 @@ cross-check in a debugger or Ghidra.
   such token re-renders at each of its uses (`il2cpp/lifter/insn.py`). A distinct base+index composes
   `(base + i*s [+ disp])` as ptr-kind (or int-kind when the base is
   integer-flavoured). `?addr` survives only for a genuinely untracked base.
-* **Array-element addressing folds the header back into the index (`il2cpp/lifter/insn.py`).**
-  `[arr + idx*S + D]` with `(D-0x20) % S == 0` renders `arr[idx + (D-0x20)/S]`
-  — correct because multidim indexing multiplies the row stride into the
-  index *first*, so the displacement lands on an element boundary (the same
-  bias fold jump tables use). Ambiguity at a zero remainder is settled by
-  access size: a load narrower than the stride (`movss` into a 12-byte
-  element) is a *member* access, resolved through the element type's field
-  chain — whose offsets carry the 0x10 object header, so the element-relative
-  offset `k` looks up `k + 0x10`.
+* **Array-element addressing uses proved element units (`il2cpp/lifter/insn.py`,
+  `arrayindex.py`).** For `[arr + idx*S + D]`, S is only the x64 scale, not
+  the managed stride. Recover the actual element type/size, strip only outer
+  positive constant multipliers/short shifts whose product with S is divisible
+  by that stride, and split `D-0x20` by the stride into element bias/member
+  offset. Do not distribute sums or invent division. A whole element requires
+  exact access width (or address-only use); a nongeneric value-type field
+  requires an exact-width path through the **element** layout, using `k+0x10`
+  for its header-relative metadata offsets. Unproved layouts, partial/padding
+  accesses and wide SIMD slices keep the legacy fallback; that fallback still
+  has known scale/width defects. This is deliberately not a general array or
+  multi-lane-copy correctness claim.
 * **Postdominators decide where branches join (`il2cpp/dec/build.py`).** `_ipdom` must return the
    *nearest* join; returning a farther one makes the then-branch swallow the
    shared tail, which then only reappears as a `goto`.

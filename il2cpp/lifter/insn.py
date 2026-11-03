@@ -1,5 +1,6 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.common import csharp_type_name
+from il2cpp.lifter.arrayindex import array_index_units
 from il2cpp.expr import Expr, _ARR_BIAS_RX, _BARE_TOKEN_RX, _BOOL_TY, _INT_TY, _R4_TY, _R8_TY, _USE_BIND_MIN, _recv_fold, _recv_shaped
 from il2cpp.names import repr_f32, repr_f64
 from il2cpp.runtime.meta import IMM_OPS, meta_lit_repr
@@ -1552,6 +1553,31 @@ class _InsnMixin:
         k = sdisp(disp) - 0x20
         if not (0 <= k < 0x100000):
             return None
+        # The hardware scale is not the element stride: native code often
+        # pre-multiplies the index (e.g. i*376, scale=1 for TMP_CharacterInfo).
+        # Recover only an exact stride multiple and an exact-width element or
+        # member, using the ELEMENT type's real layout rather than the array.
+        ety = self._elem_type(be.ty)
+        field_size = getattr(self.il, '_sf_field_size', None)
+        stride = field_size(ety, 0) if ety is not None and field_size else None
+        index = array_index_units(itxt, scale, stride)
+        if index is not None:
+            bias, offset = divmod(k, stride)
+            if bias:
+                index = '(%s + %d)' % (index, bias)
+            elem = Expr('%s[%s]' % (_recv_fold(be.text), index),
+                        ety, self._ty_kind(ety))
+            if offset == 0 and (size is None or size == stride):
+                return elem
+            path_fn = getattr(self.il, '_sf_field_path', None)
+            if self.il._type_enum(ety) == 0x11 and path_fn is not None:
+                path = path_fn(ety, offset + 0x10, 0, set())
+                if path is not None:
+                    name, fty = path
+                    if size is None or field_size(fty, 0) == size:
+                        return Expr(elem.text + '.' + name, fty, self._ty_kind(fty))
+        # Unproved shapes retain the pre-existing spelling;
+        # wide SIMD slices and open-generic layouts are separate work.
         if k == 0:
             ety = self._elem_type(be.ty)
             return Expr('%s[%s]' % (be.text, itxt), ety, self._ty_kind(ety))
