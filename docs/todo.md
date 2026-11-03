@@ -1,4 +1,49 @@
-## Current work: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
+## Current work: the shape-delta census — what the fidelity gap actually is (2026-11-03, on `main`)
+
+`shape_cos` (0.584 on survivors, 0.792 on unitask) collapses the structural
+difference into one number. `source_compare` now also records a per-construct
+delta histogram over the whole matched population plus the methods with the
+largest deltas, which answers *what* runs long:
+
+| delta | methods |
+|---|---|
+| `return+1` | 258 |
+| `new+1` | 118 |
+| `if+1` | 117 |
+| `while+1` | 54 |
+| `return-1` | 49 |
+| `if+2` / `if+3` | 36 / 36 |
+| `try+1` | 28 |
+| `for-1` | 27 |
+
+The worst offenders are all the SAME mechanism — IL2CPP inlining inflates the
+statement count:
+
+* `TMP_TextSelector_B.LateUpdate` — src 8 ifs / 2 fors / 1 switch, out **32
+  ifs** / 2 whiles / 3 gotos (the switch became an if chain and `Vector3`
+  helpers inlined);
+* `TypeRegistry.EnsureInitialized` — src **1 if**, out **33 ifs** + a try + a
+  while (the static-initialization helper fully inlined);
+* `CameraController.GetPlayerInput` — src 23 ifs, out 48.
+
+Two of them are actionable and already tracked:
+
+* **`Set_FrameCounter_Position`** — fix 197 made every comparison correct
+  (`anchor_position == FpsCounterAnchorPositions.BottomLeft`), but
+  `_switch_synth` still leaves the 4-case chain as `if`/`else if`, and the
+  struct-constant stores (`num1 = 1008981770; rectTransform1.pivot = num1;`)
+  are still raw bit patterns: fix 200 covered the narrow *load* at a struct
+  field, not the wide *store* that builds the struct.
+* `return+1` x258 is mostly the harmless trailing `return;` in void methods
+  (196 occurrences in Assembly-CSharp alone), not a defect.
+
+So the fidelity ceiling on these fixtures is dominated by inlining, and the
+remaining actionable slices are the wide struct store and switch synthesis on
+else-if chains.
+
+## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
+
+## Previous: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
 
 `out/survivors-roguelike-kit/full_s5` (fixes 198-201, 7,523 type files / 80,091
 bodies) is the first complete survivors tree whose compile number is not

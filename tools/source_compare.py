@@ -554,7 +554,28 @@ def compare(source_idx, tree_idx, min_calls=1):
                               for k, rx in TELL_PATTERNS.items()
                               if rx.search(o.body)},
                 })
-    return rows, unmatched, samples
+    # per-construct deltas over the whole matched population: shape_cos alone
+    # says HOW different, this says WHAT runs long (an `if` spray and a `goto`
+    # cascade are different defects with the same cosine).
+    deltas = collections.Counter()
+    worst_delta = []
+    for r in rows:
+        ss, os_ = r['src_shape'], r['out_shape']
+        for k in ss:
+            d = os_.get(k, 0) - ss[k]
+            if d:
+                deltas['%s%+d' % (k, d)] += 1
+        mag = sum(abs(os_.get(k, 0) - ss[k]) for k in ss)
+        if mag:
+            worst_delta.append((mag, r['type'], r['method'], r['arity'],
+                                r['src_shape'], r['out_shape']))
+    worst_delta.sort(reverse=True)
+    return rows, unmatched, samples, {
+        'deltas': dict(deltas.most_common(40)),
+        'worst': [{'magnitude': m, 'type': t, 'method': n, 'arity': a,
+                   'src_shape': s, 'out_shape': o}
+                  for m, t, n, a, s, o in worst_delta[:25]],
+    }
 
 
 def census(tree_dir, image_dirs):
@@ -644,7 +665,7 @@ def main(argv=None):
                 dst.setdefault(key, []).extend(methods)
     tree_idx = index_tree(tree, images)
 
-    rows, unmatched, samples = compare(src_idx, tree_idx)
+    rows, unmatched, samples, shapedelta = compare(src_idx, tree_idx)
     files, tells = census(tree, images)
 
     def _avg(key):
@@ -664,6 +685,7 @@ def main(argv=None):
         'matched_methods': len(rows),
         'unmatched': dict(unmatched),
         'unmatched_samples': samples,
+        'shape_deltas': shapedelta,
         'averages': {k: _avg(k) for k in (
             'call_precision', 'call_recall', 'call_f1', 'member_f1',
             'shape_cos')},
