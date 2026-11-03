@@ -378,10 +378,17 @@ class _ValuesMixin:
             pos = base + pi
             if pos > 3 or pos >= len(out) or pos >= len(arg_exprs):
                 continue
-            if (out[pos] or '').strip() not in ('?', '_', 'unknown'):
-                continue
             pty = self.il.types[p.type] \
                 if 0 <= p.type < len(self.il.types) else None
+            value = arg_exprs[pos]
+            if value is not None and value.text == out[pos] \
+                    and getattr(value, '_parts', None):
+                composite = self._copied_scalar_struct_arg(value, pty)
+                if composite is not None:
+                    out[pos] = composite
+                    continue
+            if (out[pos] or '').strip() not in ('?', '_', 'unknown'):
+                continue
             if pty is None or ((pty[1] >> 29) & 1):
                 continue
             te = self.il._type_enum(pty)

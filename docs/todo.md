@@ -4,6 +4,41 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Consumer-only copied scalar struct arguments (2026-11-04)
+
+Accepted source slice `game_out26` (not promoted), versus out23/out20. Managed
+Win64 calls can reconstruct a 4/8-byte non-generic value type only from complete
+explicit float32 copies, natural public writable fields and no explicit default
+constructor. New spellings accept only simple scalar names or float-suffixed
+literals; captured names stay captured. Unknowns, partial coverage, overlap,
+byrefs, calls, arithmetic and unbound member paths decline. No whole-container
+producer type is published. This is not a general lifetime/expression proof.
+
+Strict selected builds: **2,227 / 1,857 bodies**, zero failures/fallbacks/type-emit
+failures; brace/parse clean and frozen source fingerprints verified. Unitask's
+**474 files and seven complete diagnostic multisets are unchanged**. Survivors
+changes **six files / seven call arguments**: main **3,802 -> 3,797**, firstpass
+**816 -> 814**, **zero added diagnostics** in either complete multiset. Real
+Editor/BCL/package references and original assembly names; no stubs/self refs.
+Linq sentinel remains false: still syntax-gated, not zero-error recompilation.
+
+**82 new portable / 7 new game tests**; portable **2,262 passed**. Frozen full
+excluding parallel: **2,329 passed / 259 skipped / 1 non-strict xpassed / 3 failed**;
+parallel **2 passed**. Scoped stash proof on clean `98bfeff` reproduces exactly
+the three existing failures and restores all four candidate files byte-exact.
+No re-pin. Original Win64 bit consumer versus six recovered initializer variants:
+**1,200,000 checks / zero mismatches per checked mode**, on and off. No game-native,
+whole-method equivalence or speedup claim. Existing loop call-placement loss and
+repeated TMP getters remain unfixed.
+
+Rejected out24 lowered totals but added **25** survivors diagnostics through
+producer aggregate regressions. Rejected out25 accepted unsafe member/arithmetic
+spellings: **3 main / 2 firstpass added diagnostics** despite lower totals and
+passing synthetic bit checks. Neither has a passing full suite. Next: impure
+phi cleanup drops a loop-body call against a post-loop text twin; executable
+counter reproduces it, but a lexical-scope prototype is not native identity proof.
+Aggregate-only record: `validation_reports/quality_byval_scalar_parts_2026-11-04.json`.
+
 ### Byte-bounded aggregate slice projection (2026-11-04)
 
 Accepted source guardrail `game_out23` (not promoted), versus `game_out20`.

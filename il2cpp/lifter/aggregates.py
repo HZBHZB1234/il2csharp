@@ -1,9 +1,9 @@
 """Byte-range provenance for stack copies of metadata-proven value types."""
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.expr import Expr
-from il2cpp.csharp import FA_STATIC, FA_LITERAL, field_attrs
+from il2cpp.csharp import FA_STATIC, FA_INITONLY, FA_LITERAL, field_attrs
 from il2cpp.text import sdisp, reg_name, _int_lit
-from il2cpp.names import repr_f32, repr_f64
+from il2cpp.names import CSHARP_KEYWORDS, repr_f32, repr_f64
 
 
 _COLOR_NAMES = {
@@ -411,6 +411,102 @@ class _AggregatesMixin:
                 return None
             fields.append(name + ' = ' + value.text)
         return ('new ' + self.il.type_name(ty) + ' { ' + ', '.join(fields) + ' }') if fields else None
+
+    def _copied_scalar_leaf(self, value, offset, depth=0, snapshot=None):
+        """Read one explicit float32 copy, preserving bound scalar snapshots.
+
+        Only an identifier or a float-suffixed literal can be newly emitted.
+        Scalar types alone do not prove the spelling of arithmetic/member
+        expressions: older packed projections can contain invalid `.x` reads.
+        Follow byte copies to a scalar leaf even when a snapshot supplies the
+        emitted name; candidate whole-container types cannot prove a lane.
+        """
+        if (value is None or value._unk or depth > 8
+                or self._slice_width(value, offset, 4, depth) != 4):
+            return None
+        scalar = (offset == 0 and self.il._type_enum(value.ty) == 0x0c
+                  and value.kind in ('float', 'local')
+                  and not (value.ty[1] >> 29) & 1)
+        text = value.text or ''
+        atom = scalar and text not in CSHARP_KEYWORDS \
+            and text not in ('unknown', '_') and re.fullmatch(
+            r'@?[A-Za-z_]\w*|[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?[fF]',
+            text,
+        ) is not None
+        if snapshot is None and atom:
+            snapshot = value
+        parts = getattr(value, '_parts', None)
+        if parts is not None:
+            hits = [(lo, origin, off, count) for lo, origin, off, count in parts
+                    if lo < offset + 4 and offset < lo + count]
+            if len(hits) != 1:
+                return None
+            lo, origin, off, count = hits[0]
+            if lo > offset or offset + 4 > lo + count:
+                return None
+            return self._copied_scalar_leaf(
+                origin, off + offset - lo, depth + 1, snapshot)
+        sl = getattr(value, '_slice', None)
+        if sl is not None:
+            return self._copied_scalar_leaf(
+                sl[0], sl[1] + offset, depth + 1, snapshot)
+        return snapshot if scalar else None
+
+    def _copied_scalar_struct_arg(self, value, ty):
+        """Compose an exact small by-value aggregate at its managed consumer.
+
+        Win64 passes 4/8-byte structs in a GPR. Stack reloads can carry all
+        scalar pieces while their text names only the first one; that text
+        is not a whole-struct argument. Only complete explicit float copies
+        into public writable metadata fields are accepted. No new lane or
+        whole-container type is published to the rest of the lifter.
+        """
+        if (value is None or not getattr(value, '_parts', None)
+                or ty is None or self.il._type_enum(ty) != 0x11
+                or (ty[1] >> 29) & 1):
+            return None
+        if self.il._type_enum(value.ty) == 0x11 \
+                and self.il._closed_type_key(value.ty) == self.il._closed_type_key(ty):
+            return None  # a whole-struct snapshot already has the right spelling
+        width = self.il._sf_field_size(ty, 0)
+        if width not in (4, 8):
+            return None
+        td = self._td_of(ty)
+        if (td is None or not self.meta.typedefs[td].is_valuetype
+                or not self._piece_layout_proven(ty)):
+            return None
+        definition = self.meta.typedefs[td]
+        # C# object initializers invoke an explicit parameterless struct
+        # constructor. Native byte copies do not: do not invent its effects.
+        start, count = definition.method_start, definition.method_count
+        if (definition.bitfield & 2 or start < 0 or count < 0
+                or start + count > len(self.meta.methods)
+                or any(m.name == '.ctor' and not m.is_static and m.param_count == 0
+                       for m in self.meta.methods[start:start + count])):
+            return None
+        fields = [self.meta.fields[fi]
+                  for fi in range(definition.field_start,
+                                  definition.field_start + definition.field_count)
+                  if not field_attrs(self.il, self.meta.fields[fi])
+                  & (FA_STATIC | FA_LITERAL)]
+        if len(fields) != width // 4 or any(
+                (field_attrs(self.il, f) & 7) != 6
+                or field_attrs(self.il, f) & FA_INITONLY
+                or self.il._type_enum(self.il.types[f.type]) != 0x0c
+                for f in fields):
+            return None
+        chain = self.il.instance_field_chain(td) or {}
+        if sorted(chain) != list(range(0x10, 0x10 + width, 4)):
+            return None
+        pieces = []
+        for off, (name, ti) in sorted(chain.items()):
+            if self.il._type_enum(self.il.types[ti]) != 0x0c:
+                return None
+            scalar = self._copied_scalar_leaf(value, off - 0x10)
+            if scalar is None:
+                return None
+            pieces.append(name + ' = ' + scalar.text)
+        return 'new ' + self.il.type_name(ty) + ' { ' + ', '.join(pieces) + ' }'
 
     def _copied_struct_arg(self, text, ty):
         if not text.startswith('&') or not self._byval_struct(ty):

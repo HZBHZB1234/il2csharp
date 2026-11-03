@@ -1,0 +1,227 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source slice; not promoted; goal not achieved",
+  "baseline": "game_out23 (bytes identical to game_out20)",
+  "candidate": "game_out26",
+  "source_parent": "98bfeffe6174d495a9159b4fd2d2dda136f410f3",
+  "proof_scope": [
+    "At a managed Win64 call consumer only, reconstruct a non-generic 4/8-byte value type from explicit fully covering float32 copied leaves. No producer-side whole-container publication.",
+    "Require naturally laid out public writable float fields and no explicit parameterless instance constructor; byrefs, gaps, overlaps, unknowns, cycles, excessive nesting and non-float leaves decline.",
+    "Emit only simple scalar identifiers or float-suffixed literals; preserve captured scalar snapshots. Unbound arithmetic, member paths, calls, casts and indexers decline.",
+    "Keep correct whole-struct snapshots and the previous literal-lane branch unchanged. Restrict to the first four ABI argument positions with matching original rendered text.",
+    "This is not general scalar-expression provenance, lifetime recovery or proof of whole-method/game equivalence."
+  ],
+  "validation": {
+    "new_portable_cases": 82,
+    "new_game_cases": 7,
+    "portable": {
+      "passed": 2262,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 991.984999999986,
+      "frozen_source_verified": true,
+      "passed": 2329,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 534.1560000000754,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "frozen_source_verified": true,
+    "clean_source_baseline": {
+      "clean_source_head": "98bfeffe6174d495a9159b4fd2d2dda136f410f3",
+      "exit_code": 1,
+      "seconds": 112.76599999994505,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 0,
+      "brace_unbalanced": 0,
+      "parse_errors": 0,
+      "source_fingerprints_verified": true,
+      "compiler": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5515,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 6,
+      "brace_unbalanced": 0,
+      "parse_errors": 0,
+      "source_fingerprints_verified": true,
+      "compiler": {
+        "Assembly-CSharp": {
+          "before": 3802,
+          "after": 3797,
+          "added": 0,
+          "removed": 5,
+          "added_codes": {},
+          "removed_codes": {
+            "CS0029": 1,
+            "CS0103": 4
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 816,
+          "after": 814,
+          "added": 0,
+          "removed": 2,
+          "added_codes": {},
+          "removed_codes": {
+            "CS0103": 2
+          }
+        }
+      }
+    }
+  },
+  "runtime_proof": {
+    "original_synthetic_win64_consumer": true,
+    "checks_per_checked_mode": 1200000,
+    "checked_modes": [
+      "true",
+      "false"
+    ],
+    "bit_mismatches": 0,
+    "variants": 6,
+    "scope": "Actual recovered initializer expressions versus an original native GPR bit-preserving consumer; edge float bit patterns and random inputs. No game native or whole-method execution."
+  },
+  "output_review": {
+    "changed_files": 6,
+    "changed_call_arguments": 7,
+    "unitask_byte_identical_files": 474,
+    "new_calls": 0,
+    "limitations": [
+      "Existing loop call-placement loss in two shooting methods is not fixed by this slice.",
+      "Existing repeated getter calls in the TMP example are unchanged.",
+      "Scalar declarations referenced by new initializers can be hoisted by the existing declaration pass."
+    ]
+  },
+  "real_compilation": {
+    "references": "Installed Unity 6000 Editor engine/BCL/netstandard2.1 reference assemblies plus original player packages; exact original assembly simple names, no self references or synthetic missing-type stubs.",
+    "comparison": "Complete diagnostic multisets; zero additions in all nine selected assemblies.",
+    "body_gate": "Syntax-gated, not zero binding errors; UniTask.Linq sentinel remains false."
+  },
+  "rejected_attempts": {
+    "game_out24": {
+      "status": "reverted",
+      "survivors_before": 3802,
+      "survivors_after": 3795,
+      "diagnostics_added": 25,
+      "diagnostics_removed": 32,
+      "reason": "Producer-side scalar typing damaged downstream aggregate consumers; lower total concealed regressions. Canceled full run is not passing evidence."
+    },
+    "game_out25": {
+      "status": "reverted",
+      "survivors_before": 3802,
+      "survivors_after": 3794,
+      "diagnostics_added": 3,
+      "diagnostics_removed": 11,
+      "firstpass_before": 816,
+      "firstpass_after": 814,
+      "firstpass_added": 2,
+      "firstpass_removed": 4,
+      "portable_passed": 2230,
+      "reason": "Consumer accepted unbound arithmetic/member expressions with invalid projections. Synthetic bit proof did not validate expression provenance. No completed full suite."
+    }
+  },
+  "performance": {
+    "speedup_claim": false,
+    "reason": "No isolated improvement measurement; build walls are externally contended."
+  },
+  "next_investigation": "_drop_dead_copies deletes a loop-body impure phi against text-identical post-loop call. Original executable counter reproduces the loss; lexical prototype is exploratory, not an accepted general call identity proof.",
+  "promotion": {
+    "performed": false,
+    "goldens_modified": false,
+    "complete_recompile_or_runtime_equivalence_claim": false
+  }
+}
