@@ -1,4 +1,29 @@
-## Current work: consolidated state of the two fixtures (2026-11-03, on `main`)
+## Current work: the survivors tree's first UNMASKED compile number — 118 errors, 75 explained (2026-11-03, on `main`)
+
+`out/survivors-roguelike-kit/full_s5` (fixes 198-201, 7,523 type files / 80,091
+bodies) is the first complete survivors tree whose compile number is not
+suppressed by a syntax error:
+
+| gate | result |
+|---|---|
+| brace | 7,448 files, **0 unbalanced** |
+| tree-sitter (per image) | 7,448 files, **0 bad / 0 ERROR / 0 MISSING / 0 recovery**, no image crashed |
+| whole-tree Roslyn (4,413 sources, exact closure) | **118 errors in 59 files**, `binding_masked: false` |
+
+| code | n | verdict |
+|---|---|---|
+| CS0234 | 61 | **artifact of the one-assembly model**: the fixture's own metadata declares 3 types in a DOUBLED namespace `RGame.RoguelikeKit.RGame.RoguelikeKit` (real rows 8054-8056), so inside `namespace RGame.RoguelikeKit` the compiler binds `RGame` to that nested namespace and `RGame.RoguelikeKit.BaseBulletShootState` stops resolving. In the real project those types live in another assembly |
+| CS8701 | 14 | default-interface-method artifact of the netstandard2.0 closure |
+| CS0117 | 16 | `float.PositiveInfinity` as a DEFAULT PARAMETER VALUE (`UnityEngine.PhysicsModule/PhysicsScene.cs`, `float maxDistance = float.PositiveInfinity`): the compiler says `float` has no such member there. Open — `PositiveInfinity` is a `const` in classic Mono mscorlib, so what `float` binds to in a default-argument position needs a look |
+| CS0111 7, CS0535 6, CS0507 4, CS0460 2, CS0052 2, CS8345 1, CS0100 1, CS0644 1, CS0053 1, CS0051 1, CS0115 1 | 27 | real member/accessibility families, sized and to be triaged next |
+
+So the earlier "4 errors" was exactly the trap the new `binding_masked` flag
+warns about: the tree actually carries ~118, of which ~75 are model artifacts
+and ~43 are real defects in emitted members.
+
+## Previous: consolidated state of the two fixtures (2026-11-03, on `main`)
+
+## Previous: consolidated state of the two fixtures (2026-11-03, on `main`)
 
 The measurement that decides "near-complete recovery and near-recompilable" is
 per fixture, and both are close. All numbers below are from trees built with
