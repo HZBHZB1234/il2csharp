@@ -2836,7 +2836,7 @@ class _CallsMixin:
             value = self.reg('XMM0')
             self._hint_tok(value, _R8_TY)
             text = value.text if value is not None and not value._unk else '?'
-            result = self._mk('Math.Sqrt(%s)' % text, _R8_TY, 'float')
+            result = self._mk('global::System.Math.Sqrt(%s)' % text, _R8_TY, 'float')
             result._no_bind = True
             for r in VOLATILE:
                 self.regs.pop(r, None)

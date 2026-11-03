@@ -279,7 +279,7 @@ class _AnalyzeMixin:
                             value = L.reg('XMM0')
                             L._hint_tok(value, _R8_TY)
                             text = value.text if value is not None and not value._unk else '?'
-                            result = L._mk('Math.Sqrt(%s)' % text, _R8_TY, 'float')
+                            result = L._mk('global::System.Math.Sqrt(%s)' % text, _R8_TY, 'float')
                             b.ret = result.text if len(result.text) < 160 \
                                 else L._materialize(result, 160)
                             b.term = ('ret',)

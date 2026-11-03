@@ -159,5 +159,5 @@ def test_proved_sqrt_helper_tail_uses_xmm0_without_gpr_spray():
     lift.rt_sqrt = 0x2000
     lift._insn(ins, [ins], 0, None, ins.next_ip)
     text = " ".join(code for _, code, _ in lift.out)
-    assert text == "return Math.Sqrt(value); /* tail */"
+    assert text == "return global::System.Math.Sqrt(value); /* tail */"
     assert "junk" not in text and "sub_" not in text

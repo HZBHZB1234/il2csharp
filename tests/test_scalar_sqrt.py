@@ -9,8 +9,8 @@ DOUBLE = (0, 0x0D << 16)
 
 
 @pytest.mark.parametrize("encoding,ty,expected", [
-    ("f30f51c1", FLOAT, "(float)Math.Sqrt(value)"),
-    ("f20f51c1", DOUBLE, "Math.Sqrt(value)"),
+    ("f30f51c1", FLOAT, "(float)global::System.Math.Sqrt(value)"),
+    ("f20f51c1", DOUBLE, "global::System.Math.Sqrt(value)"),
 ])
 def test_register_source_retains_actual_result_type(encoding, ty, expected):
     lift = lifter({"XMM0": Expr("stale", None, "float"),
@@ -24,14 +24,14 @@ def test_register_source_retains_actual_result_type(encoding, ty, expected):
 def test_missing_source_is_not_fabricated_zero(encoding):
     lift = lifter({"XMM0": Expr("stale", None, "float")})
     execute(lift, encoding)
-    assert "Math.Sqrt(?)" in lift.regs["XMM0"].text
+    assert "global::System.Math.Sqrt(?)" in lift.regs["XMM0"].text
     assert "stale" not in lift.regs["XMM0"].text
 
 
 def test_float_memory_source_gets_an_explicit_float_result():
     lift = lifter(fields={0x10: ("value", 0)}, field_types=[FLOAT])
     execute(lift, "f30f514110")  # sqrtss xmm0,[rcx+10h]
-    assert lift.regs["XMM0"].text == "(float)Math.Sqrt(this.value)"
+    assert lift.regs["XMM0"].text == "(float)global::System.Math.Sqrt(this.value)"
     assert lift.regs["XMM0"].ty == FLOAT
 
 @pytest.mark.parametrize("rty,expected", [

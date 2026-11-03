@@ -54,7 +54,7 @@ def test_proved_packed_pipeline_retains_scalar_widths():
     execute(lift, "0f5ac8" "660f51c1" "660f5ac0")
 
     result = lift.regs["XMM0"]
-    assert result.text == "(float)(Math.Sqrt((double)(value)))"
+    assert result.text == "(float)(global::System.Math.Sqrt((double)(value)))"
     assert result.ty == FLOAT
 
 

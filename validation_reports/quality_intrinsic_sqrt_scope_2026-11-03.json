@@ -1,0 +1,2007 @@
+{
+  "kind": "framework binding for proven native square root intrinsics and alias-root aware using collection",
+  "date": "2026-11-03",
+  "baseline": "game_out17",
+  "candidate": "game_out19",
+  "promoted": false,
+  "rules": [
+    "Only native scalar SSE, proven packed low-lane patterns and proven helper/tail construction sites emit global::System.Math.Sqrt; no broad source-text replacement.",
+    "Single precision narrowing is preserved. Ordinary user calls, argument expressions, literals and comments are untouched.",
+    "Using collection does not restart inside explicit global/extern-alias paths; unrooted generic type arguments and ordinary qualified paths remain visible."
+  ],
+  "rejected_prototypes": [
+    {
+      "label": "game_out18",
+      "reason": "Qualified intrinsic calls also introduced using System, risking unrelated binding changes. Initial canceled suites and intermediate build are not final evidence."
+    }
+  ],
+  "fixtures": {
+    "unitask": {
+      "build": {
+        "files": 481,
+        "lifted": 2227,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 269069,
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp,TempAsm,UniTask",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "metadata_sha256": "447bfa59d619e6737225dcc30a0e7d742aeaa09d4ca313976ec4caa625a9a4de",
+        "binary_sha256": "b072436c43500dac794c8a138cd0beb6a76240aaa8a22b4fa953b69f7e952836",
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "3914727e40af1eb0e58aa25e0882d9619821fa591f166b8698f6897556913769",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "6cf28d27c7c5144d093d9491cf5c1b5c09bbc92df28bc2071ef97c953844713b",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "17ab948caedba6a37e3da6bd3ec0e86b06812e3fe4f95f92c843b7b58ab8f253",
+          "il2cpp/dec/build.py": "5934358c3cb62158a2437f89573f3817fc3b1bd0e132cf1fab115cb902c10ce0",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "c0f94e58e3c9f091ec6b71642fabd3f2576884d8865e7079c302fdbdcad68682",
+          "il2cpp/dec/ifaceprune.py": "0e6210b00c0feaa6dc1d0d91801e2d05336cdc4a52790b2fc1a0d965ab1fb34d",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "fcd6a405cb27035738406636c3cd04bf1c2e16c4de0376996bfce809b406e4a2",
+          "il2cpp/lifter/insn.py": "025cb160fbc538126b589d92eb7586d2b23edb9ce719e08e444b542aaf328fd5",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "df132d4444a8fbb8c1991abaf59369ef21e7ae4845181995c02515f1083a1537",
+          "il2cpp/lifter/values.py": "229fcf8c3b37a4101f2671a3f867935b4e2f426588c431b2635e9b6868a3f93f",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        }
+      },
+      "fingerprints_verified": true,
+      "gates": {
+        "brace": {
+          "kind": "literal-aware brace audit",
+          "tree": "<repo-root>/out/unitask/game_out19",
+          "files": 474,
+          "unbalanced_files": 0,
+          "details": {}
+        },
+        "parse": {
+          "kind": "tree-sitter C# syntax gate",
+          "tree": "<repo-root>/out/unitask/game_out19",
+          "files": 474,
+          "bad_files": 0,
+          "errors": 0,
+          "missing": 0,
+          "recovery_nodes": 0,
+          "details": {},
+          "elapsed_seconds": 2.797
+        }
+      },
+      "compile": {
+        "reference_source": "installed Unity 6000 Editor engine DLLs + Editor netstandard 2.1/BCL + original player packages, current image excluded",
+        "synthetic_stubs": false,
+        "original_assembly_simple_names": true,
+        "before": {
+          "Assembly-CSharp": {
+            "files": 16,
+            "syntax": 2,
+            "binding": 1971,
+            "top": [
+              [
+                "CS0103",
+                436
+              ],
+              [
+                "CS1061",
+                192
+              ],
+              [
+                "CS0019",
+                191
+              ],
+              [
+                "CS0029",
+                187
+              ],
+              [
+                "CS0208",
+                145
+              ],
+              [
+                "CS1503",
+                128
+              ],
+              [
+                "CS0122",
+                119
+              ],
+              [
+                "CS0119",
+                94
+              ],
+              [
+                "CS8917",
+                85
+              ],
+              [
+                "CS0165",
+                67
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0246": 41,
+              "CS1061": 192,
+              "CS0029": 187,
+              "CS0208": 145,
+              "CS0103": 436,
+              "CS0266": 46,
+              "CS8917": 85,
+              "CS0308": 3,
+              "CS7036": 11,
+              "CS0149": 17,
+              "CS1503": 128,
+              "CS0019": 191,
+              "CS0122": 119,
+              "CS0030": 55,
+              "CS0119": 94,
+              "CS1501": 50,
+              "CS0117": 48,
+              "CS1729": 2,
+              "CS0165": 67,
+              "CS7069": 9,
+              "CS0159": 35,
+              "CS0305": 1,
+              "CS0428": 1,
+              "CS1620": 9,
+              "CS0121": 1
+            },
+            "seconds": 5.75
+          },
+          "TempAsm": {
+            "files": 4,
+            "syntax": 0,
+            "binding": 6,
+            "top": [
+              [
+                "CS0103",
+                2
+              ],
+              [
+                "CS0208",
+                2
+              ],
+              [
+                "CS0266",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "TempAsm",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 2,
+              "CS0103": 2,
+              "CS0266": 2
+            },
+            "seconds": 2.797000000020489
+          },
+          "UniTask": {
+            "files": 302,
+            "syntax": 11,
+            "binding": 5504,
+            "top": [
+              [
+                "CS1061",
+                1092
+              ],
+              [
+                "CS0103",
+                1015
+              ],
+              [
+                "CS0208",
+                778
+              ],
+              [
+                "CS0019",
+                676
+              ],
+              [
+                "CS0029",
+                429
+              ],
+              [
+                "CS0149",
+                212
+              ],
+              [
+                "CS1503",
+                212
+              ],
+              [
+                "CS0165",
+                191
+              ],
+              [
+                "CS0311",
+                154
+              ],
+              [
+                "CS0122",
+                128
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 778,
+              "CS1503": 212,
+              "CS0122": 128,
+              "CS0029": 429,
+              "CS0103": 1015,
+              "CS1061": 1092,
+              "CS0161": 16,
+              "CS0266": 116,
+              "CS0019": 676,
+              "CS0246": 20,
+              "CS0149": 212,
+              "CS0165": 191,
+              "CS0571": 31,
+              "CS7036": 37,
+              "CS1501": 56,
+              "CS0030": 82,
+              "CS0117": 24,
+              "CS0173": 1,
+              "CS0177": 14,
+              "CS0159": 33,
+              "CS8917": 75,
+              "CS0119": 84,
+              "CS0214": 15,
+              "CS0212": 4,
+              "CS0163": 2,
+              "CS8070": 1,
+              "CS1729": 10,
+              "CS0311": 154,
+              "CS0308": 2,
+              "CS1929": 1,
+              "CS0023": 4
+            },
+            "seconds": 12.437999999965541
+          },
+          "UniTask.Addressables": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Addressables",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.734000000054948
+          },
+          "UniTask.DOTween": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.DOTween",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.640999999945052
+          },
+          "UniTask.Linq": {
+            "files": 143,
+            "syntax": 0,
+            "binding": 13,
+            "top": [
+              [
+                "CS0052",
+                7
+              ],
+              [
+                "CS7069",
+                5
+              ],
+              [
+                "CS0738",
+                1
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Linq",
+            "body_probe_observed": false,
+            "returncode": 1,
+            "codes": {
+              "CS0052": 7,
+              "CS7069": 5,
+              "CS0738": 1
+            },
+            "seconds": 2.172000000020489
+          },
+          "UniTask.TextMeshPro": {
+            "files": 5,
+            "syntax": 0,
+            "binding": 209,
+            "top": [
+              [
+                "CS1061",
+                60
+              ],
+              [
+                "CS0103",
+                40
+              ],
+              [
+                "CS0165",
+                21
+              ],
+              [
+                "CS0019",
+                17
+              ],
+              [
+                "CS1503",
+                15
+              ],
+              [
+                "CS0246",
+                13
+              ],
+              [
+                "CS0029",
+                9
+              ],
+              [
+                "CS0266",
+                6
+              ],
+              [
+                "CS0149",
+                5
+              ],
+              [
+                "CS7069",
+                4
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.TextMeshPro",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 40,
+              "CS0266": 6,
+              "CS0214": 2,
+              "CS1503": 15,
+              "CS0246": 13,
+              "CS0029": 9,
+              "CS1061": 60,
+              "CS0019": 17,
+              "CS0149": 5,
+              "CS8917": 2,
+              "CS0030": 2,
+              "CS0122": 3,
+              "CS0119": 2,
+              "CS1501": 1,
+              "CS0156": 1,
+              "CS0159": 2,
+              "CS7069": 4,
+              "CS0165": 21,
+              "CS0117": 1
+            },
+            "seconds": 2.672000000020489
+          }
+        },
+        "after": {
+          "Assembly-CSharp": {
+            "files": 16,
+            "syntax": 2,
+            "binding": 1971,
+            "top": [
+              [
+                "CS0103",
+                436
+              ],
+              [
+                "CS1061",
+                192
+              ],
+              [
+                "CS0019",
+                191
+              ],
+              [
+                "CS0029",
+                187
+              ],
+              [
+                "CS0208",
+                145
+              ],
+              [
+                "CS1503",
+                128
+              ],
+              [
+                "CS0122",
+                119
+              ],
+              [
+                "CS0119",
+                94
+              ],
+              [
+                "CS8917",
+                85
+              ],
+              [
+                "CS0165",
+                67
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0246": 41,
+              "CS1061": 192,
+              "CS0029": 187,
+              "CS8917": 85,
+              "CS0103": 436,
+              "CS0208": 145,
+              "CS0308": 3,
+              "CS0266": 46,
+              "CS7036": 11,
+              "CS0030": 55,
+              "CS0119": 94,
+              "CS1501": 50,
+              "CS0019": 191,
+              "CS0122": 119,
+              "CS0117": 48,
+              "CS0149": 17,
+              "CS1503": 128,
+              "CS1729": 2,
+              "CS0165": 67,
+              "CS7069": 9,
+              "CS0305": 1,
+              "CS0159": 35,
+              "CS0428": 1,
+              "CS1620": 9,
+              "CS0121": 1
+            },
+            "seconds": 5.60999999998603
+          },
+          "TempAsm": {
+            "files": 4,
+            "syntax": 0,
+            "binding": 6,
+            "top": [
+              [
+                "CS0103",
+                2
+              ],
+              [
+                "CS0208",
+                2
+              ],
+              [
+                "CS0266",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "TempAsm",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 2,
+              "CS0103": 2,
+              "CS0266": 2
+            },
+            "seconds": 1.625
+          },
+          "UniTask": {
+            "files": 302,
+            "syntax": 11,
+            "binding": 5504,
+            "top": [
+              [
+                "CS1061",
+                1092
+              ],
+              [
+                "CS0103",
+                1015
+              ],
+              [
+                "CS0208",
+                778
+              ],
+              [
+                "CS0019",
+                676
+              ],
+              [
+                "CS0029",
+                429
+              ],
+              [
+                "CS0149",
+                212
+              ],
+              [
+                "CS1503",
+                212
+              ],
+              [
+                "CS0165",
+                191
+              ],
+              [
+                "CS0311",
+                154
+              ],
+              [
+                "CS0122",
+                128
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 778,
+              "CS0029": 429,
+              "CS0103": 1015,
+              "CS0266": 116,
+              "CS1503": 212,
+              "CS0122": 128,
+              "CS1061": 1092,
+              "CS0246": 20,
+              "CS0161": 16,
+              "CS0149": 212,
+              "CS0019": 676,
+              "CS0030": 82,
+              "CS0571": 31,
+              "CS7036": 37,
+              "CS0177": 14,
+              "CS0117": 24,
+              "CS0173": 1,
+              "CS0165": 191,
+              "CS1501": 56,
+              "CS0159": 33,
+              "CS8917": 75,
+              "CS0119": 84,
+              "CS0212": 4,
+              "CS0214": 15,
+              "CS0163": 2,
+              "CS8070": 1,
+              "CS1729": 10,
+              "CS0311": 154,
+              "CS0308": 2,
+              "CS1929": 1,
+              "CS0023": 4
+            },
+            "seconds": 9.186999999918044
+          },
+          "UniTask.Addressables": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Addressables",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 2.25
+          },
+          "UniTask.DOTween": {
+            "files": 2,
+            "syntax": 0,
+            "binding": 5,
+            "top": [
+              [
+                "CS0208",
+                3
+              ],
+              [
+                "CS0103",
+                2
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.DOTween",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0208": 3,
+              "CS0103": 2
+            },
+            "seconds": 1.922000000020489
+          },
+          "UniTask.Linq": {
+            "files": 143,
+            "syntax": 0,
+            "binding": 13,
+            "top": [
+              [
+                "CS0052",
+                7
+              ],
+              [
+                "CS7069",
+                5
+              ],
+              [
+                "CS0738",
+                1
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.Linq",
+            "body_probe_observed": false,
+            "returncode": 1,
+            "codes": {
+              "CS0052": 7,
+              "CS7069": 5,
+              "CS0738": 1
+            },
+            "seconds": 2.344000000040978
+          },
+          "UniTask.TextMeshPro": {
+            "files": 5,
+            "syntax": 0,
+            "binding": 209,
+            "top": [
+              [
+                "CS1061",
+                60
+              ],
+              [
+                "CS0103",
+                40
+              ],
+              [
+                "CS0165",
+                21
+              ],
+              [
+                "CS0019",
+                17
+              ],
+              [
+                "CS1503",
+                15
+              ],
+              [
+                "CS0246",
+                13
+              ],
+              [
+                "CS0029",
+                9
+              ],
+              [
+                "CS0266",
+                6
+              ],
+              [
+                "CS0149",
+                5
+              ],
+              [
+                "CS7069",
+                4
+              ]
+            ],
+            "tool_error": null,
+            "refs": 213,
+            "assembly_name": "UniTask.TextMeshPro",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0214": 2,
+              "CS1503": 15,
+              "CS0208": 3,
+              "CS0103": 40,
+              "CS0266": 6,
+              "CS0246": 13,
+              "CS0029": 9,
+              "CS1061": 60,
+              "CS0019": 17,
+              "CS0149": 5,
+              "CS8917": 2,
+              "CS0030": 2,
+              "CS0122": 3,
+              "CS0119": 2,
+              "CS1501": 1,
+              "CS0156": 1,
+              "CS0159": 2,
+              "CS7069": 4,
+              "CS0165": 21,
+              "CS0117": 1
+            },
+            "seconds": 1.859000000054948
+          }
+        },
+        "code_deltas": {
+          "Assembly-CSharp": {},
+          "TempAsm": {},
+          "UniTask": {},
+          "UniTask.Addressables": {},
+          "UniTask.DOTween": {},
+          "UniTask.Linq": {},
+          "UniTask.TextMeshPro": {}
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "build": {
+        "files": 295,
+        "lifted": 1857,
+        "failed": 0,
+        "fallbacks": 0,
+        "emit_failed": 0,
+        "ms": 294240,
+        "flags": {
+          "strict": true,
+          "decls_only": false,
+          "publicize": true,
+          "raw_addr": true,
+          "only": "Assembly-CSharp",
+          "types": null,
+          "workers": 2,
+          "max_methods": null
+        },
+        "metadata_sha256": "10b2e9ef1fe0783e4a0bac6ebf8ebd1c94a194917e307d67ed78fd7c25094dc0",
+        "binary_sha256": "2a5cf4a8681497d9bd64aebc0bb0343268a212438a3a44344ea2305d7389482a",
+        "source_fingerprints": {
+          "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+          "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+          "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+          "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+          "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+          "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+          "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+          "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+          "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+          "il2cpp/csharp.py": "3914727e40af1eb0e58aa25e0882d9619821fa591f166b8698f6897556913769",
+          "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+          "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+          "il2cpp/expr.py": "6cf28d27c7c5144d093d9491cf5c1b5c09bbc92df28bc2071ef97c953844713b",
+          "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+          "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+          "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+          "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+          "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+          "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+          "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+          "il2cpp/x64.py": "0e311efa03106d8052344285f52c78a194f785ea3d9a05d27ee1ef071ec93f91",
+          "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+          "il2cpp/dec/analyze.py": "17ab948caedba6a37e3da6bd3ec0e86b06812e3fe4f95f92c843b7b58ab8f253",
+          "il2cpp/dec/build.py": "5934358c3cb62158a2437f89573f3817fc3b1bd0e132cf1fab115cb902c10ce0",
+          "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+          "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+          "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+          "il2cpp/dec/highlevel.py": "c0f94e58e3c9f091ec6b71642fabd3f2576884d8865e7079c302fdbdcad68682",
+          "il2cpp/dec/ifaceprune.py": "0e6210b00c0feaa6dc1d0d91801e2d05336cdc4a52790b2fc1a0d965ab1fb34d",
+          "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+          "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+          "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+          "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+          "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+          "il2cpp/lifter/aggregates.py": "c794c06995db326536b83f49fcbc6bfcffa6a4b0a54da5973ddfe27c76c54d19",
+          "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+          "il2cpp/lifter/calls.py": "fcd6a405cb27035738406636c3cd04bf1c2e16c4de0376996bfce809b406e4a2",
+          "il2cpp/lifter/insn.py": "025cb160fbc538126b589d92eb7586d2b23edb9ce719e08e444b542aaf328fd5",
+          "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+          "il2cpp/lifter/state.py": "df132d4444a8fbb8c1991abaf59369ef21e7ae4845181995c02515f1083a1537",
+          "il2cpp/lifter/values.py": "229fcf8c3b37a4101f2671a3f867935b4e2f426588c431b2635e9b6868a3f93f",
+          "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+          "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+          "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+          "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+          "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+          "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+          "il2cpp/runtime/types.py": "c4a88195661753085789da8b209d6a5d6841482ca5741a08e49606a67b0018b8"
+        }
+      },
+      "fingerprints_verified": true,
+      "gates": {
+        "brace": {
+          "kind": "literal-aware brace audit",
+          "tree": "<repo-root>/out/survivors-roguelike-kit/game_out19",
+          "files": 293,
+          "unbalanced_files": 0,
+          "details": {}
+        },
+        "parse": {
+          "kind": "tree-sitter C# syntax gate",
+          "tree": "<repo-root>/out/survivors-roguelike-kit/game_out19",
+          "files": 293,
+          "bad_files": 0,
+          "errors": 0,
+          "missing": 0,
+          "recovery_nodes": 0,
+          "details": {},
+          "elapsed_seconds": 1.047
+        }
+      },
+      "compile": {
+        "reference_source": "installed Unity 6000 Editor engine DLLs + Editor netstandard 2.1/BCL + original player packages, current image excluded",
+        "synthetic_stubs": false,
+        "original_assembly_simple_names": true,
+        "before": {
+          "Assembly-CSharp": {
+            "files": 281,
+            "syntax": 36,
+            "binding": 3784,
+            "top": [
+              [
+                "CS1061",
+                1215
+              ],
+              [
+                "CS0029",
+                527
+              ],
+              [
+                "CS0266",
+                405
+              ],
+              [
+                "CS0103",
+                370
+              ],
+              [
+                "CS0208",
+                226
+              ],
+              [
+                "CS0019",
+                192
+              ],
+              [
+                "CS1503",
+                177
+              ],
+              [
+                "CS0117",
+                163
+              ],
+              [
+                "CS0149",
+                76
+              ],
+              [
+                "CS0165",
+                74
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS1061": 1215,
+              "CS0208": 226,
+              "CS0029": 527,
+              "CS7036": 54,
+              "CS0266": 405,
+              "CS0103": 370,
+              "CS0122": 60,
+              "CS0117": 163,
+              "CS0212": 36,
+              "CS1501": 27,
+              "CS0149": 76,
+              "CS1503": 177,
+              "CS0246": 73,
+              "CS0019": 192,
+              "CS0165": 74,
+              "CS0159": 29,
+              "CS0571": 34,
+              "CS0200": 12,
+              "CS8070": 1,
+              "CS1615": 29,
+              "CS0311": 5,
+              "CS0030": 9,
+              "CS0170": 2,
+              "CS0161": 2,
+              "CS0121": 1,
+              "CS0021": 11,
+              "CS0305": 1,
+              "CS1729": 7,
+              "CS0177": 1,
+              "CS8917": 1
+            },
+            "seconds": 10.406000000075437
+          },
+          "Assembly-CSharp-firstpass": {
+            "files": 12,
+            "syntax": 2,
+            "binding": 814,
+            "top": [
+              [
+                "CS1061",
+                418
+              ],
+              [
+                "CS0246",
+                105
+              ],
+              [
+                "CS0103",
+                85
+              ],
+              [
+                "CS1503",
+                57
+              ],
+              [
+                "CS0266",
+                35
+              ],
+              [
+                "CS0029",
+                34
+              ],
+              [
+                "CS0019",
+                23
+              ],
+              [
+                "CS0208",
+                19
+              ],
+              [
+                "CS0117",
+                17
+              ],
+              [
+                "CS0159",
+                7
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp-firstpass",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS1729": 2,
+              "CS0571": 1,
+              "CS0246": 105,
+              "CS1061": 418,
+              "CS0208": 19,
+              "CS0266": 35,
+              "CS0019": 23,
+              "CS1503": 57,
+              "CS0029": 34,
+              "CS0103": 85,
+              "CS0117": 17,
+              "CS7036": 6,
+              "CS0159": 7,
+              "CS0165": 2,
+              "CS0149": 2,
+              "CS0122": 2,
+              "CS0212": 1
+            },
+            "seconds": 3.405999999959022
+          }
+        },
+        "after": {
+          "Assembly-CSharp": {
+            "files": 281,
+            "syntax": 36,
+            "binding": 3769,
+            "top": [
+              [
+                "CS1061",
+                1215
+              ],
+              [
+                "CS0029",
+                527
+              ],
+              [
+                "CS0266",
+                405
+              ],
+              [
+                "CS0103",
+                355
+              ],
+              [
+                "CS0208",
+                226
+              ],
+              [
+                "CS0019",
+                192
+              ],
+              [
+                "CS1503",
+                177
+              ],
+              [
+                "CS0117",
+                163
+              ],
+              [
+                "CS0149",
+                76
+              ],
+              [
+                "CS0165",
+                74
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS1061": 1215,
+              "CS0266": 405,
+              "CS0208": 226,
+              "CS0029": 527,
+              "CS0117": 163,
+              "CS0103": 355,
+              "CS0571": 34,
+              "CS1503": 177,
+              "CS0149": 76,
+              "CS0122": 60,
+              "CS7036": 54,
+              "CS0019": 192,
+              "CS0212": 36,
+              "CS1501": 27,
+              "CS0246": 73,
+              "CS0165": 74,
+              "CS0159": 29,
+              "CS0021": 11,
+              "CS0305": 1,
+              "CS1615": 29,
+              "CS0200": 12,
+              "CS0121": 1,
+              "CS0311": 5,
+              "CS8070": 1,
+              "CS0030": 9,
+              "CS0170": 2,
+              "CS0161": 2,
+              "CS1729": 7,
+              "CS0177": 1,
+              "CS8917": 1
+            },
+            "seconds": 6.0
+          },
+          "Assembly-CSharp-firstpass": {
+            "files": 12,
+            "syntax": 2,
+            "binding": 814,
+            "top": [
+              [
+                "CS1061",
+                418
+              ],
+              [
+                "CS0246",
+                105
+              ],
+              [
+                "CS0103",
+                85
+              ],
+              [
+                "CS1503",
+                57
+              ],
+              [
+                "CS0266",
+                35
+              ],
+              [
+                "CS0029",
+                34
+              ],
+              [
+                "CS0019",
+                23
+              ],
+              [
+                "CS0208",
+                19
+              ],
+              [
+                "CS0117",
+                17
+              ],
+              [
+                "CS0159",
+                7
+              ]
+            ],
+            "tool_error": null,
+            "refs": 225,
+            "assembly_name": "Assembly-CSharp-firstpass",
+            "body_probe_observed": true,
+            "returncode": 1,
+            "codes": {
+              "CS0019": 23,
+              "CS1729": 2,
+              "CS0571": 1,
+              "CS1061": 418,
+              "CS0246": 105,
+              "CS1503": 57,
+              "CS0208": 19,
+              "CS0266": 35,
+              "CS0103": 85,
+              "CS0029": 34,
+              "CS0117": 17,
+              "CS7036": 6,
+              "CS0159": 7,
+              "CS0165": 2,
+              "CS0149": 2,
+              "CS0122": 2,
+              "CS0212": 1
+            },
+            "seconds": 2.6410000000614673
+          }
+        },
+        "code_deltas": {
+          "Assembly-CSharp": {
+            "CS0103": -15
+          },
+          "Assembly-CSharp-firstpass": {}
+        }
+      }
+    }
+  },
+  "validation": {
+    "portable": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "2021",
+      "time": "19.892",
+      "timestamp": "2026-11-03T23:05:33.912636+08:00",
+      "hostname": "DESKTOP-FLNM4EM",
+      "failure_set": []
+    },
+    "targeted_portable": {
+      "passed": 57,
+      "new_cases": 22
+    },
+    "full_without_parallel": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "3",
+      "skipped": "259",
+      "tests": "2342",
+      "time": "1345.445",
+      "timestamp": "2026-11-03T23:06:01.295302+08:00",
+      "hostname": "DESKTOP-FLNM4EM",
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "pytest_summary": {
+        "passed": 2079,
+        "skipped": 259,
+        "non_strict_xpassed": 1,
+        "failed": 3
+      }
+    },
+    "parallel": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "2",
+      "time": "836.312",
+      "timestamp": "2026-11-03T23:06:01.431618+08:00",
+      "hostname": "DESKTOP-FLNM4EM",
+      "failure_set": []
+    },
+    "compileall": true,
+    "diff_check": true
+  },
+  "tree_diff": {
+    "unitask": {
+      "changed_files": 37,
+      "added_files": 0,
+      "removed_files": 0,
+      "changes": [
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Channel.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/ChannelReader.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Channel_2.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Channel_3.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/StateExtensions.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/TaskPool_2.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/UniTaskAsyncEnumerableExtensions.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/UniTaskCancelableAsyncEnumerable.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/WhenEachEnumerable.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/ArrayPool.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/ImmutableList.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/MinimumQueue.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/StatePool.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/StatePool_2.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/StatePool_3.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Internal/StateTuple.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 1,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask/Cysharp/Threading/Tasks/Triggers/AsyncTriggerExtensions.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/AsyncEnumerableSorter.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Cast.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Contains.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Distinct.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ElementAt.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Empty.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Never.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/OfType.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/QueueOperator.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Repeat.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Return.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Reverse.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/SequenceEqual.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/Skip.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToArray.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToHashSet.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToList.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerable.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerableTask.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "UniTask.Linq/Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerableUniTask.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        }
+      ]
+    },
+    "survivors-roguelike-kit": {
+      "changed_files": 20,
+      "added_files": 0,
+      "removed_files": 0,
+      "changes": [
+        {
+          "file": "Assembly-CSharp/RGame/CommonStat/FormulaParser.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/Framework/FactorySO.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/Framework/ScriptableEventT.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/Framework/ScriptableEventT_2.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/Framework/ScriptableEventT_3.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/ChainSkill.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/DistanceToPlayerTransition.cs",
+          "framework_sqrt_qualifications": 6,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/EnemyRangeWeapon.cs",
+          "framework_sqrt_qualifications": 1,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/FloatingJoystick.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/IDropOut.cs",
+          "framework_sqrt_qualifications": 4,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/MapManager.cs",
+          "framework_sqrt_qualifications": 1,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/MeleeEnemy.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/PlayerAnim.cs",
+          "framework_sqrt_qualifications": 1,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/PlayerMovement.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/RangeEnemy.cs",
+          "framework_sqrt_qualifications": 1,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/RotateToMovementDirection.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/StageManager.cs",
+          "framework_sqrt_qualifications": 1,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/RoguelikeKit/TeleportMovementState.cs",
+          "framework_sqrt_qualifications": 3,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/RGame/ScriptableCoreKit/StateMachine.cs",
+          "framework_sqrt_qualifications": 0,
+          "redundant_System_imports_removed": 1,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        },
+        {
+          "file": "Assembly-CSharp/TMPro/Examples/CameraController.cs",
+          "framework_sqrt_qualifications": 2,
+          "redundant_System_imports_removed": 0,
+          "associated_empty_lines_removed": 0,
+          "all_other_bytes_identical": true
+        }
+      ]
+    }
+  },
+  "removed_import_binding_review": {
+    "kind": "Roslyn symbols/types/conversions/constants/declarations differential under real Editor/BCL and original package reference closure",
+    "reports": [
+      {
+        "fixture": "unitask",
+        "image": "UniTask",
+        "files": 17,
+        "semanticNodes": 4497,
+        "unchangedErrorTypeNodes": 6,
+        "mismatches": 0,
+        "details": [
+          {
+            "file": "Cysharp/Threading/Tasks/Channel.cs",
+            "checkedNodes": 24,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/ChannelReader.cs",
+            "checkedNodes": 106,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Channel_2.cs",
+            "checkedNodes": 71,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Channel_3.cs",
+            "checkedNodes": 26,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/StateExtensions.cs",
+            "checkedNodes": 41,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/TaskPool_2.cs",
+            "checkedNodes": 51,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/UniTaskAsyncEnumerableExtensions.cs",
+            "checkedNodes": 23,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/UniTaskCancelableAsyncEnumerable.cs",
+            "checkedNodes": 90,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/WhenEachEnumerable.cs",
+            "checkedNodes": 267,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/ArrayPool.cs",
+            "checkedNodes": 111,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/ImmutableList.cs",
+            "checkedNodes": 117,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/MinimumQueue.cs",
+            "checkedNodes": 120,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/StatePool.cs",
+            "checkedNodes": 47,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/StatePool_2.cs",
+            "checkedNodes": 53,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/StatePool_3.cs",
+            "checkedNodes": 59,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Internal/StateTuple.cs",
+            "checkedNodes": 84,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Triggers/AsyncTriggerExtensions.cs",
+            "checkedNodes": 3207,
+            "errorTypes": 6
+          }
+        ]
+      },
+      {
+        "fixture": "unitask",
+        "image": "UniTask.Linq",
+        "files": 20,
+        "semanticNodes": 2220,
+        "unchangedErrorTypeNodes": 0,
+        "mismatches": 0,
+        "details": [
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/AsyncEnumerableSorter.cs",
+            "checkedNodes": 125,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Cast.cs",
+            "checkedNodes": 70,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Contains.cs",
+            "checkedNodes": 100,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Distinct.cs",
+            "checkedNodes": 84,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ElementAt.cs",
+            "checkedNodes": 101,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Empty.cs",
+            "checkedNodes": 96,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Never.cs",
+            "checkedNodes": 100,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/OfType.cs",
+            "checkedNodes": 70,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/QueueOperator.cs",
+            "checkedNodes": 252,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Repeat.cs",
+            "checkedNodes": 100,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Return.cs",
+            "checkedNodes": 90,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Reverse.cs",
+            "checkedNodes": 150,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/SequenceEqual.cs",
+            "checkedNodes": 115,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/Skip.cs",
+            "checkedNodes": 83,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToArray.cs",
+            "checkedNodes": 106,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToHashSet.cs",
+            "checkedNodes": 98,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToList.cs",
+            "checkedNodes": 91,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerable.cs",
+            "checkedNodes": 95,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerableTask.cs",
+            "checkedNodes": 146,
+            "errorTypes": 0
+          },
+          {
+            "file": "Cysharp/Threading/Tasks/Linq/ToUniTaskAsyncEnumerableUniTask.cs",
+            "checkedNodes": 148,
+            "errorTypes": 0
+          }
+        ]
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "image": "Assembly-CSharp",
+        "files": 5,
+        "semanticNodes": 484,
+        "unchangedErrorTypeNodes": 0,
+        "mismatches": 0,
+        "details": [
+          {
+            "file": "RGame/Framework/FactorySO.cs",
+            "checkedNodes": 20,
+            "errorTypes": 0
+          },
+          {
+            "file": "RGame/Framework/ScriptableEventT.cs",
+            "checkedNodes": 74,
+            "errorTypes": 0
+          },
+          {
+            "file": "RGame/Framework/ScriptableEventT_2.cs",
+            "checkedNodes": 81,
+            "errorTypes": 0
+          },
+          {
+            "file": "RGame/Framework/ScriptableEventT_3.cs",
+            "checkedNodes": 88,
+            "errorTypes": 0
+          },
+          {
+            "file": "RGame/ScriptableCoreKit/StateMachine.cs",
+            "checkedNodes": 221,
+            "errorTypes": 0
+          }
+        ]
+      }
+    ],
+    "gameRuntimeEquivalence": false
+  },
+  "synthetic_runtime": {
+    "kind": "actual recovered intrinsic fragments under synthetic user Math and System shadowing, versus original synthetic native SSE thunks",
+    "checks": 50055,
+    "mismatches": 0,
+    "paths": [
+      "SQRTSS",
+      "SQRTSD",
+      "proved packed low-lane conversion/root/narrow",
+      "proved helper expression",
+      "proved tail expression"
+    ],
+    "missing_System_import_before_CS0103": true,
+    "missing_System_import_after_compiles": true,
+    "shadowing_user_Math_not_called": true,
+    "nan_comparison": "NaNs accepted as NaN; payload/sign not asserted",
+    "non_nan_comparison": "bit-identical including signed zero",
+    "rounding_environment": "default managed/native process environment only",
+    "native_helper_body_executed": false,
+    "game_runtime_equivalence_proved": false,
+    "performance_proved": false
+  },
+  "pin_review": {
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ],
+    "same_as_baseline": true,
+    "shiftatmidnight_legacy_sqrt_pins": "Unavailable fixture; skipped, not updated."
+  },
+  "limits": [
+    "Selected images only. Thousands of real compiler errors remain; not near recompilation.",
+    "Survivors Assembly-CSharp 3820 -> 3805; firstpass 816 unchanged. Every selected unitask diagnostic-code count unchanged.",
+    "UniTask.Linq body sentinel remains false; syntax-gated exit does not mean zero binding errors.",
+    "Removing 42 redundant imports was reviewed under the real-reference closure: 7201 semantic nodes unchanged, including six unchanged error-type nodes. Not complete runtime-equivalence proof.",
+    "Synthetic SSE thunks versus emitted expressions: default rounding only; non-NaNs bit-identical, NaNs compared only as NaN. Native helper body and game runtime not executed.",
+    "No performance claim, output promotion, snapshot regeneration or golden/pin change.",
+    "Hash accumulator integer width/wrap/signedness and aggregate lifetime/provenance remain unresolved."
+  ]
+}

@@ -141,7 +141,7 @@ class _InsnMixin:
                     value = self.reg('XMM0')
                     self._hint_tok(value, _R8_TY)
                     text = value.text if value is not None and not value._unk else '?'
-                    self.emit(ip, 'return Math.Sqrt(%s); /* tail */' % text, asm)
+                    self.emit(ip, 'return global::System.Math.Sqrt(%s); /* tail */' % text, asm)
                     for r in VOLATILE:
                         self.regs.pop(r, None)
                     return
@@ -1203,7 +1203,7 @@ class _InsnMixin:
             else:
                 value = self._read_mem(ins, asm)
             self._hint_tok(value, _R8_TY)
-            result = self._mk('Math.Sqrt(%s)' % (
+            result = self._mk('global::System.Math.Sqrt(%s)' % (
                 value.text if value else '?'), _R8_TY, 'float')
             result._no_bind = True
             self.set_reg(dst, result)
@@ -1230,7 +1230,7 @@ class _InsnMixin:
             # Math.Sqrt returns Double; SQRTSS produces a Single. Keep
             # that narrowing explicit so the recovered expression compiles
             # in a float return/assignment on Unity profiles without MathF.
-            text = 'Math.Sqrt(%s)' % (a.text if a else '?')
+            text = 'global::System.Math.Sqrt(%s)' % (a.text if a else '?')
             if mn == Mnemonic.SQRTSS:
                 text = '(float)' + text
             fe = self._mk(text, fty, 'float')

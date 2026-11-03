@@ -1,0 +1,7 @@
+{
+  "kind": "literal-aware brace audit",
+  "tree": "<repo-root>/out/unitask/game_out19",
+  "files": 474,
+  "unbalanced_files": 0,
+  "details": {}
+}

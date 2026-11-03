@@ -163,7 +163,10 @@ class UsingTracker:
     dotted call targets inside bodies. Only namespaces that actually exist
     in the game metadata are emitted, so string literals and member paths
     can't smuggle in fake ones."""
-    _DOTID_RX = re.compile(r'[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+')
+    # Explicit global/extern alias paths are already rooted. Importing their
+    # namespace is unnecessary and can rebind unrelated short names. Do not
+    # restart a match inside that chain; generic argument types still scan.
+    _DOTID_RX = re.compile(r'(?<![\w.:])[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+')
     _STR_RX = re.compile(r'"(?:[^"\\]|\\.)*"')
 
     def __init__(self, il2: 'Il2Cpp' = None):

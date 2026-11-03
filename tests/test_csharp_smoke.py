@@ -10,8 +10,8 @@ from il2cpp import Expr
 
 def test_smoke_lifts_both_scalar_widths():
     f = generated_fragments()
-    assert f["sqrt_float"] == "(float)Math.Sqrt(value)"
-    assert f["sqrt_double"] == "Math.Sqrt(value)"
+    assert f["sqrt_float"] == "(float)global::System.Math.Sqrt(value)"
+    assert f["sqrt_double"] == "global::System.Math.Sqrt(value)"
 
 
 def test_smoke_preserves_allocation_and_sret_identity():
