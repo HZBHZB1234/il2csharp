@@ -72,6 +72,43 @@ path that renames or re-homes a temp must keep the declaration with it. That is
 a lifter-side fix, and it also explains the `(float2)`/struct-bit-pattern
 families: the same type is dropped in three different places.
 
+### Root cause of the undeclared temp: a READ-ONLY stack slot
+
+The raw lifter output for `ProfilerCategory.get_Name` (mi 23293) shows where the
+undeclared name comes from — it is not a minted temp at all, it is a stack slot
+the body **reads but never writes**:
+
+```
+L_181022f6b:
+        ProfilerUnsafeUtility.GetCategoryDescription_Injected(this.m_CategoryId, ...)
+L_181022fa6:
+        s_60 = v6;                       // s_38 is never assigned anywhere
+        if (s_40 == null) goto L_181023045;
+        var t0 = sub_1801c0840(typeof(byte[]), s_38 >> 32);
+        ...
+        Marshal.Copy(t1, t0, 0, s_38 >> 32);
+```
+
+`s_38` is the high half of a 64-bit return the lifter did not model
+(the callee's out/return value), so `slot_var` names it but nothing ever writes
+it — and `_rename_locals` then renders it as `num1`, which no declaration pass
+can rescue, because every declaration path keys off an ASSIGNMENT or a `_bind`
+definition site and this slot has neither.
+
+That is why round 51's house-type declarations failed: they declared the NAME
+but had no type, and the uses (`>> 32`, call arguments) need a real one.
+
+Fix design (decline-by-default, matches the `unknown` treatment):
+
+* in the slot-renaming pass, a slot token with no write in the body is NOT a
+  value — render it as `default` (spelled through the existing unresolved-value
+  path) instead of minting a name;
+* that removes the CS0103 without inventing a type, and it is honest: nothing
+  in the body knows what the slot held.
+
+Not implemented this round (needs a rebuild + the full gate battery + suite);
+the evidence and the design are recorded so it starts from a proven cause.
+
 ## Previous: the body tier measured — 78,104 errors on unitask
 
 ## Previous: the body tier measured — 78,104 errors on unitask, and every model has artifacts (2026-11-03, on `main`)
