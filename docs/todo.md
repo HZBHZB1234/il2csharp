@@ -24,6 +24,38 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### Binding scope: final evidence table, cause still unknown (do not re-open blind)
+
+Every experiment on the emitted trees reports DECLARATION-tier diagnostics and
+almost no BODY-tier ones. Recorded so the next session starts from the table:
+
+| compilation | files | body-level errors reported |
+|---|---|---|
+| 28-file folder (`TMPro/Examples`) | 28 | **0** (29 errors, all CS0246 for the unresolved `using static __SharedBodyStubs`) |
+| same folder + a stub `__SharedBodyStubs` class | 29 | **0** (1 error total) |
+| the probed file under a neutral file name, same content | 28 | **0** — so it is the content/context, not the path |
+| 280-file `Assembly-CSharp` image | 280 | **2 of 27** injected body probes reported |
+| whole survivors tree | 4,413 | all 118 errors look declaration-level |
+| a hand-written standalone probe file, same closure | 1 | CS0029/CS0117 as expected |
+
+Ruled out: the error limit (not reachable at 63), duplicate declarations (none
+for these types), an unresolved `using static` (adding the stub changed
+nothing), the file name (a neutral name behaves identically).
+
+Still standing: with the *emitted* files, Roslyn reports declaration errors and
+does not report body errors — in every shape from one file to the whole tree —
+while a hand-written file with the same compiler and closure reports them fine.
+
+**Consequence for every number this project quotes**: the compile tier measures
+DECLARATIONS. Body-level correctness of the emitted trees is unmeasured, so
+"19 errors (unitask) / 118 (survivors)" must not be read as "the bodies
+compile". Parse (tree-sitter), brace and the source comparison are unaffected
+and remain valid evidence.
+
+Do not spend more rounds on this without a new hypothesis; the next real probe
+would be a Roslyn-level one (compile the same text through `Microsoft.CodeAnalysis`
+directly and inspect the diagnostics list), not another csc invocation.
+
 ### The binding-scope question is OPEN and the probe method is unreliable
 
 Trying to size how many files have their method bodies bound went badly, and
