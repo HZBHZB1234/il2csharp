@@ -26,7 +26,6 @@ No confirmed decompiler defect remains in that tier on either fixture.
 
 ## Previous: fix 202 verified on both fixtures (2026-11-03, on `main`)
 
-## Previous: fix 202 verified on both fixtures (2026-11-03, on `main`)
 
 The switch synthesis landed and was re-measured on both fixtures with full
 rebuilds:
