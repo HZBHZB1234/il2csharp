@@ -569,7 +569,7 @@ def compare(source_idx, tree_idx, min_calls=1):
         if mag:
             worst_delta.append((mag, r['type'], r['method'], r['arity'],
                                 r['src_shape'], r['out_shape']))
-    worst_delta.sort(reverse=True)
+    worst_delta.sort(key=lambda x: x[0], reverse=True)
     return rows, unmatched, samples, {
         'deltas': dict(deltas.most_common(40)),
         'worst': [{'magnitude': m, 'type': t, 'method': n, 'arity': a,

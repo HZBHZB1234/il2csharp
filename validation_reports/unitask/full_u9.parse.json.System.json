@@ -1,0 +1,11 @@
+{
+  "kind": "tree-sitter C# syntax gate",
+  "tree": "E:\\desktop\\work\\LimbusDecompile\\il2csharp\\out\\unitask\\full_u9\\System",
+  "files": 113,
+  "bad_files": 0,
+  "errors": 0,
+  "missing": 0,
+  "recovery_nodes": 0,
+  "details": {},
+  "elapsed_seconds": 0.328
+}
