@@ -24,6 +24,34 @@ Recovering them means teaching `_seq` the *early-return* shape (the source's
 `if (cond) return X;` that the structurer turned into a jump to a trailing
 block), not post-processing text.
 
+### Measurement caveat: some files' METHOD BODIES are not bound (unexplained)
+
+Four experiments, all on `Assembly-CSharp/TMPro/Examples/TMP_UiFrameRateCounter.cs`:
+
+1. the tile contains `int num1;` and `rectTransform1.pivot = num1;` where
+   `rectTransform1 : RectTransform` and the emitted `RectTransform` declares
+   `public Vector2 pivot` — an isolated probe with the same closure is
+   **CS0029** for the same assignment, yet the 280-file image compile and the
+   whole-tree compile report **nothing** for the file;
+2. replacing the file's content with `class {` DOES report 2 errors for it
+   (CS1001/CS1513) — the file is read and the DECLARATION tier is reached;
+3. a byte-verified `int __bad = "x";` inserted INSIDE a method body (single CRLF
+   asserted on disk) still reports nothing;
+4. an injection at namespace level reports CS0116 for the same file.
+
+So: declarations are analysed, method bodies are not. And it is not a property
+of "files with float bit patterns": **8 of the 162** such files do get
+diagnostics in the whole-tree compile.
+
+This is a real caveat for the compile-tier numbers: they may under-report for
+some files, and I have no measurement of how many. Everything else about the
+trees is unaffected (parse, brace, fidelity), but the "19 / 118 errors" figures
+should be read as a lower bound until the binding scope is understood.
+
+Practical way forward if this ever matters: compile a copy with a
+deliberate body-level error in every Nth file and count how many stay silent —
+that sizes the unbound fraction directly.
+
 ### The largest remaining expression family: structs built field-wise from bit patterns
 
 Census of `<temp> = <9-10 digit literal>;` across both trees:
