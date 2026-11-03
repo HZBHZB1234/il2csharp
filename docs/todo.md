@@ -21,6 +21,41 @@ So the earlier "4 errors" was exactly the trap the new `binding_masked` flag
 warns about: the tree actually carries ~118, of which ~75 are model artifacts
 and ~43 are real defects in emitted members.
 
+### Triage of the survivors tree's 27 "real" errors
+
+Of `full_s5`'s 118 binding errors, 75 are model artifacts (CS0234 x61 from the
+fixture's own doubled namespace, CS8701 x14 from the netstandard2.0 closure).
+The remaining 27 split again, and most are *also* artifacts of compiling 75
+assemblies as one:
+
+* **CS0111 x7** — the SAME generated scaffolding emitted in several images
+  (`IsReadOnlyAttribute` in `Unity.Burst.Unsafe`, `ThrowStub` in
+  `System.Xml.Linq`, `_BurstDirectCallInitializer` in `Unity.Burst`,
+  `Unity.2D.IK.Runtime` and `Unity.Collections`). Separate assemblies in the
+  real build; a duplicate definition when merged.
+* **CS0051/CS0052/CS0053 x4** — a `Locale` field/property/parameter less
+  accessible than its member: the type is `internal` in the assembly that owns
+  it, and the accessor lives in another.
+* **CS0535 x6** — interface members with no emitted body, the generic-sharing
+  family already documented for `ArrayBufferWriter<T>.GetSpan` (the member is
+  absent from the game's own metadata).
+* **CS0507 x4, CS0460 x2, CS8345 x1, CS0100 x1, CS0644 x1, CS0115 x1** — mixed
+  modifier/accessibility rows, sized for a later pass.
+
+**CS0117 x16 is a closure artifact, verified**: every site is
+`float.NaN` / `float.PositiveInfinity` / `double.NaN` / `double.PositiveInfinity`
+in a `const` initializer (`Unity.Mathematics.math`, `PhysicsScene`,
+`Rigidbody2D`, `LayoutNode`). Against the fixture's player-build mscorlib those
+members are **not compile-time constants** (a `const` probe fails with CS0117
+while an ordinary expression compiles), so the source's own
+`public const double INFINITY_DBL = double.PositiveInfinity;` cannot compile
+against that profile — the emission is faithful, the profile differs from the
+one the package was written for.
+
+Net: after artifacts, the survivors tree has **no confirmed decompiler defect
+of its own** in the compile tier; the remaining families are generic-sharing
+stubs and modifier rows, both already tracked.
+
 ## Previous: consolidated state of the two fixtures (2026-11-03, on `main`)
 
 
