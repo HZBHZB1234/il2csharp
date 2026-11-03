@@ -1,0 +1,224 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source slice; not promoted; goal not achieved",
+  "baseline": "game_out28",
+  "candidate": "game_out29",
+  "source_parent": "9095211c6d4285e8a118d088e14c80ed43af6f11",
+  "proof_scope": [
+    "Consumer-only recovery of an exact pointer-wide reference element MOV from a nonbyref SZARRAY-typed object SSA token. Producer kinds, array allocation identity and legacy arr fallbacks remain unchanged.",
+    "Require a true 8-byte MOV memory operand into an 8-byte register, 64-bit base/index registers, scale 8, header displacement exactly 0x20 and no segment prefix. A typed nonunknown integer index is mandatory.",
+    "Only string, CLASS, object or array reference element types are supported. Byref, unknown, scalar/struct/generic elements, partial/SIMD/address reads, wrong stride/header and non-SSA base spellings decline.",
+    "This is a local x64 layout/read recovery, not a general lifetime/array provenance proof or an exception/bounds/game-equivalence proof."
+  ],
+  "validation": {
+    "new_portable_cases": 82,
+    "new_game_cases": 1,
+    "portable": {
+      "passed": 2413,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1073.6720000000205,
+      "frozen_source_verified": true,
+      "passed": 2483,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 592.719000000041,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "9095211c6d4285e8a118d088e14c80ed43af6f11",
+      "exit_code": 1,
+      "seconds": 111.35900000005495,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5515,
+          "after": 5514,
+          "added": 0,
+          "removed": 1,
+          "added_codes": {},
+          "removed_codes": {
+            "CS1503": 1
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3797,
+          "after": 3792,
+          "added": 1,
+          "removed": 6,
+          "added_codes": {
+            "CS0165": 1
+          },
+          "removed_codes": {
+            "CS0246": 1,
+            "CS0149": 1,
+            "CS0103": 2,
+            "CS1503": 1,
+            "CS0165": 1
+          }
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "original_win64_synthetic_execution": [
+    {
+      "checked": "true",
+      "exit_code": 0,
+      "result": "checks=131190, recovered_mismatches=0, byte_read_mismatches=119160"
+    },
+    {
+      "checked": "false",
+      "exit_code": 0,
+      "result": "checks=131190, recovered_mismatches=0, byte_read_mismatches=119160"
+    }
+  ],
+  "diagnostic_alpha_rename_recompile": {
+    "method": "TypeRegistry.RegisterType",
+    "local_identifier_only_rename": "obj17 -> obj20",
+    "replacements": 6,
+    "other_source_bytes_unchanged": true,
+    "real_refs_original_assembly_name": true,
+    "self_reference": false,
+    "stubs": false,
+    "body_sentinel_observed": true,
+    "baseline_diagnostics": 3797,
+    "candidate_diagnostics": 3792,
+    "alpha_recompile_diagnostics": 3792,
+    "raw_added": 1,
+    "raw_removed": 6,
+    "added_after_only_this_proven_rename": 0,
+    "removed_after_only_this_proven_rename": 5,
+    "meaning": "The sole raw added CS0165 is the existing unassigned local after a reviewed alpha rename, not a newly introduced diagnostic. No global identifier normalization is used."
+  },
+  "rejected_alternative": {
+    "broad_producer_kind_reclassification": false,
+    "reason": "Reclassifying SZARRAY call results as arr enters a legacy fallback that also folds 1-byte/4-byte partial reference-slot reads. The strict new consumer does not widen that path."
+  },
+  "limitations": [
+    "No complete game-native semantic-equivalence or speedup claim.",
+    "Complete selected compilations still contain thousands of errors.",
+    "UniTask.Linq still misses its body sentinel and remains syntax-gated.",
+    "Three known baseline failures remain; no golden re-pin or output promotion."
+  ]
+}

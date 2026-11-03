@@ -1539,6 +1539,36 @@ class _InsnMixin:
             itxt = '(%s + %d)' % (itxt, k // S)
         return Expr('%s[%s]' % (head, itxt), self._elem_type(ty), self._ty_kind(self._elem_type(ty)))
 
+    def _typed_phi_reference_array_load(self, ins, be, ie, size):
+        """An array-typed SSA object can still prove one exact reference load.
+
+        Resolved call results currently use obj even for SZARRAY returns;
+        that kind survives a phi. Do not broaden the legacy arr path: its
+        partial-width fallback is not an exact native element proof. Only a
+        pointer-wide MOV at the vector header with pointer-sized reference
+        elements, a typed integer index and an internal SSA token folds here.
+        No array identity, producer kind or general raw slice is inferred.
+        """
+        if (be.kind != 'obj' or be._unk or not _BARE_TOKEN_RX.fullmatch(be.text or '')
+                or not isinstance(be.ty, tuple) or len(be.ty) != 2
+                or self.il._type_enum(be.ty) != 0x1d or be.ty[1] & (1 << 29)
+                or ie is None or ie._unk or ie.kind not in ('int', '?')
+                or not isinstance(ie.ty, tuple) or len(ie.ty) != 2
+                or self.il._type_enum(ie.ty) not in (0x08, 0x09, 0x0a, 0x0b, 0x18, 0x19)
+                or ie.ty[1] & (1 << 29) or size != 8
+                or ins.mnemonic != Mnemonic.MOV or ins.op0_kind != OpKind.REGISTER
+                or ins.op1_kind != OpKind.MEMORY or _reg_size(ins.op0_register) != 8
+                or MemorySizeExt.size(ins.memory_size) != 8
+                or _reg_size(ins.memory_base) != 8 or _reg_size(ins.memory_index) != 8
+                or ins.segment_prefix != IReg.NONE
+                or ins.memory_index_scale != 8 or sdisp(ins.memory_displacement) != 0x20):
+            return None
+        ety = self._elem_type(be.ty)
+        if (not isinstance(ety, tuple) or len(ety) != 2 or ety[1] & (1 << 29)
+                or self.il._type_enum(ety) not in (0x0e, 0x12, 0x1c, 0x1d, 0x14)):
+            return None
+        return Expr('%s[%s]' % (be.text, ie.text), ety, self._ty_kind(ety))
+
     def _arr_elem_expr(self, be, ie, scale, disp, size) -> Optional[Expr]:
         """[arr + i*S + D] as an element access. Multidim indexing multiplies
         the row stride into the index first, so D-0x20 lands on an element
@@ -1859,6 +1889,9 @@ class _InsnMixin:
                 # pointer-first: value-identical at scale 1 and the
                 # only compilable order (ptr*int does not exist).
                 be, ie = ie, be
+            fe = self._typed_phi_reference_array_load(ins, be, ie, size)
+            if fe is not None:
+                return fe
             if be.kind == 'arr':
                 be0, d0 = self._arr_unbias(be, disp)
                 fe = self._arr_elem_expr(be0, ie, scale or 1, d0, size)
