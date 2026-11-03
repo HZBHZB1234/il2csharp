@@ -1,4 +1,37 @@
-## Current work: body tier on BOTH fixtures, per image (2026-11-03, on `main`)
+## Current work: 87% of the unitask body tier was ACCESSIBILITY — the real number is 9,619 (2026-11-03, on `main`)
+
+`--publicize` exists as a compile-gate mode (every member public, fields lose
+`readonly`); rebuilding unitask with it and re-running the per-image body tier
+collapses the number:
+
+| tree | body-tier errors | declaration left |
+|---|---|---|
+| `full_u10` (normal) | 78,104 | 324 |
+| `pub_u1` (`--publicize`) | **9,619** | 248 |
+
+The whole difference is one image: **`Unity.TextMeshPro` 68,111 -> 17**. Its
+flood was accessibility — our emitted TMP members are `private`/`protected`
+where the source was internal, and C# cascades thousands of name-resolution
+errors out of the inaccessible ones. With that gone, the ranking is:
+CoreModule 3,662, Assembly-CSharp 2,378, AndroidJNIModule 651,
+PropertiesModule 551, PhysicsModule 336, UniTask.TextMeshPro 267,
+TextRenderingModule 255, and **UniTask itself 8** (all CS8701).
+
+Publicized top codes: CS0030 1,839, CS0103 1,378, CS1061 1,364, CS0122 711,
+CS1503 686, CS0029 683, CS0019 576, CS0266 574, CS0208 316, CS1620 279.
+
+Two lessons, both worth keeping:
+
+1. the per-image body tier must be measured on a **publicized** tree — otherwise
+   it measures our member-visibility spelling, not lifting;
+2. the read-only-slot/undeclared-temp family (rounds 50-53) is 1,378 CS0103
+   after this correction, not 36,942 — still the biggest name family, but a
+   fifth of what the non-publicized count suggested.
+
+A survivors publicize build (`pub_s1`, 5 workers) was started at the end of the
+round so the same measurement exists for the larger fixture.
+
+## Previous: body tier on BOTH fixtures, per image (2026-11-03, on `main`)
 
 Both fixtures now have a per-image body-tier measurement
 (`tools/body_tier_per_image.py`: each image compiled against the original

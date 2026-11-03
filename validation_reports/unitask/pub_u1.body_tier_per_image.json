@@ -1,0 +1,536 @@
+{
+ "fixture": "unitask",
+ "label": "pub_u1",
+ "per_image": {
+  "Assembly-CSharp": {
+   "errors": 2378,
+   "declaration": 41,
+   "codes": {
+    "CS0030": 515,
+    "CS0103": 460,
+    "CS1061": 196,
+    "CS0019": 175,
+    "CS0029": 155,
+    "CS0208": 144,
+    "CS1503": 136,
+    "CS0122": 118
+   },
+   "files": 15
+  },
+  "TempAsm": {
+   "errors": 6,
+   "declaration": 0,
+   "codes": {
+    "CS0208": 2,
+    "CS0103": 2,
+    "CS0266": 2
+   },
+   "files": 4
+  },
+  "UniTask": {
+   "errors": 8,
+   "declaration": 0,
+   "codes": {
+    "CS8701": 8
+   },
+   "files": 301
+  },
+  "UniTask.Addressables": {
+   "errors": 5,
+   "declaration": 0,
+   "codes": {
+    "CS0208": 3,
+    "CS0103": 2
+   },
+   "files": 2
+  },
+  "UniTask.DOTween": {
+   "errors": 5,
+   "declaration": 0,
+   "codes": {
+    "CS0208": 3,
+    "CS0103": 2
+   },
+   "files": 2
+  },
+  "UniTask.Linq": {
+   "errors": 9,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 7,
+    "CS8702": 2
+   },
+   "files": 142
+  },
+  "UniTask.TextMeshPro": {
+   "errors": 267,
+   "declaration": 13,
+   "codes": {
+    "CS1061": 60,
+    "CS0103": 59,
+    "CS0030": 52,
+    "CS0165": 17,
+    "CS1503": 15,
+    "CS0122": 15,
+    "CS0246": 13,
+    "CS0019": 11
+   },
+   "files": 4
+  },
+  "Unity.TextMeshPro": {
+   "errors": 17,
+   "declaration": 0,
+   "codes": {
+    "CS0507": 16,
+    "CS0051": 1
+   },
+   "files": 92
+  },
+  "UnityEngine.AIModule": {
+   "errors": 3,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 2,
+    "CS0030": 1
+   },
+   "files": 1
+  },
+  "UnityEngine.AndroidJNIModule": {
+   "errors": 651,
+   "declaration": 0,
+   "codes": {
+    "CS0030": 161,
+    "CS1503": 140,
+    "CS1061": 94,
+    "CS0103": 58,
+    "CS0266": 54,
+    "CS0019": 52,
+    "CS0029": 18,
+    "CS0208": 13
+   },
+   "files": 15
+  },
+  "UnityEngine.AnimationModule": {
+   "errors": 129,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 60,
+    "CS0103": 27,
+    "CS1061": 20,
+    "CS0029": 9,
+    "CS0571": 6,
+    "CS0208": 3,
+    "CS1620": 2,
+    "CS1729": 1
+   },
+   "files": 29
+  },
+  "UnityEngine.AssetBundleModule": {
+   "errors": 1,
+   "declaration": 0,
+   "codes": {
+    "CS1729": 1
+   },
+   "files": 5
+  },
+  "UnityEngine.AudioModule": {
+   "errors": 41,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 16,
+    "CS1061": 14,
+    "CS0030": 7,
+    "CS0029": 2,
+    "CS0571": 2
+   },
+   "files": 8
+  },
+  "UnityEngine.CoreModule": {
+   "errors": 3662,
+   "declaration": 47,
+   "codes": {
+    "CS0030": 763,
+    "CS1061": 616,
+    "CS0103": 364,
+    "CS0122": 317,
+    "CS0266": 299,
+    "CS0019": 256,
+    "CS0029": 233,
+    "CS1503": 224
+   },
+   "files": 442
+  },
+  "UnityEngine.DirectorModule": {
+   "errors": 9,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 6,
+    "CS0030": 3
+   },
+   "files": 1
+  },
+  "UnityEngine.GridModule": {
+   "errors": 0,
+   "declaration": 0,
+   "codes": {},
+   "files": 1
+  },
+  "UnityEngine.IMGUIModule": {
+   "errors": 5,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 5
+   },
+   "files": 33
+  },
+  "UnityEngine.ImageConversionModule": {
+   "errors": 0,
+   "declaration": 0,
+   "codes": {},
+   "files": 1
+  },
+  "UnityEngine.InputLegacyModule": {
+   "errors": 134,
+   "declaration": 0,
+   "codes": {
+    "CS0103": 34,
+    "CS0030": 27,
+    "CS0029": 18,
+    "CS0266": 14,
+    "CS1620": 10,
+    "CS0122": 10,
+    "CS1061": 8,
+    "CS0117": 4
+   },
+   "files": 12
+  },
+  "UnityEngine.InputModule": {
+   "errors": 11,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 6,
+    "CS0030": 5
+   },
+   "files": 4
+  },
+  "UnityEngine.ParticleSystemModule": {
+   "errors": 12,
+   "declaration": 0,
+   "codes": {
+    "CS0030": 5,
+    "CS1620": 4,
+    "CS0029": 3
+   },
+   "files": 5
+  },
+  "UnityEngine.Physics2DModule": {
+   "errors": 120,
+   "declaration": 0,
+   "codes": {
+    "CS0266": 30,
+    "CS0122": 15,
+    "CS0208": 15,
+    "CS1620": 13,
+    "CS0103": 12,
+    "CS0029": 11,
+    "CS1503": 7,
+    "CS7036": 5
+   },
+   "files": 10
+  },
+  "UnityEngine.PhysicsModule": {
+   "errors": 336,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 77,
+    "CS0103": 77,
+    "CS0029": 66,
+    "CS0030": 43,
+    "CS1620": 20,
+    "CS1503": 19,
+    "CS1061": 9,
+    "CS0019": 8
+   },
+   "files": 20
+  },
+  "UnityEngine.PropertiesModule": {
+   "errors": 551,
+   "declaration": 139,
+   "codes": {
+    "CS0246": 139,
+    "CS1503": 97,
+    "CS0029": 82,
+    "CS1061": 67,
+    "CS0030": 49,
+    "CS0103": 22,
+    "CS0571": 20,
+    "CS0266": 15
+   },
+   "files": 53
+  },
+  "UnityEngine.SharedInternalsModule": {
+   "errors": 2,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 2
+   },
+   "files": 30
+  },
+  "UnityEngine.SpriteShapeModule": {
+   "errors": 0,
+   "declaration": 0,
+   "codes": {},
+   "files": 1
+  },
+  "UnityEngine.SubsystemsModule": {
+   "errors": 58,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 41,
+    "CS0030": 7,
+    "CS0019": 4,
+    "CS0208": 3,
+    "CS1503": 2,
+    "CS0029": 1
+   },
+   "files": 14
+  },
+  "UnityEngine.TerrainModule": {
+   "errors": 107,
+   "declaration": 0,
+   "codes": {
+    "CS0103": 51,
+    "CS1061": 17,
+    "CS1503": 9,
+    "CS0571": 8,
+    "CS0030": 6,
+    "CS0029": 6,
+    "CS0208": 5,
+    "CS0019": 3
+   },
+   "files": 8
+  },
+  "UnityEngine.TextCoreFontEngineModule": {
+   "errors": 189,
+   "declaration": 1,
+   "codes": {
+    "CS1061": 48,
+    "CS0030": 40,
+    "CS0029": 23,
+    "CS0266": 21,
+    "CS0103": 19,
+    "CS0208": 18,
+    "CS1620": 7,
+    "CS0019": 6
+   },
+   "files": 24
+  },
+  "UnityEngine.TextCoreTextEngineModule": {
+   "errors": 15,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 15
+   },
+   "files": 61
+  },
+  "UnityEngine.TextRenderingModule": {
+   "errors": 255,
+   "declaration": 1,
+   "codes": {
+    "CS0103": 84,
+    "CS1061": 63,
+    "CS0030": 45,
+    "CS0029": 18,
+    "CS0208": 17,
+    "CS0266": 13,
+    "CS0019": 7,
+    "CS0165": 2
+   },
+   "files": 12
+  },
+  "UnityEngine.TilemapModule": {
+   "errors": 154,
+   "declaration": 1,
+   "codes": {
+    "CS0103": 33,
+    "CS0266": 27,
+    "CS0030": 20,
+    "CS0019": 12,
+    "CS0029": 12,
+    "CS1503": 12,
+    "CS0122": 10,
+    "CS0208": 6
+   },
+   "files": 12
+  },
+  "UnityEngine.UI": {
+   "errors": 5,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 5
+   },
+   "files": 117
+  },
+  "UnityEngine.UIElementsModule": {
+   "errors": 33,
+   "declaration": 0,
+   "codes": {
+    "CS0122": 24,
+    "CS8701": 9
+   },
+   "files": 692
+  },
+  "UnityEngine.UIModule": {
+   "errors": 104,
+   "declaration": 5,
+   "codes": {
+    "CS1061": 27,
+    "CS1620": 12,
+    "CS0266": 10,
+    "CS0103": 10,
+    "CS0019": 10,
+    "CS0030": 8,
+    "CS0029": 6,
+    "CS0117": 5
+   },
+   "files": 8
+  },
+  "UnityEngine.UnityAnalyticsModule": {
+   "errors": 16,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 10,
+    "CS0030": 6
+   },
+   "files": 6
+  },
+  "UnityEngine.UnityWebRequestModule": {
+   "errors": 116,
+   "declaration": 0,
+   "codes": {
+    "CS0266": 24,
+    "CS0103": 23,
+    "CS0030": 23,
+    "CS1503": 13,
+    "CS0019": 11,
+    "CS0029": 5,
+    "CS0571": 3,
+    "CS0208": 3
+   },
+   "files": 10
+  },
+  "UnityEngine.VFXModule": {
+   "errors": 32,
+   "declaration": 0,
+   "codes": {
+    "CS0266": 10,
+    "CS7036": 7,
+    "CS1061": 4,
+    "CS0029": 3,
+    "CS0103": 3,
+    "CS0019": 2,
+    "CS0188": 1,
+    "CS0030": 1
+   },
+   "files": 14
+  },
+  "UnityEngine.VRModule": {
+   "errors": 3,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 2,
+    "CS0030": 1
+   },
+   "files": 1
+  },
+  "UnityEngine.VideoModule": {
+   "errors": 35,
+   "declaration": 0,
+   "codes": {
+    "CS1061": 16,
+    "CS0030": 8,
+    "CS0122": 8,
+    "CS0029": 1,
+    "CS0571": 1,
+    "CS0103": 1
+   },
+   "files": 11
+  },
+  "UnityEngine.XRModule": {
+   "errors": 133,
+   "declaration": 0,
+   "codes": {
+    "CS0030": 38,
+    "CS0103": 35,
+    "CS1061": 26,
+    "CS0208": 8,
+    "CS1503": 7,
+    "CS0029": 6,
+    "CS0149": 4,
+    "CS0031": 2
+   },
+   "files": 24
+  },
+  "__Generated": {
+   "errors": 2,
+   "declaration": 0,
+   "codes": {
+    "CS8701": 1,
+    "CS0644": 1
+   },
+   "files": 6
+  }
+ },
+ "errors_total": 9619,
+ "declaration_total": 248,
+ "totals": {
+  "CS0030": 1839,
+  "CS0103": 1378,
+  "CS1061": 1364,
+  "CS0122": 711,
+  "CS1503": 686,
+  "CS0029": 683,
+  "CS0019": 576,
+  "CS0266": 574,
+  "CS0208": 316,
+  "CS1620": 279,
+  "CS0246": 248,
+  "CS0165": 132,
+  "CS0571": 101,
+  "CS0119": 96,
+  "CS0159": 90,
+  "CS7036": 88,
+  "CS8917": 87,
+  "CS0117": 75,
+  "CS1501": 74,
+  "CS0212": 32,
+  "CS1729": 26,
+  "CS0149": 21,
+  "CS8701": 18,
+  "CS0507": 16,
+  "CS0023": 16,
+  "CS0200": 13,
+  "CS0214": 12,
+  "CS0021": 11,
+  "CS0188": 8,
+  "CS0171": 7,
+  "CS0161": 6,
+  "CS0079": 6,
+  "CS0221": 5,
+  "CS0176": 4,
+  "CS0308": 3,
+  "CS0411": 3,
+  "CS0305": 2,
+  "CS8702": 2,
+  "CS0031": 2,
+  "CS0428": 1,
+  "CS0156": 1,
+  "CS0051": 1,
+  "CS0157": 1,
+  "CS0163": 1,
+  "CS8070": 1,
+  "CS0136": 1,
+  "CS0173": 1,
+  "CS0644": 1
+ }
+}
