@@ -24,6 +24,36 @@ CS0051/52/53 cross-assembly internals, CS8701 profile x14, CS0117 x16) or a
 generic-sharing body that is absent from the game's own metadata (CS0535 x6).
 No confirmed decompiler defect remains in that tier on either fixture.
 
+### The goto residue is guard jumps to a SHARED COMPLEX block, not to a return
+
+`_tidy_gotos` already collapses four goto shapes; the remaining ones in the
+engine images are `if (cond) { goto L_xxx; }` where `L_xxx` is a shared block
+with real work, e.g. in `BackgroundPropertyHelper`:
+
+```csharp
+if (!((bool)sub_181f4c290(...)))
+{
+    L_181eb8ef5:
+    backgroundPositionKeyword1 = 0;
+    backgroundPositionKeyword1.ctor(0f);
+    ...
+}
+```
+
+I added a branch that duplicates a label's body at the jump site when the body
+is a single PURE `return ...;` (no call, no `new`, no `++`, no comma, no
+conditional, no assignment), which is sound because a `goto` jumps straight
+there. **Measured on UIElements: gotos 562 -> 562, labels 457 -> 457 — no
+effect**, because these labels are not returns; they are shared continuations
+with side effects, and duplicating those would change the call count. The
+branch was reverted.
+
+So the residue needs either (a) an *early-return shape* recovered in `_seq`
+(the source's `if (cond) return X;` that the structurer turned into a jump to a
+trailing block), or (b) nothing — the honest `goto` stays. This is the one
+structural slice that a text pass cannot take; it belongs to the CFG
+structurer.
+
 ## Previous: fix 202 verified on both fixtures (2026-11-03, on `main`)
 
 
