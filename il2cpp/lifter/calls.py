@@ -1874,6 +1874,111 @@ class _CallsMixin:
                 return False
         return True
 
+    def _interface_delegate_constructor(self, cands, args):
+        """Prove one fresh delegate ctor from an exact interface MethodInfo.
+
+        This is not a shared-owner heuristic. Both receiver identity and the
+        fully closed Invoke/target signatures must agree. No variance, generic
+        method inference, ABI guesses or text-based receiver identity.
+        """
+        try:
+            if len(args) < 3 or any(e is not None and not e._unk
+                    and e.text != '0' for e in args[3:]):
+                return None
+            recv, target, ptr = args[:3]
+            if recv is None or recv._unk or recv.kind != 'obj' \
+                    or recv.ty is None or (recv.ty[1] >> 29) & 1 \
+                    or not getattr(recv, '_alloc', None) \
+                    or not re.fullmatch(r'new .+\(\)', recv._alloc):
+                return None
+            if target is None or target._unk or target.kind != 'obj' \
+                    or not re.fullmatch(r'@?[A-Za-z_]\w*', target.text or '') \
+                    or target.ty is None or (target.ty[1] >> 29) & 1 \
+                    or ptr is None or ptr._unk or ptr.kind != 'ptr' \
+                    or getattr(ptr, '_ifrecv', None) is not target:
+                return None
+            proof = getattr(ptr, '_ifm', None)
+            if proof is None or len(proof) != 5 or proof[4] != 'method':
+                return None
+            mi, class_args, _, _, _ = proof
+            if not isinstance(mi, int) or not 0 <= mi < len(self.meta.methods):
+                return None
+            method = self.meta.methods[mi]
+            owner = self.meta.typedefs[method.declaring]
+            if self._td_of(target.ty) != method.declaring:
+                return None
+            if not owner.flags & 0x20 or method.is_static \
+                    or method.generic_container != -1 \
+                    or not re.fullmatch(r'[A-Za-z_]\w*', method.name):
+                return None
+            delegate_td = self._td_of(recv.ty)
+            if delegate_td is None or not any(
+                    (self.meta.typedefs[i].namespace,
+                     self.meta.typedefs[i].name) == ('System', 'MulticastDelegate')
+                    for i in self.il.base_chain_tds(delegate_td)[1:]):
+                return None
+            invoke_mi = self._delegate_invoke_method(recv.ty)
+            if invoke_mi is None:
+                return None
+            invoke = self.meta.methods[invoke_mi]
+            if invoke.declaring != delegate_td or invoke.is_static \
+                    or invoke.generic_container != -1 \
+                    or invoke.param_count != method.param_count:
+                return None
+            delegate_args = self._generic_class_args(recv.ty)
+            target_args = self._generic_class_args(target.ty)
+            target_keys = tuple(self.il._closed_type_key(t) for t in (target_args or ()))
+            proof_keys = tuple(self.il._closed_type_key(t) for t in (class_args or ()))
+            if any(k is None for k in target_keys + proof_keys) or target_keys != proof_keys:
+                return None
+
+            def signature(m, ca):
+                params = self.meta.method_params(m)
+                if len(params) != m.param_count:
+                    return None
+                tys = [self.il.types[m.return_type]] + [
+                    self.il.types[p.type] for p in params]
+                closed = [self.il._subst_closed(ty, ca, None) for ty in tys]
+                keys = [self.il._closed_type_key(ty) for ty in closed]
+                if any(k is None for k in keys):
+                    return None
+                return tuple((key, param_modifier(ty))
+                             for key, ty in zip(keys, closed))
+
+            key = signature(invoke, delegate_args)
+            if key is None or signature(method, class_args) != key:
+                return None
+            matches = set()
+            for candidate in cands or ():
+                kind, index = candidate
+                if kind == 'method':
+                    ci, ca = index, None
+                    if delegate_args:
+                        continue
+                elif kind == 'generic':
+                    ci, inst, minst = self.il.method_specs[index]
+                    if minst != -1:
+                        continue
+                    ca = self.il._method_spec_type_args(inst)
+                    if ca is None or delegate_args is None:
+                        continue
+                    ca_keys = tuple(self.il._closed_type_key(t) for t in ca)
+                    da_keys = tuple(self.il._closed_type_key(t) for t in delegate_args)
+                    if any(k is None for k in ca_keys + da_keys) or ca_keys != da_keys:
+                        continue
+                else:
+                    return None
+                ctor = self.meta.methods[ci]
+                if ctor.declaring == delegate_td and ctor.name == '.ctor' \
+                        and not ctor.is_static and ctor.param_count == 2 \
+                        and ctor.generic_container == -1:
+                    matches.add(candidate)
+            if len(matches) != 1:
+                return None
+            return next(iter(matches)), target.text + '.' + method.name
+        except (AttributeError, IndexError, TypeError, ValueError):
+            return None
+
     def _iface_resolve_target(self, arg_exprs):
         """fix 139: (mi, class_args, name, rty) for a resolved interface slot.
 
@@ -3208,7 +3313,11 @@ class _CallsMixin:
         # A fresh delegate plus its metadata method pointer proves the ctor,
         # even when the native body is shared with Invoke specializations.
         delegate_target = None
-        if recv is not None and len(arg_exprs) > 1:
+        iface_delegate = self._interface_delegate_constructor(cands, arg_exprs)
+        if iface_delegate is not None:
+            info, delegate_target = iface_delegate
+            name = self._info_name(info)
+        if delegate_target is None and recv is not None and len(arg_exprs) > 1:
             ptr_index = next((i for i, value in enumerate(arg_exprs[1:], 1)
                               if value is not None and value.kind == 'methodinfo'), None)
             ptr = arg_exprs[ptr_index] if ptr_index is not None else None
@@ -3464,6 +3573,7 @@ class _CallsMixin:
             if _ifm is not None:
                 _res = Expr('%s(%s)' % (name, ', '.join(args[:3])), None, 'ptr')
                 _res._ifm = _ifm
+                _res._ifrecv = arg_exprs[0]
                 _res._no_bind = True
                 self.regs['RAX'] = _res
                 if self.asm_comments and asm:

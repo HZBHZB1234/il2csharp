@@ -47,6 +47,9 @@ class Expr:
                   # `il2cpp_interface_get_method` result resolves; `_call`
                   # renders `call [rax]` through it as a managed call
                   '_ifm',
+                  # Exact receiver Expr used to resolve the interface slot.
+                  # Separate from recv: provenance must not change binding.
+                  '_ifrecv',
                  # fix 140: the object a `K.typeHierarchy` read came from
                  # (record-only: `recv` would change binding behaviour)
                  '_hobj',

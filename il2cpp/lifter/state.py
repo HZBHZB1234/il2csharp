@@ -2630,7 +2630,7 @@ class _StateMixin:
         c = Expr(e.text, e.ty, e.kind, e.recv)
         for name in ('_prec', '_unk', '_usg_idx', '_mi', '_td',
                      '_no_bind', '_alloc', '_slice', '_stack_offset', '_bytes', '_parts',
-                     '_newarr', '_arr_klass', '_dry_proof', '_ifm'):
+                     '_newarr', '_arr_klass', '_dry_proof', '_ifm', '_ifrecv'):
             val = getattr(e, name, None)
             if val is not None and not (name == '_unk' and not val):
                 setattr(c, name, val)

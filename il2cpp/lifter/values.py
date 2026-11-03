@@ -643,6 +643,7 @@ class _ValuesMixin:
             # Neither may bind a temp when it rides an argument register.
             pe = Expr('*(%s %s)' % (base.text, disp_add(disp)), None, 'ptr')
             pe._ifm = _ifm + ('methodPtr' if disp == 0 else 'method',)
+            pe._ifrecv = getattr(base, '_ifrecv', None)
             pe._no_bind = True
             return pe
         if size == 8 and getattr(self, '_xor_twin_loads', None) \
