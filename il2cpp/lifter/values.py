@@ -54,6 +54,24 @@ class _ValuesMixin:
                     else _base + ' { ' + _items + ' }')
             expr = Expr(_txt, expr.ty, expr.kind)
         if len(expr.text) > limit:
+            # A pending call is one native execution, not a reusable RHS.
+            # A snapshot temp here used to leave the original Expr live in
+            # predecessor end_state; a later phi use then bound it again,
+            # executing the call twice. Reuse the existing per-object binder
+            # before emitting a snapshot. Equal text from another call is
+            # deliberately not evidence of identity. Untracked, aggregate,
+            # dry and no-bind values keep the legacy snapshot path.
+            if not getattr(self, 'dry', False) and not expr._no_bind \
+                    and not expr._unk and expr._defpos is not None \
+                    and expr.kind in ('int', 'float', 'obj', 'call') \
+                    and all(getattr(expr, attr, None) is None for attr in
+                            ('_slice', '_parts', '_bytes', '_stack_offset')) \
+                    and any(e is expr for e, _, _ in
+                            getattr(self, '_pending_calls', ())):
+                self._bind(expr)
+                self._last_tmp = expr.text
+                self._tmp_expr = expr
+                return expr.text
             v = self.new_var()
             if expr.ty is not None and expr.kind != 'ptr' and not expr.text.startswith('&'):
                 if _is_unresolved_gp(expr.ty):

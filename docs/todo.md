@@ -4,6 +4,74 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Preserve one execution per materialized native call (2026-11-04)
+
+Accepted `game_out52` (not promoted), versus out48. A long call argument was
+previously copied into an offline snapshot while the original pending-call
+`Expr` remained in predecessor end-state. A later phi use could bind that
+original again, executing the same native call twice. The length limiter now
+uses the existing definition-site binder for the **exact pending object** and
+updates its live references. Equal text from distinct native calls is never
+identity evidence. Only non-dry, bindable, known int/float/obj/call values with
+a recorded definition position qualify; stack/byte/slice/aggregate provenance
+and all unproved shapes retain the old snapshot path. No scalar-home,
+RBP-copy, interface-sret or aggregate/address/overlap guard is relaxed.
+
+Production sweeps cover **2,242 / 1,936 native methods**, zero crashes, with
+**13 / 77 unique materialized native-call sites** independently checked for
+exact pending identity, owning definition block and native CALL instruction.
+Final output changes **three / 11 methods**. Changed re-lifts are identical.
+The changes remove duplicate Concat, async-pipeline and tween creation calls;
+one OnStart result moves back to its definition before the next real call.
+A separate **923-method Limbus selection** changes **seven methods / ten
+unique materialized calls**, removing **seven extra damage calls and four
+extra FormatHelper renderings**, without added call-name multiset entries or
+new cap-zero sites. This is not a full Limbus rebuild or whole-method proof.
+
+Strict sample builds retain **2,227 / 1,857 bodies**, zero failed/fallback/
+type-emit failures, clean brace/parse gates and verified source fingerprints.
+**Seven of 767 C# files** change. Nine real-reference assembly gates report
+**five fewer errors**, no message-aware added diagnostics: UniTask -2,
+survivors Assembly-CSharp -1 and Assembly-CSharp-firstpass -2. Deleting
+statements shifts later diagnostic locations; do not claim all location-aware
+multisets match. Unchanged-file location-aware multisets are identical.
+References are real Editor/BCL/netstandard2.1 and original player packages,
+with original assembly names, no self-reference or synthetic stubs.
+UniTask.Linq retains 13 declaration errors and no observed body sentinel;
+its body compilation remains unproved.
+
+**19 new portable + nine new game cases**; focused **97 passed**, portable
+**4,586 passed**. Frozen full excluding parallel: **4,689 passed / 259 skipped /
+one non-strict xpassed / the same three existing failures**; parallel
+**two passed**. Scoped clean-parent proof on `7242eb7` reproduces **eight
+failing / 11 passing portable cases**, **nine failing game cases**, the
+923 parent bodies byte-identically and exactly the existing failure set;
+all three candidate files restore byte-exact. Goldens/pins unchanged.
+
+Production-generated materialization and phi statements compile and execute
+under `/checked+ /optimize+` in **three authored effect models / 12,306
+scenarios / 24,612 effectful calls**, zero mismatches in call multiplicity,
+order, equal-text distinct identities, argument lifetime and late-phi value.
+No game-native execution, whole-game equivalence or measured runtime speed
+improvement is claimed. Aggregate-only evidence:
+`validation_reports/quality_materialized_call_identity_2026-11-04.json`.
+
+Next: address `_mk`'s existing expression-length cap, which silently emits a
+zero instead of the computation. Signed logical SHR prototypes 49/50/51
+remain **rejected**: locally correct formulas expand expressions and create
+new downstream cap-zero sites; eager SHR binding alone still leaves two new
+regressions. Do not raise the cap or accept a compiler-only improvement.
+Process-local budget54 research restores those two computations at bounded,
+closed-Int32 CMOV evaluation points, but its type, width and lifetime proof
+is incomplete; no such source change is accepted. Its 923-method combined
+trial has no new cap-zero sites but seven call-name multiset changes, including
+restored Round calls behind an existing unknown condition; those need separate
+native execution-count review. Zero cap regressions alone is not acceptance.
+Preserve native evaluation order and all aggregate/address guards before revisiting SHR. Naive early
+field-to-property renaming and byte casts of native wide stores also remain
+rejected. No promotion; the overall goal is **not achieved**.
+
+
 ### Preserve unsigned SETcc/CMOVcc conditions (2026-11-04)
 
 Accepted `game_out48` (not promoted), versus out47. The existing same-block
