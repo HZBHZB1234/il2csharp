@@ -1,0 +1,737 @@
+{
+  "date": "2026-11-05",
+  "status": "isolated_entry_int32_origin_not_enabled",
+  "source_parent_commit": "ad17dda30c085f180484d0f4db4301aaa2a02575",
+  "accepted_production_source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "accepted_candidate_label": "game_out56",
+  "output_promoted": false,
+  "production_rendering_or_recovery_rules_changed": false,
+  "new_component": {
+    "path": "il2cpp/lifter/entryorigin.py",
+    "default_production_import_sites": [],
+    "public_export": false,
+    "contract": [
+      "Bounded 513-item ingestion, at most 512 copied native instructions, exact binary/sections/current MethodDef/metadata identity, unique exact method candidate; shared/generic/constructor contexts decline.",
+      "Only exact immutable bytes backing is accepted; bytearray, memoryview and other custom backing decline before indexing, avoiding stale unwind snapshots after same-object writes.",
+      "NativeUnwindBoundary verifies a common handler-free PE AMD64 unwind root and fresh native bytes. Every supported normal CFG successor must exist; registered interiors, indirect/external flow, missing fallthrough and entry backedges decline.",
+      "Closed parameter and known return ABI checks account for receiver/sret and Win64 positional slots. Only non-byref Int32 entry GPRs seed origins.",
+      "Actual execution-block identity and native instruction equality; legacy register MOVD GPR32-to-XMM last writer and single-predecessor contiguous suffix. All reaching predecessors must agree through exact MOV32 copies; volatile calls kill provenance under Win64 ABI.",
+      "Iterative dependency traversal; suffix steps and distinct native (IP, register) states share the unchanged total 512 budget. Cycles, conflicts, partial/wide/noncopy writers and unsupported contexts decline.",
+      "Processor-state save/restore, privileged instructions and ENCLU decline before ordinary GPR/XMM write-list reasoning. The component reads no symbolic register map and mutates no Expr."
+    ],
+    "limits": [
+      "Not a full native semantics verifier, complete EH/CFG decoder, callee-preservation proof, C# binding/lifetime proof or enabled recovery. It validates supplied fresh footprint closure and assumes standard Win64 nonvolatile call preservation.",
+      "Exact per-execution entry Expr binding, immutable captures, conversion replacement, hygienic final placement and atomic fallback remain to be implemented in production.",
+      "Unwind lookup ownership is currently per plan. Before broad integration, use a verified per-binary lifecycle or lazy eligible-site construction rather than retaining one complete PE index per method."
+    ]
+  },
+  "validation": {
+    "new_authored_tests": 109,
+    "focused_with_unwind": {
+      "attributes": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "188",
+        "time": "2.448",
+        "timestamp": "2026-11-05T04:01:09.453837+08:00",
+        "hostname": "DESKTOP-FLNM4EM"
+      },
+      "failure_set": []
+    },
+    "portable_suite": {
+      "passed": 4995,
+      "deselected": 380
+    },
+    "full_suite_excluding_parallel": {
+      "passed": 5110,
+      "skipped": 259,
+      "xpassed": 1,
+      "failures": 3,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_matches_baseline": true
+    },
+    "parallel_suite": {
+      "passed": 2
+    },
+    "compileall_import_lf_and_diff_checks": true,
+    "independent_forward_oracle": {
+      "seed": 620511,
+      "counts": {
+        "queries": 6293,
+        "acyclic_diamonds": 2048,
+        "forward_unknown": 4816,
+        "prefix_cycles": 2048,
+        "forward_known": 1477,
+        "accepted": 1055,
+        "conservative_declines": 422,
+        "exhaustive_three_steps": 2197
+      },
+      "mismatches": 0,
+      "oracle": "independent generated-graph forward origin-set worklist",
+      "exact_on_supported_acyclic_graphs": true,
+      "query_digest": "589954ef7aa904dbc6102f3ead690307aa000fc5fb2dee15baef42d383f91e2d",
+      "source_freeze_verified": true,
+      "elapsed_seconds": 4.720179700059816
+    },
+    "actual_block_read_only_probe": {
+      "methods": [
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 69879,
+          "match_out56": true,
+          "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0",
+          "elapsed_seconds": 8.97392989997752
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70773,
+          "match_out56": true,
+          "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317",
+          "elapsed_seconds": 1.9808208999456838
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70777,
+          "match_out56": true,
+          "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51",
+          "elapsed_seconds": 0.24718669999856502
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70778,
+          "match_out56": true,
+          "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60",
+          "elapsed_seconds": 0.47431499999947846
+        },
+        {
+          "fixture": "limbus",
+          "mi": 35790,
+          "match_out56": true,
+          "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484",
+          "elapsed_seconds": 38.67022149998229
+        }
+      ],
+      "observations": [
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 69879,
+          "offset": 45,
+          "dry": true,
+          "parameter": 0,
+          "context_valid": true,
+          "native_instructions": 105
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 69879,
+          "offset": 48,
+          "dry": true,
+          "parameter": 1,
+          "context_valid": true,
+          "native_instructions": 105
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 69879,
+          "offset": 45,
+          "dry": false,
+          "parameter": 0,
+          "context_valid": true,
+          "native_instructions": 105
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 69879,
+          "offset": 48,
+          "dry": false,
+          "parameter": 1,
+          "context_valid": true,
+          "native_instructions": 105
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70773,
+          "offset": 367,
+          "dry": true,
+          "parameter": 1,
+          "context_valid": true,
+          "native_instructions": 225
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70773,
+          "offset": 388,
+          "dry": true,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 225
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70773,
+          "offset": 367,
+          "dry": false,
+          "parameter": 1,
+          "context_valid": true,
+          "native_instructions": 225
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70773,
+          "offset": 388,
+          "dry": false,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 225
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70777,
+          "offset": 220,
+          "dry": true,
+          "parameter": 2,
+          "context_valid": true,
+          "native_instructions": 110
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70777,
+          "offset": 244,
+          "dry": true,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 110
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70777,
+          "offset": 220,
+          "dry": false,
+          "parameter": 2,
+          "context_valid": true,
+          "native_instructions": 110
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70777,
+          "offset": 244,
+          "dry": false,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 110
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70778,
+          "offset": 373,
+          "dry": true,
+          "parameter": 0,
+          "context_valid": true,
+          "native_instructions": 184
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70778,
+          "offset": 482,
+          "dry": true,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 184
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70778,
+          "offset": 373,
+          "dry": false,
+          "parameter": 0,
+          "context_valid": true,
+          "native_instructions": 184
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "mi": 70778,
+          "offset": 482,
+          "dry": false,
+          "parameter": null,
+          "context_valid": true,
+          "native_instructions": 184
+        },
+        {
+          "fixture": "limbus",
+          "mi": 35790,
+          "offset": 149,
+          "dry": true,
+          "parameter": null,
+          "context_valid": false,
+          "native_instructions": 43
+        },
+        {
+          "fixture": "limbus",
+          "mi": 35790,
+          "offset": 152,
+          "dry": true,
+          "parameter": null,
+          "context_valid": false,
+          "native_instructions": 43
+        },
+        {
+          "fixture": "limbus",
+          "mi": 35790,
+          "offset": 149,
+          "dry": false,
+          "parameter": null,
+          "context_valid": false,
+          "native_instructions": 43
+        },
+        {
+          "fixture": "limbus",
+          "mi": 35790,
+          "offset": 152,
+          "dry": false,
+          "parameter": null,
+          "context_valid": false,
+          "native_instructions": 43
+        }
+      ],
+      "counts": {
+        "queries": 20,
+        "accepted_queries": 10
+      },
+      "accepted_real_sites": 5,
+      "original_production_handler_only": true,
+      "all_match_out56": true,
+      "source_freeze_verified": true
+    },
+    "read_only_selected_sweeps": [
+      {
+        "fixture": "unitask",
+        "methods": 2242,
+        "changed": 0,
+        "crashes": 0,
+        "queries": {
+          "queries": 4
+        },
+        "accepted_real_sites": 0,
+        "body_hash_map_sha256": "28c11b7ebf141ad0208c4cfa66808bc896cb64847291d1ac9aa138ce17c9e316",
+        "source_freeze_verified": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "methods": 1936,
+        "changed": 0,
+        "crashes": 0,
+        "queries": {
+          "queries": 300,
+          "accepted_queries": 10
+        },
+        "accepted_real_sites": 5,
+        "body_hash_map_sha256": "e81c73854221be9d7f56f03435e7185016849481d49bd6ac8f1e388e31ea7feb",
+        "source_freeze_verified": true
+      },
+      {
+        "fixture": "limbus",
+        "methods": 923,
+        "changed": 0,
+        "crashes": 0,
+        "queries": {
+          "queries": 332
+        },
+        "accepted_real_sites": 0,
+        "body_hash_map_sha256": "6882717df99cb7f19d6c322030ddb5aed48b14971a44f967063ecf700ec1f822",
+        "source_freeze_verified": true
+      }
+    ],
+    "scoped_default_parent_proof": {
+      "scope": [
+        "il2cpp/lifter/entryorigin.py",
+        "tests/test_entry_int32_origin.py"
+      ],
+      "phases": {
+        "candidate": {
+          "phase": "candidate",
+          "component_present": true,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        },
+        "parent": {
+          "phase": "parent",
+          "component_present": false,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        },
+        "restored": {
+          "phase": "restored",
+          "component_present": true,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        }
+      },
+      "restoration": {
+        "exact_scope": [
+          "il2cpp/lifter/entryorigin.py",
+          "tests/test_entry_int32_origin.py"
+        ],
+        "exact_restoration": true,
+        "owned_stash_only": true,
+        "stash_remaining": false,
+        "all_probes_passed": true,
+        "source_sha256": {
+          "il2cpp/lifter/entryorigin.py": "9f3a112d5aa5439cd6ff5172b56a41ee1333c638f1b461d5e2ca263e055a67d1",
+          "tests/test_entry_int32_origin.py": "b0a1370478e6b6417ab66c54ca8e38cc21b073b284e179408ab03eee4c2065fa"
+        }
+      },
+      "all_five_default_bodies_match_out56": true
+    }
+  },
+  "pre_acceptance_soundness_finding": {
+    "authored_only": true,
+    "production_affected": false,
+    "instruction_info_implicit_state_gap": "FXRSTOR/XRSTOR ordinary used-register lists omit restored XMM destinations; ENCLU may resume an unmodelled context.",
+    "new_policy_cases": 20,
+    "pre_guard_decline_assertions_failed": 19,
+    "post_guard_all_pass": true,
+    "obsolete_validation_consumers_stopped_before_source_changes": true,
+    "obsolete_partial_full_and_sweeps_not_acceptance_evidence": true
+  },
+  "mutable_snapshot_soundness_finding": {
+    "authored_only": true,
+    "production_affected": false,
+    "pre_guard_failed_decline_assertions": 2,
+    "backing_cases": [
+      "bytearray",
+      "memoryview"
+    ],
+    "gap": "Unwind indexing copied mutable native storage while identity checks still accepted same-object in-place native edits.",
+    "remedy": "Require exact immutable bytes before constructing the native index.",
+    "post_guard_all_pass": true,
+    "prior_source_runs_not_used_as_final_acceptance": true
+  },
+  "private_capture_experiment": {
+    "production_enabled": false,
+    "origin_uses_new_component": true,
+    "capture_and_replacement_guards_are_private_research": true,
+    "selected_sweeps": [
+      {
+        "fixture": "unitask",
+        "methods": 2242,
+        "changed_mi": [],
+        "crashes": [],
+        "final_entry_capture_counts": {},
+        "production_enabled": false,
+        "private_monkeypatch_only": true,
+        "frozen_source_checks": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "methods": 1936,
+        "changed_mi": [
+          69879,
+          70773,
+          70777,
+          70778
+        ],
+        "crashes": [],
+        "final_entry_capture_counts": {
+          "69879": 2,
+          "70773": 1,
+          "70777": 1,
+          "70778": 1
+        },
+        "production_enabled": false,
+        "private_monkeypatch_only": true,
+        "frozen_source_checks": true
+      },
+      {
+        "fixture": "limbus",
+        "methods": 923,
+        "changed_mi": [],
+        "crashes": [],
+        "final_entry_capture_counts": {},
+        "production_enabled": false,
+        "private_monkeypatch_only": true,
+        "frozen_source_checks": true
+      }
+    ],
+    "paired_review": {
+      "reports": [
+        {
+          "fixture": "unitask",
+          "methods": 2242,
+          "changed_mi": [],
+          "crashes": [],
+          "details": []
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "methods": 1936,
+          "changed_mi": [
+            69879,
+            70773,
+            70777,
+            70778
+          ],
+          "crashes": [],
+          "details": [
+            {
+              "mi": 69879,
+              "captures": 2,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 5,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "911459a4175d15fa930afea5d2ff62413ccb4d2fafa73c43d6047c88dd1bcc5c"
+            },
+            {
+              "mi": 70773,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "134f00c8a14fb8435cd4a2808b37b62dc7a0e7586d53ac72906fe7c6822777d0"
+            },
+            {
+              "mi": 70777,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "6f8cae110440ff3b5aa7795b2a1ebfbd6e1de574a78265815ca35a638346ddfd"
+            },
+            {
+              "mi": 70778,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "d9eb20f228b4f6057a3b16d7979dccad11e679492b72f107fbfeca842fc8ed12"
+            }
+          ]
+        },
+        {
+          "fixture": "limbus",
+          "methods": 923,
+          "changed_mi": [],
+          "crashes": [],
+          "details": []
+        }
+      ],
+      "limbus_leaf_declined": true,
+      "entry_captures": 5,
+      "changes_are_private_only": true,
+      "not_whole_method_or_real_reference_gate": true
+    },
+    "limits": [
+      "Five entry captures/conversion snapshots in four changed Survivors bodies are byte-identical to the prior filtered prototype. All other selected bodies match out56.",
+      "Opaque named call-target multisets and raw pre-emitter error signatures are unchanged, not proof of arguments, paths, signatures, side effects or complete compilability.",
+      "Method 69879 still has the same five raw pre-emitter parse errors; no strict emitted-tree, nine-real-reference-assembly gate, native game execution or new runtime/performance measurement was run for this unused module.",
+      "No compile-error reduction, runtime speedup, whole-method equivalence, promotion or golden re-pin is claimed."
+    ]
+  },
+  "rejected_readonly_alternative": {
+    "production_enabled": false,
+    "lexical_policy_proved_unsound": true,
+    "counterexample": {
+      "cases": 4,
+      "policy_false_accepts": 4,
+      "forms": [
+        "Mutate(count);",
+        "Mutate((count));",
+        "Mutate(value: count);",
+        "Mutate(value: ((count)));"
+      ],
+      "entry_values": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "readonly_cast_values": [
+        42,
+        42,
+        42,
+        42
+      ],
+      "snapshot_cast_values": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "omitted_in_at_call_site": true,
+      "policy_sound": false,
+      "production_enabled": false,
+      "authored_not_game": true,
+      "source_sha256": "33e9ed1e66f067cbdd2a8f61137a4534e5e86f05811815e3cadbd30217a0e447",
+      "policy_sha256": "92003270a3f29a7f7cf822e6bdbea9cb2e82a532f388989435f549413ccf8dad"
+    },
+    "reason": "Omitted in call-site modifiers still permit taking the managed parameter address. An authored pointer-writing in callee changes the source parameter without any visible caller assignment or ref/in token. Four variants pass the private lexical policy but compile and produce 42 rather than entry 7; explicit entry snapshots retain 7.",
+    "earlier_private_positive_matrices_and_kernel_runs_not_general_soundness": true,
+    "decision": "Do not activate the lexical no-capture path or broaden its guards to fit this sample; continue explicit entry capture with atomic fallback."
+  },
+  "next_step": [
+    "Add exact scalar entry Expr identity binding per dry/real execution and conversion-local cloning without changing the existing field/SIMD proof.",
+    "Preserve conversion-time Single snapshots and MOVD high-lane zeros; stage hygienic surviving entry captures after all cleanup.",
+    "On any final validation failure discard all attempted capture/binding state and atomically use the clean recovery-disabled path; cover reuse, collisions, scope and failure injection.",
+    "Only after activation run new paired frozen trees and nine real-reference assembly compile gates. Denominator wrap is a separate slice; no re-pin or promotion is authorized."
+  ],
+  "file_sha256": {
+    "il2cpp/lifter/entryorigin.py": "9f3a112d5aa5439cd6ff5172b56a41ee1333c638f1b461d5e2ca263e055a67d1",
+    "tests/test_entry_int32_origin.py": "b0a1370478e6b6417ab66c54ca8e38cc21b073b284e179408ab03eee4c2065fa"
+  },
+  "private_evidence_sha256": {
+    "prove_parameter62_real.py": "751209055f1f236c31084bd25ae7399baf65dd3dc484677a39f9f03f9545decd",
+    "prove_parameter62_sweep.py": "9423d5dc7f60fc5d86a18487babe5af7ac14b42b4901b5bb34e606c996447e2a",
+    "prove_parameter62_forward.py": "a4edae20bd61633d370fecde617f091ce0f50f30ea92fd5c062edff6f53448ba",
+    "parameter62_component_capture_prototype.py": "102ac06ea9b9e6e1a5cdc90e6798a143411c798bf91a3e832e9a356a0a97c51a",
+    "review_parameter62_sweeps.py": "fb84b3db068e576f25fbd35ff2061d3c1c7ae58864bdb9e7213c3600cc66d6d0",
+    "prove_parameter62_default_neutral.py": "755078a8784594474fe14a6af6c26887f99c3dae200d883dc220ab0c1c3a564f",
+    "parameter62_real.summary.json": "206591d4f749f6d9c4b77059ecf6e13976cf370062f0707100a06e510901cb74",
+    "parameter62_forward.summary.json": "da7c86554adcfa6bfe46523108b196afc30b79877949f852bcd2ab77c0efc5d3",
+    "parameter62_review.summary.json": "592bd9435593cae07e5a7f368651cea3d66a0c3046df49a2d5f60651a5cdefed",
+    "parameter62_hidden_repro.log": "49af24e5a37b2a4553dadc7f7956abb129cb79f05be688a8bd8284231c375b4b",
+    "parameter62_full.junit.xml": "e6c806843a735eb84185088465fef5011484d46d4029c0b60c2e15daab98f573",
+    "parameter62_parallel.junit.xml": "ff38672d8d88a7b30580ef3ece22bc105b02945f3ef4621eec545a89a9875948",
+    "parameter62_portable.junit.xml": "14bda8fcb9085c314c9ee1adda553a067ce7d2017e57c9e5d38bee6c6d982661",
+    "parameter62_focused.junit.xml": "3df43eebc36be689df58ffd569b0585b9a92fca121ceecdc0b930d1bf4bf9858",
+    "test_parameter62_mutable_snapshot_private.py": "7af184a9da22b4a5ce7d77da1b9c27c9f55f382cfd1eab21d355559a04dc25ea",
+    "parameter62_mutable_snapshot_repro.log": "fa3add45764f5ff2075d44fb0345efc5470b4d87ed6884518e5f2fdfce23c128",
+    "prove_parameter62_scoped_parent.py": "2d50bfbfb817b1f33fa371320068fd1057b06112c2903e30b05e4a02ad324fbf",
+    "parameter62_scoped_parent.summary.json": "8a0032e7ff889cb3634bba9b01b7d7d8ac4158a140e7ff4c4601b7fbfdf0a7a2",
+    "parameter63_readonly_policy.py": "92003270a3f29a7f7cf822e6bdbea9cb2e82a532f388989435f549413ccf8dad",
+    "prove_parameter63_readonly_implicit_in_matrix.py": "72ff488bcaf8de6254b1344de13241c235c1f5bab0df4a3895d794a415ae7ccd",
+    "parameter63_readonly_implicit_in_matrix.summary.json": "4ea7b1f5ee0dd10b5743c7a6d3e07aef3c3f783192dfff7199d6d41ac792695c",
+    "test_parameter63_readonly_implicit_in.py": "1b55a6dc1fd531f1348d8baf9ef7b7af18b413739fc637ea9d337dbb3bb76536",
+    "parameter63_readonly_implicit_in_repro.log": "d0e19ff5e2f652e1391c9e6c544d00cacaed056eb1a2c7e4586bbb7c690f0dfa",
+    "parameter62_default_neutral.candidate.summary.json": "e6a8e57cd4059dacd5bdc8d84cdd7f62d930f288fbc6391bd359e09a9a629193",
+    "parameter62_default_neutral.parent.summary.json": "a2b185f3907bd27052833e1ef247f52201dcca65f94d66bd14cb1c4cd97459d4",
+    "parameter62_default_neutral.restored.summary.json": "e6b79fa3ef966ed6e0c5c56fe0807f7fbf1c6ee1130d5f4d25939c2112e936df",
+    "parameter62_sweep.unitask.summary.json": "422152d1483da538f24109767448fd3914e1332189631d0e114511ac4332eb82",
+    "parameter62_sweep.survivors-roguelike-kit.summary.json": "ca12f651dba3656dd2a5d3ed0c3b052b8e74330d5f2590f178577fa6035e1fc3",
+    "parameter62_sweep.limbus.summary.json": "ac1872d03076bde29e61e654a3ee49e663a2ba67939cfe9db989a694d673a166",
+    "parameter62_snapshot.unitask.summary.json": "6bbaf719b71beec5d7c9cdda7da7ef86e4d29a9b44cca4a88cd8cebcf0cf323f",
+    "parameter62_snapshot.survivors-roguelike-kit.summary.json": "86cfee2ed0f96727f84a7fca96d2d1899518aee098ca163fe2f3140cb71eb196",
+    "parameter62_snapshot.limbus.summary.json": "5c4ec50e6268489a0d0ecfbbf92ba429ccae0d376163114c0ce1f71433c1c6bf"
+  },
+  "goal_status": "active_unachieved"
+}

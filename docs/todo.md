@@ -4,6 +4,71 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Isolated exact-owner Int32 entry-origin proof (2026-11-05)
+
+**Tested infrastructure only, not enabled recovery.** The new
+`il2cpp/lifter/entryorigin.py` validates exact current MethodDef/metadata/binary
+identity, a unique exact owner, closed ABI/receiver/sret slots and complete
+supported normal CFG successors over freshly checked native bytes. Shared,
+generic, constructor, indirect/external and missing-fallthrough contexts decline.
+It uses the existing unwind-family check; arbitrary input ingestion is bounded
+at 513 items with at most 512 accepted instructions. The actual execution block
+must supply a legacy MOVD GPR32-to-XMM last writer through a contiguous,
+single-predecessor suffix. All native reaching definitions must agree through
+MOV32 copies; calls kill volatile GPRs under Win64 ABI. Suffix and origin states
+share the existing total 512 budget. No Expr/register-use state is read or changed.
+
+Review found an additional hidden-state counterexample: FXRSTOR/XRSTOR register
+lists omit restored XMM writes. **20 new policy cases** now reject processor-state
+save/restore, privileged instructions and ENCLU. The obsolete partial validation
+was stopped before changing source, and final validation was restarted. This was
+an unused-component gap, **not an enabled production-output regression**.
+
+A second authored counterexample changes the MOVD register bytes in-place while
+retaining the binary-data object identity. Since the unwind checker snapshots its
+input, identity alone was insufficient for `bytearray` / `memoryview` backing.
+**Both new regression cases pass:** only exact immutable `bytes` are accepted;
+nonstandard mutable backing declines. All consumers of the previous source had
+exited before the change, and the final focused/suite/forward/native sweeps were
+rerun against the immutable-backing guard. Normal PE loaders already use `bytes`.
+
+**109 new authored tests pass** (188 including the unwind tests); portable
+**4,995 passed / 380 deselected**. Full excluding separate parallel tests:
+**5,110 passed / 259 skipped / 1 non-strict XPASS / identical fixed 3 failures**;
+parallel **2 passed**. An independent generated-graph forward worklist checks
+**6,293 queries / zero mismatches**; 422 conservative declines include cycles or
+unsupported wide copies. Compileall/import, LF/no-BOM and diff checks pass.
+Scoped parent removal/restoration of only the two new files preserves all five
+focused default bodies byte-for-byte and never imports the component by default.
+
+Actual-block read-only checks retain **5 sites in 4 Survivors methods**, in both
+dry and real passes; the Limbus leaf with no unwind record declines. Read-only
+selected sweeps (**2,242 / 1,936 / 923 methods**) preserve every default body
+against out56. A separate private capture experiment now uses this component
+instead of the research origin model: **0 / 4 / 0 changed, zero crashes**, the same
+five captures and byte-identical changed bodies as the preceding prototype.
+Unchanged call-target multisets/raw parse-error signatures are limited evidence,
+not whole-method semantics or strict emitted-tree/real-reference compile gates.
+No new compile-error reduction, runtime speedup or production improvement is claimed.
+
+A private no-capture alternative was **rejected**, not enabled: absence of
+parameter assignments in final text is not a storage-readonly proof. Four authored
+omitted-`in` call variants pass the lexical policy, yet an optimized C# callee
+writes the parameter through a pointer: the proposal reads **42**, while an
+explicit entry snapshot retains **7**, in all four cases. Earlier positive local
+mutation matrices and extracted-kernel checks do not establish general soundness.
+Do not replace entry captures with this private lexical shortcut.
+
+There are **no production imports/callers or public exports**. Accepted production
+remains `game_out56` (`6e4cfac`), not promoted. **Next:** exact per-execution entry
+Expr binding, conversion-local cloning, hygienic surviving captures after cleanup,
+and atomic clean recovery-disabled fallback. Preserve existing field/SIMD guards,
+conversion-point snapshots and caps. Choose a verified per-binary unwind lifecycle
+before broad activation. Then run new frozen paired trees and nine actual-reference
+assembly gates. Denominator wrap stays separate; no re-pin/promotion is authorized.
+Evidence: `validation_reports/entry_int32_origin_2026-11-05.json`.
+Goal remains **active, unachieved**. Earlier next-step sections below are history.
+
 ### Isolated native unwind-boundary component (2026-11-05)
 
 **New tested infrastructure, not enabled recovery.** `il2cpp/lifter/unwindproof.py`
