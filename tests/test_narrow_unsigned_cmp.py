@@ -28,7 +28,7 @@ def test_both_operands_are_normalized(code):
     rhs = '-1' if 'ff' in code else 'other'
     assert f'<= unchecked((ushort)({rhs}))' in out
 
-@pytest.mark.parametrize('code', ['6683f8097e00', '6683f8097400', '83f8097600', '4883f8097600', '80fc097600', '668339097600'])
+@pytest.mark.parametrize('code', ['6683f8097e00', '6683f8097400', '4883f8097600', '80fc097600', '668339097600'])
 def test_other_comparisons_keep_the_existing_spelling(code):
     lift = lifter({'RAX': Expr('value',CHAR,'int'), 'RCX': Expr('other',CHAR,'int')})
     assert 'unchecked' not in '\n'.join(execute(lift,code))
@@ -66,7 +66,7 @@ def test_lifter_reuse_does_not_leak_width():
     lift=lifter({'RAX':Expr('value',CHAR,'int')})
     assert 'unchecked' in execute(lift,'6683f8097600')[0]
     lift.out=[]
-    assert 'unchecked' not in execute(lift,'83f8097600')[0]
+    assert 'unchecked' not in execute(lift,'4883f8097600')[0]
 
 
 @pytest.mark.parametrize('call', ['e800000000', 'ffd1'])
@@ -86,7 +86,7 @@ def test_omitted_native_instruction_cannot_prove_live_cmp(omitted):
     assert 'unchecked' not in lift.out[0][1]
 
 
-@pytest.mark.parametrize('code', ['83f809','4883f809','80fc09','663901','663b01','66833909'])
+@pytest.mark.parametrize('code', ['4883f809','80fc09','663901','663b01','66833909'])
 def test_width_proof_declines_wide_high_byte_and_memory_operands(code):
     from iced_x86 import Decoder
     from il2cpp.x64 import narrow_cmp_width

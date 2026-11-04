@@ -32,7 +32,7 @@ def _reg_size(r):
 
 
 
-# Unsigned narrow CMP consumes CF/ZF. A stale width must not survive even
+# Unsigned register CMP consumes CF/ZF. A stale width must not survive even
 # CF-only writers such as STC/CLC/CMC, which the SF/PF guard does not see.
 _UNSIGNED_FLAGS = 0
 if HAVE_ICED:
@@ -49,32 +49,35 @@ def narrow_cmp_width(ins):
         return None
     high = (IReg.AH, IReg.BH, IReg.CH, IReg.DH)
     width = _reg_size(ins.op0_register)
-    if width not in (1, 2) or ins.op0_register in high:
+    if width not in (1, 2, 4) or ins.op0_register in high:
         return None
     if ins.op1_kind == OpKind.REGISTER:
         if ins.op1_register in high or _reg_size(ins.op1_register) != width:
             return None
-    elif ins.op1_kind not in (OpKind.IMMEDIATE8, OpKind.IMMEDIATE16,
-                              OpKind.IMMEDIATE8TO16):
+    elif ins.op1_kind not in {
+            1: (OpKind.IMMEDIATE8,),
+            2: (OpKind.IMMEDIATE16, OpKind.IMMEDIATE8TO16),
+            4: (OpKind.IMMEDIATE32, OpKind.IMMEDIATE8TO32),
+    }[width]:
         return None
     return width
 
 
 def narrow_unsigned_cmp(width, mnemonic, lhs, rhs):
-    """Render low 8/16 bits explicitly, under unchecked arithmetic.
+    """Render low 8/16/32 bits explicitly, under unchecked arithmetic.
 
     The caller owns same-block, live-CMP provenance. Closed integral metadata
     or an integer literal is required; bool, byref, enum, pointers and unknown
     values retain their old spelling. This does not prove value provenance or
     repair arbitrary earlier partial-register operations.
     """
-    if not HAVE_ICED or width not in (1, 2):
+    if not HAVE_ICED or width not in (1, 2, 4):
         return None
     op = {Mnemonic.JA: '>', Mnemonic.JAE: '>=',
           Mnemonic.JB: '<', Mnemonic.JBE: '<='}.get(mnemonic)
     if op is None:
         return None
-    cast = 'byte' if width == 1 else 'ushort'
+    cast = {1: 'byte', 2: 'ushort', 4: 'uint'}[width]
     operands = []
     for value in (lhs, rhs):
         if value is None or value._unk or value.kind != 'int':

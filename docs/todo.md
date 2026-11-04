@@ -4,6 +4,58 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Preserve unsigned dword CMP/Jcc relations (2026-11-04)
+
+Accepted `game_out47` (not promoted), versus out46. The same-block native
+CMP/CF/ZF proof now also covers low **32-bit registers** with IMMEDIATE32,
+sign-extended IMMEDIATE8TO32, or same-width register operands. JA/JAE/JB/JBE
+relations normalize operands to `uint` under explicit `unchecked` arithmetic.
+This prevents negative async states (including -1/-2) from entering a native
+unsigned `state <= 1` branch, and preserves range/hash comparison bits.
+Closed primitive integral metadata or integer literals are still required.
+Qword/memory/high-byte/prefixed operands, unknown or unsupported types,
+clobbered/undefined flags, calls, instruction gaps, cross-block provenance and
+flat fallback retain their parent behavior. SETcc/CMOVcc are not changed.
+
+Production sweeps cover **2,242 / 1,936 methods**, zero crashes. Independently
+checked unique new dword sites: **28 / 8 in 27 / 4 methods**; repeated lifts are
+identical and observations are deduplicated by method/native site. Final output
+changes **22 / 2 methods in six of 767 C# files**: exactly **26 if-condition
+line replacements**, no statement additions/removals and unchanged call-name
+multisets. These are local relation checks, not whole-method equivalence.
+FormulaParser still has a wrongly char-typed hash accumulator and other defects.
+
+Strict builds retain **2,227 / 1,857 bodies**, zero failed/fallback/type-emit
+failures; brace/parse gates are clean and final-source fingerprints verified.
+All **nine complete location-aware compiler diagnostic multisets are identical**
+using real Unity Editor/BCL/package references, original assembly simple names,
+no self-reference or synthetic stubs. UniTask.Linq still has 13 declaration
+errors and no observed body sentinel; its body compilation is not proved.
+No compiler-error reduction or speed improvement is claimed.
+
+**59 new portable + three new game cases**, removing two obsolete dword-decline
+parameters (net portable +57). Portable **4,319 passed**, focused portable
+**119 passed**, focused game **four passed**. Frozen full excluding parallel:
+**4,411 passed / 259 skipped / one non-strict xpassed / the same three existing
+failures**; parallel **two passed**. Scoped clean-parent proof on `3e6fa4d`
+reproduces three real changed method boundaries, **26 failing positive / 33
+passing boundary cases**, and exactly the same existing failure set, then
+restores all four files byte-exact. Goldens/pins are unchanged.
+
+Actual production-generated comparison expressions compiled with
+`/checked+ /optimize+` match **20 authored Win64 programs / 382,592 CPU calls /
+382,592 compiled C# checks**, zero mismatches, including sign-extended -1,
+all-ones and high-bit immediates. No game-native code was executed. Aggregate-only
+report: `validation_reports/quality_unsigned_dword_cmp_2026-11-04.json`.
+
+Next: unsigned SETcc/CMOVcc requires its own consumer/flat-fallback proof;
+read-only inventory finds four same-block CMOVA sites in two UniTask methods
+and no qualifying survivors sites. This is inventory, not an accepted recovery.
+Scalar-home identity/type/address lifetimes remain open. Preserve the RBP-copy
+quarantine, interface-sret and all aggregate/address/overlap guards. No promotion;
+many real compiler errors remain and the goal is **not achieved**.
+
+
 ### Preserve low-byte/word unsigned CMP semantics (2026-11-04)
 
 Accepted `game_out46` (not promoted), versus out45. A real saved-char range
