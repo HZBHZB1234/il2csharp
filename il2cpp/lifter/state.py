@@ -2101,6 +2101,8 @@ class _StateMixin:
         # faithful -- the callee overwrites the buffer. Reset per
         # method/pass with the rest: addresses repeat across methods.
         self._sret_home_buf = {}
+        # Block-local sret snapshots must not retain a previous method sink.
+        self._materialized_sret = None
         self._last_tabread = None
         self.stack_values = {}
         byval_bits = (0x12 << 16)

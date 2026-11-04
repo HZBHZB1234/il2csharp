@@ -79,6 +79,16 @@ fix-122 in `validation_reports/review122_*`;
 fix-123 in `validation_reports/review123_*`.
 
 **Current invariants:**
+
+- Materialized sret reuse (`lifter/materialized.py`) is a separate semantic
+  value proof, never a re-rooting of scalar fragments, aggregate tiles, Exprs
+  or padding facts. Evidence belongs to one execution sink and must not cross
+  CFG, dry/real or method boundaries. Replay the exact original bounded native
+  window to an exact closed typed by-value consumer; preserve the source home
+  byte identity after every instruction, not just the final destination. A
+  saved copy followed by a source mutation (even if later restored) declines.
+  Unknown aliases/effects and generic/shared/indirect contexts decline; keep
+  the interface-sret guard intact.
 - `base_chain_tds` maps IL2CPP_TYPE_OBJECT only through one unique
   `System.Object` TypeDef and stops cycles without repeating a TypeDef. The
   broad shared-receiver heuristic must use `_legacy_shared_receiver_chain` so a

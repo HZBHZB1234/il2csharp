@@ -4,6 +4,81 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Block-local materialized sret values at exact typed consumers (2026-11-04)
+
+Accepted `game_out43` (not promoted), versus out40. A separate, frozen
+whole-value record now retains an **already-emitted typed sret temporary**.
+It never re-roots scalar/tile/Expr origins and never turns padding into
+initialized-byte evidence. Every execution sink owns its own proof: CFG edges,
+backedges, dry/real passes and method reuse cannot propagate it. The retained
+sink is released at method/pass entry.
+
+The producer must be an explicit Win64 x64 PE, unique direct canonical
+nongeneric MethodDef under nongeneric owners, with a closed nonbyref value
+return, recursively proved default layout, existing typed temp and native
+size **9..64 bytes**. The consumer has the same canonical/closed signature
+requirements and an exact by-value parameter. Independently decode and match
+the original bounded native window (**96 post-call instructions / 2,048
+bytes**), including a prior exact `LEA RCX,[RSP+disp]` hidden-buffer setup
+within 16 instructions. A finite interpreter separates pointer addresses from
+original source-byte identities and proves every byte of the final argument
+copy, its actual argument register (including receiver/sret shifts) and RSP.
+Only explicitly supported MOV/LEA/SSE copy/zero operations qualify; unknown
+aliases, calls, CFG edges, RMW, unsupported operations, partial GPRs, scalar
+SSE lane merges, non-GPR control/debug registers, indexed/segmented/prefixed
+and 32-bit-address evidence decline.
+
+**Lifetime correction:** an existing managed temp is not automatically an
+immutable SSA snapshot. After *every* replayed instruction, its original source
+home must still contain the complete same-offset byte identity. A saved vector
+followed by a source write declines even if the destination is intact or the
+source is later restored. Idempotent self-copies remain accepted. This closes
+the two authored mutation/recovery counterexamples without weakening the
+interface-sret guard or changing scalar fragments, raw partial stores, hints,
+slots, variable types or statement order.
+
+Independent production sweeps cover **2,242 / 1,936 selected native methods**:
+exactly **two / zero** whole-value consumers, with matching dry/real hits and
+no new crashes. Across **474 / 293 C# files**, only **two files / two methods**
+change: two field initializers become the existing whole temp; the existing
+pipeline also removes one dead scalar field read. Reversing precisely those
+changes restores every prior source byte. Real Editor/BCL/package references,
+original assembly simple names, no self-reference or type stubs:
+`Assembly-CSharp` **1,973 -> 1,969**, exactly **four CS0122 removed / zero added**
+at the changed lines. The other eight complete diagnostic multisets are
+unchanged. UniTask.Linq retains 13 declaration errors with no observed body
+sentinel; this is not body-coverage evidence.
+
+Strict builds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit failures;
+brace/parse clean and source fingerprints verified. **104 new portable / two
+new game cases**; focused **128 synthetic + two game passed**, portable
+**4,093 passed**. Frozen full excluding parallel: **4,177 passed / 259 skipped /
+one non-strict xpassed / three existing failures**; parallel **two passed**.
+Scoped clean-parent proof on `14db1ec` repeats exactly those same three failures
+and restores all six candidate source/test files byte-exact. No golden/pin
+changes or output promotion. The report generator independently verifies the
+final test counts, exact failure set, source fingerprints and compiler deltas.
+
+An authored native-copy interpreter cross-check executes **1,024 bounded
+Win64 programs / 16,384 CPU calls / 1,120,576 byte-identity and canary checks**,
+zero mismatches. A separate authored .NET 10 blittable-value harness checks
+16/40-byte private readonly payloads against native copies: **8,654 cases /
+244,616 managed byte checks / 261,924 native byte-and-canary checks**, zero
+mismatches. Neither executes game-native methods or recompiled game consumers,
+validates reference-containing game structs, proves whole-method/game
+equivalence, or measures speed. The out41/out42 full runs were deliberately
+interrupted for boundary/lifetime repairs; neither exploratory label is an
+accepted full-suite result. Many compilation errors remain; the goal is
+**not achieved**. Aggregate-only evidence:
+`validation_reports/quality_materialized_sret_snapshot_2026-11-04.json`.
+
+Next: retain the interface-sret guard. Generic/shared/indirect calls,
+cross-CFG snapshots, unknown alias writes and managed reference-containing
+native/.NET execution still require separate proofs. Before broadening this
+record, address the upstream scalar/whole home collision behind the remaining
+Vector3/awaiter assignments, with an independent field-range proof; never
+re-root a partial scalar store onto whole-struct display text.
+
 ### Exact native-zero small-struct leaf returns (2026-11-04)
 
 Accepted `game_out40` (not promoted), versus out39. An independent leaf proof

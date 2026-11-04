@@ -1,0 +1,287 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted block-local materialized sret snapshots at exact typed consumers; not promoted; goal not achieved",
+  "baseline": "game_out40",
+  "candidate": "game_out43",
+  "source_parent": "14db1ec3f3c1f2a62d2d89e1dd6771ce5419a08a",
+  "proof_scope": [
+    "Maintain separate frozen whole-value evidence for an existing temporary after an already-emitted sret assignment; do not re-root existing scalar fragments, aggregate tiles, Exprs, hints, slots, variable types or padding facts. Reset the retained execution sink at method/pass entry.",
+    "Producer requires an explicit Win64 x64 PE, unique direct canonical nongeneric MethodDef with nongeneric owner chain, exact closed nonbyref value return, recursive default layout proof, existing typed temporary and native size 9..64 bytes. Recover only in the same execution sink: CFG edges, backedges, dry/real execution and method reuse do not share evidence.",
+    "At a unique canonical nongeneric direct typed call consumer, independently decode original native bytes and require exact equality with the whole bounded block window (96 post-call instructions / 2048 bytes). Independently prove the producer hidden RCX buffer from an exact prior LEA RCX,[RSP+disp], within 16 instructions with no intervening RSP/RCX clobber or unsupported effects.",
+    "Replay explicit finite MOV/LEA and supported SSE copy/zero forms from source RAX echo. Pointer addresses and source-byte identities are different domains. Every result byte must retain the original same-offset identity; partial, shifted, overlapped or overwritten destinations only qualify if every byte is restored. The source home must retain its original complete byte identity after EVERY replay instruction: saving its value in a register and later modifying or even restoring the source declines, because the existing managed temp is not an independent immutable SSA snapshot. Idempotent self-copies remain allowed. Unknown-address writes, calls, branches, RMW, unsupported instructions, partial registers, scalar SSE register merges, indexed/segmented/prefixed and 32-bit-address evidence decline.",
+    "Final replay RSP must agree with the lifter, and the actual native argument register must address the entire copy at an exact closed by-value consumer parameter (including instance and hidden-return positional shifts). No rendered pointer or padding-initialization guess proves this. Return only the existing materialized temporary; keep interface-sret guard and cross-CFG recovery declined."
+  ],
+  "validation": {
+    "additional_portable_cases": 104,
+    "new_game_cases": 2,
+    "focused_synthetic_passed": 128,
+    "focused_game_passed": 2,
+    "portable": {
+      "passed": 4093,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1403.6720000000205,
+      "frozen_source_verified": true,
+      "passed": 4177,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 722.280999999959,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "14db1ec3f3c1f2a62d2d89e1dd6771ce5419a08a",
+      "exit_code": 1,
+      "seconds": 120.85999999998603,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 2,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1969,
+          "added": 0,
+          "removed": 4,
+          "added_codes": {},
+          "removed_codes": {
+            "CS0122": 4
+          }
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 4545,
+          "after": 4545,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 474,
+        "changed_files": 2,
+        "changed_methods": 2,
+        "whole_value_substitutions": 2,
+        "dead_scalar_field_reads_removed": 1,
+        "all_other_source_bytes_identical": true,
+        "removed_diagnostics_at_exact_changed_lines": 4,
+        "removed_codes": {
+          "CS0122": 4
+        },
+        "added_diagnostics": 0
+      },
+      "selected_native_sweep": {
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "hit_methods": 2,
+        "dry_hits": 2,
+        "real_hits": 2,
+        "new_crashes": 0,
+        "seconds": 275.48499999998603,
+        "frozen_source_verified": true
+      },
+      "body_probe_observed": {
+        "Assembly-CSharp": true,
+        "TempAsm": true,
+        "UniTask": true,
+        "UniTask.Addressables": true,
+        "UniTask.DOTween": true,
+        "UniTask.Linq": false,
+        "UniTask.TextMeshPro": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 0,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3781,
+          "after": 3781,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 293,
+        "changed_files": 0,
+        "changed_methods": 0,
+        "whole_value_substitutions": 0,
+        "dead_scalar_field_reads_removed": 0,
+        "all_other_source_bytes_identical": true,
+        "removed_diagnostics_at_exact_changed_lines": 0,
+        "removed_codes": {},
+        "added_diagnostics": 0
+      },
+      "selected_native_sweep": {
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "hit_methods": 0,
+        "dry_hits": 0,
+        "real_hits": 0,
+        "new_crashes": 0,
+        "seconds": 194.01600000006147,
+        "frozen_source_verified": true
+      },
+      "body_probe_observed": {
+        "Assembly-CSharp": true,
+        "Assembly-CSharp-firstpass": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 4,
+    "added_occurrences": 0,
+    "net_occurrences": -4,
+    "removed_codes": {
+      "CS0122": 4
+    },
+    "normalization_or_suppression": false,
+    "all_removed_at_exact_changed_lines": true
+  },
+  "authored_synthetic_native_runtime": {
+    "authored_win64_programs": 1024,
+    "calls": 16384,
+    "byte_identity_and_canary_checks": 1120576,
+    "full_identity_programs": 718,
+    "families": [
+      "mov32",
+      "mov64",
+      "movsd",
+      "movss",
+      "movups"
+    ],
+    "mismatches": 0,
+    "game_native_execution": false,
+    "whole_method_equivalence": false,
+    "speed_evidence": false
+  },
+  "authored_native_managed_blittable_consumers": {
+    "authored_blittable_struct_sizes": [
+      16,
+      40
+    ],
+    "native_calls": 8654,
+    "native_byte_and_canary_checks": 261924,
+    "managed": {
+      "cases": 8654,
+      "byte_checks": 244616,
+      "mismatches": 0
+    },
+    "private_readonly_payload": true,
+    "arbitrary_bit_patterns": true,
+    "game_native_execution": false,
+    "recompiled_game_consumer_execution": false,
+    "whole_method_equivalence": false,
+    "speed_evidence": false,
+    "source_fingerprints_verified": true
+  },
+  "limitations": [
+    "Only two selected native methods gain whole-value typed consumers; one dead scalar field read then disappears through the existing pipeline. Reversing those exact transformations restores every prior selected source byte. The survivors selected tree and other eight complete diagnostic multisets are unchanged.",
+    "Many real compilation errors remain. UniTask.Linq retains 13 declaration errors and no observed body sentinel; do not claim body coverage for it.",
+    "The runtime harness executes authored bounded volatile-register Win64 snippets, not game-native methods or .NET recompiled game consumers. It does not establish whole-method/game equivalence or measure speed. Concurrent build/test times are not performance evidence.",
+    "The earlier out41 full run was interrupted for a control/debug-register boundary fix; out41 is not an accepted full-suite result. The out42 full run and native sweep were also deliberately interrupted for the source-home lifetime fix. Neither exploratory label is accepted; final evidence is out43. No golden/pin changes or output promotion. Generic/shared/indirect producers and consumers, cross-block values, unknown aliases and interface-sret returns remain outside this proof. A source typed consumer can be recovered without turning padding or raw partial stores into whole-value facts."
+  ]
+}

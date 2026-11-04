@@ -3834,6 +3834,8 @@ class _CallsMixin:
             # single field is a 64-byte struct has no offset >= 0x18).
             self.regs['RAX'] = Expr('&%s' % buf, rty, 'ptr')
             self.regs['RAX']._stack_offset = stack_address
+            from il2cpp.lifter.materialized import record_materialized_sret
+            record_materialized_sret(self, ins, stack_address, rty, buf)
             return
 
 

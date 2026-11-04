@@ -355,6 +355,10 @@ class _AggregatesMixin:
         return result
 
     def _stack_struct(self, address, ty):
+        from il2cpp.lifter.materialized import recover_materialized_sret
+        snapshot = recover_materialized_sret(self, address, ty)
+        if snapshot is not None:
+            return snapshot
         size = self.il._sf_field_size(ty, 0)
         if size is None:
             return None
