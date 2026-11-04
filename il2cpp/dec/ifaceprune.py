@@ -18,7 +18,8 @@ call / non-GPR write, and every callee-saved register it writes is dead
 at the join (volatile ones are undefined after the miss arm's call).
 The slot-zero LEA alternative proves the complete four-block scan and
 its receiver/class/table/count/offset def-use chain, exact helper arguments,
-and a zero starting index. It does not broaden the legacy ADD matcher.
+and a zero starting index, either locally zeroed or copied from a proved
+zero register. It does not broaden the legacy ADD matcher.
 Anything else declines and keeps the honest scan rendering.
 """
 from iced_x86 import (InstructionInfoFactory, OpAccess, RegisterExt, Mnemonic,
@@ -314,18 +315,46 @@ def _slot_zero_lea_fold(blocks, pb, bm, call_index, region, hits, res):
     if len(e) < 5 or e[-1].mnemonic != Mnemonic.JAE \
             or pb.term != ('jcc', bm.bid, load.bid):
         return False
-    seed, cnt, cmp = e[-4:-1]
-    if seed.mnemonic != Mnemonic.MOVZX or seed.op0_kind != OpKind.REGISTER \
-            or not RegisterExt.is_gpr32(seed.op0_register) \
-            or RegisterExt.full_register(seed.op0_register) != RegisterExt.full_register(counter) \
-            or seed.op1_kind != OpKind.REGISTER \
-            or not RegisterExt.is_gpr16(seed.op1_register) \
-            or cnt.mnemonic != Mnemonic.MOVZX or cnt.op0_kind != OpKind.REGISTER \
+    # Separate exact entry variant: klass load; zero local counter; load
+    # interface from a RIP slot; count load; unsigned compare; JAE miss.
+    # Keep the existing MOVZX-copy entry proof disjoint and unchanged.
+    direct_zero = (len(e) == 6 and e[1].mnemonic == Mnemonic.XOR
+                   and e[2].mnemonic == Mnemonic.MOV)
+    if direct_zero and any(i.segment_prefix != IReg.NONE or i.has_rep_prefix
+                           or i.has_repne_prefix for i in e):
+        return False
+    if direct_zero:
+        seed, iface_load, cnt, cmp = e[1:5]
+        if not rr(seed, Mnemonic.XOR, seed.op0_register, seed.op0_register) \
+                or not RegisterExt.is_gpr32(seed.op0_register) \
+                or RegisterExt.full_register(seed.op0_register) != RegisterExt.full_register(counter) \
+                or iface_load.mnemonic != Mnemonic.MOV \
+                or iface_load.op0_kind != OpKind.REGISTER or iface_load.op0_register != iface \
+                or iface_load.op1_kind != OpKind.MEMORY \
+                or iface_load.memory_base != IReg.RIP or iface_load.memory_index != IReg.NONE \
+                or iface_load.segment_prefix != IReg.NONE \
+                or MemorySizeExt.size(iface_load.memory_size) != 8:
+            return False
+        # The stable-register checks below prove that zeroing the counter
+        # and loading the interface cannot overwrite the klass or receiver.
+        prefix = e[:1]
+        compare_source = counter
+    else:
+        seed, cnt, cmp = e[-4:-1]
+        if seed.mnemonic != Mnemonic.MOVZX or seed.op0_kind != OpKind.REGISTER \
+                or not RegisterExt.is_gpr32(seed.op0_register) \
+                or RegisterExt.full_register(seed.op0_register) != RegisterExt.full_register(counter) \
+                or seed.op1_kind != OpKind.REGISTER \
+                or not RegisterExt.is_gpr16(seed.op1_register):
+            return False
+        prefix = e[:-4]
+        compare_source = seed.op1_register
+    if cnt.mnemonic != Mnemonic.MOVZX or cnt.op0_kind != OpKind.REGISTER \
             or not RegisterExt.is_gpr32(cnt.op0_register) \
             or RegisterExt.full_register(cnt.op0_register) != count \
             or cnt.op1_kind != OpKind.MEMORY \
             or not mem(cnt, klass, IReg.NONE, 1, 0x12E, 2) \
-            or not rr(cmp, Mnemonic.CMP, seed.op1_register, s[1].op1_register):
+            or not rr(cmp, Mnemonic.CMP, compare_source, s[1].op1_register):
         return False
     miss = body(bm)
     # No hidden preparations, reordered arguments, slot changes or copies.
@@ -345,7 +374,6 @@ def _slot_zero_lea_fold(blocks, pb, bm, call_index, region, hits, res):
         return False
     # klass is freshly loaded from precisely the helper receiver. No later
     # call/write may replace either before the test; table/count use that klass.
-    prefix = e[:-4]
     for j in range(len(prefix) - 1, -1, -1):
         ins = prefix[j]
         writes = _gpr_writes(ins)
@@ -361,6 +389,8 @@ def _slot_zero_lea_fold(blocks, pb, bm, call_index, region, hits, res):
             return False
     else:
         return False
+    if direct_zero:
+        return True
     source = RegisterExt.full_register(seed.op1_register)
     if source in stable or source == IReg.RSP:
         return False

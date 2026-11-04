@@ -1,0 +1,267 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact local-zero slot-zero LEA interface scan entry; not promoted; goal not achieved",
+  "baseline": "game_out38",
+  "candidate": "game_out39",
+  "source_parent": "de9fe52343964c6fe4cc6a5d949c774e50156a71",
+  "proof_scope": [
+    "The existing slot-zero LEA scan proof gains one disjoint exact six-instruction entry: receiver klass load; 32-bit self-XOR counter; eight-byte RIP interface load; unsigned word interface-count load; word compare; JAE miss. Legacy MOVZX-copy seed and ADD matchers are not relaxed.",
+    "The complete four-block scan, loop bounds, exact receiver/class/table/count/interface def-use chain, signed offset times 16, exact helper arguments (same receiver, same interface, zero slot), pure entry/region/exits and preserved-register liveness remain independently proved. Overlapping roles, partial/wide seeds, MOV-zero, wrong widths/branches, extra effects, indexes, segments, REP and reordered entry decline.",
+    "Only CFG reachability and skip membership change. No text-based source repair, fabricated casts, declarations or managed interface-call recovery is added. The surviving sret indirect invocation remains honest and unresolved."
+  ],
+  "validation": {
+    "additional_portable_cases": 85,
+    "new_game_cases": 3,
+    "focused_synthetic_passed": 148,
+    "focused_game_passed": 3,
+    "portable": {
+      "passed": 3563,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1170.4060000000754,
+      "frozen_source_verified": true,
+      "passed": 3644,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 668.9679999999935,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "de9fe52343964c6fe4cc6a5d949c774e50156a71",
+      "exit_code": 1,
+      "seconds": 117.25,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 75,
+      "complete_raw_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5434,
+          "after": 4546,
+          "added": 148,
+          "removed": 1036,
+          "added_codes": {
+            "CS0103": 148
+          },
+          "removed_codes": {
+            "CS1061": 444,
+            "CS0029": 148,
+            "CS0019": 296,
+            "CS0103": 148
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 474,
+        "changed_files": 75,
+        "native_proved_methods": 148,
+        "unused_System_usings_removed": 73,
+        "whole_file_causal_equality": true,
+        "constructor_and_all_surviving_statements_preserved_in_order": true,
+        "temp_names_bijective_and_literal_comment_safe": true
+      },
+      "independent_native_review": {
+        "status": "production selected-corpus read-only predicate review and independent integer/memory interpreter; not game-native execution",
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "new_predicate_hits": 148,
+        "methods_with_body_changes": 148,
+        "predicate_read_only": true,
+        "all_prior_predicate_acceptances_preserved": true,
+        "source_frozen_verified": true,
+        "independent_interpreter_cases": 8292,
+        "large_count_register_shapes": 2,
+        "interpreter_mismatches": 0,
+        "prune_stats": {
+          "sites": 274,
+          "d_hit": 121,
+          "d_nopred": 121,
+          "pruned": 153
+        },
+        "seconds": 239.625
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 0,
+      "complete_raw_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3781,
+          "after": 3781,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 293,
+        "changed_files": 0,
+        "native_proved_methods": 0,
+        "unused_System_usings_removed": 0,
+        "whole_file_causal_equality": true,
+        "constructor_and_all_surviving_statements_preserved_in_order": true,
+        "temp_names_bijective_and_literal_comment_safe": true
+      },
+      "independent_native_review": {
+        "status": "production selected-corpus read-only predicate review and independent integer/memory interpreter; not game-native execution",
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "new_predicate_hits": 0,
+        "methods_with_body_changes": 0,
+        "predicate_read_only": true,
+        "all_prior_predicate_acceptances_preserved": true,
+        "source_frozen_verified": true,
+        "independent_interpreter_cases": 0,
+        "large_count_register_shapes": 0,
+        "interpreter_mismatches": 0,
+        "prune_stats": {
+          "sites": 167,
+          "pruned": 160,
+          "d_hit": 6,
+          "d_nopred": 6,
+          "d_tail2": 1
+        },
+        "seconds": 139.9529999999795
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "raw_added_CS0103": 148,
+    "raw_removed": 1036,
+    "raw_net_removed": 888,
+    "surviving_undeclared_temp_diagnostics_renamed": 148,
+    "after_verified_source_line_and_bijective_temp_map_added": 0,
+    "removed_diagnostics_on_exact_deleted_scan_lines": 888,
+    "removed_codes": {
+      "CS1061": 444,
+      "CS0029": 148,
+      "CS0019": 296
+    },
+    "raw_message_normalization_or_suppression": false,
+    "explanation": "Raw 148 CS0103 additions are explicitly reported. A separate whole-source proof with per-method bijective identifier maps and exact surviving-line positions pairs every one with an existing undeclared sret temporary diagnostic. The 888 truly removed diagnostics all reside on exact deleted scan lines."
+  },
+  "next_temp_only_probe": {
+    "status": "Unsafe removal of returns_sret guard is disproved as a production fix: three methods gain managed-looking calls but subsequent return copies still refer to stale undeclared obj temporaries. No production acceptance or compiler/ABI/effects proof.",
+    "source_unchanged": true,
+    "representative_methods": 3
+  },
+  "limitations": [
+    "Interpreter checks use actual decoded game CFG but synthetic memory/register inputs and an independent lookup contract. They do not execute game-native methods or independently verify the runtime helper implementation, exceptions, allocation/GC behavior, full-game equivalence or speed.",
+    "148 methods change in 75 files; 73 unused System using directives disappear. Constructors and all surviving statements are preserved exactly in order after the verified single miss-path replacement and one-to-one temporary renaming. The other 692 selected files and eight diagnostic multisets are byte/exact-multiset unchanged.",
+    "The 148 underlying undeclared sret temporaries remain unfixed. Many real compiler errors remain; UniTask.Linq still has 13 declaration errors with no observed body sentinel.",
+    "No golden/pin changes, output promotion, near-zero-error recompilation, game-runtime equivalence or performance improvement claim."
+  ]
+}
