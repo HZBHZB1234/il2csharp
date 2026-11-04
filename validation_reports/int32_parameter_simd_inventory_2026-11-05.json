@@ -1,0 +1,217 @@
+{
+  "date": "2026-11-05",
+  "status": "read-only research; no production recovery enabled",
+  "accepted_source_candidate": "game_out56; not promoted",
+  "source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "source_fingerprints_sha256": "c51e30153041311fd25240706f1c0dbe653b9299b170ae517239824e3d14945c",
+  "source_and_test_bytes_match_accepted_commit": true,
+  "production_logic_or_tests_changed": false,
+  "inventory": {
+    "unitask": {
+      "fixture": "unitask",
+      "methods": 2242,
+      "gpr_movd_cvtdq2ps_sites": 2,
+      "all_path_native_parameter_candidates": 0,
+      "exact_typed_scalar_candidates": 0,
+      "reasons": {
+        "volatile_across_call": 2
+      },
+      "candidate_mi": [],
+      "crashes": [],
+      "all_bodies_byte_identical_to_accepted56": true,
+      "source_fingerprints_verified": true,
+      "production_logic_or_tests_modified": false,
+      "not_a_production_proof": true,
+      "seconds": 226.10900000005495
+    },
+    "survivors-roguelike-kit": {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "gpr_movd_cvtdq2ps_sites": 138,
+      "all_path_native_parameter_candidates": 5,
+      "exact_typed_scalar_candidates": 5,
+      "reasons": {
+        "unsupported_control": 50,
+        "volatile_across_call": 21,
+        "noncopy_last_writer": 53,
+        "same_parameter_all_predecessors": 5,
+        "external_branch": 3,
+        "shared_or_unregistered_entry": 6
+      },
+      "candidate_mi": [
+        69879,
+        70773,
+        70777,
+        70778
+      ],
+      "crashes": [],
+      "all_bodies_byte_identical_to_accepted56": true,
+      "source_fingerprints_verified": true,
+      "production_logic_or_tests_modified": false,
+      "not_a_production_proof": true,
+      "seconds": 197.65600000007544
+    },
+    "limbus": {
+      "fixture": "limbus",
+      "methods": 923,
+      "gpr_movd_cvtdq2ps_sites": 154,
+      "all_path_native_parameter_candidates": 1,
+      "exact_typed_scalar_candidates": 1,
+      "reasons": {
+        "unsupported_control": 54,
+        "noncopy_last_writer": 61,
+        "shared_or_unregistered_entry": 33,
+        "volatile_across_call": 4,
+        "same_parameter_all_predecessors": 1,
+        "external_branch": 1
+      },
+      "candidate_mi": [
+        35790
+      ],
+      "crashes": [],
+      "all_bodies_byte_identical_to_accepted56": true,
+      "source_fingerprints_verified": true,
+      "production_logic_or_tests_modified": false,
+      "not_a_production_proof": true,
+      "seconds": 114.59400000004098
+    }
+  },
+  "candidate_sites": [
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 0,
+      "backward_states": 9,
+      "suffix_states": 2,
+      "preserved_call_states": 0,
+      "copy_count": 0,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 1,
+      "backward_states": 10,
+      "suffix_states": 2,
+      "preserved_call_states": 0,
+      "copy_count": 0,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70773,
+      "parameter_index": 1,
+      "backward_states": 70,
+      "suffix_states": 1,
+      "preserved_call_states": 10,
+      "copy_count": 1,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70777,
+      "parameter_index": 2,
+      "backward_states": 41,
+      "suffix_states": 1,
+      "preserved_call_states": 5,
+      "copy_count": 1,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70778,
+      "parameter_index": 0,
+      "backward_states": 77,
+      "suffix_states": 1,
+      "preserved_call_states": 13,
+      "copy_count": 1,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    },
+    {
+      "fixture": "limbus",
+      "mi": 35790,
+      "parameter_index": 0,
+      "backward_states": 8,
+      "suffix_states": 3,
+      "preserved_call_states": 0,
+      "copy_count": 0,
+      "typed_scalar_and_metadata_parameter_text_agree": true,
+      "production_field_proof_accepts": false
+    }
+  ],
+  "inventory_scope": [
+    "Selected 2242 UniTask / 1936 survivors / 923 Limbus methods, not a full-game scan.",
+    "Same-block register MOVD last-writer followed by CVTDQ2PS, within 512 contiguous suffix instructions. This is not an inventory of all integer conversions.",
+    "Research-only backwards predecessor walk accepts unanimous exact non-byref Int32 entry-parameter origins, following exact MOV r32,r32 copies. Metadata and hidden-sret/instance ABI positions define entry registers, not variable text.",
+    "One total 512-state budget includes the suffix and native predecessor trace; volatile GPRs do not survive direct calls, Win64 nonvolatile copies can. Partial writes, arithmetic writers, mixed roots, cycles and unsupported flow decline.",
+    "Only exact caller-owned x64 Win64 native contexts with unique non-generic entry metadata are considered. Indirect calls/branches and external branch targets decline the whole context.",
+    "An initial overstrict private probe rejected exact terminal INT3 trap/padding. The revised private census treats only Code.INT3 as a no-successor terminator and reruns all three fixtures. Production code was never changed."
+  ],
+  "authored_private_spec": {
+    "cases": 15,
+    "passed": 15,
+    "not_repository_suite_cases": true,
+    "not_production_acceptance": true,
+    "coverage": [
+      "entry Int32 origin, exact 32-bit copies, nonvolatile save across calls",
+      "volatile clobber, arithmetic and partial writers, conflicting roots",
+      "same-root branch join, backward cycle, shared/generic signature rejection",
+      "hidden-sret positional shift and one total state budget"
+    ]
+  },
+  "runtime_counterexample": {
+    "fixture": "survivors-roguelike-kit",
+    "mi": 70778,
+    "authored_positive_int32_inputs": 110001,
+    "existing_production_expression_sha256": "bca49a33e2a1c21a0a86d3152d6e77aa98a83b1f7e18eb4bbeb657d13b389cc2",
+    "existing_production_expression_unmodified": true,
+    "hardware_SSE2_conversion_then_SSE_sqrt": true,
+    "existing_expression_mismatches": 12110,
+    "authored_float_snapshot_proposal_mismatches": 0,
+    "counterexample": {
+      "input": 16785411,
+      "existing_result": 4097.0,
+      "native_float_result": 4097.00048828125
+    },
+    "proposal_only_not_production_enabled": true,
+    "checked_optimized_compile": true,
+    "default_rounding_only": true,
+    "negative_helper_inputs_checked": false,
+    "game_native_execution": false,
+    "whole_method_equivalence": false
+  },
+  "remaining_proof_obligations": [
+    "The private predecessor model is not a production recognizer or whole-method semantic proof. Independently decode candidate paths and verify actual ownership, native register alias/writer semantics, entry ABI and metadata identity.",
+    "Prove conversion-point source expression identity and lifetime, address escapes and exceptional/funclet paths; source-text equality alone must never establish the origin.",
+    "Preserve zero high lanes for legacy MOVD and snapshot the low float exactly at CVTDQ2PS. Never cast an unknown object, bound temp or aggregate token numerically.",
+    "Do not generalize the existing field proof, relax RBP/frame, aggregate/address/overlap, interface-sret or scalar-home guards, or infer all GPR/packed/high-lane conversions.",
+    "Keep opaque domain/error-helper calls and their argument semantics; no sqrtf replacement or broad Math.Sqrt repair is justified.",
+    "A production candidate needs authored boundary tests, game re-lifts, frozen suites, paired tree/compiler diagnostics and clean-parent behavioral reproduction before acceptance."
+  ],
+  "limitations": [
+    "All selected bodies remain byte-identical to game_out56. No compilation-error reduction, source recovery or speed gain is claimed for this read-only study.",
+    "The runtime comparison compiles an unchanged positive-branch production expression against SSE2 integer conversion followed by SSE square root. The float-snapshot alternative is authored, not production-generated.",
+    "110001 positive Int32 samples with default rounding are not exhaustive and do not execute game-native helpers, negative arms, all FP environments or whole methods.",
+    "Existing compile errors, original three test failures and other source/phi/aggregate/helper defects remain; near-recompilability and semantic equivalence are not achieved."
+  ],
+  "publication": {
+    "aggregate_only": true,
+    "native_bytes_or_disassembly_published": false,
+    "generated_method_bodies_or_full_diagnostics_published": false,
+    "game_data_published": false,
+    "promotion_performed": false,
+    "goldens_or_pins_changed": false
+  },
+  "local_evidence_script_sha256": {
+    "inventory_parameter57.py": "c6c8d8a2e86588ee192161034d9ba3f85d4b2a63eb0ceea2cfbf7d9b2a2d5fb4",
+    "inventory_parameter57b.py": "1b5655a2dcff57be112fb6f15cca6c940db65141d5c6859ea05eab27532a51e7",
+    "inspect_parameter57_context.py": "8f562c0cf63435e075609086bb2ab88f2591c039aaaf23ff0fca66431ec88556",
+    "test_parameter57_spec.py": "f74251d7ce3b6a4ac8fb4d3cb247236038544c305ac0ba7a203e1f3797ba3ebe",
+    "prove_parameter57_sqrt.py": "72d46b0e7e461e48cb51920b3f7dc44efbb2f0ea08b737c1ad8ec2810c3e46fe"
+  }
+}
