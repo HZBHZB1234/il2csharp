@@ -312,6 +312,9 @@ class _BuildMixin:
         # scan alone can miss it -- this flat, unsplit view always has it.
         self._flat_insns = insns
         self._flat_ip_idx = {ins.ip: i for i, ins in enumerate(insns)}
+        # Optional all-path scalar return proof owns this exact native body.
+        from il2cpp.lifter.resultflow import ScalarResultFlow
+        L._scalar_result_flow = ScalarResultFlow(m, insns)
         extra_leaders = self._scan_jump_table_leaders(insns)
         blocks, bmap = self._make_blocks(insns, skip, extra_leaders)
         if not blocks:

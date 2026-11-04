@@ -4355,6 +4355,12 @@ class _CallsMixin:
         # scalar width, before touching RAX: the value lives in XMM0.
         if re.fullmatch(r'sub_[0-9a-f]+', name):
             fw = xmm0_result_width(self.bin, ins.next_ip)
+            if fw is None:
+                # A branch is not a return-type guess: every bounded native
+                # continuation must consume the same scalar low-lane width.
+                flow = getattr(self, '_scalar_result_flow', None)
+                if flow is not None:
+                    fw = flow.width(self, ins)
             if fw is not None:
                 r = Expr('(%s)%s' % ('float' if fw == 4 else 'double', call),
                          _R4_TY if fw == 4 else _R8_TY, 'float')
