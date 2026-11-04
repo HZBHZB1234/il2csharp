@@ -1,0 +1,458 @@
+{
+  "date": "2026-11-05",
+  "status": "research_only_not_enabled",
+  "source_commit": "a3742e763b7ff8c97793d3a174a8ea22eaa8e9f9",
+  "accepted_candidate_source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "accepted_candidate_label": "game_out56",
+  "production_logic_or_repository_tests_changed": false,
+  "fixtures": {
+    "survivors-roguelike-kit": {
+      "methods": 4,
+      "sites": 5,
+      "all_bodies_byte_identical_to_accepted56": true,
+      "source_fingerprints_verified": true
+    },
+    "limbus": {
+      "methods": 1,
+      "sites": 1,
+      "all_bodies_byte_identical_to_accepted56": true,
+      "source_fingerprints_verified": true
+    }
+  },
+  "candidate_sites": [
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 0,
+      "forward_transfer_states": 9,
+      "co_reachable_prefix_instructions": 9,
+      "distinct_prefix_native_calls": 0,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 0,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 6,
+      "unwind_versions": [
+        1
+      ],
+      "unwind_flags_including_chains": [
+        0,
+        4
+      ],
+      "uncovered_native_instructions": 0,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 1
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 1,
+      "forward_transfer_states": 10,
+      "co_reachable_prefix_instructions": 10,
+      "distinct_prefix_native_calls": 0,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 0,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 6,
+      "unwind_versions": [
+        1
+      ],
+      "unwind_flags_including_chains": [
+        0,
+        4
+      ],
+      "uncovered_native_instructions": 0,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 1
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70773,
+      "parameter_index": 1,
+      "forward_transfer_states": 85,
+      "co_reachable_prefix_instructions": 70,
+      "distinct_prefix_native_calls": 10,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 2,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 1,
+      "unwind_versions": [
+        1
+      ],
+      "unwind_flags_including_chains": [
+        0
+      ],
+      "uncovered_native_instructions": 0,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 0
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70777,
+      "parameter_index": 2,
+      "forward_transfer_states": 50,
+      "co_reachable_prefix_instructions": 41,
+      "distinct_prefix_native_calls": 5,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 3,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 1,
+      "unwind_versions": [
+        1
+      ],
+      "unwind_flags_including_chains": [
+        0
+      ],
+      "uncovered_native_instructions": 0,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 0
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70778,
+      "parameter_index": 0,
+      "forward_transfer_states": 83,
+      "co_reachable_prefix_instructions": 77,
+      "distinct_prefix_native_calls": 13,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 3,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 1,
+      "unwind_versions": [
+        1
+      ],
+      "unwind_flags_including_chains": [
+        0
+      ],
+      "uncovered_native_instructions": 0,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 0
+    },
+    {
+      "fixture": "limbus",
+      "mi": 35790,
+      "parameter_index": 0,
+      "forward_transfer_states": 8,
+      "co_reachable_prefix_instructions": 8,
+      "distinct_prefix_native_calls": 0,
+      "same_entry_expr_identity": true,
+      "production_field_proof_accepts": false,
+      "parameter_mutation_scan_hits": 0,
+      "parameter_address_scan_hits": 0,
+      "origin_write_memory_touches": 0,
+      "origin_memory_address_or_lea_touches": 0,
+      "origin_argument_register_states": 0,
+      "unanimous_call_input_signatures_proved": false,
+      "runtime_function_chunks": 0,
+      "unwind_versions": [],
+      "unwind_flags_including_chains": [],
+      "uncovered_native_instructions": 43,
+      "production_eh_regions_present": false,
+      "movd_zero_high_96_bits": true,
+      "unchanged_source_xmm_suffix_instructions": 2
+    }
+  ],
+  "independent_audit": [
+    "Fresh recursive binary decode, not the decompiler reachable-instruction list or the previous backwards origin model.",
+    "Forward GPR origin-set fixedpoint from metadata/Win64 entry slots; exact MOV32 copies, all other GPR writers kill, direct calls kill volatile registers.",
+    "Reverse reachability only removes arms unable to reach the target MOVD; forward origins join over every remaining predecessor.",
+    "Direct .pdata and version-1 UNWIND_INFO parsing recursively follows CHAININFO, independently of production eh_regions.",
+    "The initial single function_extent assumption failed on survivors 69879. Six runtime-function chunks cover its recursively decoded body; the audit was corrected and rerun. This is not evidence of a production source defect.",
+    "Limbus 35790 has no .pdata record (leaf); its 43 decoded instructions are uncovered. This does not prove either corruption or complete absence of exceptional behavior.",
+    "Parameter mutation/ref/out/address regexes are literal-masked observations, not a full C# alias or lifetime proof.",
+    "origin_write_memory_touches includes parameter-origin address reads on a memory-write instruction, not only the stored value.",
+    "origin_memory_address_or_lea_touches includes arithmetic LEA; the Limbus count-1 LEA uses another parameter, not the candidate index, and is not an observed index address escape.",
+    "origin_argument_register_states only records origin presence in Win64 argument registers before calls, not actual argument consumption. Shared/generic callee signatures have not been proved unanimous."
+  ],
+  "authored_private_forward_tests": {
+    "passed": 34,
+    "repository_suite_count_changed": false,
+    "mechanism": "AST-extract the audit forward model without fixture-loading side effects; fake metadata and authored x64 bytes.",
+    "coverage": [
+      "MOV32 vs MOV64, byte/word/arithmetic/conditional/implicit writes",
+      "all-predecessor matching/conflicting/unknown joins",
+      "volatile and nonvolatile call rules, irrelevant call arm",
+      "static/instance/hidden-sret entry shifts, byref/float/stack exclusions",
+      "loop fixedpoint, copy-before-overwrite",
+      "memory-write address touch vs value-store distinction",
+      "arithmetic LEA vs address escape distinction",
+      "argument-register presence vs actual call-input consumption"
+    ]
+  },
+  "runtime_counterexamples": {
+    "fixtures": [
+      "survivors-roguelike-kit",
+      "limbus"
+    ],
+    "mi": [
+      69879,
+      35790
+    ],
+    "unchanged_production_rhs_sha256": [
+      "81bb0cf83371edb1357dd9d8374b205b00cdf7e60e8a54bd102e5121f3b5f7b8",
+      "8deb0766d7d4f191acc29a67305abc8087d41ab3ec84b973d58b67c86fb136e6"
+    ],
+    "unchanged_rhs_and_range_count_one_guard": true,
+    "hardware_SSE2_int32_conversion_then_SSE_division": true,
+    "checked_optimized_compile": true,
+    "default_rounding_only": true,
+    "proposal_only_not_production_enabled": true,
+    "range_domain_excludes_count_int32_minvalue": true,
+    "range_excluded_count_subtraction_overflow_remains_unfixed": true,
+    "lifetime_countermodel_is_authored_not_observed_game_output": true,
+    "game_native_execution": false,
+    "whole_method_equivalence": false,
+    "results": {
+      "bar": {
+        "inputs": 100225,
+        "existing_mismatches": 100144,
+        "existing_mismatch_kinds": {
+          "bits": 100128,
+          "OverflowException": 1,
+          "DivideByZeroException": 15
+        },
+        "proposal_mismatches": 0
+      },
+      "range": {
+        "inputs": 100210,
+        "existing_mismatches": 100122,
+        "existing_mismatch_kinds": {
+          "bits": 100121,
+          "OverflowException": 1
+        },
+        "proposal_mismatches": 0
+      },
+      "examples": [
+        {
+          "family": "bar",
+          "x": 1,
+          "y": 2,
+          "existing": {
+            "kind": "value",
+            "bits": 0,
+            "value": "0"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          }
+        },
+        {
+          "family": "bar",
+          "x": 0,
+          "y": -1,
+          "existing": {
+            "kind": "value",
+            "bits": 0,
+            "value": "0"
+          },
+          "native": {
+            "kind": "value",
+            "bits": -2147483648,
+            "value": "-0"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": -2147483648,
+            "value": "-0"
+          }
+        },
+        {
+          "family": "bar",
+          "x": 1,
+          "y": 0,
+          "existing": {
+            "kind": "DivideByZeroException"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 2139095040,
+            "value": "Infinity"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 2139095040,
+            "value": "Infinity"
+          }
+        },
+        {
+          "family": "bar",
+          "x": -2147483648,
+          "y": -1,
+          "existing": {
+            "kind": "OverflowException"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 1325400064,
+            "value": "2147483648"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 1325400064,
+            "value": "2147483648"
+          }
+        },
+        {
+          "family": "range",
+          "x": 1,
+          "y": 3,
+          "existing": {
+            "kind": "value",
+            "bits": 0,
+            "value": "0"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          }
+        },
+        {
+          "family": "range",
+          "x": 0,
+          "y": 0,
+          "existing": {
+            "kind": "value",
+            "bits": 0,
+            "value": "0"
+          },
+          "native": {
+            "kind": "value",
+            "bits": -2147483648,
+            "value": "-0"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": -2147483648,
+            "value": "-0"
+          }
+        },
+        {
+          "family": "range",
+          "x": -2147483648,
+          "y": 0,
+          "existing": {
+            "kind": "OverflowException"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 1325400064,
+            "value": "2147483648"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 1325400064,
+            "value": "2147483648"
+          }
+        },
+        {
+          "family": "range",
+          "x": 1,
+          "y": 1,
+          "existing": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          },
+          "proposal": {
+            "kind": "value",
+            "bits": 1056964608,
+            "value": "0.5"
+          }
+        },
+        {
+          "family": "range",
+          "x": 1,
+          "y": -2147483648,
+          "existing": {
+            "kind": "OverflowException"
+          },
+          "native": {
+            "kind": "value",
+            "bits": 805306368,
+            "value": "4.656612873077393E-10"
+          },
+          "proposal": {
+            "kind": "OverflowException"
+          }
+        }
+      ],
+      "lifetime_authored_inputs": 10001,
+      "lifetime_conversion_only_mismatches": 10001,
+      "lifetime_entry_snapshot_mismatches": 0,
+      "lifetime_call_effect_count_mismatches": 0
+    }
+  },
+  "evidence_limits": [
+    "Only six previously inventoried sites in five selected methods, not a fresh full-game inventory.",
+    "Runtime checks use authored extracted expressions and local hardware SSE2/SSE under default rounding, checked+/optimize+. They are not game-native or whole-method equivalence tests.",
+    "The actual Limbus count==1 guard is retained: both implementations return 0.5 at that guard.",
+    "Range numerator-only proposal has zero mismatches only on the sampled domain excluding count==Int32.MinValue. At that excluded boundary checked count-1 still overflows while native LEA wraps.",
+    "The ref-mutation lifetime countermodel is authored, not observed in the five game outputs. It disproves a general conversion-only snapshot rule, not the observed native origins.",
+    "No compiler-error reduction, decompilation speed gain, source fix, output promotion, re-pin or whole-method equivalence is claimed.",
+    "Repository suites not rerun for this evidence-only change; prior source validation remains in quality_scalar_result_flow_2026-11-05.json."
+  ],
+  "next_steps": [
+    "Design a decline-by-default entry-parameter storage/lifetime guard separately from native origin and MOVD-high-lane proof.",
+    "Prefer a narrow untouched entry-GPR/no-prior-call subset initially; cross-call origins remain research-only until managed storage and alias lifetime are executable proof obligations.",
+    "If using entry Int32 snapshots, protect capture placement and cleanup against inlining into mutated parameter storage; avoid name collisions.",
+    "Any source candidate still requires frozen suites, paired real trees/compiler diagnostics and scoped clean-parent behavioral reproduction."
+  ],
+  "private_evidence_sha256": {
+    "audit_parameter58.py": "94b6e440c9c180a46af8c22049e2cde4f30698c5c13d4440cc00652c7d9c8b3f",
+    "test_parameter58_forward_private.py": "7ed0c1935518b58a44662998f58ef3219772f90366109b96b756f6410477c402",
+    "parameter58_audit.survivors-roguelike-kit.summary.json": "3dea3f9d446f497c8631a7ab7c2bc2d387e4d4b3de31bcac63e9ea5c6164175a",
+    "parameter58_audit.limbus.summary.json": "a4377f35163565fa7aa88a7e92caa1cf60698de47763a36a4233d330eac66941",
+    "prove_parameter58_division.py": "bad26fe255a3259a63ae28726c3c9ebaec6ccc2fc1219f6d5a16d96202ea4d22",
+    "parameter58_division.summary.json": "f040db284b362281681fb167104227bd9e1b49370ab9e34865656bed476bb100"
+  },
+  "goal_complete": false,
+  "goldens_or_pins_changed": false,
+  "output_promoted": false
+}
