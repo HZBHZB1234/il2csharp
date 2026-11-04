@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-04",
+  "status": "read-only inventory; no new recovery accepted",
+  "source_parent": "1046ee6538dd03ec240176bc15217fd44601c8a7",
+  "fixtures": {
+    "unitask": {
+      "research_only": true,
+      "accepted_source_change": false,
+      "source_parent": "1046ee6538dd03ec240176bc15217fd44601c8a7",
+      "fixture": "unitask",
+      "methods": 2242,
+      "unique_overcap_expressions": 0,
+      "overcap_methods": 0,
+      "mnemonic_counts": {},
+      "kind_counts": {},
+      "prospective_closed_int32_register_cmov_sites": 0,
+      "crashes": 0,
+      "seconds": 143.4529999999795,
+      "source_fingerprints_verified": true
+    },
+    "survivors-roguelike-kit": {
+      "research_only": true,
+      "accepted_source_change": false,
+      "source_parent": "1046ee6538dd03ec240176bc15217fd44601c8a7",
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "unique_overcap_expressions": 0,
+      "overcap_methods": 0,
+      "mnemonic_counts": {},
+      "kind_counts": {},
+      "prospective_closed_int32_register_cmov_sites": 0,
+      "crashes": 0,
+      "seconds": 120.875,
+      "source_fingerprints_verified": true
+    },
+    "limbus": {
+      "research_only": true,
+      "accepted_source_change": false,
+      "source_parent": "1046ee6538dd03ec240176bc15217fd44601c8a7",
+      "fixture": "limbus",
+      "methods": 923,
+      "unique_overcap_expressions": 16,
+      "overcap_methods": 16,
+      "mnemonic_counts": {
+        "CMOVL": 4,
+        "ADDSS": 3,
+        "CMOVGE": 1,
+        "CMOVG": 5,
+        "CMOVNS": 1,
+        "CMOVNE": 2
+      },
+      "kind_counts": {
+        "int": 10,
+        "float": 3,
+        "?": 3
+      },
+      "prospective_closed_int32_register_cmov_sites": 0,
+      "crashes": 0,
+      "seconds": 85.90600000007544,
+      "source_fingerprints_verified": true
+    }
+  },
+  "limbus_scope": "Selected 923 native methods from the historical small-method dword-SHR inventory, not a full Limbus scan.",
+  "findings": [
+    "Current sample-fixture sweeps have zero oversized _mk expressions.",
+    "Selected Limbus methods have 16 oversized expressions in 16 methods: ten int, three float, three unknown-kind results.",
+    "Native instruction counts: ten signed relational CMOV, one CMOVNS, two CMOVNE, three ADDSS.",
+    "The tentative closed-Int32 register CMOV boundary has zero qualifying sites on accepted source, without the rejected SHR rewrite.",
+    "Float result kind is not a proof of valid float arithmetic: the inventory includes unknown and mismatched operand/result types.",
+    "A process-local SHR/budget trial has no new cap-zero methods in the same selection but changes seven call-name multisets. Its acceptance is not established."
+  ],
+  "combined_process_local_trial": {
+    "research_only": true,
+    "repository_changed": false,
+    "selected_methods": 923,
+    "changed_methods": 162,
+    "new_cap_zero_methods": [],
+    "call_name_multiset_changes": {
+      "15390": {
+        "added": {
+          "Round": 2
+        },
+        "removed": {}
+      },
+      "15396": {
+        "added": {
+          "Round": 2
+        },
+        "removed": {}
+      },
+      "65091": {
+        "added": {},
+        "removed": {
+          "GetExpectedCoinScale": 1
+        }
+      },
+      "105643": {
+        "added": {},
+        "removed": {
+          "GetExpectedCoinScale": 1
+        }
+      },
+      "130083": {
+        "added": {},
+        "removed": {
+          "IndexOf": 1
+        }
+      },
+      "172444": {
+        "added": {},
+        "removed": {
+          "InternalDecrypt": 1
+        }
+      },
+      "172452": {
+        "added": {},
+        "removed": {
+          "InternalDecrypt": 1
+        }
+      }
+    },
+    "oversize_sites": 14,
+    "tentative_closed_int32_cmov_sites": 2,
+    "remaining_cap_zero_total": 12,
+    "accepted_source_change": false,
+    "proof_gaps": [
+      "Complete width/type/lifetime proof for retained CMOV expressions",
+      "Whole-method and real compiler delta review",
+      "Authored boundary/decline and CPU/compiled C# verification"
+    ]
+  },
+  "decision": "Do not ship the tentative CMOV budget guard or revive SHR based only on zero cap regressions. Establish per-node type/width and native execution identity, or a proved evaluation-boundary representation, before replacing cap-to-zero.",
+  "source_changed": false,
+  "goldens_or_pins_changed": false,
+  "promotion_performed": false,
+  "whole_game_equivalence_proved": false,
+  "runtime_speed_improvement_claimed": false,
+  "publication": "Aggregate counts only; full expressions, generated bodies and native instruction observations remain local."
+}
