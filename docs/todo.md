@@ -4,6 +4,79 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Recover proved Int32-field SIMD conversions (2026-11-04)
+
+Accepted `game_out54` (not promoted), versus out52. Legacy memory MOVD
+zeroes the high 96 bits, but the scalar expression did not retain that fact;
+CVTDQ2PS could leave an integer source feeding native float operations,
+including DIVSS rendered as integer division. A new same-block native proof
+recognizes only a known reference-instance Int32 field loaded by legacy
+four-byte memory MOVD. At CVTDQ2PS it emits a float snapshot and records three
+positive-zero high lanes, without changing the MOVD expression's identity.
+The snapshot is evaluated at the conversion, not lazily after later field
+writes. Int32 is recognized by the metadata primitive enum and non-byref bit,
+not raw type-tuple equality (real field attribute/data bits differ).
+
+The proof owns the exact block instruction list and actual native instruction,
+scans at most 512 contiguous instructions, rejects calls/branches, intervening
+memory writes and source/base alias writes, and requires a plain named CLASS
+receiver with no unknown/stack/byte/slice/aggregate provenance. GPR MOVD,
+double conversions, flat/cross-block paths and all unproved shapes retain the
+old path. No cap increase or aggregate/address/overlap, RBP, interface-sret or
+scalar-home guard relaxation. Initial out53 integration wrongly treated
+`_insn`'s always-zero structured index hint as the native position: authored
+tests passed but production had zero recoveries. Its evidence is rejected;
+out54 finds the real block position, tests fixed hints -1/0/999, and reruns
+all production audits, trees and suites.
+
+Production sweeps cover **2,242 / 1,936 sample methods** and a **923-method
+Limbus selection**, with **zero / 11 / six unique conversion sites** in
+**zero / nine / six changed methods**. All have independent native field/
+producer checks, zero crashes, identical changed re-lifts, unchanged call-name
+multisets and no new expression-cap-to-zero sites. These lexical checks do
+not prove execution counts or whole-method equivalence.
+
+Strict sample trees retain **2,227 / 1,857 bodies**, zero failed/fallback/
+type-emit failures, clean brace/parse gates and verified source fingerprints.
+**Eight of 767 C# files** change. Nine real-reference assembly gates reduce
+survivors Assembly-CSharp **3,780 -> 3,769 errors (-11)**; the other eight
+assemblies are unchanged. Message-aware deltas are **11 added CS0165 / 11
+removed CS0165 / 11 removed CS0266**. The CS0165 pairs are existing VertexJitter
+float temporaries renumbered by nine: every occurrence retains the same line
+and normalized read/write context; one column moves because an earlier name
+gains a digit. They are not new error sites. Existing hoisted declarations
+still lack initializers; later backedge writes remain. CS0266 removals are
+nine in VertexJitter and two in TreasurePanel. Unchanged-file location-aware
+diagnostic multisets are identical; all-file multisets are not. References
+are real Editor/BCL/netstandard2.1 and original player packages, original
+assembly identities, no self-reference or synthetic stubs. UniTask.Linq still
+has no observed body sentinel; its body compilation remains unproved.
+
+**73 new portable + eight new game cases**; focused **137 passed**, portable
+**4,659 passed**. Frozen full excluding parallel: **4,770 passed / 259 skipped /
+one non-strict xpassed / the same three existing failures**; parallel **two
+passed**. Scoped clean-parent proof on `86eed6d` reproduces **19 failing / 54
+passing portable cases**, **eight failing game cases**, all 923 parent bodies
+byte-identically and exactly the existing failure set; all four candidate
+files restore byte-exact. Goldens/pins unchanged.
+
+Production-generated C# compiles under `/checked+ /optimize+` and matches an
+authored SSE2/SSE hardware oracle on **4,115 signed-Int32 inputs / 53,495 float
+lane-and-division checks / 4,115 field-snapshot checks**, zero mismatches.
+This covers local default-rounding arithmetic and snapshot lifetime, not
+native game execution or whole-method equivalence. Some converted values
+still have broken downstream aggregate/phi consumers; GPR/double and silent
+expression-cap recovery remain open. Limbus has not had a full rebuild.
+No measured runtime speed improvement, near-recompilability or overall goal
+completion is claimed. Aggregate-only evidence:
+`validation_reports/quality_simd_field_conversion_2026-11-04.json`.
+
+Next: extend scalar conversion only with independent native source-lane,
+width, metadata-type and lifetime proof; broad GPR/double casts remain
+rejected. Separately replace cap-to-zero only at a proved bounded evaluation
+boundary before revisiting signed SHR. No promotion.
+
+
 ### Preserve one execution per materialized native call (2026-11-04)
 
 Accepted `game_out52` (not promoted), versus out48. A long call argument was

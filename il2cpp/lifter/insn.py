@@ -1,6 +1,7 @@
 from il2cpp.prelude import *  # noqa: F401,F403
 from il2cpp.common import csharp_type_name
 from il2cpp.lifter.arrayindex import array_index_units
+from il2cpp.lifter.simdproof import movd_int32_field
 from il2cpp.expr import Expr, _ARR_BIAS_RX, _BARE_TOKEN_RX, _BOOL_TY, _INT_TY, _R4_TY, _R8_TY, _USE_BIND_MIN, _recv_fold, _recv_shaped
 from il2cpp.names import repr_f32, repr_f64
 from il2cpp.runtime.meta import IMM_OPS, meta_lit_repr
@@ -1134,6 +1135,20 @@ class _InsnMixin:
             dst = reg_name(ins.op0_register)
             right = (self.reg(reg_name(ins.op1_register)) if A(1) == OpKind.REGISTER
                      else self._read_mem(ins, asm))
+            if movd_int32_field(self, ins, insns, right):
+                # MOVD clears the upper 96 bits. Snapshot the converted low
+                # lane here, not lazily at a later use/field write. Do not
+                # mutate or wrap the original scalar Expr shared by MOVD.
+                name = self.new_var()
+                self.emit(ip, 'var ' + name + ' = (float)(' + right.text + ');', asm)
+                self._var_types[name] = _R4_TY
+                low = Expr(name, _R4_TY, 'float')
+                packed = Expr(name, _R4_TY, 'float')
+                packed._parts = [(0, low, 0, 4)] + [
+                    (lo, Expr('0.0f', _R4_TY, 'float'), 0, 4)
+                    for lo in (4, 8, 12)]
+                self.set_reg(dst, packed)
+                return
             parts = []
             ok = right is not None
             if ok:

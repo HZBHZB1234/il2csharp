@@ -1,0 +1,606 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted source candidate; not promoted",
+  "baseline": "game_out52",
+  "candidate": "game_out54",
+  "source_parent": "86eed6ddacf3f655cde96095a6782a4fb2f65c13",
+  "source_sha256": {
+    "il2cpp/lifter/insn.py": "14b4a779276467c9d3d28ba9669cedc2fd63f563bc537b2556200bcd9173d4b1",
+    "il2cpp/lifter/simdproof.py": "40ee58eac4546e18fd494bf7bfbad76fcaf7e878421cc2abaf378af7ef22593f",
+    "tests/test_simd_field_conversion.py": "7fd9e91256ef6b44f7ead9f3bc9ba6a870ada00650f8045809e9eefd39c5f337",
+    "tests/test_game_simd_field_conversion.py": "681d3971281b557a4f324e2fb9f5a47b97e295f0f4894b1defd7c17ff50f7313"
+  },
+  "correction": {
+    "root_cause": "Legacy MOVD preserved scalar Expr identity but lost the cleared upper 96 bits; CVTDQ2PS could not prove four Int32 lanes and left an integer source live for floating consumers, including native DIVSS rendered as integer division.",
+    "recovery": "Prove a same-block memory MOVD from a known reference-instance Int32 field, then emit an explicit float snapshot at CVTDQ2PS and record three positive-zero high lanes. Preserve the MOVD scalar Expr identity.",
+    "proof_boundary": [
+      "structured block owns the exact instruction list and current native instruction",
+      "at most 512 contiguous prior instructions, no calls/branches or memory writes",
+      "last XMM-family write is legacy 4-byte memory MOVD; alias and partial writes decline",
+      "non-indexed, segment-free, 64-bit non-stack/frame/RIP base, no intervening alias write",
+      "uncounted bare identifier receiver with metadata CLASS non-byref non-valuetype identity",
+      "metadata field and current scalar both semantically Int32, not raw tuple-equal",
+      "no unknown, no-bind, stack, byte, slice or aggregate provenance"
+    ],
+    "declines": "GPR-source MOVD, double conversions, copied/cross-block/flat instruction lists and all unproved shapes preserve the prior path. No generic MOVD wrapping, cap increase, RBP, interface-sret, scalar-home or aggregate/address/overlap guard changes."
+  },
+  "validation": {
+    "new_portable_cases": 73,
+    "new_game_cases": 8,
+    "focused_portable_and_retained_cases_passed": 137,
+    "portable": {
+      "exit_code": 0,
+      "seconds": 71.70299999997951,
+      "frozen_source_verified": true,
+      "passed": 4659,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 2017.8129999999655,
+      "frozen_source_verified": true,
+      "passed": 4770,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 840.313000000082,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "clean_source_baseline": {
+      "clean_source_head": "86eed6ddacf3f655cde96095a6782a4fb2f65c13",
+      "scope": [
+        "il2cpp/lifter/insn.py",
+        "il2cpp/lifter/simdproof.py",
+        "tests/test_simd_field_conversion.py",
+        "tests/test_game_simd_field_conversion.py"
+      ],
+      "source_test_sha256": {
+        "il2cpp/lifter/insn.py": "14b4a779276467c9d3d28ba9669cedc2fd63f563bc537b2556200bcd9173d4b1",
+        "il2cpp/lifter/simdproof.py": "40ee58eac4546e18fd494bf7bfbad76fcaf7e878421cc2abaf378af7ef22593f",
+        "tests/test_simd_field_conversion.py": "7fd9e91256ef6b44f7ead9f3bc9ba6a870ada00650f8045809e9eefd39c5f337",
+        "tests/test_game_simd_field_conversion.py": "681d3971281b557a4f324e2fb9f5a47b97e295f0f4894b1defd7c17ff50f7313"
+      },
+      "portable_repro": {
+        "total": 73,
+        "failed": 19,
+        "skipped": 0,
+        "exit_code": 1,
+        "passed": 54
+      },
+      "portable_boundary_helper_loaded_from_candidate_temp_copy": true,
+      "parent_native_instruction_handler_unmodified": true,
+      "game_repro": {
+        "total": 8,
+        "failed": 8,
+        "skipped": 0,
+        "exit_code": 1,
+        "passed": 0
+      },
+      "selected_923_parent_bodies_reproduce": true,
+      "fixed_failure_repro": {
+        "total": 3,
+        "failed": 3,
+        "skipped": 0,
+        "exit_code": 1,
+        "passed": 0
+      },
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true,
+      "seconds": 727.0
+    }
+  },
+  "pin_review": {
+    "goldens_modified": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ],
+    "failure_set_exactly_matches_parent": true
+  },
+  "production": {
+    "unitask": {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_methods": [],
+      "unique_conversion_sites": 0,
+      "crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "production_matches_process_local_prototype": true,
+      "call_name_multiset_changes": [],
+      "new_capzero_methods": [],
+      "independent_native_field_checks": true,
+      "source_fingerprints_verified": true,
+      "seconds": 173.43799999996554
+    },
+    "survivors-roguelike-kit": {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_methods": [
+        69686,
+        69717,
+        69747,
+        69822,
+        70234,
+        70561,
+        70752,
+        70755,
+        70843
+      ],
+      "unique_conversion_sites": 11,
+      "crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "production_matches_process_local_prototype": true,
+      "call_name_multiset_changes": [],
+      "new_capzero_methods": [],
+      "independent_native_field_checks": true,
+      "source_fingerprints_verified": true,
+      "seconds": 234.4529999999795
+    },
+    "limbus": {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_methods": [
+        40548,
+        65142,
+        65143,
+        65145,
+        129477,
+        153530
+      ],
+      "unique_conversion_sites": 6,
+      "crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "production_matches_process_local_prototype": true,
+      "call_name_multiset_changes": [],
+      "new_capzero_methods": [],
+      "independent_native_field_checks": true,
+      "source_fingerprints_verified": true,
+      "seconds": 166.2970000000205
+    }
+  },
+  "trees": {
+    "unitask": {
+      "cs_files": 474,
+      "changed_files": [],
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "source_fingerprints_verified": true,
+      "brace": {
+        "kind": "literal-aware brace audit",
+        "tree": "<repo-root>\\out\\unitask\\game_out54",
+        "files": 474,
+        "unbalanced_files": 0,
+        "details": {}
+      },
+      "parse": {
+        "kind": "tree-sitter C# syntax gate",
+        "tree": "<repo-root>\\out\\unitask\\game_out54",
+        "files": 474,
+        "bad_files": 0,
+        "errors": 0,
+        "missing": 0,
+        "recovery_nodes": 0,
+        "details": {},
+        "elapsed_seconds": 3.828
+      },
+      "assemblies": {
+        "Assembly-CSharp": {
+          "previous_errors": 1969,
+          "errors": 1969,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "TempAsm": {
+          "previous_errors": 6,
+          "errors": 6,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask": {
+          "previous_errors": 4541,
+          "errors": 4541,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.Addressables": {
+          "previous_errors": 5,
+          "errors": 5,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.DOTween": {
+          "previous_errors": 5,
+          "errors": 5,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.Linq": {
+          "previous_errors": 13,
+          "errors": 13,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": false
+        },
+        "UniTask.TextMeshPro": {
+          "previous_errors": 209,
+          "errors": 209,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        }
+      }
+    },
+    "survivors-roguelike-kit": {
+      "cs_files": 293,
+      "changed_files": [
+        "Assembly-CSharp\\RGame\\RoguelikeKit\\SkillManager.cs",
+        "Assembly-CSharp\\RGame\\RoguelikeKit\\SlowBuff.cs",
+        "Assembly-CSharp\\RGame\\RoguelikeKit\\SpiralShotStateNode.cs",
+        "Assembly-CSharp\\RGame\\RoguelikeKit\\TreasurePanel.cs",
+        "Assembly-CSharp\\TMPro\\Examples\\ObjectSpin.cs",
+        "Assembly-CSharp\\TMPro\\Examples\\TMP_FrameRateCounter.cs",
+        "Assembly-CSharp\\TMPro\\Examples\\TMP_UiFrameRateCounter.cs",
+        "Assembly-CSharp\\TMPro\\Examples\\VertexJitter.cs"
+      ],
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "source_fingerprints_verified": true,
+      "brace": {
+        "kind": "literal-aware brace audit",
+        "tree": "<repo-root>\\out\\survivors-roguelike-kit\\game_out54",
+        "files": 293,
+        "unbalanced_files": 0,
+        "details": {}
+      },
+      "parse": {
+        "kind": "tree-sitter C# syntax gate",
+        "tree": "<repo-root>\\out\\survivors-roguelike-kit\\game_out54",
+        "files": 293,
+        "bad_files": 0,
+        "errors": 0,
+        "missing": 0,
+        "recovery_nodes": 0,
+        "details": {},
+        "elapsed_seconds": 1.468
+      },
+      "assemblies": {
+        "Assembly-CSharp": {
+          "previous_errors": 3780,
+          "errors": 3769,
+          "net_errors": -11,
+          "complete_diagnostic_multiset_byte_location_identical": false,
+          "location_aware_added": 105,
+          "location_aware_removed": 116,
+          "message_aware_added": 11,
+          "message_aware_removed": 22,
+          "added_codes": {
+            "CS0165": 11
+          },
+          "removed_codes": {
+            "CS0266": 11,
+            "CS0165": 11
+          },
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        },
+        "Assembly-CSharp-firstpass": {
+          "previous_errors": 812,
+          "errors": 812,
+          "net_errors": 0,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "location_aware_added": 0,
+          "location_aware_removed": 0,
+          "message_aware_added": 0,
+          "message_aware_removed": 0,
+          "added_codes": {},
+          "removed_codes": {},
+          "unaffected_file_diagnostic_multisets_identical": true,
+          "body_probe_observed": true
+        }
+      }
+    }
+  },
+  "compiler_reference_policy": {
+    "unity_root": "D:/unity_editor_6000",
+    "real_editor_bcl_netstandard21_and_original_player_packages": true,
+    "original_assembly_simple_names": true,
+    "no_self_reference": true,
+    "no_synthetic_stubs": true
+  },
+  "compiler_delta": {
+    "assemblies": 9,
+    "net_errors": -11,
+    "message_aware_added": 11,
+    "message_aware_removed": 22,
+    "unaffected_file_location_aware_diagnostic_multisets_identical": true,
+    "all_location_aware_multisets_identical": false,
+    "reason": "Snapshots and correctly propagated float types shift later diagnostic locations; compare message-aware deltas only in changed files. Unchanged files retain identical complete locations.",
+    "unitask_linq_body_compilation_proved": false,
+    "diagnostic_delta_review": {
+      "renumbered_existing_CS0165": 11,
+      "identical_file_line_code": true,
+      "column_changes_explained_by_preceding_temp_digit_count": true,
+      "message_difference_is_only_float_temp_renumbering": true,
+      "hoisted_declarations_still_have_no_initializer": true,
+      "all_occurrence_lines_and_normalized_read_write_contexts_identical": true,
+      "removed_CS0266": 11,
+      "removed_CS0266_files": {
+        "TreasurePanel": 2,
+        "VertexJitter": 9
+      },
+      "new_error_sites": 0,
+      "limitations": "Local diagnostic/occurrence audit only; existing unassigned phi and aggregate consumers are not repaired."
+    }
+  },
+  "authored_production_generated_csharp_runtime": {
+    "authored_inputs": 4115,
+    "generated_csharp_lane_and_division_checks": 53495,
+    "field_snapshot_checks": 4115,
+    "mismatches": 0,
+    "hardware_SSE2_oracle": true,
+    "checked_compile": true,
+    "optimized_compile": true,
+    "default_rounding_only": true,
+    "process_local_prototype_only": false,
+    "production_generated": true,
+    "game_native_execution": false,
+    "whole_method_equivalence": false
+  },
+  "rejected_experiments": {
+    "broad_gpr_and_double_recovery": false,
+    "generic_movd_expr_wrapping": false,
+    "lazy_bind_only_snapshot": false,
+    "reasons": [
+      "GPR/double conversion prototypes include cap-zero values typed as Int32 but printed as object; a numeric cast could be an incorrect unbox.",
+      "Wrapping MOVD changes Expr identity and binding lifetime.",
+      "A lazy binder can leave stale lane parts or evaluate the field after later effects; emit a scalar conversion snapshot at its native conversion point."
+    ],
+    "semantic_primitive_metadata_discovery": "An Int32 field may have nonzero metadata data and attribute bits; use the primitive enum and non-byref flag, not raw tuple equality.",
+    "initial_zero_hit_integration": {
+      "candidate": "game_out53",
+      "accepted": false,
+      "cause": "The structured decompiler always passes idx=0 to _insn; treating it as a block offset silently produced zero real hits despite authored tests passing.",
+      "disposition": "Discard its validation as recovery evidence; recover the actual native instruction position in the owned block, add fixed idx=-1/0/999 handler tests, and rerun all production audits, trees and suites as field54."
+    },
+    "broader_prototypes_accepted": false
+  },
+  "limitations": [
+    "Existing declaration, value-type, SIMD-lane, phi and control-flow defects remain; near-recompilability and whole-game semantic equivalence are not achieved.",
+    "Some recovered values are unused by existing broken downstream aggregate consumers. Native conversion proof does not repair these consumers.",
+    "Authored SSE2 checks cover default rounding and local float lane/division/snapshot semantics only, not native game execution or whole-method equivalence.",
+    "Call-name multiset parity is a lexical audit, not a proof of whole-method control-flow or execution counts.",
+    "No measured runtime speed improvement is claimed.",
+    "UniTask.Linq retains declaration errors without an observed body sentinel; its body compilation remains unproved.",
+    "Limbus validation covers a selected 923 methods, not a full Limbus rebuild.",
+    "The existing expression-length cap can still replace computations with zero; signed logical SHR prototypes remain rejected."
+  ],
+  "publication": {
+    "aggregate_only": true,
+    "licensed_game_data_or_full_bodies_published": false,
+    "full_diagnostics_or_disassembly_published": false,
+    "goldens_or_pins_changed": false,
+    "promotion_performed": false
+  },
+  "next_slice_investigation": "Extend conversion recovery only with independent source-lane, width, type and lifetime proof. Keep broad GPR/double recovery rejected. Separately replace silent cap-to-zero at a proved bounded evaluation boundary before reconsidering signed SHR.",
+  "changed_method_review": {
+    "normalized_diff_audit": {
+      "survivors-roguelike-kit": [
+        {
+          "mi": 69686,
+          "method_lines_before": 32,
+          "method_lines_after": 33,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 30
+        },
+        {
+          "mi": 69717,
+          "method_lines_before": 34,
+          "method_lines_after": 35,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 29
+        },
+        {
+          "mi": 69747,
+          "method_lines_before": 34,
+          "method_lines_after": 35,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 29
+        },
+        {
+          "mi": 69822,
+          "method_lines_before": 534,
+          "method_lines_after": 534,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 47
+        },
+        {
+          "mi": 70234,
+          "method_lines_before": 87,
+          "method_lines_after": 89,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 64
+        },
+        {
+          "mi": 70561,
+          "method_lines_before": 38,
+          "method_lines_after": 39,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 23
+        },
+        {
+          "mi": 70752,
+          "method_lines_before": 162,
+          "method_lines_after": 164,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 26
+        },
+        {
+          "mi": 70755,
+          "method_lines_before": 34,
+          "method_lines_after": 36,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 26
+        },
+        {
+          "mi": 70843,
+          "method_lines_before": 67,
+          "method_lines_after": 66,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 37
+        }
+      ],
+      "limbus": [
+        {
+          "mi": 40548,
+          "method_lines_before": 20,
+          "method_lines_after": 20,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 11
+        },
+        {
+          "mi": 65142,
+          "method_lines_before": 98,
+          "method_lines_after": 98,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 11
+        },
+        {
+          "mi": 65143,
+          "method_lines_before": 38,
+          "method_lines_after": 38,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 11
+        },
+        {
+          "mi": 65145,
+          "method_lines_before": 29,
+          "method_lines_after": 29,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 11
+        },
+        {
+          "mi": 129477,
+          "method_lines_before": 26,
+          "method_lines_after": 27,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 34
+        },
+        {
+          "mi": 153530,
+          "method_lines_before": 67,
+          "method_lines_after": 67,
+          "control_token_multisets_identical": true,
+          "added_control": {},
+          "removed_control": {},
+          "normalized_diff_lines": 11
+        }
+      ],
+      "unitask": []
+    },
+    "all_changed_methods_reviewed": true,
+    "control_token_and_call_name_multisets_unchanged": true,
+    "not_whole_method_semantic_proof": true,
+    "remaining_broken_consumers_in_selected_methods": true
+  }
+}
