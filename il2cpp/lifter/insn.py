@@ -5,7 +5,7 @@ from il2cpp.expr import Expr, _ARR_BIAS_RX, _BARE_TOKEN_RX, _BOOL_TY, _INT_TY, _
 from il2cpp.names import repr_f32, repr_f64
 from il2cpp.runtime.meta import IMM_OPS, meta_lit_repr
 from il2cpp.text import _ATOM_PREC, _BIN_PREC, _bin_txt, _fold_bin, _int_lit, _term_up, disp_add, imm_of, reg_name, sdisp, strip_outer
-from il2cpp.x64 import ARG_REGS, RMW_OPS, STORE_MNEMONICS, VOLATILE, _CMOV_AS_J, _SFPF, _reg_size, flag_cond
+from il2cpp.x64 import ARG_REGS, RMW_OPS, STORE_MNEMONICS, VOLATILE, _CMOV_AS_J, _SFPF, _reg_size, flag_cond, _UNSIGNED_FLAGS, narrow_cmp_width, narrow_unsigned_cmp
 try:
     _MN_NAME = {getattr(Mnemonic, n): n for n in ('MOV', 'MOVZX', 'MOVSX', 'MOVSXD', 'CMP', 'TEST')}
 except Exception:                       # no iced (portable fakes)
@@ -92,6 +92,14 @@ class _InsnMixin:
         if _SFPF and (ins.rflags_written | ins.rflags_undefined) & _SFPF:
             self._flags_mn = None
 
+        if getattr(self, '_cmp_width', None) is not None:
+            if (ins.ip != self._cmp_next_ip
+                    or ins.rflags_modified & _UNSIGNED_FLAGS
+                    or ins.flow_control in (FlowControl.CALL, FlowControl.INDIRECT_CALL)):
+                self._cmp_width = None
+            else:
+                self._cmp_next_ip = ins.next_ip
+
         def A(i):  # operand helpers
             return ins.op_kind(i)
 
@@ -102,7 +110,10 @@ class _InsnMixin:
             lhs, rhs = (self.flags or (Expr('?', None, '?'), Expr('?', None, '?')))
             self._note_use(lhs)
             self._note_use(rhs)
-            if op is None:
+            narrow = narrow_unsigned_cmp(getattr(self, '_cmp_width', None), mn, lhs, rhs)
+            if narrow is not None:
+                self.emit(ip, 'if (%s) goto L_%x;' % (narrow, t), asm)
+            elif op is None:
                 # the rare flag-specific jumps (JS/JNS/JO/JNO/JP/JNP --
                 # CMP_OPS has never mapped them) can't splice a bare '?'
                 # in as if it were a comparison operator: it collides with
@@ -1336,6 +1347,8 @@ class _InsnMixin:
                     self.flags = (a, Expr('null' if (be and be.text == '0') else (be.text if be else '0'), None, 'int'))
             else:
                 self.flags = (a, be or Expr('0', None, 'int'))
+                self._cmp_width = narrow_cmp_width(ins)
+                self._cmp_next_ip = ins.next_ip
             return
         if mn in (Mnemonic.SETA, Mnemonic.SETAE, Mnemonic.SETB, Mnemonic.SETBE, Mnemonic.SETG,
                   Mnemonic.SETGE, Mnemonic.SETL, Mnemonic.SETLE, Mnemonic.SETE, Mnemonic.SETNE):

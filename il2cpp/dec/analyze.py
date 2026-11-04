@@ -4,7 +4,7 @@ from il2cpp.common import csharp_type_name
 from il2cpp.expr import Expr, _BARE_TOKEN_RX, _R8_TY, _mentions, _merge_arr_proof, _recv_fold, _recv_shaped
 from il2cpp.expr import _tile_proof_for as _dry_tile_proof
 from il2cpp.text import imm_of, reg_name
-from il2cpp.x64 import ARG_REGS, GPRS, flag_cond
+from il2cpp.x64 import ARG_REGS, GPRS, flag_cond, narrow_unsigned_cmp
 from il2cpp.dec.stackframe import prove_block_entry_rsp
 from il2cpp.lifter.leafreturns import (
     recover_leaf_struct_return, recover_leaf_struct_zero_return,
@@ -87,6 +87,7 @@ class _AnalyzeMixin:
         jcc_fallthrough_flags = {}
 
         def exec_block(b, dry):
+            L._cmp_width = None  # native width proof is deliberately block-local
             if frame_entries is not None:
                 L.rsp_delta = frame_entries[b.bid]
             L.out = _Sink(b)
@@ -156,6 +157,14 @@ class _AnalyzeMixin:
                     lt = lhs.text if lhs else '?'
                     rt = rhs.text if rhs else '?'
                     op = L.CMP_OPS.get(mn)
+                    narrow = narrow_unsigned_cmp(
+                        getattr(L, '_cmp_width', None)
+                        if getattr(L, '_cmp_next_ip', None) == ins.ip else None,
+                        mn, lhs, rhs)
+                    if narrow is not None:
+                        b.cond = narrow
+                        L.flags = None
+                        continue
                     # an int literal compared against an enum-typed
                     # lhs names the member (`Stage != 4` -> `!=
                     # SimulationStage.Host`) -- batch 39, same

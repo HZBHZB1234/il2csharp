@@ -2047,6 +2047,10 @@ class _StateMixin:
                 continue
             if ins.ip in self.targets and self.out:
                 self.emit(ins.ip, '', None)  # label marker
+            # Flat fallback has no native block/flag-merge proof. Do not
+            # apply the structured path's narrow unsigned comparison rule.
+            if ins.flow_control == FlowControl.CONDITIONAL_BRANCH:
+                self._cmp_width = None
             self._insn(ins, insns, i, fmt, end)
         return self._render()
 
@@ -2199,6 +2203,7 @@ class _StateMixin:
     @flags.setter
     def flags(self, v):
         self._flags = v
+        self._cmp_width = None  # restored/replaced pairs carry no native width proof
         self._flags_mn = getattr(self, '_cur_mn', None) if v else None
 
     def reg(self, name) -> Optional[Expr]:

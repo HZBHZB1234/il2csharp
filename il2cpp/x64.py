@@ -31,6 +31,69 @@ def _reg_size(r):
         return 0
 
 
+
+# Unsigned narrow CMP consumes CF/ZF. A stale width must not survive even
+# CF-only writers such as STC/CLC/CMC, which the SF/PF guard does not see.
+_UNSIGNED_FLAGS = 0
+if HAVE_ICED:
+    from iced_x86 import RflagsBits as _UnsignedFlags
+    _UNSIGNED_FLAGS = _UnsignedFlags.CF | _UnsignedFlags.ZF
+
+
+def narrow_cmp_width(ins):
+    """Only modeled low-register CMP operands; no high-byte or memory aliases."""
+    if not HAVE_ICED or ins.mnemonic != Mnemonic.CMP \
+            or ins.op0_kind != OpKind.REGISTER:
+        return None
+    if ins.has_lock_prefix or ins.has_rep_prefix or ins.has_repne_prefix:
+        return None
+    high = (IReg.AH, IReg.BH, IReg.CH, IReg.DH)
+    width = _reg_size(ins.op0_register)
+    if width not in (1, 2) or ins.op0_register in high:
+        return None
+    if ins.op1_kind == OpKind.REGISTER:
+        if ins.op1_register in high or _reg_size(ins.op1_register) != width:
+            return None
+    elif ins.op1_kind not in (OpKind.IMMEDIATE8, OpKind.IMMEDIATE16,
+                              OpKind.IMMEDIATE8TO16):
+        return None
+    return width
+
+
+def narrow_unsigned_cmp(width, mnemonic, lhs, rhs):
+    """Render low 8/16 bits explicitly, under unchecked arithmetic.
+
+    The caller owns same-block, live-CMP provenance. Closed integral metadata
+    or an integer literal is required; bool, byref, enum, pointers and unknown
+    values retain their old spelling. This does not prove value provenance or
+    repair arbitrary earlier partial-register operations.
+    """
+    if not HAVE_ICED or width not in (1, 2):
+        return None
+    op = {Mnemonic.JA: '>', Mnemonic.JAE: '>=',
+          Mnemonic.JB: '<', Mnemonic.JBE: '<='}.get(mnemonic)
+    if op is None:
+        return None
+    cast = 'byte' if width == 1 else 'ushort'
+    operands = []
+    for value in (lhs, rhs):
+        if value is None or value._unk or value.kind != 'int':
+            return None
+        text, ty = value.text, value.ty
+        if not text or text in ('?', 'unknown'):
+            return None
+        literal = bool(re.fullmatch(r'-?\d+', text))
+        if not literal and not (isinstance(ty, tuple) and len(ty) == 2
+                and not (ty[1] >> 29) & 1
+                and 3 <= (ty[1] >> 16) & 0xff <= 11):
+            return None
+        if literal and 0 <= int(text) < 1 << (width * 8):
+            operands.append(text)
+        else:
+            operands.append('unchecked((%s)(%s))' % (cast, text))
+    return '%s %s %s' % (operands[0], op, operands[1])
+
+
 # --- flag-specific branch recovery (fix 60) ---------------------------
 # The six jumps CMP_OPS deliberately never mapped -- JS/JNS/JO/JNO/JP/JNP --
 # and their CMOV twins read a single flag rather than a comparison, so they
