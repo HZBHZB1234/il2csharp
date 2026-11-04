@@ -4,6 +4,62 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Exact small-struct leaf returns through owned copy constructors (2026-11-04)
+
+Accepted `game_out38` (not promoted), versus out37. Two scalar-looking leaf
+returns now preserve their missing managed struct wrapper. Only an explicit
+Win64 PE, canonical nongeneric nullary instance method with a two-instruction
+entry block **MOV EAX/RAX,[RCX+disp]; RET** qualifies. Source/target owners are
+closed nongeneric non-enum value types with recursively proved default layout.
+The target has exactly one full-width four/eight-byte instance field at payload
+offset zero. The original source member, uncounted nonunknown RAX Expr, existing
+text and exact native width must agree.
+
+The wrapper uses an **original public owned one-parameter constructor**, never
+a fabricated initializer for private/initonly fields. Its exact parameter,
+access/flags, void signature and canonical MethodDef/candidate identity are
+proved, and its independent native body must be precisely **MOV [RCX],EDX/RDX;
+RET**. A known owned MethodDef may have other address sharers: none is guessed
+as the target. Same original image and absence of a target cctor prevent added
+initialization effects. Ambiguous/private/runtime/synchronized/security ctors,
+scalar float arguments in XMM1, unknown/packed/explicit/open/byref layouts,
+partial or indexed copies, segments, REP and RET-imm shapes decline. Register
+Exprs, counted uses, hints, slots, variable types and statement order are not
+mutated; boolean/enum return normalization is unchanged.
+
+Independent production sweeps cover **2,242 / 1,936 selected native methods**:
+exactly **two wrappers / zero**. Across all **474 / 293 C# files**, only **two
+files / two return lines** change; reversing those wrappers restores every
+prior source byte. Real Editor/BCL/package references and original assembly
+simple names, without self-reference or type stubs: UniTask **5,436 -> 5,434**,
+exactly **two CS0029 removed / zero diagnostics added** at the changed returns.
+The other eight complete diagnostic multisets are unchanged. UniTask.Linq
+still has 13 declaration errors with no observed body sentinel.
+
+Strict builds: **2,227 / 1,857 bodies**, zero failed/fallback/type-emit failures;
+brace/parse clean, source fingerprints verified. **226 new portable / one new
+game case**; focused **226 synthetic + one game passed**, portable **3,478
+passed**. Frozen full excluding parallel: **3,556 passed / 259 skipped / one
+non-strict xpassed / three existing failures**; parallel **two passed**. Scoped
+stash proof on clean `7365e11` reproduces exactly the same three failures and
+restores all four candidate files byte-exact. No golden/pin changes or output
+promotion.
+
+An authored Win64 native/.NET 10 harness compares four/eight-byte loads and
+copy ctors with eight readonly managed wrappers (signed, unsigned, enum and
+nested float-bit structs), eight source offsets, boundaries and deterministic
+random patterns, checked/unchecked, with native source/output canaries:
+**525,824 checks / zero mismatches**. It neither executes game-native methods
+nor covers reference-containing runtime cases, whole-method/game equivalence
+or speed. Many real compiler errors remain; the goal is **not achieved**.
+
+Next **TEMP-only**, not accepted: exact adjacent XOR EAX/RAX + RET can name a
+small-struct zero as `default(T)`. The selected inventory finds only **one
+eight-byte UniTask method / zero survivors methods**, with return-only deltas;
+no production change, complete negative suite or compiler acceptance yet.
+Aggregate-only evidence:
+`validation_reports/quality_leaf_struct_copy_ctor_2026-11-04.json`.
+
 ### Exact false stack homes from native zero registers (2026-11-04)
 
 Accepted `game_out37` (not promoted), versus out36. The existing immediate-only

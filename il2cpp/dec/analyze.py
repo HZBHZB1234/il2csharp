@@ -5,6 +5,7 @@ from il2cpp.expr import Expr, _BARE_TOKEN_RX, _R8_TY, _mentions, _merge_arr_proo
 from il2cpp.expr import _tile_proof_for as _dry_tile_proof
 from il2cpp.text import imm_of, reg_name
 from il2cpp.x64 import ARG_REGS, GPRS, flag_cond
+from il2cpp.lifter.leafreturns import recover_leaf_struct_return
 
 class _AnalyzeMixin:
     def _analyze(self, m, td, blocks, bmap):
@@ -1586,11 +1587,14 @@ class _AnalyzeMixin:
         """Name a literal returned through the method's own return type.
 
         `return 1;` from a `UniTaskStatus` getter is `Succeeded`, and from a
-        bool method it is `true`.  Same exact-member proof as the store path
-        (`_fimm`) and the argument path (fix 85): a [Flags] combination with
-        no single named member keeps its literal.  Non-literal values never
-        change.
+        bool method it is `true`. Same exact-member proof as the store path
+        (`_fimm`) and argument path (fix 85): unnamed [Flags] combinations
+        keep their literal. A separate exact native leaf/copy-ctor proof may
+        restore a missing small-struct wrapper; other nonliterals stay raw.
         """
+        wrapped = recover_leaf_struct_return(L, text, rty)
+        if wrapped is not None:
+            return wrapped
         if rty is None or not isinstance(rty, tuple) \
                 or not re.fullmatch(r'-?\d+', text):
             return text

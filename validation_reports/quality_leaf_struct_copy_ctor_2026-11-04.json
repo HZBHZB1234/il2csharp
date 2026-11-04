@@ -1,0 +1,298 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact small-struct leaf returns through original public native-proved copy constructors; not promoted; goal not achieved",
+  "baseline": "game_out37",
+  "candidate": "game_out38",
+  "source_parent": "7365e116bbf235b27652e97315b89a97b0dbe3c6",
+  "proof_scope": [
+    "Explicit Win64 x64 PE; canonical nongeneric instance MethodDef with no parameters, closed nongeneric source and result owners, non-enum value types and recursively proved default layout.",
+    "Only an entry block containing exactly MOV EAX/RAX,[RCX+disp]; RET qualifies. The original source member, uncounted nonunknown RAX Expr and existing return text must agree at exact field type and full native width. The target has exactly one real instance field at payload offset zero and exact four/eight-byte size, without padding.",
+    "The target owns exactly one original public nongeneric one-parameter .ctor matching that field type. Its independent native decode must be exactly MOV [RCX],EDX/RDX; RET. Original ctor access/flags/void signature, canonical MethodDef/candidate identity, same original image and absence of target cctor are proved. Shared addresses are permitted only because the known owned MethodDef is decoded independently, not selected from sharers.",
+    "Packed/explicit/open/byref/unknown layouts, scalar float arguments in XMM1, ctor ambiguity, private ctor, added initialization/security/runtime/synchronization effects, partial loads/stores, aliases, segments and REP or RET-imm shapes decline. Original private/initonly target fields are never assigned by a fabricated object initializer.",
+    "Only the missing managed constructor wrapper is rendered at the return. Register Exprs, counted uses, hints, slots, variable types, declarations and statement order are not mutated. Existing boolean/enum return normalization remains unchanged."
+  ],
+  "validation": {
+    "additional_portable_cases": 226,
+    "new_game_cases": 1,
+    "focused_synthetic_passed": 226,
+    "focused_game_passed": 1,
+    "portable": {
+      "passed": 3478,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1207.375,
+      "frozen_source_verified": true,
+      "passed": 3556,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 541.0470000000205,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "xpassed_non_strict": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "7365e116bbf235b27652e97315b89a97b0dbe3c6",
+      "exit_code": 1,
+      "seconds": 110.01599999994505,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 2,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 5436,
+          "after": 5434,
+          "added": 0,
+          "removed": 2,
+          "added_codes": {},
+          "removed_codes": {
+            "CS0029": 2
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 474,
+        "changed_files": 2,
+        "changed_lines": 2,
+        "native_copy_constructor_proofs": 2,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 2,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep, independent metadata and native copy proof",
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "wrapper_methods": 2,
+        "widths": [
+          4,
+          8
+        ],
+        "seconds": 229.89100000006147,
+        "original_public_owned_constructor": true,
+        "private_field_not_written_by_initializer": true,
+        "original_same_image_no_cctor": true,
+        "register_expr_hints_and_slots_unchanged": true,
+        "each_delta_exact_return_only": true,
+        "production": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 0,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3781,
+          "after": 3781,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 293,
+        "changed_files": 0,
+        "changed_lines": 0,
+        "native_copy_constructor_proofs": 0,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 0,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep, independent metadata and native copy proof",
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "wrapper_methods": 0,
+        "widths": [],
+        "seconds": 139.89100000006147,
+        "original_public_owned_constructor": true,
+        "private_field_not_written_by_initializer": true,
+        "original_same_image_no_cctor": true,
+        "register_expr_hints_and_slots_unchanged": true,
+        "each_delta_exact_return_only": true,
+        "production": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 2,
+    "added_occurrences": 0,
+    "net_occurrences": -2,
+    "removed_codes": {
+      "CS0029": 2
+    },
+    "normalization_or_suppression": false,
+    "all_removed_at_exact_changed_return_lines": true
+  },
+  "authored_synthetic_native_runtime": {
+    "runtime": "installed .NET 10 / authored synthetic Win64 native x64",
+    "scope": "exact 4/8-byte RCX field loads and EDX/RDX copy constructors versus eight readonly managed wrappers (signed/unsigned/enum/nested float-bit struct), eight offsets, boundaries and 4096 deterministic random patterns, native source/output canaries",
+    "runs": [
+      {
+        "checked": "true",
+        "checks": 262912,
+        "mismatches": 0
+      },
+      {
+        "checked": "false",
+        "checks": 262912,
+        "mismatches": 0
+      }
+    ],
+    "checks": 525824,
+    "mismatches": 0,
+    "game_native_execution": false,
+    "whole_method_or_game_equivalence": false,
+    "gc_reference_execution": false,
+    "speed_evidence": false
+  },
+  "next_temp_only_probe": {
+    "unitask": {
+      "status": "TEMP-only exact final adjacent XOR EAX/RAX + RET struct return inventory; no production or compiler acceptance",
+      "fixture": "unitask",
+      "selected_native_methods": 2242,
+      "prefiltered_native_methods": 1,
+      "candidate_methods": 1,
+      "widths": [
+        8
+      ],
+      "return_only_deltas": true,
+      "seconds": 4.297000000020489,
+      "production": false,
+      "compiler_gate": false
+    },
+    "survivors-roguelike-kit": {
+      "status": "TEMP-only exact final adjacent XOR EAX/RAX + RET struct return inventory; no production or compiler acceptance",
+      "fixture": "survivors-roguelike-kit",
+      "selected_native_methods": 1936,
+      "prefiltered_native_methods": 0,
+      "candidate_methods": 0,
+      "widths": [],
+      "return_only_deltas": true,
+      "seconds": 0.2190000000409782,
+      "production": false,
+      "compiler_gate": false
+    },
+    "status": "Only one eight-byte small-struct default return is currently proved by an immediately adjacent XOR EAX/RAX + RET; no production change, complete negative suite or compiler-gated acceptance for this next slice."
+  },
+  "limitations": [
+    "Exactly two selected methods gain return wrappers; reversing those two lines restores every prior selected C# source byte. The survivors selected tree and eight other complete diagnostic multisets are unchanged.",
+    "Nine selected assemblies still have many real compiler errors. UniTask.Linq retains 13 declaration errors with no observed body sentinel, so no body-coverage claim is made for it.",
+    "The runtime harness uses authored synthetic Win64 snippets and non-GC bit-pattern wrappers. It does not execute the IL2CPP/game-native methods, test reference-containing runtime cases, establish whole-method/game equivalence or measure speed.",
+    "No golden changes, output promotion, near-zero-error recompilation or performance improvement claim.",
+    "The subsequent zero-return inventory is TEMP-only and not accepted."
+  ]
+}
