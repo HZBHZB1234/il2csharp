@@ -1,0 +1,320 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted exact native-zero small-struct leaf returns; not promoted; goal not achieved",
+  "baseline": "game_out39",
+  "candidate": "game_out40",
+  "source_parent": "5a434de65878b45678f83b4d9642ad6f31a3a48a",
+  "proof_scope": [
+    "Only an explicit Win64 x64 PE and a canonical owned nongeneric nullary MethodDef, original address candidate and closed nongeneric non-enum value return qualify. The exact entry block and independent original-binary decode must agree: XOR EAX,EAX or XOR RAX,RAX followed immediately by a plain one-byte RET, with no predecessors, extra instructions, prefixes, branches or calls.",
+    "The original closed return signature, uncounted nonunknown RAX Expr and rendered literal zero must agree. The result has a recursively proved default layout and exactly one full-width scalar/reference field at payload offset zero, size one/two/four/eight, no sret or padding. Nested aggregates, enums, open/generic/byref/unknown/packed/explicit layouts, malformed ranges and target static constructors decline.",
+    "Render only default(original result type); invoke no constructor and assign no private or readonly field. Shared addresses do not require selecting another MethodDef. Partial/other-register zeros, MOV zero, noncanonical signatures, segmented/REP entries and RET-imm retain their old spelling.",
+    "No register Exprs, counted uses, hints, slots, variable types, declarations or statement order change. Existing copy-constructor, Boolean and enum return proofs remain unchanged."
+  ],
+  "validation": {
+    "additional_portable_cases": 426,
+    "new_game_cases": 1,
+    "focused_synthetic_passed": 652,
+    "focused_game_passed": 1,
+    "portable": {
+      "passed": 3989,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1169.1089999999385,
+      "frozen_source_verified": true,
+      "passed": 4071,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 599.8439999999246,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0
+    },
+    "compileall": true,
+    "diff_check": true,
+    "clean_source_baseline": {
+      "clean_source_head": "5a434de65878b45678f83b4d9642ad6f31a3a48a",
+      "exit_code": 1,
+      "seconds": 111.01599999994505,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    }
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 474,
+      "changed_files": 1,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 1973,
+          "after": 1973,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "TempAsm": {
+          "before": 6,
+          "after": 6,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask": {
+          "before": 4546,
+          "after": 4545,
+          "added": 0,
+          "removed": 1,
+          "added_codes": {},
+          "removed_codes": {
+            "CS0029": 1
+          }
+        },
+        "UniTask.Addressables": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.DOTween": {
+          "before": 5,
+          "after": 5,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.Linq": {
+          "before": 13,
+          "after": 13,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "UniTask.TextMeshPro": {
+          "before": 209,
+          "after": 209,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 474,
+        "changed_files": 1,
+        "changed_lines": 1,
+        "native_zero_leaf_proofs": 1,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 1,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep, independently decoded exact native zero and canonical closed full-width payload",
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "zero_methods": 1,
+        "widths": [
+          8
+        ],
+        "seconds": 248.375,
+        "register_expr_hints_and_slots_unchanged": true,
+        "each_delta_exact_return_only": true,
+        "production": true,
+        "frozen_source_verified": true,
+        "game_native_execution": false,
+        "speed_evidence": false
+      },
+      "body_probe_observed": {
+        "Assembly-CSharp": true,
+        "TempAsm": true,
+        "UniTask": true,
+        "UniTask.Addressables": true,
+        "UniTask.DOTween": true,
+        "UniTask.Linq": false,
+        "UniTask.TextMeshPro": true
+      }
+    },
+    "survivors-roguelike-kit": {
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "cs_files": 293,
+      "changed_files": 0,
+      "complete_diagnostic_multisets": {
+        "Assembly-CSharp": {
+          "before": 3781,
+          "after": 3781,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        },
+        "Assembly-CSharp-firstpass": {
+          "before": 814,
+          "after": 814,
+          "added": 0,
+          "removed": 0,
+          "added_codes": {},
+          "removed_codes": {}
+        }
+      },
+      "source_fingerprints_verified": true,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "source_causal_review": {
+        "files": 293,
+        "changed_files": 0,
+        "changed_lines": 0,
+        "native_zero_leaf_proofs": 0,
+        "all_other_source_bytes_identical": true,
+        "no_variable_retyping_or_renaming": true,
+        "removed_diagnostics_at_exact_changed_lines": 0,
+        "added_diagnostics": 0
+      },
+      "independent_native_review": {
+        "scope": "production selected-native-method sweep, independently decoded exact native zero and canonical closed full-width payload",
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "zero_methods": 0,
+        "widths": [],
+        "seconds": 142.71899999992456,
+        "register_expr_hints_and_slots_unchanged": true,
+        "each_delta_exact_return_only": true,
+        "production": true,
+        "frozen_source_verified": true,
+        "game_native_execution": false,
+        "speed_evidence": false
+      },
+      "body_probe_observed": {
+        "Assembly-CSharp": true,
+        "Assembly-CSharp-firstpass": true
+      }
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false,
+    "near_zero_error_recompilation": false
+  },
+  "diagnostic_delta": {
+    "removed_occurrences": 1,
+    "added_occurrences": 0,
+    "net_occurrences": -1,
+    "removed_codes": {
+      "CS0029": 1
+    },
+    "normalization_or_suppression": false,
+    "all_removed_at_exact_changed_return_lines": true
+  },
+  "authored_synthetic_native_runtime": {
+    "runtime": "installed .NET 10 / authored synthetic Win64 x64 code",
+    "scope": "four EAX/RAX self-XOR variants with arbitrary incoming 64-bit RAX versus seventeen private readonly single-field managed defaults, including bool, char, integers, FP positive-zero, native integers and null references; explicit side-effecting parameterless ctors are bypassed; native memory canaries",
+    "runs": [
+      {
+        "checked": "true",
+        "checks": 279344,
+        "mismatches": 0,
+        "constructor_invocations": 0
+      },
+      {
+        "checked": "false",
+        "checks": 279344,
+        "mismatches": 0,
+        "constructor_invocations": 0
+      }
+    ],
+    "checks": 558688,
+    "mismatches": 0,
+    "game_native_execution": false,
+    "whole_method_or_game_equivalence": false,
+    "speed_evidence": false
+  },
+  "limitations": [
+    "One selected native method gains a default(T) return; reversing that line restores every prior selected source byte. The survivors selected tree and the other eight complete diagnostic multisets are unchanged.",
+    "Many real compilation errors remain. UniTask.Linq retains 13 declaration errors and no observed body sentinel; do not claim body coverage for it.",
+    "The native/.NET 10 runtime comparison executes authored snippets, not game-native methods. It does not establish whole-method/game equivalence or measure speed. Concurrent build/test wall times are not performance evidence.",
+    "No golden/pin changes or output promotion. The interface-sret guard stays intact; simply removing it still produces stale unbound return-copy temporaries."
+  ],
+  "next_aggregate_probes": {
+    "status": "TEMP-only investigation; no accepted source change or interface-sret guard relaxation",
+    "read_only_alias_inventory": {
+      "unitask": {
+        "fixture": "unitask",
+        "selected_native_methods": 2242,
+        "alias_composite_loads": 123,
+        "home_disagreement": 123,
+        "sret_home_known": 106,
+        "methods": 102,
+        "seconds": 146.4220000000205,
+        "read_only_observation": true,
+        "frozen_source_verified": true,
+        "independent_native_or_runtime_proof": false
+      },
+      "survivors-roguelike-kit": {
+        "fixture": "survivors-roguelike-kit",
+        "selected_native_methods": 1936,
+        "alias_composite_loads": 311,
+        "home_disagreement": 311,
+        "sret_home_known": 214,
+        "methods": 130,
+        "seconds": 122.28200000000652,
+        "read_only_observation": true,
+        "frozen_source_verified": true,
+        "independent_native_or_runtime_proof": false
+      }
+    },
+    "rejected_scalar_reroot_prototype": {
+      "status": "TEMP-only partial whole-origin prototype; not production-ready or accepted",
+      "methods": 12,
+      "changed_methods": 7,
+      "typed_snapshot_hits": 0,
+      "real_hits": 0,
+      "seconds": 12.358999999938533,
+      "production": false,
+      "compiler_gate": false,
+      "negative_suite": false,
+      "frozen_source_verified": true
+    },
+    "rejection_reason": "Seven of twelve methods change, zero typed snapshot consumers recovered. Re-rooting existing scalar tiles can leak whole-struct text into partial raw stores; preserve byte/scalar origins and use separate semantic snapshot evidence instead."
+  }
+}

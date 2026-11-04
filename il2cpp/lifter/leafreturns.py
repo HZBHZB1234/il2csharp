@@ -178,3 +178,91 @@ def recover_leaf_struct_return(lift, text, return_ty):
         return 'new ' + il.type_name(return_ty) + '(' + text + ')'
     except (AttributeError, IndexError, KeyError, TypeError, ValueError, OverflowError, StopIteration):
         return None
+
+
+def recover_leaf_struct_zero_return(lift, text, return_ty):
+    """Name native zero as default(T), only for a closed Win64 leaf value.
+
+    This is independent of the copy-ctor proof: default(T) invokes no ctor.
+    The native block, original binary, canonical signature and uncounted RAX
+    value must agree. Do not infer a zero struct from a literal alone.
+    """
+    if text != '0' or not HAVE_ICED:
+        return None
+    try:
+        if not isinstance(return_ty, tuple) or len(return_ty) != 2 \
+                or (return_ty[1] >> 16) & 0xff != 0x11 \
+                or return_ty[1] & (1 << 29):
+            return None
+        il = lift.il
+        block = lift.out.block
+        if len(block.insns) != 2 or block.bid != 0 or block.preds:
+            return None
+        method = lift._current_method
+        if not is_win64_pe(il.bin) or method.param_count != 0 \
+                or method.generic_container != -1 or not method.addr \
+                or method.flags & (0x400 | 0x2000) or method.iflags & 0x1037 \
+                or not 0 <= method.index < len(il.meta.methods) \
+                or il.meta.methods[method.index] is not method \
+                or not 0 <= method.return_type < len(il.types) \
+                or not _closed_owner(il, method.declaring) \
+                or ('method', method.index) not in il.addr_candidates.get(method.addr, ()):
+            return None
+        if not 0 <= return_ty[0] < len(il.meta.typedefs) \
+                or il._closed_type_key(return_ty) is None \
+                or il._closed_type_key(return_ty) != il._closed_type_key(il.types[method.return_type]) \
+                or not _closed_owner(il, return_ty[0]):
+            return None
+        td = il.meta.typedefs[return_ty[0]]
+        methods = _methods(il, td)
+        if not td.is_valuetype or td.is_enum or td.has_cctor or methods is None \
+                or any(m.name == '.cctor' for m in methods) \
+                or il._sf_field_size(return_ty, 0) not in (1, 2, 4, 8) \
+                or il.returns_sret(return_ty) or not lift._piece_layout_proven(return_ty):
+            return None
+        # Keep this slice to one exact full-width scalar/reference payload.
+        # No open generic, nested aggregate, padding or guessed field range may
+        # turn a machine integer zero into an invented managed value.
+        if td.field_start < 0 or td.field_count < 0 \
+                or td.field_start + td.field_count > len(il.meta.fields):
+            return None
+        fields = [f for f in il.meta.fields[td.field_start:td.field_start + td.field_count]
+                  if not field_attrs(il, f) & (FA_STATIC | FA_LITERAL)]
+        chain = il.instance_field_chain(return_ty[0]) or {}
+        if len(fields) != 1 or len(chain) != 1 or 0x10 not in chain \
+                or chain[0x10][1] != fields[0].type \
+                or not 0 <= fields[0].type < len(il.types):
+            return None
+        field_ty = il.types[fields[0].type]
+        if il._type_enum(field_ty) not in (2, 3, 4, 5, 6, 7, 8, 9, 0x0a, 0x0b,
+                                          0x0c, 0x0d, 0x0e, 0x12, 0x18, 0x19, 0x1c) \
+                or field_ty[1] & (1 << 29) or il._closed_type_key(field_ty) is None \
+                or il._sf_field_size(field_ty, 0) != il._sf_field_size(return_ty, 0) \
+                or (il._type_enum(field_ty) == 0x12 and (
+                    not _closed_owner(il, field_ty[0])
+                    or il.meta.typedefs[field_ty[0]].is_valuetype)):
+            return None
+        value = dict.get(lift.regs, 'RAX')
+        if value is None or value._unk or value.text != text:
+            return None
+        offset = il.bin.va2off(method.addr)
+        if offset is None or not 0 <= offset < len(il.bin.d):
+            return None
+        native = iter(Decoder(64, il.bin.d[offset:offset + 16], ip=method.addr))
+        decoded = (next(native), next(native))
+        for zero, ret in (block.insns, decoded):
+            if zero.ip != method.addr or zero.next_ip != ret.ip \
+                    or ret.ip != lift._cur_ip \
+                    or ret.mnemonic != Mnemonic.RET or ret.op_count != 0 or ret.len != 1 \
+                    or zero.mnemonic != Mnemonic.XOR or zero.op_count != 2 \
+                    or zero.op0_kind != OpKind.REGISTER or zero.op1_kind != OpKind.REGISTER \
+                    or zero.op0_register != zero.op1_register \
+                    or zero.op0_register not in (IReg.EAX, IReg.RAX) \
+                    or any(i.segment_prefix != IReg.NONE or i.has_rep_prefix \
+                           or i.has_repne_prefix for i in (zero, ret)):
+                return None
+        if any(a != b for a, b in zip(block.insns, decoded)):
+            return None
+        return 'default(' + il.type_name(return_ty) + ')'
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError, OverflowError, StopIteration):
+        return None

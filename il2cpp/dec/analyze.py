@@ -5,7 +5,9 @@ from il2cpp.expr import Expr, _BARE_TOKEN_RX, _R8_TY, _mentions, _merge_arr_proo
 from il2cpp.expr import _tile_proof_for as _dry_tile_proof
 from il2cpp.text import imm_of, reg_name
 from il2cpp.x64 import ARG_REGS, GPRS, flag_cond
-from il2cpp.lifter.leafreturns import recover_leaf_struct_return
+from il2cpp.lifter.leafreturns import (
+    recover_leaf_struct_return, recover_leaf_struct_zero_return,
+)
 
 class _AnalyzeMixin:
     def _analyze(self, m, td, blocks, bmap):
@@ -1590,8 +1592,12 @@ class _AnalyzeMixin:
         bool method it is `true`. Same exact-member proof as the store path
         (`_fimm`) and argument path (fix 85): unnamed [Flags] combinations
         keep their literal. A separate exact native leaf/copy-ctor proof may
-        restore a missing small-struct wrapper; other nonliterals stay raw.
+        restore a missing small-struct wrapper. An independent native zero
+        leaf proof names default(T); every other shape keeps its spelling.
         """
+        zero = recover_leaf_struct_zero_return(L, text, rty)
+        if zero is not None:
+            return zero
         wrapped = recover_leaf_struct_return(L, text, rty)
         if wrapped is not None:
             return wrapped
