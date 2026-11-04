@@ -1,0 +1,411 @@
+{
+  "date": "2026-11-05",
+  "status": "isolated_native_unwind_boundary_not_enabled",
+  "source_parent_commit": "66b6ace778d968ed443e2672bd827450dcdb1f2b",
+  "accepted_production_source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "accepted_candidate_label": "game_out56",
+  "output_promoted": false,
+  "production_rendering_or_recovery_rules_changed": false,
+  "new_component": {
+    "path": "il2cpp/lifter/unwindproof.py",
+    "default_production_import_sites": [],
+    "exported_in_public_package": false,
+    "contract": [
+      "Immutable per-binary AMD64 PE snapshot; the PE exception directory selects indexed RUNTIME_FUNCTION records, not section naming.",
+      "Only version-1 UNWIND_INFO with flags 0 or CHAININFO qualifies. Known slot grammar, raw/file/executable backing, ordered nonoverlapping records, instruction re-decode equality, exact chained triples and common primary entry are checked.",
+      "At most 32 chain records and 512 accepted instructions; these are independent bounds, not increases to existing lifting or origin budgets.",
+      "Missing leaf records, handler/reserved flags, unsupported versions/slots, unrelated roots, cycles, truncated backing or mutated/overlapping instructions decline.",
+      "Failure caches are per instance and queried record; a failed child cannot poison a valid ancestor or another binary."
+    ],
+    "limits": [
+      "Not a stack unwinder, complete UNWIND_INFO semantic validator, full EH decoder, CFG completeness proof, metadata/body owner proof or C# lifetime proof.",
+      "Input is intended to be a finite decoder-owned instruction sequence; the current tuple materialization is not a bounded-ingestion API for arbitrary/infinite iterables.",
+      "No parameter-origin recovery, entry captures or new arithmetic rule is enabled by adding this unused module."
+    ]
+  },
+  "validation": {
+    "focused_tests": {
+      "passed": 79
+    },
+    "portable_suite": {
+      "passed": 4886,
+      "deselected": 380
+    },
+    "full_suite_excluding_parallel": {
+      "passed": 5001,
+      "skipped": 259,
+      "xpassed": 1,
+      "failures": 3,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_matches_baseline": true
+    },
+    "parallel_suite": {
+      "passed": 2
+    },
+    "compileall_and_import_smoke": true,
+    "lf_no_bom_and_diff_check": true,
+    "authored_matrix": {
+      "authored_only": true,
+      "cases": 65536,
+      "queries": 131072,
+      "two_chunk_positive_cases": 1,
+      "primary_only_positive_cases": 256,
+      "mismatches": [],
+      "seconds": 6.202999999979511,
+      "not_full_unwind_or_eh_proof": true,
+      "source_sha256": "184935f55ec6b7bf73611ec4f2b04ca625288ed0629de711d160b68620d48ab7"
+    },
+    "default_path_scoped_clean_parent_proof": {
+      "scope": [
+        "il2cpp/lifter/unwindproof.py",
+        "tests/test_native_unwind_boundary.py"
+      ],
+      "phases": {
+        "candidate": {
+          "phase": "candidate",
+          "component_present": true,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        },
+        "parent": {
+          "phase": "parent",
+          "component_present": false,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        },
+        "restored": {
+          "phase": "restored",
+          "component_present": true,
+          "component_imported_by_default": false,
+          "methods": [
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 69879,
+              "body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70773,
+              "body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70777,
+              "body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51"
+            },
+            {
+              "fixture": "survivors-roguelike-kit",
+              "mi": 70778,
+              "body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60"
+            },
+            {
+              "fixture": "limbus",
+              "mi": 35790,
+              "body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484"
+            }
+          ],
+          "all_match_accepted_out56": true,
+          "source_freeze_verified": true
+        }
+      },
+      "all_five_methods_byte_identical_to_accepted_out56": true,
+      "component_not_imported_in_all_phases": true,
+      "not_old_fails_new_passes_production_rule_proof": true
+    }
+  },
+  "private_filtered_capture_experiment": {
+    "production_enabled": false,
+    "research_origin_model": true,
+    "selected_sweeps": [
+      {
+        "fixture": "unitask",
+        "methods": 2242,
+        "changed_mi": [],
+        "crashes": [],
+        "final_entry_capture_counts": {},
+        "source_freeze_verified": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "methods": 1936,
+        "changed_mi": [
+          69879,
+          70773,
+          70777,
+          70778
+        ],
+        "crashes": [],
+        "final_entry_capture_counts": {
+          "69879": 2,
+          "70773": 1,
+          "70777": 1,
+          "70778": 1
+        },
+        "source_freeze_verified": true
+      },
+      {
+        "fixture": "limbus",
+        "methods": 923,
+        "changed_mi": [],
+        "crashes": [],
+        "final_entry_capture_counts": {},
+        "source_freeze_verified": true
+      }
+    ],
+    "paired_review": {
+      "reports": [
+        {
+          "fixture": "unitask",
+          "methods": 2242,
+          "changed_mi": [],
+          "crashes": [],
+          "details": []
+        },
+        {
+          "fixture": "survivors-roguelike-kit",
+          "methods": 1936,
+          "changed_mi": [
+            69879,
+            70773,
+            70777,
+            70778
+          ],
+          "crashes": [],
+          "details": [
+            {
+              "mi": 69879,
+              "captures": 2,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 5,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "911459a4175d15fa930afea5d2ff62413ccb4d2fafa73c43d6047c88dd1bcc5c"
+            },
+            {
+              "mi": 70773,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "134f00c8a14fb8435cd4a2808b37b62dc7a0e7586d53ac72906fe7c6822777d0"
+            },
+            {
+              "mi": 70777,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "6f8cae110440ff3b5aa7795b2a1ebfbd6e1de574a78265815ca35a638346ddfd"
+            },
+            {
+              "mi": 70778,
+              "captures": 1,
+              "prior_prototype_identical": true,
+              "opaque_target_multisets_preserved": true,
+              "structural_metrics": {
+                "brace_unclosed": 0,
+                "brace_underflow": 0,
+                "dangling_gotos": 0,
+                "into_block_gotos": 0,
+                "empty_args": 0
+              },
+              "raw_pre_emitter_parse_errors": 0,
+              "parse_error_signature_multisets_unchanged": true,
+              "body_sha256": "d9eb20f228b4f6057a3b16d7979dccad11e679492b72f107fbfeca842fc8ed12"
+            }
+          ]
+        },
+        {
+          "fixture": "limbus",
+          "methods": 923,
+          "changed_mi": [],
+          "crashes": [],
+          "details": []
+        }
+      ],
+      "limbus_leaf_declined": true,
+      "entry_captures": 5,
+      "changes_are_private_only": true,
+      "not_whole_method_or_real_reference_gate": true
+    },
+    "covered_footprints": [
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 69879,
+        "allowed": true,
+        "instruction_count": 105,
+        "chunks": 6
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70773,
+        "allowed": true,
+        "instruction_count": 225,
+        "chunks": 1
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70777,
+        "allowed": true,
+        "instruction_count": 110,
+        "chunks": 1
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70778,
+        "allowed": true,
+        "instruction_count": 184,
+        "chunks": 1
+      }
+    ],
+    "limbus_35790_leaf_declined": true,
+    "limits": [
+      "Private process-local monkeypatch only; origin and capture guards are not production-approved.",
+      "Four changed Survivors bodies are byte-identical to the previous entry-capture prototype. All remaining selected bodies match accepted out56. Five captures/conversions survive cleanup.",
+      "Named opaque call-target multiset equality is not proof of call arguments, path coverage, signatures or side effects.",
+      "Raw pre-emitter method 69879 has five parse errors on both sides due to unsanitized generated member identifiers. Error signature multisets are unchanged; other changed methods have zero in this check. This is not a strict emitted-tree parse gate.",
+      "No new runtime kernel, native game execution, full tree or nine-real-reference-assembly gate was run for this unused component; previous evidence is not relabeled as this run.",
+      "No compile-error reduction, performance gain, whole-method equivalence, promotion or re-pin is claimed."
+    ]
+  },
+  "authored_research_context_proof_gaps": {
+    "authored_only": true,
+    "production_changed": false,
+    "scope": "Independent proof gaps, not enabled production output counterexamples",
+    "research_model_sha256": "1b5655a2dcff57be112fb6f15cca6c940db65141d5c6859ea05eab27532a51e7",
+    "cases": [
+      {
+        "case": "wrong_unique_metadata_owner",
+        "research_context_accepts": true,
+        "unwind_footprint_accepts": true,
+        "research_origin_parameter": 0,
+        "exact_owner": false,
+        "complete_normal_successors": true
+      },
+      {
+        "case": "missing_normal_fallthrough",
+        "research_context_accepts": true,
+        "unwind_footprint_accepts": true,
+        "research_origin_parameter": 0,
+        "exact_owner": true,
+        "complete_normal_successors": false
+      }
+    ],
+    "conclusion": "An unwind-family check cannot replace exact metadata ownership or complete normal CFG validation in the future entry-origin plan."
+  },
+  "next_step": [
+    "Build a separate exact-metadata-owner bounded entry-origin plan, not a widened field proof. Prove complete normal CFG successors and decline missing fallthroughs, shared/generic/constructor/unsupported ABI contexts.",
+    "Record exact entry Expr identity per execution, preserve all-predecessor MOV32 origin with volatile-call kills and the existing 512 total budget.",
+    "Clone only the conversion source reference, retain conversion-time float snapshot and old SIMD guards; insert hygienic surviving Int32 captures after cleanup.",
+    "On any final capture validation failure, discard the attempt and atomically clean re-lift with recovery disabled, preserving old behavior; test dry/real, scope, reuse and collisions.",
+    "Only an enabled source candidate proceeds through new frozen paired sweeps, strict trees, nine actual-reference assemblies and clean-parent behavioral proof. Checked denominator wrap remains separate."
+  ],
+  "file_sha256": {
+    "il2cpp/lifter/unwindproof.py": "184935f55ec6b7bf73611ec4f2b04ca625288ed0629de711d160b68620d48ab7",
+    "tests/test_native_unwind_boundary.py": "a4714eadc11794a298377a1bb0c9c7b6f2725587019d2a6251f71cf50f3c901d"
+  },
+  "private_evidence_sha256": {
+    "parameter60_unwind_filtered_prototype.py": "6360f4b7f7ce6f7525818c06c0753c6f1e5de39e63b225d85efeffaf86f361ef",
+    "prove_parameter60_unwind_matrix.py": "43757cf0a71bba6610a7e7b0aa0e60a7ed97130a7c93934ce163b276731aaa89",
+    "prove_parameter60_default_neutral.py": "fd4ee509cd727df9475ca2ca2a454f805ecc2f0bae21f480918f166cf96d5b75",
+    "review_parameter60_sweeps.py": "1ffdeeff9a24d364d472849aabb1703a77198b2899a9e402f8e32e0905808a26",
+    "parameter60_unwind_matrix.summary.json": "5a36481fab238c17ebcb3a744a11a61725c69d09e412c1cfebf1db353587e623",
+    "parameter60_sweep_combined.summary.json": "e3b880d951f20928f66344b73143f82fc445b76f737e1fc63f3ff3dcc74cc640",
+    "parameter60_review.summary.json": "592bd9435593cae07e5a7f368651cea3d66a0c3046df49a2d5f60651a5cdefed",
+    "parameter60_full_suite.summary.json": "4d42d8c52066c83758344afad571c4e7e15e27e4c0a43ad7492038d6131b074b",
+    "parameter60_full_suite.junit.xml": "c5a827a8c63c6eff8ddde74c8327f2906e62ec7734dbac5bc91ce16b1ee84dc5",
+    "parameter60_parallel_suite.junit.xml": "aafd4944c1490915fb7137294044eb06b54ae24f6ebef4e843495975004a7379",
+    "parameter60_default_neutral.candidate.summary.json": "e6a8e57cd4059dacd5bdc8d84cdd7f62d930f288fbc6391bd359e09a9a629193",
+    "parameter60_default_neutral.parent.summary.json": "a2b185f3907bd27052833e1ef247f52201dcca65f94d66bd14cb1c4cd97459d4",
+    "parameter60_default_neutral.restored.summary.json": "e6b79fa3ef966ed6e0c5c56fe0807f7fbf1c6ee1130d5f4d25939c2112e936df",
+    "parameter60_snapshot.unitask.summary.json": "55fc6ee932fd5ecaf6cf82e88f5f9b1895d6eb1d61dc20ddb8baa69fac93fbc3",
+    "parameter60_snapshot.survivors-roguelike-kit.summary.json": "2af0885948c09c924be29352076c166488396c9cc775ff237af587aae9686379",
+    "parameter60_snapshot.limbus.summary.json": "6211aef1f1ef80fb135392518a0faddf2a31870d90e49535cd6013d2a722c567",
+    "prove_parameter61_context_gaps.py": "3f48da4822faedefb34393c567b93adf05d83a61cc364dccc802e717be77aff0",
+    "parameter61_context_gaps.summary.json": "f91a6f82c746e42e8ca38783fb5ce522b891b3f08fd955741a65c5124d607ed1"
+  },
+  "goal_status": "active_unachieved"
+}

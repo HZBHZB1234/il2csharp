@@ -4,6 +4,59 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Isolated native unwind-boundary component (2026-11-05)
+
+**New tested infrastructure, not enabled recovery.** `il2cpp/lifter/unwindproof.py`
+adds an immutable per-binary AMD64 PE unwind-family check. The exception data
+**directory**, not the `.pdata` section name, selects the table. Exact raw-backed
+instruction re-decodes must share one method-entry primary, directly or through
+indexed version-1 CHAININFO records. Handler/reserved flags, malformed supported
+slot grammar, missing leaf data, unrelated chains and unsupported versions decline.
+The independent **32-record / 512-instruction** limits do not raise older caps.
+This is not a stack unwinder, complete EH decoder, metadata-owner or CFG proof;
+it assumes a finite decoder-owned input sequence, not arbitrary iterable ingestion.
+There are **no default production imports/callers or public exports** of the new
+component. Production output remains `game_out56` (`6e4cfac`), not promoted.
+
+**79 new authored tests pass**; portable **4,886 passed / 380 deselected**.
+Full suite excluding the separate parallel tests: **5,001 passed / 259 skipped /
+1 non-strict XPASS / the identical fixed 3 failures**. Parallel: **2 passed**.
+Compileall/import smoke, LF/no-BOM and diff checks pass. A separate authored
+version/flags matrix covers **65,536 layouts / 131,072 queries / zero mismatches**,
+including failed-child then valid-primary cache order. Scoped clean-parent removal
+and exact restoration of only the two new files preserve all five focused default
+bodies byte-for-byte against accepted out56; none of the three phases imports the
+component by default. This is neutrality evidence, not a production fix proof.
+
+Private origin/capture prototype, now additionally filtered by the component:
+**2,242 / 1,936 / 923 selected methods**, **0 / 4 / 0 changed**, **zero crashes**.
+The four Survivors bodies retain **5 entry captures / 5 conversions**, byte-identical
+to the preceding prototype; all other selected bodies match out56. Method 69879
+covers **six chained chunks**; Limbus 35790 lacks unwind records and now declines.
+Opaque call-target multisets are unchanged, not a call-argument/path/side-effect
+proof. Raw pre-emitter 69879 has the **same five parse errors on both sides** from
+unsanitized generated member identifiers; the other three have zero. This check
+is **not** a strict emitted-tree or nine-assembly real-reference compile gate.
+No new runtime/performance or compile-error improvement is claimed.
+
+Two additional authored counterexamples show why filtering alone is insufficient:
+the research context still accepts a unique **wrong MethodDef candidate** and a
+**missing normal fallthrough**, even though unwind-footprint checks pass. These
+are private model proof gaps, not enabled production-output regressions.
+
+**Next:** an independent exact-owner entry-origin/capture plan must validate all
+normal CFG successors and ABI/sret types, reject shared/generic/constructor
+contexts, record exact per-execution entry Expr identity, and use all-predecessor
+MOV32 provenance with volatile-call kills under the existing total 512 budget.
+Clone only the conversion input; preserve old field/SIMD guards and conversion-
+time float snapshots. Insert hygienic surviving captures after all cleanup.
+Any final validation failure must discard the attempt and **atomically clean
+re-lift with recovery disabled**. Cover dry/real, reuse, scope and collision
+cases before enabling and running new frozen paired trees/real-reference gates.
+Denominator wrapping remains a separate slice; no re-pin or promotion is allowed.
+Evidence: `validation_reports/native_unwind_boundary_2026-11-05.json`.
+Goal remains **active, unachieved**. Earlier prototype sections below are history.
+
 ### Private entry-snapshot emission prototype (2026-11-05)
 
 **Research only, not enabled.** Production remains the accepted `game_out56`
