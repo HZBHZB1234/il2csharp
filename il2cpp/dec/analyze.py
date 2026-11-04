@@ -5,6 +5,7 @@ from il2cpp.expr import Expr, _BARE_TOKEN_RX, _R8_TY, _mentions, _merge_arr_proo
 from il2cpp.expr import _tile_proof_for as _dry_tile_proof
 from il2cpp.text import imm_of, reg_name
 from il2cpp.x64 import ARG_REGS, GPRS, flag_cond
+from il2cpp.dec.stackframe import prove_block_entry_rsp
 from il2cpp.lifter.leafreturns import (
     recover_leaf_struct_return, recover_leaf_struct_zero_return,
 )
@@ -12,6 +13,11 @@ from il2cpp.lifter.leafreturns import (
 class _AnalyzeMixin:
     def _analyze(self, m, td, blocks, bmap):
         L = self.L
+        # Native CFG entry coordinates, never the offset left by the previous
+        # RPO block's epilogue. Unsupported methods retain the existing path.
+        frame_entries = prove_block_entry_rsp(
+            L.il, m, getattr(self, '_flat_insns', ()), blocks,
+            getattr(self, 'skip_ips', ()), getattr(self, 'eh', None))
         # _rpo appends the unreachable tail (the EH pads, entered only by the
         # exception dispatcher) after the reachable order, so they lift too
         rpo = self._rpo(blocks)
@@ -81,6 +87,8 @@ class _AnalyzeMixin:
         jcc_fallthrough_flags = {}
 
         def exec_block(b, dry):
+            if frame_entries is not None:
+                L.rsp_delta = frame_entries[b.bid]
             L.out = _Sink(b)
             L.dry = dry
             L._jcc_flags = None
