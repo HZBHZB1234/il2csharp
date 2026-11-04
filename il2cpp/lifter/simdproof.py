@@ -16,8 +16,10 @@ def movd_int32_field(lift, ins, insns, value):
 
     Only a plain Int32 reference-instance field, a contiguous same-block
     legacy MOVD last writer, and no intervening memory/base writes qualify.
-    Register inputs, aliases, partial writes, calls and flat fallback decline.
-    No spelling-based guess of an unknown value's scalar type is permitted.
+    A GPR source also needs an exact four-byte field-load last writer and
+    the unchanged receiver-field expression. Other register inputs, aliases,
+    partial writes, calls and flat fallback decline. Text is never used to
+    guess an unknown scalar type.
     """
     from iced_x86 import InstructionInfoFactory, OpAccess, RegisterExt
 
@@ -40,6 +42,7 @@ def movd_int32_field(lift, ins, insns, value):
     if index is None:
         return False
     source = RegisterExt.full_register(ins.op1_register)
+    gpr = None
     expected = ins.ip
     written = set()
     factory = InstructionInfoFactory()
@@ -56,13 +59,32 @@ def movd_int32_field(lift, ins, insns, value):
             return False
         regs = {RegisterExt.full_register(reg.register)
                 for reg in info.used_registers() if reg.access in writes}
-        if source not in regs:
-            written.update(regs)
-            continue
-        if (native.mnemonic != Mnemonic.MOVD
-                or native.op0_kind != OpKind.REGISTER
-                or native.op0_register != ins.op1_register
-                or native.op1_kind != OpKind.MEMORY
+        if gpr is None:
+            if source not in regs:
+                written.update(regs)
+                continue
+            if (native.mnemonic != Mnemonic.MOVD
+                    or native.op0_kind != OpKind.REGISTER
+                    or native.op0_register != ins.op1_register):
+                return False
+            if native.op1_kind == OpKind.REGISTER:
+                if RegisterExt.size(native.op1_register) != 4:
+                    return False
+                # MOVD captured this GPR before any later writes. Find its
+                # last native writer at that point, not the current GPR Expr.
+                gpr = RegisterExt.full_register(native.op1_register)
+                written.update(regs)
+                continue
+        else:
+            if gpr not in regs:
+                written.update(regs)
+                continue
+            if (native.mnemonic != Mnemonic.MOV
+                    or native.op0_kind != OpKind.REGISTER
+                    or RegisterExt.size(native.op0_register) != 4
+                    or RegisterExt.full_register(native.op0_register) != gpr):
+                return False
+        if (native.op1_kind != OpKind.MEMORY
                 or MemorySizeExt.size(native.memory_size) != 4
                 or native.segment_prefix != IReg.NONE
                 or native.memory_index != IReg.NONE
@@ -86,5 +108,8 @@ def movd_int32_field(lift, ins, insns, value):
         field = (lift.il.instance_field_chain(td) or {}).get(
             sdisp(native.memory_displacement))
         return (field is not None and 0 <= field[1] < len(lift.il.types)
-                and _int32(lift.il.types[field[1]]))
+                and _int32(lift.il.types[field[1]])
+                # Do not cast an inferred/bound object token numerically.
+                # The extra GPR path must still denote the proved field.
+                and (gpr is None or value.text == base.text + '.' + field[0]))
     return False
