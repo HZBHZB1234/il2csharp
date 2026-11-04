@@ -1,0 +1,274 @@
+{
+  "date": "2026-11-05",
+  "status": "private_emission_prototype_not_enabled",
+  "source_commit": "ed9b4afa97651c32f5b8c083f39cd41bbe4dd14a",
+  "accepted_candidate_source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "accepted_candidate_label": "game_out56",
+  "production_logic_or_repository_tests_changed": false,
+  "source_fingerprints_sha256": "c51e30153041311fd25240706f1c0dbe653b9299b170ae517239824e3d14945c",
+  "architecture_experiment": [
+    "Process-local monkeypatch, no repository source or test change and no game/MI/IP allowlist in the origin or capture rule. Frozen selected methods are evaluation input, not production evidence.",
+    "Research native backwards origin model and existing scalar/provenance guards identify exact non-byref Int32 metadata entry Expr objects captured by same-block legacy MOVD before CVTDQ2PS. The pre-existing 512 total state bound is not increased.",
+    "A private clone of only the captured XMM source Expr refers to separate entry snapshot storage; the original GPR/parameter Expr is never mutated. The original production CVTDQ2PS handler still performs instruction bookkeeping and creates the conversion-time float snapshot and zero high lanes.",
+    "Int32 entry-capture declarations are inserted after the entire statement/text cleanup pipeline, before the first executable statement (inside an unsafe body envelope when present). Only surviving capture uses get a declaration; no floating-point conversion is moved to entry.",
+    "Generated capture names avoid metadata parameter names. Before final insertion, each marker use must be an exact generated float-cast operand, not an assignment, declaration or address/reference use. These private lexical checks are deliberately narrow, not a general C# symbol/binding proof.",
+    "The research model already declines shared/generic owners, unowned or unsupported control flow, noncopy writers, conflicting origins and over-budget paths; it is not yet an enabled production gate. Native EH/ownership completeness and atomic fallback still need production design and tests."
+  ],
+  "frozen_selected_method_sweeps": {
+    "unitask": {
+      "methods": 2242,
+      "changed_mi": [],
+      "crashes": [],
+      "final_entry_capture_counts": {},
+      "frozen_source_checks": true
+    },
+    "survivors-roguelike-kit": {
+      "methods": 1936,
+      "changed_mi": [
+        69879,
+        70773,
+        70777,
+        70778
+      ],
+      "crashes": [],
+      "final_entry_capture_counts": {
+        "69879": 2,
+        "70773": 1,
+        "70777": 1,
+        "70778": 1
+      },
+      "frozen_source_checks": true
+    },
+    "limbus": {
+      "methods": 923,
+      "changed_mi": [
+        35790
+      ],
+      "crashes": [],
+      "final_entry_capture_counts": {
+        "35790": 1
+      },
+      "frozen_source_checks": true
+    }
+  },
+  "candidate_sites": [
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 0,
+      "native_prefix_states": 9,
+      "suffix_states": 2,
+      "preserved_call_states": 0,
+      "native_copy_count": 0
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 69879,
+      "parameter_index": 1,
+      "native_prefix_states": 10,
+      "suffix_states": 2,
+      "preserved_call_states": 0,
+      "native_copy_count": 0
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70773,
+      "parameter_index": 1,
+      "native_prefix_states": 70,
+      "suffix_states": 1,
+      "preserved_call_states": 10,
+      "native_copy_count": 1
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70777,
+      "parameter_index": 2,
+      "native_prefix_states": 41,
+      "suffix_states": 1,
+      "preserved_call_states": 5,
+      "native_copy_count": 1
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "mi": 70778,
+      "parameter_index": 0,
+      "native_prefix_states": 77,
+      "suffix_states": 1,
+      "preserved_call_states": 13,
+      "native_copy_count": 1
+    },
+    {
+      "fixture": "limbus",
+      "mi": 35790,
+      "parameter_index": 0,
+      "native_prefix_states": 8,
+      "suffix_states": 3,
+      "preserved_call_states": 0,
+      "native_copy_count": 0
+    }
+  ],
+  "paired_body_review": {
+    "changed_methods": [
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 69879,
+        "entry_capture_declarations": 2,
+        "scalar_conversion_snapshots": 2,
+        "baseline_body_sha256": "207d124e13f5b67ce67b81ff9560b27842f3d0e9be1e2c57aa3193121bfaebe0",
+        "prototype_body_sha256": "911459a4175d15fa930afea5d2ff62413ccb4d2fafa73c43d6047c88dd1bcc5c",
+        "named_opaque_call_target_multiset_unchanged": true,
+        "entry_capture_placement_verified": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70773,
+        "entry_capture_declarations": 1,
+        "scalar_conversion_snapshots": 1,
+        "baseline_body_sha256": "75d350be9fab5390c83ac893533bbb180211d11849526846e90202256997b317",
+        "prototype_body_sha256": "134f00c8a14fb8435cd4a2808b37b62dc7a0e7586d53ac72906fe7c6822777d0",
+        "named_opaque_call_target_multiset_unchanged": true,
+        "entry_capture_placement_verified": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70777,
+        "entry_capture_declarations": 1,
+        "scalar_conversion_snapshots": 1,
+        "baseline_body_sha256": "0c9f753af8017c493a842be4497e4bd5d0d2ffbb2dd202a24d9abaa3ac296a51",
+        "prototype_body_sha256": "6f8cae110440ff3b5aa7795b2a1ebfbd6e1de574a78265815ca35a638346ddfd",
+        "named_opaque_call_target_multiset_unchanged": true,
+        "entry_capture_placement_verified": true
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "mi": 70778,
+        "entry_capture_declarations": 1,
+        "scalar_conversion_snapshots": 1,
+        "baseline_body_sha256": "cf39fc049dd1b2d55f3354a2fd58203f13c6ea07afce499d709af469c0ebeb60",
+        "prototype_body_sha256": "d9eb20f228b4f6057a3b16d7979dccad11e679492b72f107fbfeca842fc8ed12",
+        "named_opaque_call_target_multiset_unchanged": true,
+        "entry_capture_placement_verified": true
+      },
+      {
+        "fixture": "limbus",
+        "mi": 35790,
+        "entry_capture_declarations": 1,
+        "scalar_conversion_snapshots": 1,
+        "baseline_body_sha256": "1d5ef97951c4225c07672a101ff183a5a99c48273dc00e64594ec54f32bc1484",
+        "prototype_body_sha256": "e5373011242e78621e4edee6ed54d76c5e8c1f0478e2741d88c490463f759fa4",
+        "named_opaque_call_target_multiset_unchanged": true,
+        "entry_capture_placement_verified": true
+      }
+    ],
+    "all_method_sets_identical": true,
+    "changed_methods_exactly_previous_inventory": true,
+    "all_other_selected_bodies_byte_identical": true,
+    "all_named_opaque_call_target_multisets_preserved": true,
+    "entry_captures_first_executable_lines": true,
+    "no_production_change": true
+  },
+  "private_authored_tests": {
+    "snapshot_staging_passed": 23,
+    "independent_forward_model_passed": 34,
+    "combined_passed": 57,
+    "repository_suite_counts_unchanged": true,
+    "snapshot_cases": [
+      "entry-before-mutation capture placement and unsafe scope",
+      "parameter-name collision and deterministic names",
+      "unused/literal-only/member-only marker exclusion",
+      "assignment, increment, ref/out/address, in/ref-readonly, shift assignment and bare-declaration declines",
+      "every surviving marker use must have the generated float-cast operand shape"
+    ]
+  },
+  "extracted_emitted_kernel_runtime": {
+    "production_enabled": false,
+    "exact_final_prototype_statements_extracted": true,
+    "entry_capture_placement_preserved": true,
+    "conversion_point_cast_preserved": true,
+    "local_extracted_kernels_not_whole_methods": true,
+    "hardware_SSE2_and_SSE_oracle": true,
+    "default_rounding_only": true,
+    "optimized": true,
+    "game_native_execution": false,
+    "negative_sqrt_helper_checked": false,
+    "checked_and_unchecked_results": {
+      "checked": {
+        "bar_inputs": 100225,
+        "bar_existing_mismatches": 100144,
+        "bar_prototype_mismatches": 0,
+        "range_inputs_excluding_count_minvalue": 100210,
+        "range_existing_mismatches": 100122,
+        "range_prototype_mismatches": 0,
+        "range_count_minvalue_inputs": 15,
+        "range_count_minvalue_prototype_mismatches": 15,
+        "range_count_minvalue_mismatch_kinds": {
+          "OverflowException": 15
+        },
+        "sqrt_inputs": 110001,
+        "sqrt_existing_mismatches": 12321,
+        "sqrt_prototype_mismatches": 0,
+        "lifetime_authored_inputs": 10001,
+        "lifetime_prototype_mismatches": 0,
+        "lifetime_helper_count_mismatches": 0
+      },
+      "unchecked": {
+        "bar_inputs": 100225,
+        "bar_existing_mismatches": 100144,
+        "bar_prototype_mismatches": 0,
+        "range_inputs_excluding_count_minvalue": 100210,
+        "range_existing_mismatches": 100122,
+        "range_prototype_mismatches": 0,
+        "range_count_minvalue_inputs": 15,
+        "range_count_minvalue_prototype_mismatches": 0,
+        "range_count_minvalue_mismatch_kinds": {},
+        "sqrt_inputs": 110001,
+        "sqrt_existing_mismatches": 12321,
+        "sqrt_prototype_mismatches": 0,
+        "lifetime_authored_inputs": 10001,
+        "lifetime_prototype_mismatches": 0,
+        "lifetime_helper_count_mismatches": 0
+      }
+    },
+    "isolated_original_circle_compile_error": "CS0266",
+    "isolated_prototype_circle_compile_success": true,
+    "not_a_real_reference_assembly_gate": true,
+    "emitted_kernel_sha256": {
+      "bar": "62b5fcc223d9f18339d39a725cb5510f8bbffcb1defe0e66286eb187aec7d220",
+      "range": "19f5335b9ce0e7c9063ef827c5e8fddf38811f7be0ef0d44bf7808ccee9d1f95",
+      "sqrt": "cf310ca30551de53786700d6fefc0e38f6ff9781f72fb779f337b8da20e594fd",
+      "lifetime": "18a0369dc4874053f47c5bc2ed00df25acb4453b871d546f9029edebc2a9ac05"
+    }
+  },
+  "evidence_limits": [
+    "No source fix has been enabled; this is emitted-code feasibility evidence, not a promoted output, full strict-tree rebuild, whole-method proof or real-reference assembly compile gate.",
+    "Only 2242 / 1936 / 923 selected methods were evaluated, not all methods in these games. No additional candidate appeared beyond the previous inventory.",
+    "Named opaque sub_ call-target multisets are textually preserved in changed bodies. That does not prove each argument signature, call path, helper identity or runtime side effect.",
+    "New runtime tests extract actual final private prototype entry/float declarations and arithmetic expressions, rather than merely substituting handwritten casts. They still isolate kernels from surrounding game logic and do not execute the native game.",
+    "Bar and range use 100000 deterministic seed-59 xorshift pairs plus 225 edge pairs. Positive sqrt uses 110001 inputs and a different random sample from the earlier seed-57 test, explaining 12321 rather than 12110 old mismatches.",
+    "Default FP rounding only. Both checked and unchecked optimized local compilations pass the sampled prototype bar, positive sqrt and range excluding count-minvalue comparisons. Negative sqrt helper inputs and nondefault FP modes are untested.",
+    "At count==Int32.MinValue, all 15 checked-mode prototype range cases still overflow; the 15 unchecked cases agree with native modulo subtraction in this sample. This is not a repaired or generally proved arithmetic-width/checked-context policy.",
+    "The lifetime helper mutation is authored, not observed game output. The actual emitted entry capture survives 10001 sampled mutations with zero bit or helper-count mismatches.",
+    "One isolated original circle Int32 declaration fails CS0266 while the corresponding emitted float kernel compiles. This is not a measured full-body or nine-assembly compiler error reduction.",
+    "Production test suites, paired strict trees, nine real-reference assembly diagnostics and clean-parent source behavioral proof have not been run for this private prototype. Prior accepted source evidence remains unchanged.",
+    "No speed improvement or near-recompilability/semantic equivalence claim."
+  ],
+  "next_steps": [
+    "Implement a separate per-method native parameter-origin/capture plan, not a broadening of the existing field proof. Keep exact metadata/body ownership, scalar/aggregate guards, Win64 ABI and total budget.",
+    "Add executable native unwind/EH boundary checks, hygienic capture identity/final placement and atomic decline/fallback; test reuse across methods, dry/real passes, malformed metadata, shared signatures, loops and cleanup.",
+    "Only after bounded production tests should a source candidate undergo the complete frozen suites, paired selected sweeps/strict trees, nine real-reference compiler review and scoped clean-parent behavioral reproduction.",
+    "Leave denominator modulo-wrap/checked-context recovery as its own proof obligation; preserve original opaque helper calls and side effects."
+  ],
+  "private_evidence_sha256": {
+    "parameter59_entry_snapshot_prototype.py": "6c608b9fc99ee342a824d23a5b0f89e1b181cc991e3c521a28c1a87fc2a28fe5",
+    "test_parameter59_entry_snapshot_private.py": "66fde8090a9c97c9e9656812bb90b1c55fe13e60b2d243286aae0eea05815471",
+    "prove_parameter59_emitted_kernels.py": "63c2d8fd32e21d52abf55a3c5f18226e2a852bedb9ef60dc9f2d91327a4a8879",
+    "parameter59_review.summary.json": "31d5c7d907c72f1a3e8fec2184184faef32533c1d599c2bdd56ad57d71fe8836",
+    "parameter59_emitted_kernels.summary.json": "90380874a573f9bf78778565aa54f9849a3fcdc391a34e5941daf1c9b31dd608",
+    "parameter59_snapshot.unitask.summary.json": "b1dfc0dfd98d2edb6a15182d71c9e230832d00481c6dca6acc02635a002eaba4",
+    "parameter59_snapshot.survivors-roguelike-kit.summary.json": "89cdafe49077a64e548796fa483a5b80adde2066ddfc02f4f5fc64f861a1653d",
+    "parameter59_snapshot.limbus.summary.json": "6b369c238b73db86a8591c3a43c7e4cd1b82d794b072760b88541c4a2cd2ec25"
+  },
+  "goal_complete": false,
+  "goldens_or_pins_changed": false,
+  "output_promoted": false
+}

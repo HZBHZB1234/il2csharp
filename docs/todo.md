@@ -4,6 +4,54 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Private entry-snapshot emission prototype (2026-11-05)
+
+**Research only, not enabled.** Production remains the accepted `game_out56`
+source (`6e4cfac`), not promoted; no repository source/tests changed. A private
+per-process prototype separates native origin, immutable entry Int32 capture,
+and conversion-point Single snapshot. Entry declarations are inserted **after
+all statement/text cleanup**, before executable code (inside `unsafe` when
+needed), so cleanup cannot inline them back into mutable parameter storage.
+The original scalar Expr is not mutated; the existing conversion handler still
+builds all four lanes. Capture names avoid parameters; every surviving marker
+must be an exact generated float-cast operand. These lexical checks are narrow
+experimental guards, not general symbol-binding or production EH proof.
+
+Frozen selected sweeps: **2,242 / 1,936 / 923 methods**, **0 / 4 / 1 changes**,
+**zero crashes**, unchanged method sets and all other bodies byte-identical to
+out56. The same six conversion sites change; no game/MI/IP allowlist controls
+the prototype rule. Six entry captures and six conversion snapshots survive
+the real cleanup pipeline. Named opaque `sub_` call-target multisets remain
+unchanged (not a call-signature or full side-effect proof). **23 private capture
+staging tests + 34 independent forward-model tests = 57 passed**; repository
+suite counts are unchanged.
+
+Unlike the earlier handwritten proposals, runtime kernels are extracted from
+the **actual final prototype declarations and expressions**. Checked and
+unchecked optimized local runs both yield zero prototype mismatches on
+**100,225 bar pairs / 100,210 guarded range pairs / 110,001 positive sqrt
+inputs**. Unchanged source expressions disagree **100,144 / 100,122 / 12,321**
+times. The sqrt sample uses a new deterministic seed, not the previous 12,110-
+mismatch sample. The range domain still excludes `count == Int32.MinValue`:
+all **15** separately checked boundary cases overflow, while the **15 unchecked**
+cases match native wrapping subtraction in this sample. No denominator-wrap
+repair is enabled. An authored mutation between emitted entry and conversion
+statements gives **0 / 10,001** value mismatches and zero helper-count mismatches.
+
+An isolated exact original circle Int32 declaration fails **CS0266**; the
+corresponding emitted float kernel compiles. This is **not** a full-method or
+nine-assembly compile-error reduction. Runtime checks use local hardware SIMD,
+default rounding and extracted kernels, not game-native execution, negative
+sqrt-helper paths or whole methods. No performance gain is claimed.
+
+Next: turn the plan into a bounded, separately tested production component with
+native EH/ownership boundaries, hygienic final capture placement and atomic
+fallback; then the full frozen source validation procedure. The prototype does
+not authorize changing guards/caps, goldens/pins or promotion. Evidence:
+`validation_reports/int32_parameter_entry_snapshot_prototype_2026-11-05.json`.
+Goal remains **active, unachieved**. This updates the next step of the earlier
+read-only audit below.
+
 ### Independent parameter-origin audit and division counterexamples (2026-11-05)
 
 Evidence-only continuation of the inventory below: **no production or repository
