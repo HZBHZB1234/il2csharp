@@ -1,0 +1,221 @@
+{
+  "date": "2026-11-04",
+  "status": "accepted; not promoted; goal not achieved",
+  "baseline": "game_out43",
+  "candidate": "game_out44",
+  "source_parent": "0262f59cf60b4695a3e4584497d736e83d9830d9",
+  "correction": {
+    "module": "il2cpp/lifter/materialized.py",
+    "previous_defect": "The immediate-MOV replay arm imported IMM_OPS from il2cpp.x64, where it does not exist; the resulting ImportError escaped the conservative proof boundary. This boundary was missing from out43 portable tests and not reached by its selected changed native methods.",
+    "fix": "Import the existing immediate operand-kind set from il2cpp.runtime.meta. No recovery guards, layouts, native-byte identities, lifetimes, aliases or interface-sret rules are relaxed.",
+    "new_boundary_coverage": "Five immediate MOV forms (EAX imm32, RAX sign-extended imm32, RAX imm64, memory dword imm32, memory qword sign-extended imm32), each with zero, one and all-ones values. Constants never become source-byte identities; unrelated writes keep an intact copy recoverable; source overwrites decline without crashing."
+  },
+  "validation": {
+    "additional_portable_cases": 36,
+    "focused_synthetic_passed": 164,
+    "focused_game_passed": 2,
+    "portable": {
+      "exit_code": 0,
+      "seconds": 17.843999999924563,
+      "frozen_source_verified": true,
+      "passed": 4129,
+      "failed": 0
+    },
+    "full_without_parallel": {
+      "exit_code": 1,
+      "seconds": 1135.9060000000754,
+      "frozen_source_verified": true,
+      "passed": 4213,
+      "failed": 3,
+      "skipped": 259,
+      "xpassed_non_strict": 1
+    },
+    "parallel": {
+      "exit_code": 0,
+      "seconds": 610.061999999918,
+      "frozen_source_verified": true,
+      "passed": 2,
+      "failed": 0
+    },
+    "clean_source_baseline": {
+      "clean_source_head": "0262f59cf60b4695a3e4584497d736e83d9830d9",
+      "authored_boundary_tests_failed_on_parent": 36,
+      "all_boundary_failures_are_wrong_import": true,
+      "exit_code": 1,
+      "seconds": 119.03099999995902,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_exactly_matches_accepted_baseline": true,
+      "candidate_restored_byte_exact": true
+    },
+    "compileall": true,
+    "diff_check": true
+  },
+  "pin_review": {
+    "same_as_baseline": true,
+    "repinned": false,
+    "failure_set": [
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+      "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+      "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+    ]
+  },
+  "fixtures": {
+    "unitask": {
+      "cs_files": 474,
+      "source_bytes_identical": true,
+      "changed_files": 0,
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "source_fingerprints_verified": true,
+      "assemblies": {
+        "Assembly-CSharp": {
+          "errors": 1969,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "TempAsm": {
+          "errors": 6,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask": {
+          "errors": 4545,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.Addressables": {
+          "errors": 5,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.DOTween": {
+          "errors": 5,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "UniTask.Linq": {
+          "errors": 13,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": false
+        },
+        "UniTask.TextMeshPro": {
+          "errors": 209,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        }
+      },
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "parse_recovery_nodes": 0
+    },
+    "survivors-roguelike-kit": {
+      "cs_files": 293,
+      "source_bytes_identical": true,
+      "changed_files": 0,
+      "lifted": 1857,
+      "failed": 0,
+      "fallbacks": 0,
+      "type_emit_failures": 0,
+      "source_fingerprints_verified": true,
+      "assemblies": {
+        "Assembly-CSharp": {
+          "errors": 3781,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        },
+        "Assembly-CSharp-firstpass": {
+          "errors": 814,
+          "complete_diagnostic_multiset_byte_location_identical": true,
+          "body_probe_observed": true
+        }
+      },
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "parse_errors": 0,
+      "parse_missing": 0,
+      "parse_recovery_nodes": 0
+    }
+  },
+  "compile_reference_policy": {
+    "real_editor_root": "D:/unity_editor_6000",
+    "real_engine_bcl_package_references": true,
+    "original_assembly_simple_names": true,
+    "self_reference": false,
+    "synthetic_type_stubs": false
+  },
+  "diagnostic_delta": {
+    "added_occurrences": 0,
+    "removed_occurrences": 0,
+    "complete_multisets_including_file_line_column_code_message_identical": 9,
+    "normalization_or_suppression": false
+  },
+  "authored_synthetic_native_runtime": {
+    "authored_win64_programs": 108,
+    "native_calls": 3456,
+    "byte_identity_and_canary_checks": 199296,
+    "source_intact_programs": 84,
+    "destination_intact_programs": 96,
+    "mismatches": 0,
+    "game_native_execution": false,
+    "whole_method_equivalence": false,
+    "speed_evidence": false,
+    "source_fingerprints_verified": true
+  },
+  "next_read_only_frame_audit": {
+    "status": "TEMP-only; no production change or accepted recovery",
+    "selected": {
+      "unitask": {
+        "fixture": "unitask",
+        "methods": 2242,
+        "solved_frame_methods": 2056,
+        "declined_frame_methods": 186,
+        "real_proved_stack_stores": 3937,
+        "wrong_rsp": 19,
+        "wrong_stack_address": 43,
+        "distinct_home_same_name": 64,
+        "wrong_display_key": 95,
+        "wrong_rsp_methods": 13,
+        "same_name_collision_methods": 43,
+        "wrong_display_key_methods": 52,
+        "crashes": 0,
+        "source_unchanged": true,
+        "production_change": false,
+        "seconds": 145.28100000007544
+      },
+      "survivors-roguelike-kit": {
+        "fixture": "survivors-roguelike-kit",
+        "methods": 1936,
+        "solved_frame_methods": 1876,
+        "declined_frame_methods": 59,
+        "real_proved_stack_stores": 4180,
+        "wrong_rsp": 171,
+        "wrong_stack_address": 319,
+        "distinct_home_same_name": 309,
+        "wrong_display_key": 899,
+        "wrong_rsp_methods": 22,
+        "same_name_collision_methods": 67,
+        "wrong_display_key_methods": 91,
+        "crashes": 0,
+        "source_unchanged": true,
+        "production_change": false,
+        "seconds": 114.01500000001397
+      }
+    },
+    "scope": "Finite CFG RSP/RBP coordinate solver over decoded blocks, compared only at supported reachable real-execution stack stores. Unsupported stack operations or conflicting joins decline; methods that bypass general analysis are not counted as solved. These are store observations, not compiler-error counts or whole-game equivalence proofs.",
+    "prototype_disproof": "A deliberate unique-slot-name plus exact-RBP-coordinate TEMP prototype eliminates sampled coordinate/name collisions, but creates aggregate initializer forms retaining effectful call text alongside already emitted calls. It is not accepted. Do not infer field writes from target compiler types; keep the RBP-copy quarantine and interface-sret guard until an independent coordinate and value-lifetime proof covers the original counterexamples."
+  },
+  "limitations": [
+    "The selected 767 C# files are byte-identical to out43 and all nine complete diagnostic multisets, including source locations, are unchanged; this is a latent crash correction, not a compiler-error reduction.",
+    "UniTask.Linq still has 13 declaration errors and no observed body sentinel; do not claim body compilation coverage for it. Many compilation errors remain; the goal is not achieved.",
+    "The runtime harness executes authored volatile-register Win64 programs, not game-native methods or recompiled game consumers. It does not establish whole-method/game semantic equivalence or speed. Concurrent build/test times are not performance evidence.",
+    "No output promotion, golden/pin changes, architecture relaxation or fixture data publication."
+  ]
+}

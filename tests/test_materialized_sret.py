@@ -243,3 +243,48 @@ def test_noncanonical_producer_does_not_walk_an_unneeded_layout():
     lift._piece_layout_proven = unnecessary
     record(lift, lift.out.block.insns[1], -0xe0, ty, 't1001')
     assert not hasattr(lift, '_materialized_sret')
+
+
+_IMMEDIATE_MOVS = [
+    bytes.fromhex(prefix + value + suffix)
+    for value in ('00000000', '01000000', 'ffffffff')
+    for prefix, suffix in (
+        ('b8', ''),                       # imm32 -> eax
+        ('48c7c0', ''),                   # sign-extended imm32 -> rax
+        ('48b8', value),                  # imm64 -> rax
+        ('c7442460', ''),                 # imm32 -> separate stack home
+        ('48c7442460', ''),               # sign-extended imm32 -> qword
+    )
+]
+
+
+@pytest.mark.parametrize('code', _IMMEDIATE_MOVS)
+def test_immediate_movs_are_not_source_byte_identities(code):
+    from il2cpp.lifter.materialized import _copy
+    from iced_x86 import OpKind
+    ins = next(iter(Decoder(64, code)))
+    regs, memory = {'RSP': -256}, {}
+    assert _copy(ins, regs, memory)
+    if ins.op0_kind == OpKind.REGISTER:
+        assert isinstance(regs['RAX'], tuple)
+        assert all(byte is None for byte in regs['RAX'])
+    else:
+        assert memory and all(byte is None for byte in memory.values())
+
+
+@pytest.mark.parametrize('code', _IMMEDIATE_MOVS)
+def test_nonaliasing_constants_do_not_crash_an_intact_whole_copy(code):
+    copy = bytes.fromhex('0f1000') + code + bytes.fromhex('0f29442440488d542440')
+    lift, address, ty = setup(copy=copy)
+    assert recover(lift, address, ty) == 't1001'
+
+
+@pytest.mark.parametrize('code', [
+    bytes.fromhex(prefix + value)
+    for prefix in ('c700', '48c700')
+    for value in ('00000000', '01000000', 'ffffffff')
+])
+def test_immediate_source_overwrites_decline_without_crashing(code):
+    copy = bytes.fromhex('0f1000') + code + bytes.fromhex('0f29442440488d542440')
+    lift, address, ty = setup(copy=copy)
+    assert recover(lift, address, ty) is None

@@ -180,7 +180,7 @@ def _copy(ins, regs, memory):
         value = regs.get(reg_name(ins.op1_register))
     else:
         # Constants may overwrite copies, but cannot prove source-byte identity.
-        from il2cpp.x64 import IMM_OPS
+        from il2cpp.runtime.meta import IMM_OPS
         if ins.op1_kind not in IMM_OPS:
             return False
         value = None
