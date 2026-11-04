@@ -4,6 +4,68 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Scalar metadata arena cloning and state-alias safety (2026-11-05)
+
+**Private opt-in infrastructure only; recovery is still off by default.**
+The independent arena now preallocates exact `TypeDef`, `MethodDef`, `FieldDef`,
+`ParamDef` and `ImageDef` records only when their complete state consists of
+string keys and exact immutable atomic values. Both each record and its state
+dictionary are fresh. Repeated references and shared state dictionaries use the
+same private memo entry. Subclasses, mutable/nested attributes, non-string keys,
+new inheritance/slots/copy hooks and callbacks keep the full admission/copy path
+or decline; no live mutable model is shared. Scalar-leaf admission retains the
+same mutable node set while avoiding repeated scalar/slot traversal.
+
+An authored regression exposed an existing generic-copy gap: Python deepcopy
+uses `clone.__dict__.update(copied_state)`, so an externally held state dictionary
+can detach from the copied object's actual state. Five parent regressions fail
+before this change. The arena now checks ordinary reconstructed state against
+the memo and restores its canonical private dictionary, preserving external
+aliases, two-record shared state and dictionary self-cycles. Unexpected custom
+copy state declines. This is an infrastructure counterexample, not evidence of
+a previously wrong production game body.
+
+**83 new authored tests pass** (381 with capture/origin/unwind regressions);
+portable **5,188 passed / 380 deselected**. Full excluding separate parallel
+tests: **5,303 passed / 259 skipped / 1 non-strict XPASS / identical fixed
+3 failures**; parallel **2 passed**. Default-selected sweeps (**2,242 / 1,936 /
+923 methods**) again match out56 byte-for-byte without importing recovery.
+Scoped stash/clean-parent/exact-restoration checks preserve all five focused
+default bodies; the five alias counterexamples fail on the clean parent and
+pass after restoration. Restored focused/portable suites pass. An independent
+2,048-graph authored matrix checks **143,701 mutable-node pairs / 900,522 edges**
+with zero isolation or examined-edge mismatches. Four real accepted methods /
+five captures and the declined Limbus leaf exactly match the parent and prior
+prototype output, preserving live continuation, subsequent method output and
+the global allocator. Source/tests/tools stay frozen during final validation;
+compileall, LF/no-BOM and diff checks pass.
+
+**Measured clone improvement, not activation.** On one real Survivors baseline
+with 258,098 metadata records, a same-process
+parent/optimized/optimized/parent comparison (two runs per mode, own
+validation consumers already exited) measures median isolated-clone time
+**22.066 s -> 17.145 s (22.3% less time)**. All admitted mutable nodes remain
+disjoint and all metadata field states match. Ambient system load is
+uncontrolled. A separate contended four-method paired recovery check measures
+parent 26.3-28.8 s versus optimized 21.0-21.7 s; these are diagnostic samples,
+not a universal throughput guarantee. The arena remains expensive and default
+recovery remains disabled.
+
+This does **not** enable recovery or claim faster emitted game code, fewer
+compiler errors, whole-game semantic equivalence, or completed recompilability.
+Accepted production remains `6e4cfac` / `game_out56`; no golden re-pin or output
+promotion. Existing field/SIMD guards, native-origin 512 budget, conversion-point
+float snapshots, entry snapshots, baseline-only live continuation, and private
+synthetic allocator remain unchanged.
+
+**Next:** reduce remaining full-arena costs and establish a verified per-binary
+unwind lifecycle before considering activation. Activation still requires new
+frozen paired emitted trees plus all nine actual-Editor-reference assembly
+compile gates and semantic review; denominator wrapping remains separate.
+Evidence: `validation_reports/entry_capture_arena_clone_2026-11-05.json`.
+Goal remains **active, unachieved**. Earlier next-step sections below are history.
+
+
 ### Transactional Int32 entry captures (2026-11-05)
 
 **Private opt-in integration, still disabled by default.** The baseline pipeline

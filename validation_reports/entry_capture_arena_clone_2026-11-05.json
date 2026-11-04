@@ -1,0 +1,321 @@
+{
+  "date": "2026-11-05",
+  "status": "private_opt_in_arena_scalar_leaf_optimization_and_state_alias_repair_default_disabled",
+  "source_parent_commit": "b17e90dc80349a67399600f50b504f6723d820e5",
+  "accepted_production_source_commit": "6e4cfaca0d6eff63220bbc0671c4f2826fceed2f",
+  "accepted_candidate_label": "game_out56",
+  "output_promoted": false,
+  "goldens_or_pins_changed": false,
+  "default_recovery_enabled": false,
+  "public_option_or_export_added": false,
+  "architecture": [
+    "Exact five plain metadata record types only: complete exact-atomic scalar state with string keys may be fast admitted and independently preallocated; each record and its dict remain private.",
+    "Deepcopy memo preserves record aliases and shared scalar state dictionaries. Mutable or nested attributes, subclasses, slots, inheritance, copy hooks and non-string state keys do not use the leaf shortcut.",
+    "Existing callback/resource admission and every-mutable-node-disjoint checks remain. Reconstructed ordinary object state is checked against its memo dict and rebound to preserve external state aliases and cycles; inconsistent custom state declines.",
+    "Baseline-first output-only commit, live baseline continuation, private synthetic allocator, entry/float snapshots, original field/SIMD guards and the 512 native-origin budget are unchanged."
+  ],
+  "validation": {
+    "new_authored_tests": 83,
+    "focused_passed": 381,
+    "portable": {
+      "passed": 5188,
+      "deselected": 380
+    },
+    "full_excluding_parallel": {
+      "failed": 3,
+      "passed": 5303,
+      "skipped": 259,
+      "xpassed": 1,
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "failure_set_matches_fixed_baseline": true
+    },
+    "parallel": {
+      "passed": 2,
+      "seconds": 534.828
+    },
+    "five_parent_alias_counterexamples_reproduced": true,
+    "authored_generated_graphs": {
+      "authored_graphs": 2048,
+      "mutable_node_pairs": 143701,
+      "checked_edges": 900522,
+      "seeded_records": 12971,
+      "all_mutable_nodes_disjoint": true,
+      "all_examined_edges_preserve_memo_correspondence": true,
+      "seed": 650051,
+      "source_freeze_verified": true
+    },
+    "default_selected_sweeps": [
+      {
+        "fixture": "unitask",
+        "methods": 2242,
+        "all_match_out56": true,
+        "no_default_recovery_import": true,
+        "seconds": 168.14
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "methods": 1936,
+        "all_match_out56": true,
+        "no_default_recovery_import": true,
+        "seconds": 153.141
+      },
+      {
+        "fixture": "limbus",
+        "methods": 923,
+        "all_match_out56": true,
+        "no_default_recovery_import": true,
+        "seconds": 100.047
+      }
+    ],
+    "scoped_clean_parent": {
+      "exact_scope": [
+        "il2cpp/dec/entrycapture.py",
+        "tests/test_entry_capture_arena.py"
+      ],
+      "exact_restoration": true,
+      "owned_stash_only": true,
+      "stash_remaining": false,
+      "all_probes_passed": true,
+      "source_sha256": {
+        "il2cpp/dec/entrycapture.py": "2c54a16cb368c32757d7bf29c4ad78b72d0005c6ffdc77b2c9133bc38a41d7e7",
+        "tests/test_entry_capture_arena.py": "607408d2d3ef4f3b608ff22eaab6319e2d6d037032a3cdedc85d1448a1812669"
+      }
+    },
+    "real_method_parent_vs_optimized": {
+      "fixtures": {
+        "survivors-roguelike-kit": [
+          {
+            "method_row": 69879,
+            "status": "accepted",
+            "changed": true,
+            "captures": 2,
+            "seconds": {
+              "parent": 26.344000000040978,
+              "optimized": 21.046999999904074
+            },
+            "same_parent_and_previous_candidate": true,
+            "candidate_sha256": "fb978cb1d86f8465205fbc549acd716ec001f5489365bd94d2fdc07b41bf992e",
+            "continuation_unchanged": true,
+            "live_context_unchanged": true,
+            "global_allocator_unchanged": true
+          },
+          {
+            "method_row": 70773,
+            "status": "accepted",
+            "changed": true,
+            "captures": 1,
+            "seconds": {
+              "optimized": 21.67200000002049,
+              "parent": 28.405999999959022
+            },
+            "same_parent_and_previous_candidate": true,
+            "candidate_sha256": "9ea2b97f5efda7564271c30bb9a97d6068e2fca0709785617597215ad10c7331",
+            "continuation_unchanged": true,
+            "live_context_unchanged": true,
+            "global_allocator_unchanged": true
+          },
+          {
+            "method_row": 70777,
+            "status": "accepted",
+            "changed": true,
+            "captures": 1,
+            "seconds": {
+              "parent": 28.76500000001397,
+              "optimized": 21.46799999999348
+            },
+            "same_parent_and_previous_candidate": true,
+            "candidate_sha256": "9b49c04f7f0a7f5de38c28aac1f7810372bf77c592beb0e6dfc2f1b6501fa7c5",
+            "continuation_unchanged": true,
+            "live_context_unchanged": true,
+            "global_allocator_unchanged": true
+          },
+          {
+            "method_row": 70778,
+            "status": "accepted",
+            "changed": true,
+            "captures": 1,
+            "seconds": {
+              "optimized": 21.70299999997951,
+              "parent": 27.531000000075437
+            },
+            "same_parent_and_previous_candidate": true,
+            "candidate_sha256": "d0946ccc39652425eed939e741acd59b89c731d35cf2800b03cf694cd3870c2d",
+            "continuation_unchanged": true,
+            "live_context_unchanged": true,
+            "global_allocator_unchanged": true
+          }
+        ],
+        "limbus": [
+          {
+            "method_row": 35790,
+            "status": "not-candidate",
+            "changed": false,
+            "captures": 0,
+            "seconds": {
+              "parent": 0.7809999999590218,
+              "optimized": 0.7809999999590218
+            },
+            "same_parent_and_previous_candidate": true,
+            "candidate_sha256": "bfe84fda50ae153a39f2b088aa6031772ea4af96e8216399f4987b5e5387aa60",
+            "continuation_unchanged": true,
+            "live_context_unchanged": true,
+            "global_allocator_unchanged": true
+          }
+        ]
+      },
+      "timing_context": "paired same process, concurrent validation load; not an isolated benchmark"
+    },
+    "source_tests_tools_freeze_verified": true,
+    "fingerprinted_source_tests_tools_files": 387,
+    "compileall_lf_bom_diff_checks": true
+  },
+  "performance": {
+    "fixture": "survivors-roguelike-kit",
+    "method_row": 69879,
+    "python": "3.11.9",
+    "timing_scope": "isolated_clone only, not native preflight or speculative lift",
+    "timing_context": "same process, same live baseline, alternating parent/optimized/optimized/parent; owned validation consumers already exited; ambient system load uncontrolled",
+    "rows": [
+      {
+        "mode": "parent",
+        "order": 0,
+        "total_clone_seconds": 21.553665400017053,
+        "stages": {
+          "admission_seconds": 5.688765799975954,
+          "deepcopy_seconds": 15.43898530001752
+        },
+        "mutable_nodes": 687607,
+        "all_mutable_nodes_disjoint": true,
+        "metadata_record_pairs_equal": 258098,
+        "global_allocator_unchanged": true
+      },
+      {
+        "mode": "optimized",
+        "order": 1,
+        "total_clone_seconds": 17.421817699912935,
+        "stages": {
+          "admission_seconds": 4.469732400029898,
+          "seed_seconds": 2.3947509999852628,
+          "deepcopy_seconds": 9.4023228000151,
+          "restore_aliases_seconds": 0.6707424999913201
+        },
+        "mutable_nodes": 687607,
+        "seeded_records": 258098,
+        "all_mutable_nodes_disjoint": true,
+        "metadata_record_pairs_equal": 258098,
+        "global_allocator_unchanged": true
+      },
+      {
+        "mode": "optimized",
+        "order": 2,
+        "total_clone_seconds": 16.86763360002078,
+        "stages": {
+          "admission_seconds": 4.3424277999438345,
+          "seed_seconds": 2.5229343000100926,
+          "deepcopy_seconds": 9.087929300032556,
+          "restore_aliases_seconds": 0.5049941000761464
+        },
+        "mutable_nodes": 687607,
+        "seeded_records": 258098,
+        "all_mutable_nodes_disjoint": true,
+        "metadata_record_pairs_equal": 258098,
+        "global_allocator_unchanged": true
+      },
+      {
+        "mode": "parent",
+        "order": 3,
+        "total_clone_seconds": 22.579088400001638,
+        "stages": {
+          "admission_seconds": 5.938161399913952,
+          "deepcopy_seconds": 16.09457219997421
+        },
+        "mutable_nodes": 687607,
+        "all_mutable_nodes_disjoint": true,
+        "metadata_record_pairs_equal": 258098,
+        "global_allocator_unchanged": true
+      }
+    ],
+    "median_clone_seconds": {
+      "parent": 22.066376900009345,
+      "optimized": 17.14472564996686
+    },
+    "median_time_reduction_fraction": 0.223038483949778
+  },
+  "limitations": [
+    "Timing measures private recovery/clone work only, not emitted game-code execution speed. Ambient system load is uncontrolled; the four-method end-to-end comparison also ran under concurrent validation load.",
+    "Default output is unchanged. This is not a new paired emitted-tree or nine actual-Editor-reference assembly compile gate, compiler-error reduction, whole-game execution-equivalence or recompilability proof.",
+    "The isolated arena remains too expensive for activation. A verified per-binary unwind lifecycle and further arena cost reductions remain open. Recovery stays disabled until new frozen tree/real-reference gates and semantic review.",
+    "Generic deepcopy state-alias failures are authored infrastructure counterexamples, not observed incorrect production game bodies."
+  ],
+  "source_sha256": {
+    "il2csharp.py": "d38845b02a16b545e1ca9e7ae214fa465e46e6dede36e96ee295b4182c1c9599",
+    "il2cpp/__init__.py": "af6d855739b2ec3ba2af20f674847aba198629519b7d67e04386369b82a28ca9",
+    "il2cpp/__main__.py": "08b465be110ae46cad2c48eed9c67f6b8ad633837d84d12abf0faeff13c8d8a3",
+    "il2cpp/arm64.py": "93758d8a72fd95a2833e9477037c4e4be30a3c80fa9299fae793f7f57f17232d",
+    "il2cpp/arm64_dec.py": "7c6529f69841476d1d77a58a0a12d329210d05e9f24bb4bad5e3ee5fa373090e",
+    "il2cpp/binary.py": "b1785b36d1140d29c358816d93636cd9a2c49b06c15f13cc639fb0e030c65fba",
+    "il2cpp/cfg.py": "550707800b5905ddbdfdd3e11e0a268a3e28df7aa22fcf2d332675580c275c0a",
+    "il2cpp/cli.py": "7cd9ba6ae0add9983022c09a1ed7470d87279420910fbe1491c7fd5b5b19808d",
+    "il2cpp/common.py": "239e5f9a64012071de2ada9a73d03f4ddb1e38f9e13bf89f09f3fc1c94b44967",
+    "il2cpp/csharp.py": "3914727e40af1eb0e58aa25e0882d9619821fa591f166b8698f6897556913769",
+    "il2cpp/dec/__init__.py": "d7d832984149adfb07550a21141a817575746f040b9fd7c0a70f9b0204ab8690",
+    "il2cpp/dec/analyze.py": "0752bc9c25bcd1c0caf92ca5a84dd81d7de1f5d7cb274f41f269f1d87c15222e",
+    "il2cpp/dec/build.py": "6e306202c355776ff806524a72d5ca1f734fef9aea2dad5c4b8a7d092abd089e",
+    "il2cpp/dec/dataflow.py": "310d4b98028a2f575fa730d9f325f0987813df1756ac7def9658b7d2bbca3e0a",
+    "il2cpp/dec/emit.py": "0c9c671c865bcf832a8de4cc94e1ff20ab1d72989be06ae8bc9a96251d9b903c",
+    "il2cpp/dec/entrycapture.py": "2c54a16cb368c32757d7bf29c4ad78b72d0005c6ffdc77b2c9133bc38a41d7e7",
+    "il2cpp/dec/flow.py": "633a415d15f8d5a57c2096a69e6219168cf7284ed17f6ce59dd0ee8f90135f1a",
+    "il2cpp/dec/highlevel.py": "1082feaff85790650aaa676bf69215ecf6b7ce4a1de730352d204e0e1b32d90e",
+    "il2cpp/dec/ifaceprune.py": "9514985f5d1cfb2d3f06c9251bdee7888b1747d804a62495daf48f11d750cb6b",
+    "il2cpp/dec/seh.py": "fbd0d1a2bb35f7f73ea68e065cd9c2b297c63189541ae676e0434d9d1cd69cc7",
+    "il2cpp/dec/stackframe.py": "10f53624969cb24def1cafc6a51bbd4068840b6a903f22b018fe7ea36e0d623f",
+    "il2cpp/dec/stringfold.py": "17dbd3450db7cb2dbc1f073a85e2a45bcf23d62ebf132cebcdf87952b5785b64",
+    "il2cpp/dec/structure.py": "30e320dbc4b6685eb9bfc970c889b607d9aa76e6d263782f86f86b2a13b73d92",
+    "il2cpp/dec/sugar.py": "fdb5dd893bf7b95e305ffc1b9819b56e75f165ef6d6f5ed1fa9d4ecbb166479d",
+    "il2cpp/dec/textpass.py": "30fb3810223dd165f081a5b4c1d0904bb4ed274e4f0d3a29cecfe44632ea1fe7",
+    "il2cpp/emitter.py": "db543ceaf117941a448d4a308380a7222ff6e15ab577b903d2fba13e2ad98d4b",
+    "il2cpp/entrylive.py": "94920c97808ff87ebb9914ac9a8e20d58e3d228835c38cb09eb88bbbf6d153e9",
+    "il2cpp/expr.py": "b7b0d00ceed92a8f318b7f1e38ac9a329ce1ecc75a9664373b1f60847e4103a3",
+    "il2cpp/headers.py": "feed6974cd802ca36006644b64c58baa3042a73c49fe6703b33a24dc94981321",
+    "il2cpp/lifter/__init__.py": "e7db518dd5d78e4e775ff45898eb14706d033121f4d926ebed7cdde03df8542c",
+    "il2cpp/lifter/abi.py": "f2bc8c469a87d731733b790006a32d0768a5b6389071289df0c19e5d862cfb3a",
+    "il2cpp/lifter/aggregates.py": "ca596f7f3a8cb4ba39bdcaeeb341ef2c270031b48e1e5fc1f99758d8357b0d67",
+    "il2cpp/lifter/arrayindex.py": "1909fc679d6c9c151b4d71c8b33fa8725251deebd28394b745cbccabd8a2d0f2",
+    "il2cpp/lifter/calls.py": "205ef65bb7197f6c3097810f9146951e38ee1dfaa30f64f8becd984f2d0ec60b",
+    "il2cpp/lifter/entrycapture.py": "453e60cac4be202f3f92c30fd47267513d754230bb568e03bd3be78de78810aa",
+    "il2cpp/lifter/entryorigin.py": "9f3a112d5aa5439cd6ff5172b56a41ee1333c638f1b461d5e2ca263e055a67d1",
+    "il2cpp/lifter/insn.py": "b1a945986d2d2e255515ef51b370f672ea20edfab5677417635a49c19ff4c5df",
+    "il2cpp/lifter/leafreturns.py": "d0825bf70b6c709d36ba712bcadb01a75706cad2392ed90317b175eebbe3adc5",
+    "il2cpp/lifter/materialized.py": "5a948441afd36567960345931245415c7881353ff8d2e8fa5013fa097e5c05b5",
+    "il2cpp/lifter/render.py": "8ac138cfa236d445005bb71401304e536d5fe2731419b3aee686790b9a2f0118",
+    "il2cpp/lifter/resultflow.py": "1d51b60cd47bf4dfebc251b3ae3e6650a6c75bc7ad50f2919cd0b1cd6d45d1ed",
+    "il2cpp/lifter/simdproof.py": "5ef34d2f8669383fb9fc60ee0ea02521bf3703be65fa1cfaa67a5491f170cd7d",
+    "il2cpp/lifter/stackrefs.py": "6cee02ccd508b969146a2d43e6ba2d9635415e9b7fa4ace33b00aebbbd491d19",
+    "il2cpp/lifter/stackscalars.py": "1374b327b74c70be7c1cc400af8f20dbc213b5e5900538d87e17ec61b61776e8",
+    "il2cpp/lifter/state.py": "5a0bfdf41b30643ef482d90457485d5d6f48102da26371745432aca2a643291b",
+    "il2cpp/lifter/typehandles.py": "79913910497488871c19673a51247abf4b06c8f122d35d3e4fda233b58a43725",
+    "il2cpp/lifter/unwindproof.py": "184935f55ec6b7bf73611ec4f2b04ca625288ed0629de711d160b68620d48ab7",
+    "il2cpp/lifter/values.py": "786571311fbe9a1b7c94d498d9cd097ee2a5828a87091d80e9d98a32b9007fe4",
+    "il2cpp/metadata.py": "0dbcc2063c711f4ff063f107fb69c25fa0bbabbbb1a460149cacc802d7aa98dd",
+    "il2cpp/names.py": "644ed21cb56d23a7331c8d3285572abaf803f369610b4129d6056683f35c6493",
+    "il2cpp/prelude.py": "1dd70c27e54eb4144127df48bd961c6139ac208c26036aebe51951a0e1e5c550",
+    "il2cpp/rawaddr.py": "c4f141b6515fa471a49d4b4ca936b284aa4ce2d5b8af09cfd2bc3ac6cdb5bb08",
+    "il2cpp/runtime/__init__.py": "1a0671b60b656b86e28eb48c0f4a72d61e43148efbf2108cf8079bb29b243311",
+    "il2cpp/runtime/core.py": "10df0de523bd1d22b8ee9deab285585bb12e109055b5a283abb617ca0aec43c0",
+    "il2cpp/runtime/eh.py": "9d14061919b08a049811891fdb1c9ed3ada64cdb1139d4cbf9bb31a49321aeb0",
+    "il2cpp/runtime/fields.py": "4d10d1bdf16d70b209208b6654fbffad594187f4cb9de2655981278e3be2c69b",
+    "il2cpp/runtime/meta.py": "614b4fccf1487fa9b993dc9e60e65b7559d3f101b83cde229e0736c38d3b5b7f",
+    "il2cpp/runtime/registration.py": "58ca4fd2f62bd3847ed426fcc3dc64742979a5b5e36df4cc87a14796a7a40570",
+    "il2cpp/runtime/types.py": "7545e65c6013ab32f04da9e75938dc7b996b04ca7547083188c5a33ce758e107",
+    "il2cpp/stmt_text.py": "72895fc8a32c1cec6d7989407a722ee9bed3cf34df0c74fe707f7707ff56c712",
+    "il2cpp/text.py": "d73543d7c70112e5477ffdff6ae068c4b4b5fd3d9238dbf22495483d41cf05aa",
+    "il2cpp/x64.py": "55b91b355af36d33c4615e951827525daff4fc14880355ee40f1dc96ed7e05ab"
+  },
+  "new_tests_sha256": {
+    "tests/test_entry_capture_arena.py": "607408d2d3ef4f3b608ff22eaab6319e2d6d037032a3cdedc85d1448a1812669"
+  }
+}

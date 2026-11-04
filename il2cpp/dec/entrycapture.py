@@ -14,11 +14,84 @@ from types import ModuleType, SimpleNamespace
 from il2cpp.lifter.entrycapture import EntryInt32Captures
 from il2cpp.lifter.entryorigin import EntryInt32Origin
 from il2cpp.names import safe_ident
+from il2cpp.metadata import TypeDef, MethodDef, FieldDef, ParamDef, ImageDef
 from il2cpp.runtime.types import _SYNTH_NEXT_VA
 
 
 class ArenaDeclined(ValueError):
     pass
+
+
+_ATOMIC_TYPES = frozenset((str, bytes, int, float, bool, complex, type(None), range))
+_METADATA_RECORDS = frozenset((TypeDef, MethodDef, FieldDef, ParamDef, ImageDef))
+_COPY_HOOKS = ('__slots__', '__deepcopy__', '__getstate__', '__setstate__',
+               '__reduce__', '__reduce_ex__', '__new__', '__getattribute__',
+               '__getattr__', '__setattr__')
+
+
+def _metadata_leaf_types():
+    # Exact plain records only. Future inheritance, slots or copy hooks must
+    # take the full graph path, not silently lose state or bypass a hook.
+    return frozenset(ty for ty in _METADATA_RECORDS
+                     if ty.__bases__ == (object,)
+                     and getattr(sys.modules.get(ty.__module__), ty.__name__, None) is ty
+                     and not any(name in ty.__dict__ for name in _COPY_HOOKS))
+
+
+def _scalar_record_state(obj, leaf_types):
+    if type(obj) not in leaf_types:
+        return None
+    state = vars(obj)
+    if (type(state) is dict
+            and all(type(key) is str and type(value) in _ATOMIC_TYPES
+                    for key, value in state.items())):
+        return state
+    return None
+
+
+def _seed_metadata_memo(mutable, memo):
+    """Preallocate independent scalar records; never share a mutable leaf.
+
+    Seed the record AND its state dict. This keeps repeated references and two
+    records sharing one state dict attached to the same private copied state.
+    Nested/mutable attributes and subclasses use ordinary deepcopy instead.
+    """
+    leaf_types = _metadata_leaf_types()
+    count = 0
+    for key, obj in mutable.items():
+        state = _scalar_record_state(obj, leaf_types)
+        if state is None:
+            continue
+        clone = object.__new__(type(obj))
+        memo[key] = clone
+        if id(state) not in memo:
+            memo[id(state)] = state.copy()
+        clone.__dict__ = memo[id(state)]
+        count += 1
+    return count
+
+
+def _restore_state_aliases(mutable, memo):
+    # deepcopy reconstructs Python objects with __dict__.update(state), which
+    # detaches an externally held reference to that state dict. Restore the
+    # canonical memo dict after checking it describes exactly the copied object.
+    # Do not guess how custom state/copy hooks transformed an ordinary model.
+    for key, obj in mutable.items():
+        if type(obj) in (dict, list, set, defaultdict, deque):
+            continue
+        if not hasattr(obj, '__dict__'):
+            continue
+        copied_state = memo.get(id(vars(obj)))
+        clone = memo[key]
+        state = vars(clone)
+        if state is copied_state:
+            continue
+        if (type(state) is not dict or type(copied_state) is not dict
+                or len(state) != len(copied_state)
+                or any(name not in state or state[name] is not value
+                       for name, value in copied_state.items())):
+            raise ArenaDeclined('nonstandard copied model state')
+        object.__setattr__(clone, '__dict__', copied_state)
 
 
 def _mutable_graph(roots):
@@ -28,7 +101,8 @@ def _mutable_graph(roots):
     allowed to smuggle a reference to the live runtime into an attempt. The
     only admitted module is bisect, stored by the runtime as a pure search API.
     """
-    atomic = (str, bytes, int, float, bool, complex, type(None), range)
+    atomic = _ATOMIC_TYPES
+    leaf_types = _metadata_leaf_types()
     containers = (list, dict, tuple, set, frozenset, defaultdict, deque)
     work = list(roots)
     seen, mutable = set(), {}
@@ -57,6 +131,14 @@ def _mutable_graph(roots):
                         raise ArenaDeclined('unsupported cache factory')
             else:
                 work.extend(obj)
+            continue
+        state = _scalar_record_state(obj, leaf_types)
+        if state is not None:
+            # All state edges are already proved immutable atoms. Still admit
+            # both mutable nodes, including externally held/shared state dicts.
+            mutable[key] = obj
+            mutable[id(state)] = state
+            seen.add(id(state))
             continue
         module = getattr(ty, '__module__', '')
         trusted = (module.startswith('il2cpp.') or module == 'iced_x86._iced_x86_py')
@@ -90,9 +172,11 @@ def isolated_clone(decompiler, method, owner):
     """Copy the complete reachable model, proving no mutable model is shared."""
     mutable = _mutable_graph((decompiler, method, owner))
     memo = {id(bisect): bisect}
+    _seed_metadata_memo(mutable, memo)
     arena, copied_method, copied_owner = copy.deepcopy((decompiler, method, owner), memo)
     if any(key not in memo or memo[key] is obj for key, obj in mutable.items()):
         raise ArenaDeclined('attempt retained mutable baseline state')
+    _restore_state_aliases(mutable, memo)
     # The ordinary process-wide synthetic VA allocator is not in the object
     # graph. Do not reserve from it, restore it, or let speculative calls use it.
     arena.L.il._synthetic_allocator = [_SYNTH_NEXT_VA[0]]
