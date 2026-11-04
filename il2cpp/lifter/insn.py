@@ -1360,8 +1360,11 @@ class _InsnMixin:
             self._note_use(lhs)
             self._note_use(rhs)
             # setcc materialises a C# bool
-            self.set_reg(dst, self._mk('(%s %s %s ? 1 : 0)' % (
-                lhs.text if lhs else '?', op, rhs.text if rhs else '?'), _BOOL_TY, 'int'))
+            condition = narrow_unsigned_cmp(getattr(self, '_cmp_width', None), mn, lhs, rhs)
+            if condition is None:
+                condition = '%s %s %s' % (
+                    lhs.text if lhs else '?', op, rhs.text if rhs else '?')
+            self.set_reg(dst, self._mk('(%s ? 1 : 0)' % condition, _BOOL_TY, 'int'))
             self.flags = None
             return
         if mn in (Mnemonic.CMOVA, Mnemonic.CMOVAE, Mnemonic.CMOVB, Mnemonic.CMOVBE,
@@ -1396,8 +1399,9 @@ class _InsnMixin:
                 lhs, rhs = (self.flags or (Expr('?', None, '?'), Expr('?', None, '?')))
                 self._note_use(lhs)
                 self._note_use(rhs)
-                cond = '(%s %s %s)' % (lhs.text if lhs else '?', op,
-                                       rhs.text if rhs else '?')
+                condition = narrow_unsigned_cmp(getattr(self, '_cmp_width', None), mn, lhs, rhs)
+                cond = '(' + condition + ')' if condition is not None else '(%s %s %s)' % (
+                    lhs.text if lhs else '?', op, rhs.text if rhs else '?')
             if A(1) == OpKind.REGISTER:
                 src = self.reg(reg_name(ins.op1_register))
             elif A(1) == OpKind.MEMORY:

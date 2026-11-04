@@ -32,6 +32,18 @@ def _reg_size(r):
 
 
 
+# Jcc, SETcc and CMOVcc share the same unsigned flag relation. Keep the
+# operator table immutable in practice; native width/provenance remains the
+# caller's responsibility, not a fact inferred from the consumer spelling.
+_UNSIGNED_CMP_OPS = {}
+if HAVE_ICED:
+    _UNSIGNED_CMP_OPS = {
+        getattr(Mnemonic, prefix + suffix): op
+        for prefix in ('J', 'SET', 'CMOV')
+        for suffix, op in (('A', '>'), ('AE', '>='), ('B', '<'), ('BE', '<='))
+    }
+
+
 # Unsigned register CMP consumes CF/ZF. A stale width must not survive even
 # CF-only writers such as STC/CLC/CMC, which the SF/PF guard does not see.
 _UNSIGNED_FLAGS = 0
@@ -73,8 +85,7 @@ def narrow_unsigned_cmp(width, mnemonic, lhs, rhs):
     """
     if not HAVE_ICED or width not in (1, 2, 4):
         return None
-    op = {Mnemonic.JA: '>', Mnemonic.JAE: '>=',
-          Mnemonic.JB: '<', Mnemonic.JBE: '<='}.get(mnemonic)
+    op = _UNSIGNED_CMP_OPS.get(mnemonic)
     if op is None:
         return None
     cast = {1: 'byte', 2: 'ushort', 4: 'uint'}[width]

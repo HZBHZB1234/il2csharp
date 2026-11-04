@@ -4,6 +4,65 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Preserve unsigned SETcc/CMOVcc conditions (2026-11-04)
+
+Accepted `game_out48` (not promoted), versus out47. The existing same-block
+CMP/CF/ZF proof now also serves SETA/SETAE/SETB/SETBE and
+CMOVA/CMOVAE/CMOVB/CMOVBE. Low byte/word/dword register comparisons retain
+native unsigned bits via explicit `unchecked` normalization. The real defect
+is a signed capacity comparison after doubling a queue count: native CMOVA
+caps the unsigned overflow, while the old signed relation could miss it.
+A shared static operator table replaces the per-call Jcc table; no speed gain
+is claimed. Width, operand-type, contiguous-instruction and flag guards are
+unchanged. Flat fallback explicitly clears the width before every unsigned
+consumer, not just branches. SETcc's existing flag clearing and CMOV selected
+values/partial-register model are unchanged.
+
+Independent native flag/width/block checks over **2,242 / 1,936 methods** find
+**four / zero unique recovered sites**, in **two / zero methods**, zero crashes.
+Final strict trees change **two of 767 C# files**: exactly **four ternary-condition
+line replacements**, unchanged call-name multisets and repeated lifts. Builds
+retain **2,227 / 1,857 bodies**, zero failed/fallback/type-emit failures, clean
+brace/parse gates and verified final-source fingerprints.
+
+**248 new portable + two new game cases**; focused portable **367 passed**,
+focused game **two passed**, portable **4,567 passed**. Frozen full excluding
+parallel: **4,661 passed / 259 skipped / one non-strict xpassed / the same three
+existing failures**; parallel **two passed**. A five-file scoped clean-parent
+proof on `00a6783` reproduces the two methods' four old conditions,
+**96 failing positive / 152 passing boundary cases**, and exactly the same
+existing failure set; all five files restore byte-exact. Goldens/pins unchanged.
+
+Actual production-generated comparison/selection expressions, compiled with
+`/checked+ /optimize+`, match **72 authored Win64 programs / 710,856 CPU calls /
+710,856 compiled C# checks**, zero mismatches. No game-native code is executed.
+This proves local consumer expressions, not arbitrary partial-register
+producers, checked arithmetic in other CMOV branches, or whole-method equivalence.
+
+All **nine complete location-aware compiler diagnostic multisets are identical**
+using real Editor/BCL/package references and original assembly identities,
+without self-reference or synthetic stubs. UniTask.Linq still has 13 declaration
+errors and no observed body sentinel. No compiler-error reduction or runtime
+speed improvement is claimed. Aggregate-only evidence:
+`validation_reports/quality_unsigned_cmp_consumers_2026-11-04.json`.
+
+Next: investigate readonly property recovery only where the exact closed
+receiver has a registered native getter proved to be the same field load and
+return. Generic-definition getter addresses are zero; registered instantiations
+must be checked individually. Dictionary.Count subtracts two fields and must
+not be treated as a direct field alias. This is investigation, not accepted
+recovery; writes/addresses, virtual override risks and getter self-recursion
+must decline. Keep all scalar-home, RBP-copy, interface-sret and aggregate guards.
+Read-only closed-instance inventory finds three / ten candidate loads in one /
+eight methods. A three-case authored lifetime probe disproves naive early
+`_size` -> `Count` renaming: kill-on-write still keys on the native field text
+and fails to freeze the renamed read before a field write. No recovery change
+is accepted. Preserve storage identity through an alias-aware or late projection
+design before revisiting this candidate. Next alternative: inspect integer RHS
+truncation on native byte stores; do not repair wide/unproved loads in textpass.
+No promotion; many real compiler errors remain and the goal is **not achieved**.
+
+
 ### Preserve unsigned dword CMP/Jcc relations (2026-11-04)
 
 Accepted `game_out47` (not promoted), versus out46. The same-block native

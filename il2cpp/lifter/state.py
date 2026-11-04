@@ -4,7 +4,7 @@ from il2cpp.metadata import MethodDef, TypeDef
 from il2cpp.names import safe_ident
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.text import imm_of, reg_name, sdisp, strip_outer
-from il2cpp.x64 import ARG_REGS, ARG_XMM, GPRS, GPR_ALIAS, VOLATILE
+from il2cpp.x64 import ARG_REGS, ARG_XMM, GPRS, GPR_ALIAS, VOLATILE, _UNSIGNED_CMP_OPS
 
 class _StateMixin:
     """Lift one native method body to pseudo-C# statements."""
@@ -2049,7 +2049,8 @@ class _StateMixin:
                 self.emit(ins.ip, '', None)  # label marker
             # Flat fallback has no native block/flag-merge proof. Do not
             # apply the structured path's narrow unsigned comparison rule.
-            if ins.flow_control == FlowControl.CONDITIONAL_BRANCH:
+            if (ins.flow_control == FlowControl.CONDITIONAL_BRANCH
+                    or ins.mnemonic in _UNSIGNED_CMP_OPS):
                 self._cmp_width = None
             self._insn(ins, insns, i, fmt, end)
         return self._render()
