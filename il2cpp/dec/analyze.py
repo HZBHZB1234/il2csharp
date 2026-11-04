@@ -52,6 +52,11 @@ class _AnalyzeMixin:
                 e._unk = True         # fix 58: never written yet
                 L.regs[r] = e
             L._setup_entry(m, td)
+            capture = getattr(L, '_entry_int32_capture', None)
+            if capture is not None:
+                # L.dry is set later by exec_block and still belongs to the
+                # previous pass here. Bind to this explicit execution phase.
+                capture.bind_entry(L, m, real=counting)
 
         FLAGS = '!flags'
 

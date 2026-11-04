@@ -1135,12 +1135,21 @@ class _InsnMixin:
             dst = reg_name(ins.op0_register)
             right = (self.reg(reg_name(ins.op1_register)) if A(1) == OpKind.REGISTER
                      else self._read_mem(ins, asm))
-            if movd_int32_field(self, ins, insns, right):
+            # The existing field proof remains independent and unchanged.
+            # An arena may instead supply a conversion-local entry snapshot;
+            # neither the GPR parameter nor the source XMM Expr is mutated.
+            captured = None
+            field_int32 = movd_int32_field(self, ins, insns, right)
+            capture = getattr(self, '_entry_int32_capture', None)
+            if not field_int32 and capture is not None:
+                captured = capture.conversion_input(self, ins, insns, right)
+            if field_int32 or captured is not None:
+                scalar = captured if captured is not None else right
                 # MOVD clears the upper 96 bits. Snapshot the converted low
                 # lane here, not lazily at a later use/field write. Do not
                 # mutate or wrap the original scalar Expr shared by MOVD.
                 name = self.new_var()
-                self.emit(ip, 'var ' + name + ' = (float)(' + right.text + ');', asm)
+                self.emit(ip, 'var ' + name + ' = (float)(' + scalar.text + ');', asm)
                 self._var_types[name] = _R4_TY
                 low = Expr(name, _R4_TY, 'float')
                 packed = Expr(name, _R4_TY, 'float')

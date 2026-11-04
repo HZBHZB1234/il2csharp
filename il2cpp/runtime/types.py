@@ -802,8 +802,11 @@ class _TypesMixin:
         key = (base_tup, args, bits)
         va = cache.get(key)
         if va is None:
-            va = _SYNTH_NEXT_VA[0]
-            _SYNTH_NEXT_VA[0] = va + 1
+            # A speculative arena owns a private allocator as well as private
+            # runtime tables. Normal lifting keeps the historical allocator.
+            allocator = self.__dict__.get('_synthetic_allocator', _SYNTH_NEXT_VA)
+            va = allocator[0]
+            allocator[0] = va + 1
             cache[key] = va
             self.__dict__.setdefault('_synthetic_insts', {})[va] = (base_tup, args)
         return (va, bits)

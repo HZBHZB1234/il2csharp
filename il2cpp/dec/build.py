@@ -272,6 +272,16 @@ class _BuildMixin:
 
     # ==================================================================
     def lift_method(self, m: MethodDef, td: TypeDef) -> List[str]:
+        # Recovery is transactional: normal state/output always belongs to
+        # this decompiler; an optional attempt runs in a disjoint arena.
+        self.L._entry_int32_capture = None
+        baseline = self._lift_method(m, td)
+        if not getattr(self, '_entry_int32_recovery', False):
+            return baseline
+        from il2cpp.dec.entrycapture import recover_entry_int32
+        return recover_entry_int32(self, m, td, baseline)
+
+    def _lift_method(self, m: MethodDef, td: TypeDef) -> List[str]:
         # the proven EH helper set is evidence about the binary, not about
         # this method, so it is built once and reused. Every field the scan
         # touches is re-initialized for m in the lines below -- fix 91

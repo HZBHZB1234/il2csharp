@@ -1,0 +1,176 @@
+"""Transactional entry-Int32 recovery: baseline first, disjoint attempt second.
+
+A failed attempt never reuses its lifter, runtime, caches or synthetic addresses.
+The caller's baseline lifter/decompiler remain the authoritative continuation,
+including Emitter.lifter's flat fallback. No candidate state is committed.
+"""
+import bisect
+from collections import defaultdict, deque
+import copy
+import re
+import sys
+from types import ModuleType, SimpleNamespace
+
+from il2cpp.lifter.entrycapture import EntryInt32Captures
+from il2cpp.lifter.entryorigin import EntryInt32Origin
+from il2cpp.names import safe_ident
+from il2cpp.runtime.types import _SYNTH_NEXT_VA
+
+
+class ArenaDeclined(ValueError):
+    pass
+
+
+def _mutable_graph(roots):
+    """Admit only the model's ordinary data graph, not callbacks/resources.
+
+    In particular, deepcopy shares functions/closures silently. They are not
+    allowed to smuggle a reference to the live runtime into an attempt. The
+    only admitted module is bisect, stored by the runtime as a pure search API.
+    """
+    atomic = (str, bytes, int, float, bool, complex, type(None), range)
+    containers = (list, dict, tuple, set, frozenset, defaultdict, deque)
+    work = list(roots)
+    seen, mutable = set(), {}
+    while work:
+        obj = work.pop()
+        ty = type(obj)
+        if ty in atomic:
+            continue
+        if ty is ModuleType:
+            if obj is not bisect:
+                raise ArenaDeclined('unsupported module in attempt state')
+            continue
+        key = id(obj)
+        if key in seen:
+            continue
+        seen.add(key)
+        if ty in containers:
+            if ty not in (tuple, frozenset):
+                mutable[key] = obj
+            if isinstance(obj, dict):
+                work.extend(obj.keys())
+                work.extend(obj.values())
+                if ty is defaultdict and obj.default_factory is not None:
+                    # Builtin factories are immutable, closure-free types.
+                    if obj.default_factory not in (list, dict, set, int):
+                        raise ArenaDeclined('unsupported cache factory')
+            else:
+                work.extend(obj)
+            continue
+        module = getattr(ty, '__module__', '')
+        trusted = (module.startswith('il2cpp.') or module == 'iced_x86._iced_x86_py')
+        if (not trusted or getattr(sys.modules.get(module), ty.__name__, None) is not ty):
+            raise ArenaDeclined('unsupported object in attempt state: ' + module + '.' + ty.__name__)
+        mutable[key] = obj
+        # Trusted model containers (notably _RegState(dict)) own BOTH their
+        # container payload and their attributes/slots. Traversing only slots
+        # misses register Exprs and can let a deepcopy-shared callback escape.
+        if isinstance(obj, dict):
+            work.extend(obj.keys())
+            work.extend(obj.values())
+            if isinstance(obj, defaultdict) and obj.default_factory is not None:
+                if obj.default_factory not in (list, dict, set, int):
+                    raise ArenaDeclined('unsupported model cache factory')
+        elif isinstance(obj, (list, tuple, set, frozenset, deque)):
+            work.extend(obj)
+        if hasattr(obj, '__dict__'):
+            work.append(vars(obj))
+        for cls in ty.__mro__:
+            slots = cls.__dict__.get('__slots__', ())
+            if isinstance(slots, str):
+                slots = (slots,)
+            for slot in slots:
+                if slot not in ('__dict__', '__weakref__') and hasattr(obj, slot):
+                    work.append(getattr(obj, slot))
+    return mutable
+
+
+def isolated_clone(decompiler, method, owner):
+    """Copy the complete reachable model, proving no mutable model is shared."""
+    mutable = _mutable_graph((decompiler, method, owner))
+    memo = {id(bisect): bisect}
+    arena, copied_method, copied_owner = copy.deepcopy((decompiler, method, owner), memo)
+    if any(key not in memo or memo[key] is obj for key, obj in mutable.items()):
+        raise ArenaDeclined('attempt retained mutable baseline state')
+    # The ordinary process-wide synthetic VA allocator is not in the object
+    # graph. Do not reserve from it, restore it, or let speculative calls use it.
+    arena.L.il._synthetic_allocator = [_SYNTH_NEXT_VA[0]]
+    arena._entry_int32_recovery = False
+    arena.L._entry_int32_capture = None
+    if (arena.L.il is decompiler.L.il or arena.L is decompiler.L
+            or arena.L.meta is decompiler.L.meta or arena.L.bin is decompiler.L.bin
+            or arena.L.il.meta is not arena.L.meta
+            or arena.L.il.bin is not arena.L.bin
+            or arena.L.meta.methods[copied_method.index] is not copied_method
+            or arena.L.meta.typedefs[copied_method.declaring] is not copied_owner):
+        raise ArenaDeclined('inconsistent copied method context')
+    return arena, copied_method, copied_owner
+
+
+def _candidate(decompiler, method):
+    from iced_x86 import Mnemonic
+
+    lift = decompiler.L
+    insns = getattr(decompiler, '_flat_insns', ())
+    if (getattr(lift, 'asm_comments', False) or getattr(decompiler, 'eh', None)
+            or getattr(lift, '_current_method', None) is not method
+            or not insns or len(insns) > 512
+            or not any(ins.mnemonic == Mnemonic.CVTDQ2PS for ins in insns)):
+        return False
+    origin = EntryInt32Origin(lift.il, method, insns)
+    # Do not replace the live sink or read symbolic registers for preflight.
+    probe = SimpleNamespace(il=lift.il, bin=lift.bin, meta=lift.meta,
+                            _current_method=method)
+    for block in getattr(lift, '_blocks', ()):
+        probe.out = SimpleNamespace(block=block)
+        for ins in block.insns:
+            if (ins.mnemonic == Mnemonic.CVTDQ2PS
+                    and origin.parameter_at(probe, ins, block.insns) is not None):
+                return True
+    return False
+
+
+def _marker_reservations(metadata, baseline):
+    # All metadata spellings are included, even fields/types/properties hidden
+    # in baseline output. A later cleanup may expose one of these symbols.
+    backing, offset, size = metadata.d, metadata.string_off, metadata.string_size
+    if type(backing) is not bytes:
+        raise ArenaDeclined('mutable metadata name table')
+    if (type(offset) is not int or type(size) is not int
+            or offset < 0 or size < 0 or offset > len(backing)
+            or size > len(backing) - offset):
+        raise ArenaDeclined('invalid metadata name-table bounds')
+    data = backing[offset:offset + size]
+    if data and not data.endswith(b'\0'):
+        raise ArenaDeclined('unterminated metadata name table')
+    reserved = set(re.findall(r'\w+', '\n'.join(baseline)))
+    for raw in data.split(b'\0'):
+        name = safe_ident(raw.decode('utf-8', 'replace'))
+        reserved.update(re.findall(r'\w+', name))
+    return reserved
+
+
+def recover_entry_int32(decompiler, method, owner, baseline):
+    """Return baseline unchanged unless the *whole* arena attempt commits."""
+    decompiler._entry_int32_status = 'not-candidate'
+    try:
+        if not _candidate(decompiler, method):
+            return baseline
+        decompiler._entry_int32_status = 'declined'
+        arena, copied_method, copied_owner = isolated_clone(decompiler, method, owner)
+        capture = EntryInt32Captures(arena.L.il, copied_method,
+                                     arena._flat_insns,
+                                     reserved=_marker_reservations(arena.L.meta, baseline))
+        arena.L._entry_int32_capture = capture
+        lines = arena._lift_method(copied_method, copied_owner)
+        lines, count = capture.finalize(lines, arena._mask_literals)
+        if not count:
+            return baseline
+        decompiler._entry_int32_status = 'accepted'
+        return lines
+    except Exception:
+        # A partial body, a partially updated register file or a cache from the
+        # attempt must never be used as a fallback. The baseline is already
+        # complete; the entire arena becomes unreachable here.
+        return baseline
