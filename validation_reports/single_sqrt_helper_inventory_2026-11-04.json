@@ -1,0 +1,158 @@
+{
+  "date": "2026-11-04",
+  "status": "read-only next-slice inventory; no new production recovery accepted",
+  "source_commit": "9ab91079c14467424f378dd4d81b8bd160f4e62f",
+  "accepted_candidate_unchanged": "game_out55; not promoted",
+  "source_fingerprints_verified": true,
+  "selection": {
+    "unitask": {
+      "selected_methods": 2242,
+      "decode_errors": 0,
+      "candidate_helpers": 0,
+      "direct_call_or_tail_sites": 0,
+      "distinct_calling_methods": 0,
+      "tail_sites": 0,
+      "sites_with_unresolved_sub_marker_in_method": 0,
+      "existing_double_recognizer_accepts": 0,
+      "candidate_extents_bytes": [],
+      "seconds": 11.922000000020489
+    },
+    "survivors-roguelike-kit": {
+      "selected_methods": 1936,
+      "decode_errors": 0,
+      "candidate_helpers": 1,
+      "direct_call_or_tail_sites": 2,
+      "distinct_calling_methods": 2,
+      "tail_sites": 0,
+      "sites_with_unresolved_sub_marker_in_method": 2,
+      "existing_double_recognizer_accepts": 0,
+      "candidate_extents_bytes": [
+        159
+      ],
+      "seconds": 25.625
+    },
+    "limbus": {
+      "selected_methods": 923,
+      "decode_errors": 0,
+      "candidate_helpers": 1,
+      "direct_call_or_tail_sites": 4,
+      "distinct_calling_methods": 3,
+      "tail_sites": 0,
+      "sites_with_unresolved_sub_marker_in_method": 4,
+      "existing_double_recognizer_accepts": 0,
+      "candidate_extents_bytes": [
+        147
+      ],
+      "seconds": 75.75
+    }
+  },
+  "candidate_definition": {
+    "predicate": "Unknown non-export bounded executable target, with RIP-relative RCX sqrtf literal, SQRTSS XMM0, some MOVSS [RSP+N],XMM0 and RET.",
+    "shape_inventory_only": true,
+    "not_a_helper_identity_or_input_lifetime_proof": true,
+    "inventory_spill_may_be_zero_scratch_not_input": true,
+    "existing_double_recognizer_accepts_candidates": false
+  },
+  "existing_handler_observations": {
+    "fixtures": {
+      "survivors-roguelike-kit": {
+        "observed_methods": 2,
+        "observed_unique_calls": 2,
+        "typed_single_inputs": 1,
+        "unknown_inputs": 0,
+        "typed_single_xmm0_outputs": 0,
+        "rax_object_results": 0,
+        "bodies_byte_identical_to_accepted_candidate": true,
+        "uncounted_side_reads_only": true
+      },
+      "limbus": {
+        "observed_methods": 3,
+        "observed_unique_calls": 4,
+        "typed_single_inputs": 3,
+        "unknown_inputs": 0,
+        "typed_single_xmm0_outputs": 2,
+        "rax_object_results": 0,
+        "bodies_byte_identical_to_accepted_candidate": true,
+        "uncounted_side_reads_only": true
+      }
+    },
+    "total_direct_calls": 6,
+    "typed_single_inputs": 4,
+    "other_nonunknown_but_not_single_inputs": 2,
+    "missing_xmm0_after_calls": 4,
+    "untyped_nonunknown_rax_values_after_calls": 4,
+    "existing_typed_single_xmm0_results": 2,
+    "all_five_method_bodies_byte_identical_to_accepted_candidate": true,
+    "unresolved_marker_observation_is_method_level_not_site_level": true,
+    "not_all_six_sites_are_missing_xmm0": true,
+    "observations_use_uncounted_register_reads": true
+  },
+  "independent_native_review": {
+    "survivors": {
+      "extent_bytes": 159,
+      "entry_single_input_saved_at_old_rsp_plus": 8,
+      "frame_allocation_bytes": 88,
+      "normal_sqrt_input_at_new_rsp_plus": 96,
+      "classification_copy_at_new_rsp_plus": 104,
+      "literal": "sqrtf",
+      "normal_operation": "SQRTSS XMM0 from original input spill",
+      "special_paths": "NaN tail target and negative/domain error helper remain separate proof obligations"
+    },
+    "limbus": {
+      "extent_bytes": 147,
+      "original_input_preserved_in": "XMM2",
+      "normal_sqrt_input": "XMM0 low single copied from XMM2 after high-lane zeroing",
+      "matched_xmm0_spill_is": "zero-valued scratch on the domain-error path, not original input",
+      "literal": "sqrtf",
+      "normal_operation": "SQRTSS XMM0,XMM0",
+      "special_paths": "NaN tail target and negative/domain error helper remain separate proof obligations"
+    },
+    "two_distinct_input_storage_shapes": true,
+    "broad_double_spill_signature_reuse_rejected": true
+  },
+  "authored_mapping_hardware_check": {
+    "authored_float_bitpattern_samples": 1004608,
+    "sse_scalar_sqrt_oracle": true,
+    "cast_double_sqrt_finite_and_signed_zero_bit_mismatches": 0,
+    "cast_double_sqrt_nan_classification_mismatches": 0,
+    "cast_double_sqrt_nan_payload_bit_mismatches": 0,
+    "mathf_sqrt_bit_mismatches": 0,
+    "checked_optimized_compile": true,
+    "default_rounding_only": true,
+    "authored_proposal_only": true,
+    "production_generated": false,
+    "game_crt_wrapper_executed": false,
+    "crt_error_side_effects_or_fp_status_proved": false,
+    "whole_method_equivalence": false,
+    "script_sha256": "7e7572b7354cace22d9b693287a948e153f7847e357d7204a326071b1e1bcfb1"
+  },
+  "required_integration_review": [
+    "Independent bounded helper identity, CFG and original-input provenance for both native storage shapes, including special exits and wrong-shape mutation tests.",
+    "Precision-specific helper contract and uniqueness discovery; never put the single wrapper into rt_sqrt, whose packed-diamond proof requires double ABI.",
+    "Direct call, flat tail and structured tail must agree on XMM0 Single return, volatile invalidation and unknown propagation; no GPR argument spray or fabricated RAX object result.",
+    "Exclude a newly proved helper from throw-helper speculation without weakening existing guards.",
+    "Do not infer source scalar type from method names or insert numeric casts around Int32/object/aggregate tokens; the two non-Single inputs require independent lane/origin recovery.",
+    "Keep existing packed-sqrt narrowing/high-lane proof boundaries unchanged; scalar helper return does not prove positive-zero upper lanes.",
+    "Only accept after authored and real-binary tests, source-frozen paired audits and compiler/tree gates, clean-parent proof and unchanged known failure set."
+  ],
+  "limitations": [
+    "This is a shape census and observation of current handlers, not accepted production recognition or whole-method equivalence.",
+    "Only the selected 2242/1936/923 methods are scanned; no full Limbus coverage claim.",
+    "Method-level sub markers do not count exact unresolved call sites: two calls already have typed XMM0 results under current heuristics.",
+    "The 1004608 hardware inputs are deterministic samples (1000000 xorshift bit patterns plus 4608 sign/exponent/mantissa edges), not exhaustive Single-space verification.",
+    "Authored cast-Math.Sqrt and MathF.Sqrt proposals, not production-generated helper recovery; no game CRT wrapper execution, errno/FP-status, NaN special-wrapper behavior or nondefault rounding proof.",
+    "No speed, compiler-error reduction, new accepted output candidate or overall goal completion is claimed."
+  ],
+  "publication": {
+    "aggregate_only": true,
+    "raw_native_or_bodies_or_full_diagnostics_published": false,
+    "production_or_tests_changed": false,
+    "goldens_or_pins_changed": false,
+    "promotion_performed": false
+  },
+  "evidence_script_sha256": {
+    "inventory_sqrtf56.py": "2e9c8dff65d5bd2fa7707b12627e65acc17f12d0655b3985187b4674f297e538",
+    "observe_sqrtf56.py": "b10dcc324367d5082f6763082dae56aa53398c8cee5c4a3b087288c41f94173d",
+    "prove_sqrtf56_mapping.py": "7e7572b7354cace22d9b693287a948e153f7847e357d7204a326071b1e1bcfb1"
+  }
+}

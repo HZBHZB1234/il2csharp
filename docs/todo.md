@@ -4,6 +4,45 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Read-only next slice: single-precision sqrt-helper ABI (2026-11-04)
+
+`game_out55` remains the accepted source candidate, **not promoted**. No
+additional production recovery or tests changed in this inventory. Across
+**2,242 / 1,936 / 923 selected methods**, an intentionally incomplete
+`sqrtf`/SQRTSS native-shape census finds **zero / one / one candidate
+helpers**, with **zero / two / four direct calls** in **zero / two / three
+methods**. Decode errors are zero. Candidates are not proved recognizers.
+
+Uncounted observations of the existing handler preserve all five method
+bodies byte-identically. **Four of six inputs** are tracked Single; two
+still have integer/aggregate-like provenance and must not be fixed by a
+numeric cast. **Four calls lose XMM0 and leave an untyped RAX value**, while
+two already retain a typed Single XMM0 result under existing heuristics.
+Every method has a `sub_` marker, but that method-level observation is not
+a count of wholly unresolved sites.
+
+Native review finds two different input lifetimes: survivors spills the
+entry value at old RSP+8 and roots from new RSP+0x60 after a 0x58 frame;
+Limbus preserves it in XMM2, then roots XMM0. The Limbus MOVSS memory store
+matched by the broad census is **zero scratch, not the original input**.
+Thus reusing a double spill/opcode/literal signature would not prove the
+new contract. NaN tails and domain/error-helper returns need separate proof.
+
+An **authored proposal only**, checked/optimized `(float)Math.Sqrt(x)` and
+`MathF.Sqrt(x)`, matches SSE scalar sqrt on **1,004,608 sampled Single bit
+patterns**, including sign/exponent/mantissa edges: zero finite/signed-zero,
+NaN-classification or sampled payload-bit mismatches. This is not exhaustive,
+not production-generated recovery, and does not execute the game CRT helper
+or prove its side effects, FP status, special exits or other rounding modes.
+
+Next: prove per-precision identity/input lifetime and return ABI; cover direct
+calls and both tail paths, unknown propagation and throw-helper exclusion.
+Do not reuse `rt_sqrt` or relax its double-only packed-diamond/high-lane proof;
+do not repair the two unproved source lanes by casting. Source-frozen suites,
+paired compiler/tree audits and clean-parent reproduction remain mandatory.
+Evidence: `validation_reports/single_sqrt_helper_inventory_2026-11-04.json`.
+The overall goal remains **unachieved**; no speed/error-count gain is claimed.
+
 ### Recover proved GPR-transported Int32-field SIMD conversions (2026-11-04)
 
 Accepted `game_out55` (not promoted), versus out54. A native Int32 field
