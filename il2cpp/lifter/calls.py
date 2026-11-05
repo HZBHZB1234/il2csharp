@@ -3291,6 +3291,17 @@ class _CallsMixin:
                     continue
                 nm6 = self.il.generic_method_name(si)
                 if ae.text == nm6:
+                    # The vector still uses physical GPR positions here.
+                    # An instance call needs a receiver before its hidden
+                    # MethodInfo (and sret can only add another argument).
+                    # RCX holding that MethodInfo therefore disproves this
+                    # identity: metadata helpers also take it as an ordinary
+                    # argument. Keep their raw call, not an invented managed
+                    # invocation. This is only a negative proof; the legacy
+                    # _methodinfo_slot cannot validate closed sret/FP ABIs.
+                    if i == 0 and not self.meta.methods[
+                            self.il.method_specs[si][0]].is_static:
+                        continue
                     info = ('generic', si)
                     name = nm6
                     arg_exprs = arg_exprs[:i] + arg_exprs[i + 1:]
