@@ -17,9 +17,9 @@ class EntryCaptureDeclined(ValueError):
 
 
 class EntryInt32Captures:
-    def __init__(self, il, method, insns, *, reserved=()):
+    def __init__(self, il, method, insns, *, reserved=(), unwind_cache=None):
         self._reserved = frozenset(reserved)
-        self.origin = EntryInt32Origin(il, method, insns)
+        self.origin = EntryInt32Origin(il, method, insns, unwind_cache=unwind_cache)
         self.method = method
         self._lift = None
         self._bindings = {}

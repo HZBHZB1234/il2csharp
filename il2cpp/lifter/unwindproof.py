@@ -213,3 +213,51 @@ class NativeUnwindBoundary:
             end = ins.next_ip
             records.add(row)
         return tuple(sorted(records))
+
+
+class NativeUnwindCache:
+    """One owner's checked immutable snapshot, never a global/identity-only cache.
+
+    Owning decompilers may reuse the index across preflights. A recovery arena
+    must deepcopy this object with its binary: the owner and mutable root cache
+    then belong to that arena. This is not MethodDef, CFG or ABI-slot evidence.
+    """
+
+    def __init__(self):
+        self._clear()
+
+    def _clear(self):
+        self._owner = self._data = self._base = self._sections = self._proof = None
+
+    def snapshot(self, binary):
+        """Return a snapshot only while its entire live native context matches.
+
+        A strong owner reference prevents recycled-id hits. Equal bytes from a
+        different image are not identity evidence. Mutable backing is declined,
+        even when its present contents happen to match an earlier snapshot.
+        """
+        try:
+            data, base = binary.d, binary.image_base
+            if type(data) is not bytes or type(base) is not int or not is_win64_pe(binary):
+                self._clear()
+                return None
+            sections = tuple((s.addr, s.size, s.offset, s.rawsize, s.is_exec)
+                             for s in binary.sections)
+            if any(any(type(value) is not int for value in row[:4])
+                   or type(row[4]) is not bool for row in sections):
+                self._clear()
+                return None
+            if (self._owner is binary and self._data is data
+                    and self._base == base and self._sections == sections):
+                return self._proof
+            # Publish the complete snapshot together, including negative parses.
+            # No earlier proof remains available if construction fails.
+            self._clear()
+            proof = NativeUnwindBoundary(binary)
+            self._owner, self._data, self._base = binary, data, base
+            self._sections, self._proof = sections, proof
+            return proof
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError,
+                OverflowError, struct.error):
+            self._clear()
+            return None

@@ -7,13 +7,13 @@ Expr, preserve conversion-time snapshots and validate final capture lifetime.
 from itertools import islice
 
 from il2cpp.lifter.abi import is_win64_pe
-from il2cpp.lifter.unwindproof import NativeUnwindBoundary
+from il2cpp.lifter.unwindproof import NativeUnwindBoundary, NativeUnwindCache
 
 
 class EntryInt32Origin:
-    """A finite, decoded, exact-method context; no cross-method/binary cache."""
+    """A finite exact-method context; only the checked unwind index may be reused."""
 
-    def __init__(self, il, method, insns):
+    def __init__(self, il, method, insns, *, unwind_cache=None):
         self.il = il
         self.method = method
         self.insns = ()
@@ -36,8 +36,13 @@ class EntryInt32Origin:
             self._by_ip = {ins.ip: ins for ins in self.insns}
             if len(self._by_ip) != len(self.insns):
                 return
-            self._boundary = NativeUnwindBoundary(self.bin)
-            self._valid = True
+            if unwind_cache is None:
+                self._boundary = NativeUnwindBoundary(self.bin)
+            elif type(unwind_cache) is NativeUnwindCache:
+                self._boundary = unwind_cache.snapshot(self.bin)
+            else:
+                return
+            self._valid = self._boundary is not None
         except (AttributeError, IndexError, KeyError, TypeError, ValueError,
                 OverflowError):
             pass

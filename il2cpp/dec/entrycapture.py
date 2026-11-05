@@ -13,6 +13,7 @@ from types import ModuleType, SimpleNamespace
 
 from il2cpp.lifter.entrycapture import EntryInt32Captures
 from il2cpp.lifter.entryorigin import EntryInt32Origin
+from il2cpp.lifter.unwindproof import NativeUnwindCache
 from il2cpp.names import safe_ident
 from il2cpp.metadata import TypeDef, MethodDef, FieldDef, ParamDef, ImageDef
 from il2cpp.runtime.types import _SYNTH_NEXT_VA
@@ -200,6 +201,17 @@ def isolated_clone(decompiler, method, owner):
     return arena, copied_method, copied_owner
 
 
+def _unwind_cache(decompiler):
+    # Created only by the opt-in path, after the cheap candidate filters. The
+    # complete object is cloned with the arena; never lend it a live proof.
+    cache = getattr(decompiler, '_entry_int32_unwind', None)
+    if cache is None:
+        cache = decompiler._entry_int32_unwind = NativeUnwindCache()
+    if type(cache) is not NativeUnwindCache:
+        raise ArenaDeclined('unsupported unwind cache')
+    return cache
+
+
 def _candidate(decompiler, method):
     from iced_x86 import Mnemonic
 
@@ -210,7 +222,8 @@ def _candidate(decompiler, method):
             or not insns or len(insns) > 512
             or not any(ins.mnemonic == Mnemonic.CVTDQ2PS for ins in insns)):
         return False
-    origin = EntryInt32Origin(lift.il, method, insns)
+    origin = EntryInt32Origin(lift.il, method, insns,
+                              unwind_cache=_unwind_cache(decompiler))
     # Do not replace the live sink or read symbolic registers for preflight.
     probe = SimpleNamespace(il=lift.il, bin=lift.bin, meta=lift.meta,
                             _current_method=method)
@@ -253,6 +266,7 @@ def recover_entry_int32(decompiler, method, owner, baseline):
         arena, copied_method, copied_owner = isolated_clone(decompiler, method, owner)
         capture = EntryInt32Captures(arena.L.il, copied_method,
                                      arena._flat_insns,
+                                     unwind_cache=_unwind_cache(arena),
                                      reserved=_marker_reservations(arena.L.meta, baseline))
         arena.L._entry_int32_capture = capture
         lines = arena._lift_method(copied_method, copied_owner)
