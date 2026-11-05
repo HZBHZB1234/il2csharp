@@ -58,8 +58,10 @@ unchanged. Evidence:
 Prioritize typed state-machine/builder aggregate homes; revisit return aliases
 only with an output-changing consumer and separate effect/identity evidence.
 
-**Next:** prove the generic-context helper structurally, then typed
-state-machine/builder stack aggregates. Evidence:
+**Next:** recover typed state-machine/builder stack aggregates. Independently,
+require structural effect/identity proof before naming or removing a generic-
+context helper; the no-benefit return-provenance trial does not supply it.
+Evidence for the landed import fix:
 `validation_reports/nullary_import_entry_liveness_2026-11-05.json`.
 Last accepted/promoted output remains `game_out56`; goal **active, unachieved**.
 
