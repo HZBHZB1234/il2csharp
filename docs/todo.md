@@ -4,6 +4,90 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Long resolved instance calls retain instance dispatch (2026-11-05)
+
+A display-length cap no longer rewrites proved nongeneric instance calls into
+`Type.Method(receiver, ...)`. Existing metadata, receiver, arity and constructor
+checks remain. The cap is bypassed only for a nongeneric non-constructor method
+whose receiver text equals the recovered first argument. This equality guard
+prevents re-evaluating an expression already bound to a temporary. Generic
+methods, constructors and unproved receivers retain their prior boundaries.
+
+**46 authored portable cases; 245 focused / 5,529 portable pass.** Frozen full
+excluding parallel: **5,644 passed / 259 skipped / one non-strict XPASS / the
+same fixed three failures**; parallel **two pass**. Scoped clean-parent proof
+reproduces seven failures (six long ordinary calls, one long indexer), passes
+199 legacy focused tests, fresh-builds/gates all seven baseline assemblies, and
+restores exact source/tests/tools bytes and untouched untracked reports. The
+restored 46-case repro, 245 focused and 5,529 portable pass again.
+
+Paired selected re-lifts: UniTask **2,242 / four changed**, Survivors
+**1,936 / 20 changed**, Limbus **923 / 13 changed**, zero crashes. Every changed
+body reproduces from the parent, has an attributed nongeneric instance event,
+and repeats identically; raw helper target multiplicities are unchanged. That
+is not full effect equivalence. A synthetic harness compiles final-lifter call
+statements and runs **120,000 dispatch/evaluation-order checks per mode** in
+optimized checked and unchecked C#, zero mismatches; it is not native-game
+execution.
+
+**Fresh real-Editor pair, visibility preserved:** seven assemblies / 474 C# files /
+2,227 lifted bodies, **10,438 -> 10,437 compiler errors**. Four C# files change;
+message-aware comparison removes one CS1503 with **no additions**, unchanged-file
+diagnostics and all 13 existing syntax-band location/message sets are identical.
+Strict emission, brace and tree-sitter gates have zero failures. Explicit
+`unityjit-win32`, 283 framework / 430 total references, original Editor assembly
+identities and observed body sentinel; no publicizing. **Every Roslyn run still
+returns 1**, Linq remains 3,697 errors / 2,106 explicit unrecovered bodies. No
+speedup, semantic completeness, re-pin or promotion claim.
+
+**Declined experiments:** zero-SIMD-to-default reduced the total by two but added
+one CS1503 and two CS0266; whole-home/lifetime, IntPtr and real TypeHandle proof
+are still missing. Unrestricted long instance rendering exposed generic/ref ABI
+errors (10,479 errors call-only). Nongeneric-only rendering without the final
+receiver equality guard had no added diagnostics but failed the one-evaluation
+test. None of these broader prototypes is landed.
+
+**Next:** signature-owned byref/ParamAttributes in class VAR substitution, closed
+generic/ref ABI, then typed builder/state-machine whole-home recovery. The current
+substitution is observed dropping byref in a read-only probe; that is follow-up
+evidence, not a landed fix. Unknown helper effects remain unknown. Evidence:
+`validation_reports/long_instance_dispatch_2026-11-05.json`.
+Last accepted/promoted output stays `game_out56`; goal **active, unachieved**.
+
+
+### Class VAR modifier probe: real defect, broader fix not yet accepted (2026-11-05)
+
+**Process-local experiments only; source remains the guarded long-call fix.**
+A read-only UniTask probe observes **652 class VAR substitutions in 122 methods**
+losing signature byref. A signature-owned byref/ParamAttributes prototype passes
+69 synthetic tests (parent: 60 fail / nine pass), including float-byref GPR
+selection, static/instance+sret offsets and ref/out attributes. Complete selected
+sweeps: UniTask 2,242 / 22 changed, Survivors 1,936 / 16 changed, Limbus 923 /
+three changed, zero crashes.
+
+**Do not accept on net count alone:** fresh real-Editor seven-assembly gate,
+474 C# files / 2,227 bodies, **10,437 -> 10,416 errors (-21)**, but message-aware
+comparison removes 23 and **adds one CS1929 and one CS1503**. These involve an
+unproved generic Deconstruct receiver and an exception argument lane. The gate's
+syntax band increases 13 -> 14 because its classifier includes CS1929; braces
+and tree-sitter remain clean. All Roslyn runs still fail, Linq stays 3,697 errors.
+No source fix, re-pin, promotion, speedup or native equivalence claim.
+
+A second, separate probe finds that `_kill_byref_slots` computes width from the
+unsubstituted VAR: an unknown width can leave a stale aggregate tile even after
+`stack_values` is cleared. Closing that pointee in the process-local modifier
+prototype changes 22/22 selected UniTask and 13/16 selected Survivors methods;
+repeats agree. It replaces stale post-out constants with live homes in sampled
+pool methods, but does **not** repair the generic receiver or exception lane.
+One raw helper target count also changes as a stale-zero awaiter becomes a
+modeled interface call; do not call that effect equivalence. This is only a
+38-method subset, not a full gate or accepted cache-invalidation fix.
+
+**Next:** make signature modifiers and post-byref home invalidation consistent,
+then prove generic receiver ownership and exception-edge lanes before landing.
+Evidence: `validation_reports/class_var_modifier_probe_2026-11-05.json`.
+
+
 ### Exact nullary PE imports stop residual helper arguments (2026-11-05)
 
 **Bounded ABI proof, not helper naming.** The PE frontend records file-backed

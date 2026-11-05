@@ -1,0 +1,178 @@
+{
+  "kind": "Unlanded signature-owned class VAR modifier experiment",
+  "date": "2026-11-05",
+  "scope": "Process-local only; no source change, re-pin or promotion",
+  "hypothesis": "Class VAR substitution must retain signature byref and low-16 ParamAttributes; float-byref stays in GPR instead of stale XMM.",
+  "read_only_probe": {
+    "methods": 2242,
+    "byref_loss_events": 652,
+    "affected_method_count": 122
+  },
+  "synthetic": {
+    "cases": 69,
+    "parent_failed": 60,
+    "parent_passed": 9,
+    "prototype_passed": 69,
+    "range": "scalar/reference/value types; ref/out/in+out flags; static/instance and sret ABI offsets; unknown VAR/MVAR boundaries; artificial actual-argument modifier contamination"
+  },
+  "selected_sweeps": [
+    {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_method_rows": [
+        19936,
+        20290,
+        20304,
+        20318,
+        20334,
+        20348,
+        20362,
+        20376,
+        20445,
+        20473,
+        20501,
+        21472,
+        21639,
+        21834,
+        21850,
+        21870,
+        21890,
+        21911,
+        21932,
+        21953,
+        21984,
+        22955
+      ],
+      "crashes": 0,
+      "modifier_correction_events": 652,
+      "event_method_count": 122
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_method_rows": [
+        69907,
+        69910,
+        69911,
+        69933,
+        70421,
+        70422,
+        70423,
+        70424,
+        70439,
+        70450,
+        70451,
+        70452,
+        70474,
+        71034,
+        71064,
+        71215
+      ],
+      "crashes": 0,
+      "modifier_correction_events": 104,
+      "event_method_count": 24
+    },
+    {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_method_rows": [
+        101215,
+        146541,
+        156529
+      ],
+      "crashes": 0,
+      "modifier_correction_events": 20,
+      "event_method_count": 5
+    }
+  ],
+  "real_editor_gate": {
+    "assemblies": 7,
+    "cs_files": 474,
+    "lifted": 2227,
+    "baseline_errors": 10437,
+    "prototype_errors": 10416,
+    "normalized_message_removed": 23,
+    "normalized_message_added": 2,
+    "added_codes": {
+      "CS1929": 1,
+      "CS1503": 1
+    },
+    "removed_codes": {
+      "CS0208": 22,
+      "CS1061": 1
+    },
+    "original_visibility_preserved": true,
+    "framework_profile": "unityjit-win32",
+    "framework_refs": 283,
+    "total_refs": 430,
+    "all_roslyn_returncodes_one": true,
+    "linq_errors": 3697,
+    "explicit_unrecovered_linq_bodies": 2106,
+    "gate_syntax_band_baseline": 13,
+    "gate_syntax_band_prototype": 14
+  },
+  "decision": "Do not land as-is: total errors fell by 21 but two new message-aware diagnostics remain. Generic Deconstruct receiver and exception argument lanes require separate provenance/ABI review.",
+  "additional_finding": "The byref stack-cache invalidation routine reads unsubstituted VAR when computing pointee width. If width remains unknown, stack_values is removed but an aggregate tile can retain a stale pre-call constant. A separate closed-pointee invalidation prototype is under subset-only investigation; not a landed fix.",
+  "limitations": [
+    "No native game equivalence claim.",
+    "Net compiler error reduction does not justify additions or prove semantic validity.",
+    "No speedup measured.",
+    "Synthetic actual-type modifiers are negative/robustness tests, not legitimate metadata examples."
+  ],
+  "closed_pointee_cache_invalidation_subset": [
+    {
+      "fixture": "unitask",
+      "methods": 22,
+      "changed_method_rows": [
+        19936,
+        20290,
+        20304,
+        20318,
+        20334,
+        20348,
+        20362,
+        20376,
+        20445,
+        20473,
+        20501,
+        21472,
+        21639,
+        21834,
+        21850,
+        21870,
+        21890,
+        21911,
+        21932,
+        21953,
+        21984,
+        22955
+      ],
+      "repeat_equal": true,
+      "raw_target_multiplicity_changed_method_rows": [
+        21639
+      ]
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 16,
+      "changed_method_rows": [
+        69910,
+        69911,
+        69933,
+        70421,
+        70422,
+        70423,
+        70424,
+        70439,
+        70450,
+        70451,
+        70452,
+        70474,
+        71034
+      ],
+      "repeat_equal": true,
+      "raw_target_multiplicity_changed_method_rows": []
+    }
+  ],
+  "closed_pointee_cache_invalidation_subset_limit": "Selected prior-prototype changed methods only. No full sweep, fresh compiler gate, permanent tests or native equivalence proof for the additional invalidation change. One raw-target count changes when a stale-zero awaiter becomes a modeled interface call; not effect-equivalence evidence."
+}

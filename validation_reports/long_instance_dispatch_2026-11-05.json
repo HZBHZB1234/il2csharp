@@ -1,0 +1,846 @@
+{
+  "kind": "Preserve resolved nongeneric instance dispatch beyond display text budget",
+  "date": "2026-11-05",
+  "parent_commit": "31f49cb4312fb3a496c6c8ae1c545e34e684121b",
+  "scope": [
+    "il2cpp/lifter/calls.py",
+    "tests/test_long_instance_calls.py"
+  ],
+  "rule": "Keep every existing receiver and metadata proof; only bypass the 150-character display cap for a nongeneric non-constructor instance when receiver text equals recovered arg0. Do not duplicate a materialized receiver. Generic methods and constructors retain the prior boundary.",
+  "authored_portable_tests": 46,
+  "validation_suites": [
+    {
+      "name": "focused",
+      "returncode": 0,
+      "totals": {
+        "tests": 245,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 2.407
+    },
+    {
+      "name": "portable",
+      "returncode": 0,
+      "totals": {
+        "tests": 5529,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 23.75
+    },
+    {
+      "name": "full",
+      "returncode": 1,
+      "totals": {
+        "tests": 5907,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 259
+      },
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "seconds": 1732.031
+    },
+    {
+      "name": "parallel",
+      "returncode": 0,
+      "totals": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 730.109
+    }
+  ],
+  "scoped_clean_parent": {
+    "parent_commit": "31f49cb4312fb3a496c6c8ae1c545e34e684121b",
+    "scope": [
+      "il2cpp/lifter/calls.py",
+      "tests/test_long_instance_calls.py"
+    ],
+    "candidate_hashes": {
+      "il2cpp/lifter/calls.py": "9bce5b627a444077979b32f39fc00dd04e9dd8076619caf65222766969cfefe2",
+      "tests/test_long_instance_calls.py": "69c1868fd7fc286ea51b5cbaf08034bf45f89029801050886eed6d7ef1e2d7c6"
+    },
+    "exact_restoration": true,
+    "source_tests_tools_restoration": true,
+    "untracked_reports_preserved": true,
+    "no_other_paths_stashed": true,
+    "fresh_parent_tree_equals_previously_measured_head_baseline_cs": true,
+    "reports": [
+      {
+        "name": "calls78_candidate_repro",
+        "returncode": 0,
+        "tests": 46,
+        "failure_set": []
+      },
+      {
+        "name": "calls78_clean_parent_repro",
+        "returncode": 1,
+        "tests": 46,
+        "failure_set": [
+          "test_indexer_arguments_keep_the_receiver[65-False]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns0-items[index]-obj]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns0-receiver-int]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns0-receiver-obj]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns1-items[index]-obj]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns1-receiver-int]",
+          "test_resolved_instance_syntax_never_depends_on_total_argument_text_length[65-returns1-receiver-obj]"
+        ]
+      },
+      {
+        "name": "calls78_clean_parent_legacy",
+        "returncode": 0,
+        "tests": 199,
+        "failure_set": []
+      },
+      {
+        "name": "calls78_clean_parent_build_and_gates",
+        "returncode": 0
+      },
+      {
+        "name": "calls78_restored_repro",
+        "returncode": 0,
+        "tests": 46,
+        "failure_set": []
+      },
+      {
+        "name": "calls78_restored_focused",
+        "returncode": 0,
+        "tests": 245,
+        "failure_set": []
+      },
+      {
+        "name": "calls78_restored_portable",
+        "returncode": 0,
+        "tests": 5529,
+        "failure_set": []
+      },
+      {
+        "name": "calls78_final_broad_diagnostics",
+        "returncode": 0
+      }
+    ]
+  },
+  "selected_sweeps": [
+    {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_method_rows": [
+        18701,
+        18847,
+        19305,
+        22952
+      ],
+      "crashes": 0,
+      "attributed_events": 5,
+      "exact_parent_body": true,
+      "repeat_equal": true,
+      "raw_target_multiplicity_equal": true,
+      "baseline_selected_bodies_sha256": "ed47f97e2a1259352d954c139ff690509f98cf91edd712c07e55ce66d3fe4651",
+      "candidate_selected_bodies_sha256": "31938f276b9945dd93a6daea39eb602246450b376aa4986e2e58cf38a22ca5df"
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_method_rows": [
+        69622,
+        69717,
+        69747,
+        70242,
+        70243,
+        70439,
+        70441,
+        70558,
+        70562,
+        70977,
+        70978,
+        70979,
+        70981,
+        70982,
+        70986,
+        70987,
+        70988,
+        70990,
+        70991,
+        90847
+      ],
+      "crashes": 0,
+      "attributed_events": 24,
+      "exact_parent_body": true,
+      "repeat_equal": true,
+      "raw_target_multiplicity_equal": true,
+      "baseline_selected_bodies_sha256": "fbec5ff31e7d4cc1f3494d524f1d97a17ea0325404a99ce8db6e6fd8f321146b",
+      "candidate_selected_bodies_sha256": "d16c450452fe03d1d1d764f88d488f4cedfa8ea9c9d34c0da698e7b7c95cbe43"
+    },
+    {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_method_rows": [
+        8664,
+        8670,
+        13922,
+        24632,
+        24823,
+        24957,
+        45911,
+        46310,
+        46335,
+        46775,
+        78586,
+        80001,
+        95296
+      ],
+      "crashes": 0,
+      "attributed_events": 27,
+      "exact_parent_body": true,
+      "repeat_equal": true,
+      "raw_target_multiplicity_equal": true,
+      "baseline_selected_bodies_sha256": "257394b1e7cb6a46f98499ef09b0412cf621e777338011b5704d143845179ee1",
+      "candidate_selected_bodies_sha256": "498d48b9c84227d325743350f7d5ad04eea381c431b8d9d6bef1dbbafe91976f"
+    }
+  ],
+  "attribution_limit": "Raw helper target multiplicity and repeated text are not full effect or native semantic equivalence.",
+  "fresh_trees": [
+    {
+      "side": "baseline",
+      "label": "game_out78_call_baseline",
+      "cs_files": 474,
+      "lifted": 2227,
+      "emit_failures": 0,
+      "fallbacks": 0,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "linq_explicit_unrecovered_bodies": 2106
+    },
+    {
+      "side": "candidate",
+      "label": "game_out78_call_candidate",
+      "cs_files": 474,
+      "lifted": 2227,
+      "emit_failures": 0,
+      "fallbacks": 0,
+      "brace_unbalanced": 0,
+      "parse_bad_files": 0,
+      "linq_explicit_unrecovered_bodies": 2106
+    }
+  ],
+  "compiler_errors": {
+    "baseline": 10438,
+    "candidate": 10437
+  },
+  "real_editor_compile_reports": [
+    {
+      "files": 16,
+      "syntax": 2,
+      "binding": 1787,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "Assembly-CSharp",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0246": 40,
+        "CS1061": 168,
+        "CS0029": 187,
+        "CS8917": 84,
+        "CS0208": 145,
+        "CS0103": 340,
+        "CS0122": 120,
+        "CS7036": 11,
+        "CS0266": 46,
+        "CS0149": 17,
+        "CS0030": 55,
+        "CS0119": 94,
+        "CS0019": 191,
+        "CS1503": 128,
+        "CS0117": 48,
+        "CS1729": 2,
+        "CS0165": 66,
+        "CS0305": 1,
+        "CS0159": 35,
+        "CS0428": 1,
+        "CS1620": 9,
+        "CS0121": 1
+      }
+    },
+    {
+      "files": 4,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "TempAsm",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 2,
+        "CS0103": 2,
+        "CS0266": 2
+      }
+    },
+    {
+      "files": 302,
+      "syntax": 11,
+      "binding": 4726,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 778,
+        "CS0103": 887,
+        "CS0122": 614,
+        "CS0266": 113,
+        "CS0161": 16,
+        "CS1503": 126,
+        "CS1061": 538,
+        "CS0246": 19,
+        "CS0029": 257,
+        "CS0019": 376,
+        "CS0149": 208,
+        "CS0117": 24,
+        "CS0030": 82,
+        "CS0173": 1,
+        "CS7036": 36,
+        "CS0571": 31,
+        "CS0177": 14,
+        "CS0165": 190,
+        "CS0159": 33,
+        "CS8917": 75,
+        "CS0119": 84,
+        "CS0214": 15,
+        "CS0191": 37,
+        "CS0163": 2,
+        "CS8070": 1,
+        "CS0212": 4,
+        "CS1729": 10,
+        "CS0311": 154,
+        "CS1501": 7,
+        "CS1929": 1,
+        "CS0023": 4
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.Addressables",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.DOTween",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 3697,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.Linq",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 587,
+        "CS0266": 132,
+        "CS0122": 203,
+        "CS0029": 419,
+        "CS8917": 200,
+        "CS1061": 609,
+        "CS0019": 293,
+        "CS0117": 176,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 40,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 291,
+        "CS0571": 22,
+        "CS0156": 38
+      }
+    },
+    {
+      "files": 5,
+      "syntax": 0,
+      "binding": 199,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.TextMeshPro",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 35,
+        "CS0266": 6,
+        "CS0214": 2,
+        "CS1503": 15,
+        "CS0246": 13,
+        "CS0029": 9,
+        "CS1061": 60,
+        "CS0019": 17,
+        "CS0149": 5,
+        "CS8917": 2,
+        "CS0030": 2,
+        "CS0122": 3,
+        "CS0119": 2,
+        "CS0156": 1,
+        "CS0159": 2,
+        "CS0165": 21,
+        "CS0117": 1
+      }
+    },
+    {
+      "files": 16,
+      "syntax": 2,
+      "binding": 1787,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "Assembly-CSharp",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0246": 40,
+        "CS1061": 168,
+        "CS0029": 187,
+        "CS8917": 84,
+        "CS0208": 145,
+        "CS0103": 340,
+        "CS0122": 120,
+        "CS0266": 46,
+        "CS7036": 11,
+        "CS0030": 55,
+        "CS0119": 94,
+        "CS0019": 191,
+        "CS0117": 48,
+        "CS1503": 128,
+        "CS0149": 17,
+        "CS0159": 35,
+        "CS0165": 66,
+        "CS1729": 2,
+        "CS0305": 1,
+        "CS0428": 1,
+        "CS1620": 9,
+        "CS0121": 1
+      }
+    },
+    {
+      "files": 4,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "TempAsm",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 2,
+        "CS0103": 2,
+        "CS0266": 2
+      }
+    },
+    {
+      "files": 302,
+      "syntax": 11,
+      "binding": 4725,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 778,
+        "CS0103": 887,
+        "CS0266": 113,
+        "CS0122": 614,
+        "CS1503": 125,
+        "CS1061": 538,
+        "CS0029": 257,
+        "CS0246": 19,
+        "CS0161": 16,
+        "CS0149": 208,
+        "CS0019": 376,
+        "CS0177": 14,
+        "CS0571": 31,
+        "CS7036": 36,
+        "CS0165": 190,
+        "CS0030": 82,
+        "CS0117": 24,
+        "CS0173": 1,
+        "CS0214": 15,
+        "CS0159": 33,
+        "CS8917": 75,
+        "CS0119": 84,
+        "CS0191": 37,
+        "CS0212": 4,
+        "CS0163": 2,
+        "CS8070": 1,
+        "CS1729": 10,
+        "CS0311": 154,
+        "CS1501": 7,
+        "CS1929": 1,
+        "CS0023": 4
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.Addressables",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.DOTween",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 3697,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.Linq",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 183,
+        "CS0103": 587,
+        "CS0266": 132,
+        "CS7036": 27,
+        "CS0029": 419,
+        "CS0122": 203,
+        "CS8917": 200,
+        "CS1061": 609,
+        "CS0117": 176,
+        "CS0159": 154,
+        "CS0019": 293,
+        "CS0030": 68,
+        "CS1501": 40,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 291,
+        "CS0156": 38,
+        "CS0571": 22
+      }
+    },
+    {
+      "files": 5,
+      "syntax": 0,
+      "binding": 199,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.TextMeshPro",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 35,
+        "CS0266": 6,
+        "CS0214": 2,
+        "CS1503": 15,
+        "CS0246": 13,
+        "CS0029": 9,
+        "CS1061": 60,
+        "CS0019": 17,
+        "CS0149": 5,
+        "CS8917": 2,
+        "CS0030": 2,
+        "CS0122": 3,
+        "CS0119": 2,
+        "CS0156": 1,
+        "CS0159": 2,
+        "CS0165": 21,
+        "CS0117": 1
+      }
+    }
+  ],
+  "diagnostic_review": {
+    "reports": [
+      {
+        "assembly": "Assembly-CSharp",
+        "cs_files": 16,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 1789,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 2
+      },
+      {
+        "assembly": "TempAsm",
+        "cs_files": 4,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 6,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask",
+        "cs_files": 302,
+        "changed_cs_files": 1,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 4686,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 1,
+        "added_code_counts": {},
+        "removed_code_counts": {
+          "CS1503": 1
+        },
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 11
+      },
+      {
+        "assembly": "UniTask.Addressables",
+        "cs_files": 2,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 5,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.DOTween",
+        "cs_files": 2,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 5,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.Linq",
+        "cs_files": 143,
+        "changed_cs_files": 3,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 1104,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.TextMeshPro",
+        "cs_files": 5,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 199,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      }
+    ],
+    "normalization": "per-file/code/message Counter, temporary numeric names normalized; locations ignored only in changed C# files",
+    "all_unchanged_file_diagnostics_identical": true
+  },
+  "synthetic_dispatch_runtime": {
+    "scope": "synthetic targets executing final-source Lifter-produced statements, NOT game bodies or native-game equivalence; checked/unchecked optimized .NET runtime",
+    "results": {
+      "checked": {
+        "cases": 12,
+        "checks": 120000,
+        "mismatches": 0,
+        "compile_returncode": 0,
+        "execution_returncode": 0
+      },
+      "unchecked": {
+        "cases": 12,
+        "checks": 120000,
+        "mismatches": 0,
+        "compile_returncode": 0,
+        "execution_returncode": 0
+      }
+    },
+    "source_freeze_verified": true
+  },
+  "rejected_experiments": [
+    {
+      "rounds": [
+        73,
+        74
+      ],
+      "experiment": "Zero SIMD tile to default struct",
+      "errors_before": 10438,
+      "errors_after": 10436,
+      "added_codes": {
+        "CS1503": 1,
+        "CS0266": 2
+      },
+      "decision": "Not landed: new type errors; whole-home/lifetime and TypeHandle/IntPtr proofs still missing."
+    },
+    {
+      "rounds": [
+        75,
+        76
+      ],
+      "experiment": "Remove all resolved instance display caps",
+      "combined_zero_experiment_errors": 10477,
+      "call_only_errors": 10479,
+      "decision": "Not landed: generic method closure/ref ABI regressions."
+    },
+    {
+      "rounds": [
+        77
+      ],
+      "experiment": "Nongeneric instance cap bypass without receiver text equality",
+      "compiler_errors": 10437,
+      "message_aware_diagnostic_additions": 0,
+      "decision": "Not landed as-is: synthetic effectful receiver could execute twice. Round78 adds equality guard and fresh validation."
+    }
+  ],
+  "limitations": [
+    "All seven Roslyn runs still return 1.",
+    "Linq retains 2106 explicit unrecovered bodies.",
+    "Synthetic runtime tests do not execute original native game bodies.",
+    "No speedup claim, golden re-pin or output promotion."
+  ],
+  "accepted_promoted_tree": "game_out56",
+  "goal_status": "active_unachieved",
+  "next": "Prove signature-owned byref/ParamAttributes during class VAR substitution, then closed generic/ref ABI and typed aggregate whole-home lifetimes."
+}

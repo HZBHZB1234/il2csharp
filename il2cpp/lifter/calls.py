@@ -3901,6 +3901,13 @@ class _CallsMixin:
                         recv_txt):
                     recv_txt = '%s.%s' % (recv_txt, _vfield)
             mname = m2.name
+            # A display budget must not change known instance dispatch. Keep
+            # generic methods/constructors on their existing paths until closed
+            # ref/ABI recovery is proved. Also require the recovered arg0 to
+            # match recv_txt: argument rendering may have materialized a long
+            # receiver, and reusing its old text would evaluate it twice.
+            _long_instance = (m2.generic_container == -1
+                              and not mname.startswith('.'))
             # metadata ctor names carry a leading dot (`.ctor`); the
             # instance join below adds its own
             mdot = (mname[1:] if mname.startswith('.') else mname)
@@ -4053,7 +4060,8 @@ class _CallsMixin:
                 # property accessors
                 if mbase.startswith('get_') and not rest:
                     cand = '%s.%s' % (_recv_fold(recv_txt), mbase[4:])
-                    if len(cand) < 150:
+                    if len(cand) < 150 or (_long_instance
+                                          and recv_txt == args[0]):
                         short = cand
                 elif mbase.startswith('set_') and len(rest) == 1 and not rty_has_value(self, rty):
                     cand = None
@@ -4078,7 +4086,8 @@ class _CallsMixin:
                 elif mbase == 'get_Item' and 1 <= len(rest) <= 2:
                     # indexer accessors: recv.get_Item(k) -> recv[k]
                     cand = '%s[%s]' % (_recv_fold(recv_txt), ', '.join(rest))
-                    if len(cand) < 150:
+                    if len(cand) < 150 or (_long_instance
+                                          and recv_txt == args[0]):
                         short = cand
                 elif mbase == 'set_Item' and len(rest) == 2:
                     lv = '%s[%s]' % (_recv_fold(recv_txt), rest[0])
@@ -4089,7 +4098,8 @@ class _CallsMixin:
                     return
                 else:
                     cand = '%s.%s(%s)' % (_recv_fold(recv_txt), mdot, self._render_args(rest))
-                    if len(cand) < 150:
+                    if len(cand) < 150 or (_long_instance
+                                          and recv_txt == args[0]):
                         short = cand
         if short is None and mi is not None and 0 <= mi < len(self.meta.methods):
             m2 = self.meta.methods[mi]
@@ -4134,7 +4144,8 @@ class _CallsMixin:
                     return
                 if _sg is not None:
                     cand = _sg[1]
-                if len(cand) < 150:
+                if len(cand) < 150 or (_long_instance
+                                      and recv_txt == args[0]):
                     short = cand
             elif _recv_shaped(a0) and not m2.name.startswith('.'):
                 # fix 40: a resolved instance method's arg0 IS the
@@ -4156,7 +4167,8 @@ class _CallsMixin:
                     return
                 if _sg is not None:
                     cand = _sg[1]
-                if len(cand) < 150:
+                if len(cand) < 150 or (_long_instance
+                                      and recv_txt == args[0]):
                     short = cand
         # --- runtime-helper arity: `name` from rt_names knows the true
         # signature; the register spray's leftover residues exceed it.
