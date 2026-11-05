@@ -16,7 +16,8 @@ is conservative everywhere it cannot see:
   target reads (recursively, memoized, depth-bounded); an unprovable
   target reads every register still holding its entry value;
 * an indirect call/jump reads every register still holding its entry
-  value;
+  value; an indirect call to an exact file-backed import with a proved
+  nullary ABI is the sole exception (indirect jumps still decline);
 * only a WRITE access defines a register (iced's READ_WRITE merges such
   as `movss xmm0,xmm1` count as reads), and an 8/16-bit GPR write never
   does;
@@ -31,6 +32,7 @@ The result is a tuple of four entries, each '' (dead), 'g' or 'x'
 decline). None = no proof; the caller keeps today's spelling.
 """
 from il2cpp.prelude import *  # noqa: F401,F403
+from il2cpp.binary import PE
 
 try:
     from iced_x86 import InstructionInfoFactory, OpAccess, RegisterExt, Code
@@ -126,6 +128,26 @@ def _regs(il, target, depth):
     return r
 
 
+# The shipped Baselib_Thread.h declares this exact function with (void).
+# The decorated PE import additionally carries that nullary ABI. Match both
+# module and exact symbol: a similar name, ordinal or unknown DLL is not proof.
+_NULLARY_IMPORTS = frozenset({
+    ('baselib.dll', '?Baselib_Thread_GetCurrentThreadId@il2cpp_baselib@@YA_JXZ'),
+})
+
+
+def _known_nullary_import(il, ins):
+    if (not isinstance(il.bin, PE) or not il.bin.is64
+            or ins.code != Code.CALL_RM64
+            or ins.op0_kind != OpKind.MEMORY
+            or ins.segment_prefix in (IReg.FS, IReg.GS)
+            or not ins.is_ip_rel_memory_operand):
+        return False
+    identity = il.bin.named_imports.get(ins.ip_rel_memory_address)
+    return (identity is not None
+            and (identity[0].lower(), identity[1]) in _NULLARY_IMPORTS)
+
+
 def _walk(il, target, depth):
     start, finish = il.function_extent(target)
     if start != target or finish is None or not 0 < finish - start <= MAX_EXTENT:
@@ -215,7 +237,10 @@ def _walk(il, target, depth):
                 ip, undef = nxt, frozenset(u)
                 continue
             if fc == FlowControl.INDIRECT_CALL:
-                live.update(u)
+                # A proved nullary IAT call reads no entry arguments, but
+                # still executes and clobbers the same volatile registers.
+                if not _known_nullary_import(il, ins):
+                    live.update(u)
                 u -= _VOL
                 ip, undef = nxt, frozenset(u)
                 continue

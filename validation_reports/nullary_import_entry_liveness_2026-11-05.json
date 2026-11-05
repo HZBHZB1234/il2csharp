@@ -1,0 +1,872 @@
+{
+  "kind": "Exact nullary PE import ABI in conservative native entry-argument analysis",
+  "date": "2026-11-05",
+  "parent_commit": "a6a3a2f2294cef81521a823ffefca484841e2365",
+  "scope": [
+    "il2cpp/binary.py",
+    "il2cpp/entrylive.py",
+    "tests/test_pe_import_liveness.py"
+  ],
+  "rule": "File-backed Win64 near RIP-relative IAT CALL to exact baselib.dll decorated GetCurrentThreadId reads no incoming argument lanes. Retain the call and ordinary volatile clobbers. FS/GS, far calls, tails, other DLLs/names, ordinals and malformed tables retain conservative behavior.",
+  "abi_evidence": {
+    "header": "Editor/Data/il2cpp/external/baselib/Include/C/Baselib_Thread.h",
+    "header_sha256": "81c0b7361fc1878fb17cde164121ab12a77ce0ffe0547b01ce24123607f34ccd",
+    "declaration_line": 27,
+    "symbol": "?Baselib_Thread_GetCurrentThreadId@il2cpp_baselib@@YA_JXZ",
+    "module": "baselib.dll",
+    "parameters": "void"
+  },
+  "parser_limits": {
+    "descriptors": 4096,
+    "total_thunks": 65536,
+    "dll_name_bytes": 256,
+    "symbol_name_bytes": 1024,
+    "malformed_or_ambiguous_table": "all identities declined",
+    "file_backed_only": true,
+    "loads_or_executes_external_dlls": false
+  },
+  "unchanged": [
+    "unknown native helper names and execution effects",
+    "volatile clobbers",
+    "return type inference",
+    "indirect tail decline",
+    "unproved import identities remain conservative"
+  ],
+  "new_tests": 55,
+  "suites": [
+    {
+      "name": "focused",
+      "returncode": 0,
+      "totals": {
+        "tests": 194,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 9.859
+    },
+    {
+      "name": "portable",
+      "returncode": 0,
+      "totals": {
+        "tests": 5483,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 35.969
+    },
+    {
+      "name": "full",
+      "returncode": 1,
+      "totals": {
+        "tests": 5861,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 259
+      },
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "seconds": 2484.469
+    },
+    {
+      "name": "parallel",
+      "returncode": 0,
+      "totals": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 565.188
+    }
+  ],
+  "clean_parent_proof": {
+    "parent_commit": "a6a3a2f2294cef81521a823ffefca484841e2365",
+    "scope": [
+      "il2cpp/binary.py",
+      "il2cpp/entrylive.py",
+      "tests/test_pe_import_liveness.py"
+    ],
+    "candidate_hashes": {
+      "il2cpp/binary.py": "b7edd4cae02d0ea65b55c60a86adc9bbfb82ec1dd31c7e09f93b968c5384f312",
+      "il2cpp/entrylive.py": "f10d7685ad9ded7c28fbc6f08ae4a101617fc8bcb975ec8967578eb954c6b912",
+      "tests/test_pe_import_liveness.py": "b5a8a014daf53df58829150c0695915f95db1d8fc4ad98c5fa010790f2dada19"
+    },
+    "exact_restoration": true,
+    "source_tests_tools_restoration": true,
+    "untracked_reports_preserved": true,
+    "no_other_paths_stashed": true,
+    "fresh_parent_tree_equals_inprocess_baseline_cs": true,
+    "inprocess_baseline_equals_previous_committed_candidate_cs": true,
+    "reports": [
+      {
+        "name": "imports71_candidate_repro",
+        "returncode": 0
+      },
+      {
+        "name": "imports71_clean_parent_repro",
+        "returncode": 1
+      },
+      {
+        "name": "imports71_clean_parent_legacy",
+        "returncode": 0,
+        "tests": 139
+      },
+      {
+        "name": "imports71_clean_parent_build",
+        "returncode": 0
+      },
+      {
+        "name": "imports71_clean_parent_gate",
+        "returncode": 0
+      },
+      {
+        "name": "imports71_restored_repro",
+        "returncode": 0
+      },
+      {
+        "name": "imports71_restored_focused",
+        "returncode": 0,
+        "tests": 194
+      },
+      {
+        "name": "imports71_restored_portable",
+        "returncode": 0,
+        "tests": 5483
+      }
+    ]
+  },
+  "selected_sweeps": [
+    {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_methods": 196,
+      "parent_crashes": 0,
+      "candidate_crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "parent_equals_previous_committed_candidate": true,
+      "named_imports": 171,
+      "known_nullary_import_slots": 1,
+      "parent_selected_bodies_sha256": "1375b08e6a5042f140ed4d99caf4f859a8cd06a3ea52d03d239a54f50ac060ff",
+      "candidate_selected_bodies_sha256": "ed47f97e2a1259352d954c139ff690509f98cf91edd712c07e55ce66d3fe4651"
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_methods": 0,
+      "parent_crashes": 0,
+      "candidate_crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "parent_equals_previous_committed_candidate": true,
+      "named_imports": 213,
+      "known_nullary_import_slots": 1,
+      "parent_selected_bodies_sha256": "fbec5ff31e7d4cc1f3494d524f1d97a17ea0325404a99ce8db6e6fd8f321146b",
+      "candidate_selected_bodies_sha256": "fbec5ff31e7d4cc1f3494d524f1d97a17ea0325404a99ce8db6e6fd8f321146b"
+    },
+    {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_methods": 0,
+      "parent_crashes": 0,
+      "candidate_crashes": 0,
+      "repeated_changed_lifts_identical": true,
+      "parent_equals_previous_committed_candidate": true,
+      "named_imports": 214,
+      "known_nullary_import_slots": 1,
+      "parent_selected_bodies_sha256": "257394b1e7cb6a46f98499ef09b0412cf621e777338011b5704d143845179ee1",
+      "candidate_selected_bodies_sha256": "257394b1e7cb6a46f98499ef09b0412cf621e777338011b5704d143845179ee1"
+    }
+  ],
+  "argument_proof_audits": [
+    {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_methods": 196,
+      "all_candidate_bodies_equal_uninstrumented": true,
+      "all_changed_methods_have_argument_proof": true,
+      "unique_changed_method_target_pairs": 331,
+      "targets": 2,
+      "dry_real_proof_events": 1629,
+      "parent_candidate_signature_pairs": {
+        "(('gx', 'x', 'x', 'gx'), ('g', '', '', ''))": 533,
+        "(('gx', 'gx', 'gx', 'gx'), ('g', '', '', ''))": 1096
+      },
+      "registered_target_counts": {
+        "false": 2
+      },
+      "source_freeze_verified": true
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_methods": 0,
+      "all_candidate_bodies_equal_uninstrumented": true,
+      "all_changed_methods_have_argument_proof": true,
+      "unique_changed_method_target_pairs": 2,
+      "targets": 2,
+      "dry_real_proof_events": 5,
+      "parent_candidate_signature_pairs": {
+        "(('gx', 'gx', 'gx', 'gx'), ('g', '', '', ''))": 5
+      },
+      "registered_target_counts": {
+        "false": 2
+      },
+      "source_freeze_verified": true
+    },
+    {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_methods": 0,
+      "all_candidate_bodies_equal_uninstrumented": true,
+      "all_changed_methods_have_argument_proof": true,
+      "unique_changed_method_target_pairs": 24,
+      "targets": 1,
+      "dry_real_proof_events": 27,
+      "parent_candidate_signature_pairs": {
+        "(('gx', 'gx', 'gx', 'gx'), ('g', '', '', ''))": 27
+      },
+      "registered_target_counts": {
+        "false": 1
+      },
+      "source_freeze_verified": true
+    }
+  ],
+  "raw_call_multiplicities": {
+    "reports": [
+      {
+        "fixture": "unitask",
+        "changed_methods": 196,
+        "raw_call_target_multisets_identical": true,
+        "raw_calls_in_changed_methods": 1055
+      },
+      {
+        "fixture": "survivors-roguelike-kit",
+        "changed_methods": 0,
+        "raw_call_target_multisets_identical": true,
+        "raw_calls_in_changed_methods": 0
+      },
+      {
+        "fixture": "limbus",
+        "changed_methods": 0,
+        "raw_call_target_multisets_identical": true,
+        "raw_calls_in_changed_methods": 0
+      }
+    ],
+    "interpretation": "Textual raw-call multiplicities retained; not proof of all runtime effects or full semantic equivalence."
+  },
+  "corruption_probe": {
+    "seed": 71005,
+    "cases": 20000,
+    "exceptions": 0,
+    "nonempty_tables": 3672,
+    "source_freeze_verified": true,
+    "seconds": 2.047,
+    "interpretation": "Bounded import-data/directory corruption probe; not complete PE parser security proof or speedup measurement."
+  },
+  "emitted_trees": [
+    {
+      "label": "game_out71_import_baseline",
+      "cs_files": 474,
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "emit_failed": 0,
+      "explicit_unrecovered_throws": 3791,
+      "linq_explicit_unrecovered_throws": 2106,
+      "brace_unbalanced": 0,
+      "tree_sitter_bad_files": 0,
+      "source_freeze_verified": true
+    },
+    {
+      "label": "game_out71_import_candidate",
+      "cs_files": 474,
+      "lifted": 2227,
+      "failed": 0,
+      "fallbacks": 0,
+      "emit_failed": 0,
+      "explicit_unrecovered_throws": 3791,
+      "linq_explicit_unrecovered_throws": 2106,
+      "brace_unbalanced": 0,
+      "tree_sitter_bad_files": 0,
+      "source_freeze_verified": true
+    }
+  ],
+  "broad_compile_pair": [
+    {
+      "files": 16,
+      "syntax": 2,
+      "binding": 1915,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "Assembly-CSharp",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0246": 40,
+        "CS1061": 168,
+        "CS0029": 187,
+        "CS8917": 85,
+        "CS0103": 465,
+        "CS0208": 145,
+        "CS0266": 46,
+        "CS0122": 120,
+        "CS7036": 11,
+        "CS1503": 128,
+        "CS0019": 191,
+        "CS0030": 55,
+        "CS0119": 94,
+        "CS0117": 48,
+        "CS0149": 17,
+        "CS1729": 2,
+        "CS0165": 68,
+        "CS0159": 35,
+        "CS0305": 1,
+        "CS0428": 1,
+        "CS1620": 9,
+        "CS0121": 1
+      }
+    },
+    {
+      "files": 4,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "TempAsm",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 2,
+        "CS0103": 2,
+        "CS0266": 2
+      }
+    },
+    {
+      "files": 302,
+      "syntax": 11,
+      "binding": 4858,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 778,
+        "CS0103": 1019,
+        "CS0266": 113,
+        "CS0122": 614,
+        "CS0161": 16,
+        "CS1503": 126,
+        "CS1061": 538,
+        "CS0246": 19,
+        "CS0029": 257,
+        "CS0030": 82,
+        "CS0117": 24,
+        "CS0177": 14,
+        "CS0019": 376,
+        "CS0165": 190,
+        "CS0149": 208,
+        "CS0571": 31,
+        "CS7036": 36,
+        "CS8917": 75,
+        "CS1729": 10,
+        "CS0159": 33,
+        "CS0119": 84,
+        "CS0191": 37,
+        "CS0212": 4,
+        "CS0214": 15,
+        "CS0173": 1,
+        "CS0311": 154,
+        "CS0163": 2,
+        "CS8070": 1,
+        "CS1501": 7,
+        "CS1929": 1,
+        "CS0023": 4
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.Addressables",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.DOTween",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4105,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.Linq",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 993,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 609,
+        "CS0122": 203,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0117": 176,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 40,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      }
+    },
+    {
+      "files": 5,
+      "syntax": 0,
+      "binding": 204,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "assembly": "UniTask.TextMeshPro",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0214": 2,
+        "CS1503": 15,
+        "CS0208": 3,
+        "CS0103": 40,
+        "CS0266": 6,
+        "CS0246": 13,
+        "CS0029": 9,
+        "CS1061": 60,
+        "CS0019": 17,
+        "CS0149": 5,
+        "CS8917": 2,
+        "CS0030": 2,
+        "CS0122": 3,
+        "CS0119": 2,
+        "CS0156": 1,
+        "CS0159": 2,
+        "CS0165": 21,
+        "CS0117": 1
+      }
+    },
+    {
+      "files": 16,
+      "syntax": 2,
+      "binding": 1787,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "Assembly-CSharp",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0246": 40,
+        "CS1061": 168,
+        "CS0029": 187,
+        "CS0208": 145,
+        "CS0103": 340,
+        "CS0266": 46,
+        "CS8917": 84,
+        "CS0122": 120,
+        "CS0149": 17,
+        "CS0019": 191,
+        "CS1729": 2,
+        "CS1503": 128,
+        "CS0165": 66,
+        "CS7036": 11,
+        "CS0030": 55,
+        "CS0119": 94,
+        "CS0117": 48,
+        "CS0305": 1,
+        "CS0159": 35,
+        "CS1620": 9,
+        "CS0428": 1,
+        "CS0121": 1
+      }
+    },
+    {
+      "files": 4,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "TempAsm",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 2,
+        "CS0103": 2,
+        "CS0266": 2
+      }
+    },
+    {
+      "files": 302,
+      "syntax": 11,
+      "binding": 4726,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask",
+      "cli_returncode": 1,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 778,
+        "CS0122": 614,
+        "CS0103": 887,
+        "CS1503": 126,
+        "CS0266": 113,
+        "CS1061": 538,
+        "CS0029": 257,
+        "CS0161": 16,
+        "CS0246": 19,
+        "CS0149": 208,
+        "CS0019": 376,
+        "CS0117": 24,
+        "CS0571": 31,
+        "CS7036": 36,
+        "CS0030": 82,
+        "CS0165": 190,
+        "CS0173": 1,
+        "CS0177": 14,
+        "CS8917": 75,
+        "CS0119": 84,
+        "CS0191": 37,
+        "CS0159": 33,
+        "CS0214": 15,
+        "CS0212": 4,
+        "CS0163": 2,
+        "CS8070": 1,
+        "CS1729": 10,
+        "CS0311": 154,
+        "CS1501": 7,
+        "CS1929": 1,
+        "CS0023": 4
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.Addressables",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 2,
+      "syntax": 0,
+      "binding": 5,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.DOTween",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 2
+      }
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 3697,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.Linq",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 587,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 609,
+        "CS0117": 176,
+        "CS0122": 203,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0149": 97,
+        "CS0030": 68,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0159": 154,
+        "CS0165": 291,
+        "CS1501": 40,
+        "CS0571": 22,
+        "CS0156": 38
+      }
+    },
+    {
+      "files": 5,
+      "syntax": 0,
+      "binding": 199,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "candidate",
+      "assembly": "UniTask.TextMeshPro",
+      "cli_returncode": 0,
+      "roslyn_returncodes": [
+        1
+      ],
+      "codes": {
+        "CS0208": 3,
+        "CS0103": 35,
+        "CS0266": 6,
+        "CS0214": 2,
+        "CS1503": 15,
+        "CS0246": 13,
+        "CS0029": 9,
+        "CS1061": 60,
+        "CS0019": 17,
+        "CS0149": 5,
+        "CS8917": 2,
+        "CS0030": 2,
+        "CS0122": 3,
+        "CS0119": 2,
+        "CS0156": 1,
+        "CS0159": 2,
+        "CS0165": 21,
+        "CS0117": 1
+      }
+    }
+  ],
+  "broad_total_errors": {
+    "baseline": 11111,
+    "candidate": 10438
+  },
+  "diagnostic_delta_review": {
+    "reports": [
+      {
+        "assembly": "Assembly-CSharp",
+        "cs_files": 16,
+        "changed_cs_files": 5,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 46,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 128,
+        "added_code_counts": {},
+        "removed_code_counts": {
+          "CS0103": 125,
+          "CS8917": 1,
+          "CS0165": 2
+        },
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 2
+      },
+      {
+        "assembly": "TempAsm",
+        "cs_files": 4,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 6,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask",
+        "cs_files": 302,
+        "changed_cs_files": 8,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 1812,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 132,
+        "added_code_counts": {},
+        "removed_code_counts": {
+          "CS0103": 132
+        },
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 11
+      },
+      {
+        "assembly": "UniTask.Addressables",
+        "cs_files": 2,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 5,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.DOTween",
+        "cs_files": 2,
+        "changed_cs_files": 0,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 5,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 0,
+        "added_code_counts": {},
+        "removed_code_counts": {},
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.Linq",
+        "cs_files": 143,
+        "changed_cs_files": 5,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 111,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 408,
+        "added_code_counts": {},
+        "removed_code_counts": {
+          "CS0103": 406,
+          "CS0165": 2
+        },
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      },
+      {
+        "assembly": "UniTask.TextMeshPro",
+        "cs_files": 5,
+        "changed_cs_files": 1,
+        "same_cs_file_set": true,
+        "unaffected_location_message_diagnostics_identical": true,
+        "unaffected_diagnostics": 6,
+        "normalized_message_added": 0,
+        "normalized_message_removed": 5,
+        "added_code_counts": {},
+        "removed_code_counts": {
+          "CS0103": 5
+        },
+        "gate_syntax_location_message_set_identical": true,
+        "gate_syntax_diagnostic_count": 0
+      }
+    ],
+    "normalization": "per-file/code/message Counter, temporary numeric names normalized; locations ignored only in changed C# files",
+    "all_unchanged_file_diagnostics_identical": true
+  },
+  "candidate_source_test_hashes": {
+    "il2cpp/binary.py": "b7edd4cae02d0ea65b55c60a86adc9bbfb82ec1dd31c7e09f93b968c5384f312",
+    "il2cpp/entrylive.py": "f10d7685ad9ded7c28fbc6f08ae4a101617fc8bcb975ec8967578eb954c6b912",
+    "tests/test_pe_import_liveness.py": "b5a8a014daf53df58829150c0695915f95db1d8fc4ad98c5fa010790f2dada19"
+  },
+  "harness_corrections": [
+    "Initial integration test used an out-of-range rel32; corrected caller IP to the same image before final runs.",
+    "Review found FS/GS addressing and far-call ambiguity; added exact near-call and segment guards plus three regressions. Stopped old consumers, separated partial evidence/trees and reran all validation on final frozen source.",
+    "Rebuild refused existing tree as designed; moved the two previous trial outputs to explicitly checked sibling local paths, then fresh-built the final pair."
+  ],
+  "interpretation": [
+    "Only an exact nullary import ABI is recovered, not the identity or full semantics of the surrounding generic-context helper.",
+    "Seven assembly gates remove 673 normalized diagnostics without additions in this measured pair; this is not global zero-regression proof.",
+    "All Roslyn runs still return 1; body sentinel does not imply exhaustive body coverage.",
+    "Linq still contains 2106 explicit unrecovered bodies. No re-pin, promotion, semantic completeness or speedup claim.",
+    "Last accepted/promoted output remains game_out56. Goal active and unachieved."
+  ],
+  "next": "Prove runtime generic-context helper effects structurally, then recover typed state-machine/builder aggregate homes; do not infer managed call identities from metadata-pointer arguments alone."
+}

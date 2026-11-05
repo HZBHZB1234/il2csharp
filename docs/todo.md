@@ -4,6 +4,54 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Exact nullary PE imports stop residual helper arguments (2026-11-05)
+
+**Bounded ABI proof, not helper naming.** The PE frontend records file-backed
+Win64 IAT identities. Entry-argument analysis recognizes only the exact
+`baselib.dll` decorated `Baselib_Thread_GetCurrentThreadId` import, whose real
+Editor header declares `(void)`. A proved near RIP-relative import call reads
+no incoming argument lanes but still executes and clobbers the same volatile
+registers. Unknown helpers keep their raw names/effects. Other DLLs/names,
+ordinals, non-PE inputs, FS/GS accesses, far calls and indirect tails remain
+conservative; malformed/truncated/ambiguous import tables expose no identities.
+No DLL loading, API stubs or new return inference.
+
+**55 new authored portable tests; 194 focused and 5,483 portable pass.** Frozen
+full excluding parallel: **5,598 passed / 259 skipped / one non-strict XPASS /
+the identical fixed three failures**; parallel **two pass**. Scoped clean-parent
+proof reproduces the all-lanes-live defect, passes 139 legacy focused tests,
+fresh-builds/gates the exact prior Linq baseline, and restores exact source bytes
+and all untouched untracked reports. Restored repro, 194 focused and 5,483
+portable pass again. Source/tests/tools stay frozen throughout final consumers.
+The earlier validation attempt was discarded after review added FS/GS and
+far-call negative guards. A 20,000-case bounded import-corruption probe has zero
+exceptions; this is not a complete PE security proof or speedup measurement.
+
+**Paired re-lifts:** UniTask 2,242 methods / **196 changed**,
+Survivors 1,936 / **0 changed**, selected Limbus
+923 / **0 changed**; zero crashes, repeated changed lifts
+identical. Instrumented re-lifts reproduce every candidate body and attribute
+every changed method to the argument proof. Raw-call target multiplicities
+remain identical in each changed method; that is not full effect equivalence.
+
+**Fresh visibility-preserving real-Editor pair:** seven assemblies, 474 C# files /
+2,227 lifted bodies each, **11,111 -> 10,438 compiler errors (-673)**; 19 changed
+C# files, same file set, zero emit/fallback/brace/tree-sitter failures. Linq
+**4,105 -> 3,697**. Message-aware diagnostic Counters remove 668 CS0103,
+four CS0165 and one CS8917, **no additions** in this pair. Unchanged-file
+diagnostics and all 13 pre-existing syntax-band location/message sets are
+identical. Explicit `unityjit-win32`, real Editor assemblies with original
+identities, 283 framework / 430 total references, observed body sentinel; no
+publicizing. **All Roslyn runs still return 1**; Linq still has **2,106 explicit
+unrecovered bodies**. No semantic-completeness or speedup claim; no re-pin or
+promotion. Compileall/import, LF/no-BOM and diff checks pass.
+
+**Next:** prove the generic-context helper structurally, then typed
+state-machine/builder stack aggregates. Evidence:
+`validation_reports/nullary_import_entry_liveness_2026-11-05.json`.
+Last accepted/promoted output remains `game_out56`; goal **active, unachieved**.
+
+
 ### Reject impossible RCX instance identities from MethodRef arguments (2026-11-05)
 
 **Correctness fix, not positive helper recovery.** The argument-derived generic

@@ -95,6 +95,84 @@ class PE(Binary):
             chars = u32(d, b + 36)
             self.sections.append(Section(name, self.image_base + va, vsz, ro, rsz, chars))
         self._parse_exports(pe + 24, optsz)
+        self.named_imports = self._parse_named_imports(pe + 24, optsz)
+
+    def _parse_named_imports(self, opt_off, optsz):
+        """File-backed Win64 IAT slots -> exact (DLL, symbol) identities.
+
+        No loading, address dereferencing, delay-import inference or ordinal
+        guessing. A truncated/ambiguous table contributes no identities, so
+        consumers retain their conservative unknown-import behavior.
+        """
+        if not self.is64 or optsz < 128:
+            return {}
+
+        def raw(va, count):
+            for sec in self.sections:
+                rel = va - sec.addr
+                if (0 <= rel and rel + count <= sec.rawsize
+                        and sec.offset + rel + count <= len(self.d)):
+                    return self.d[sec.offset + rel:sec.offset + rel + count]
+            raise ValueError('import outside file-backed section')
+
+        def name(va, limit):
+            for sec in self.sections:
+                rel = va - sec.addr
+                if 0 <= rel < sec.rawsize:
+                    count = min(limit, sec.rawsize - rel)
+                    data = raw(va, count)
+                    end = data.find(b'\0')
+                    if end <= 0:
+                        raise ValueError('unterminated/empty import name')
+                    return data[:end].decode('ascii')
+            raise ValueError('unmapped import name')
+
+        try:
+            if u32(self.d, opt_off + 108) < 2:
+                return {}
+            rva, size = struct.unpack_from('<II', self.d, opt_off + 120)
+            if not rva and not size:
+                return {}
+            if not rva or not 40 <= size <= 4096 * 20:
+                return {}
+            base = self.image_base
+            result = {}
+            slots = set()
+            budget = 65536
+            for off in range(0, size - 19, 20):
+                lookup, stamp, chain, dll_rva, iat = struct.unpack(
+                    '<IIIII', raw(base + rva + off, 20))
+                if not any((lookup, stamp, chain, dll_rva, iat)):
+                    return result
+                if not dll_rva or not iat or (not lookup and stamp):
+                    return {}  # no names in a bound IAT without a lookup table
+                module = name(base + dll_rva, 256)
+                for index in range(budget):
+                    thunk = struct.unpack('<Q', raw(
+                        base + (lookup or iat) + index * 8, 8))[0]
+                    budget -= 1
+                    if not thunk:
+                        break
+                    slot = base + iat + index * 8
+                    raw(slot, 8)
+                    if slot in slots:
+                        return {}
+                    slots.add(slot)
+                    if self.is_exec_va(slot) or self.is_exec_va(slot + 7):
+                        return {}
+                    if thunk & (1 << 63):
+                        if thunk & ~((1 << 63) | 0xffff):
+                            return {}
+                        continue  # named signatures never apply to ordinals
+                    if thunk > 0xffffffff:
+                        return {}
+                    raw(base + thunk, 2)  # IMAGE_IMPORT_BY_NAME hint
+                    result[slot] = (module, name(base + thunk + 2, 1024))
+                else:
+                    return {}  # unterminated table / exhausted total budget
+            return {}  # missing descriptor terminator
+        except (ValueError, struct.error, IndexError):
+            return {}
 
     def _parse_exports(self, opt_off, optsz):
         d = self.d
