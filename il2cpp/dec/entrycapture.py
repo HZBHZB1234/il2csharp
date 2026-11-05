@@ -94,7 +94,7 @@ def _restore_state_aliases(mutable, memo):
         object.__setattr__(clone, '__dict__', copied_state)
 
 
-def _mutable_graph(roots):
+def _mutable_graph(roots, immutable_memo=None):
     """Admit only the model's ordinary data graph, not callbacks/resources.
 
     In particular, deepcopy shares functions/closures silently. They are not
@@ -119,6 +119,14 @@ def _mutable_graph(roots):
         if key in seen:
             continue
         seen.add(key)
+        if ty is tuple and all(type(value) in atomic for value in obj):
+            # deepcopy already shares these exact immutable tuples, but still
+            # revisits every element at every occurrence. Admit them once and
+            # seed that same result; nested/mutable tuples and subclasses keep
+            # the full graph path. Never seed an unproved mutable model node.
+            if immutable_memo is not None:
+                immutable_memo[key] = obj
+            continue
         if ty in containers:
             if ty not in (tuple, frozenset):
                 mutable[key] = obj
@@ -170,8 +178,8 @@ def _mutable_graph(roots):
 
 def isolated_clone(decompiler, method, owner):
     """Copy the complete reachable model, proving no mutable model is shared."""
-    mutable = _mutable_graph((decompiler, method, owner))
     memo = {id(bisect): bisect}
+    mutable = _mutable_graph((decompiler, method, owner), immutable_memo=memo)
     _seed_metadata_memo(mutable, memo)
     arena, copied_method, copied_owner = copy.deepcopy((decompiler, method, owner), memo)
     if any(key not in memo or memo[key] is obj for key, obj in mutable.items()):
