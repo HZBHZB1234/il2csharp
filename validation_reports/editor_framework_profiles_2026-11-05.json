@@ -1,0 +1,442 @@
+{
+  "kind": "explicit real Unity Editor framework profile validation",
+  "date": "2026-11-05",
+  "parent_commit": "d020afa5fed56d6208ecbec9a86d5faa6991641a",
+  "scope": "Gate reference configuration only; no lifter, emitter, recovery or generated body changes.",
+  "default": "Historical netstandard2.1 shim resolution unchanged; runtime profiles are explicit opt-ins.",
+  "profiles": [
+    "netstandard2.1",
+    "unityjit-win32",
+    "unityaot-win32",
+    "net_4_x-win32"
+  ],
+  "runtime_guards": [
+    "one fixed known profile under the same real Editor root",
+    "only top-level DLLs and that profile Facades",
+    "require mscorlib.dll, System.dll, System.Core.dll and Facades/netstandard.dll",
+    "missing or unsupported explicit profiles fail closed with usage error",
+    "no silent shim fallback or synthetic managed API stubs",
+    "explicit profile conflicts with --no-framework",
+    "existing reference merge, override, exclusion, assembly identity and body sentinel preserved"
+  ],
+  "authored_new_tests": 39,
+  "suites": [
+    {
+      "name": "focused",
+      "returncode": 0,
+      "totals": {
+        "tests": 96,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 7.172
+    },
+    {
+      "name": "portable",
+      "returncode": 0,
+      "totals": {
+        "tests": 5410,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 47.875
+    },
+    {
+      "name": "full",
+      "returncode": 1,
+      "totals": {
+        "tests": 5788,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 259
+      },
+      "failure_set": [
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]",
+        "tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]",
+        "tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room"
+      ],
+      "seconds": 1521.953
+    },
+    {
+      "name": "parallel",
+      "returncode": 0,
+      "totals": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failure_set": [],
+      "seconds": 608.906
+    }
+  ],
+  "focused_and_portable_restored": [
+    {
+      "name": "framework69_candidate_repro",
+      "returncode": 0,
+      "tests": 1,
+      "failure_set": []
+    },
+    {
+      "name": "framework69_clean_parent_repro",
+      "returncode": 1,
+      "tests": 1,
+      "failure_set": [
+        "::test_runtime_framework_selection_reaches_facades"
+      ]
+    },
+    {
+      "name": "framework69_clean_parent_legacy",
+      "returncode": 0,
+      "tests": 57,
+      "failure_set": []
+    },
+    {
+      "name": "framework69_restored_repro",
+      "returncode": 0,
+      "tests": 1,
+      "failure_set": []
+    },
+    {
+      "name": "framework69_restored_focused",
+      "returncode": 0,
+      "tests": 96,
+      "failure_set": []
+    },
+    {
+      "name": "framework69_restored_portable",
+      "returncode": 0,
+      "tests": 5410,
+      "failure_set": []
+    }
+  ],
+  "scoped_clean_parent_proof": {
+    "head": "d020afa5fed56d6208ecbec9a86d5faa6991641a",
+    "scope": [
+      "tools/compile_gate.py",
+      "tools/gate.py",
+      "tests/test_compile_framework_profile.py"
+    ],
+    "candidate_hashes": {
+      "tools/compile_gate.py": "5bb015130e858631f6075d7610b8749d75dc999d5ae3cb04f686de7aeffd5d72",
+      "tools/gate.py": "22733c5126d3488ea240758340127954237d1fdecf567dd730142cd827c6f009",
+      "tests/test_compile_framework_profile.py": "f90b9bf95aa9c8d9a85e2b924c31fae49a4ecd136e5e285d46bed9825ab1e85c"
+    },
+    "exact_restoration": true,
+    "source_tests_tools_restoration": true,
+    "no_other_paths_stashed": true
+  },
+  "gate_profiles": [
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 270,
+      "framework_profile": "netstandard2.1",
+      "framework_refs": 121,
+      "body_probe_observed": false,
+      "side": "baseline",
+      "requested_profile": "historical-default",
+      "codes": {
+        "CS7069": 5,
+        "CS0738": 1
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 270,
+      "framework_profile": "netstandard2.1",
+      "framework_refs": 121,
+      "body_probe_observed": false,
+      "side": "baseline",
+      "requested_profile": "netstandard2.1",
+      "codes": {
+        "CS7069": 5,
+        "CS0738": 1
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "requested_profile": "unityjit-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 689,
+        "CS0122": 243,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0117": 176,
+        "CS0149": 97,
+        "CS0030": 68,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0159": 154,
+        "CS1501": 80,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 361,
+      "framework_profile": "unityaot-win32",
+      "framework_refs": 214,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "requested_profile": "unityaot-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 689,
+        "CS0117": 176,
+        "CS0122": 243,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 80,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 427,
+      "framework_profile": "net_4_x-win32",
+      "framework_refs": 280,
+      "body_probe_observed": true,
+      "side": "baseline",
+      "requested_profile": "net_4_x-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS1061": 689,
+        "CS8917": 200,
+        "CS0122": 243,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0117": 176,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 80,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 293,
+        "CS0571": 22,
+        "CS0156": 38
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 270,
+      "framework_profile": "netstandard2.1",
+      "framework_refs": 121,
+      "body_probe_observed": false,
+      "side": "default",
+      "requested_profile": "historical-default",
+      "codes": {
+        "CS7069": 5,
+        "CS0738": 1
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 6,
+      "refs": 270,
+      "framework_profile": "netstandard2.1",
+      "framework_refs": 121,
+      "body_probe_observed": false,
+      "side": "default",
+      "requested_profile": "netstandard2.1",
+      "codes": {
+        "CS7069": 5,
+        "CS0738": 1
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 430,
+      "framework_profile": "unityjit-win32",
+      "framework_refs": 283,
+      "body_probe_observed": true,
+      "side": "default",
+      "requested_profile": "unityjit-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 689,
+        "CS0122": 243,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0117": 176,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 80,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 361,
+      "framework_profile": "unityaot-win32",
+      "framework_refs": 214,
+      "body_probe_observed": true,
+      "side": "default",
+      "requested_profile": "unityaot-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 689,
+        "CS0117": 176,
+        "CS0122": 243,
+        "CS0029": 419,
+        "CS0019": 293,
+        "CS0159": 154,
+        "CS0030": 68,
+        "CS1501": 80,
+        "CS0149": 97,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    },
+    {
+      "files": 143,
+      "syntax": 0,
+      "binding": 4185,
+      "refs": 427,
+      "framework_profile": "net_4_x-win32",
+      "framework_refs": 280,
+      "body_probe_observed": true,
+      "side": "default",
+      "requested_profile": "net_4_x-win32",
+      "codes": {
+        "CS7036": 27,
+        "CS0029": 419,
+        "CS0208": 183,
+        "CS0103": 913,
+        "CS0266": 132,
+        "CS8917": 200,
+        "CS1061": 689,
+        "CS0117": 176,
+        "CS0122": 243,
+        "CS0019": 293,
+        "CS0159": 154,
+        "CS0149": 97,
+        "CS0030": 68,
+        "CS0023": 40,
+        "CS1503": 118,
+        "CS1501": 80,
+        "CS0165": 293,
+        "CS0156": 38,
+        "CS0571": 22
+      },
+      "syntax_gate_cli_returncode": 0,
+      "roslyn_returncode": 1
+    }
+  ],
+  "read_only_existing_emitted_pair": {
+    "fixture": "unitask",
+    "assembly": "UniTask.Linq",
+    "baseline_label": "game_out68_linq_visibility_baseline",
+    "default_label": "game_out68_linq_visibility_probe",
+    "files": 143,
+    "lifted_bodies": 214,
+    "explicit_not_recovered_bodies": 2106,
+    "metadata_visibility_preserved": true,
+    "paired_cs_byte_identical": true,
+    "no_tree_rebuild_or_promotion": true
+  },
+  "standalone_cli_reproduces_4185": true,
+  "interpretation": [
+    "All actual Roslyn compilations still fail (returncode 1). CLI returncode 0 gates syntax only.",
+    "The 4185 runtime-profile errors are previously hidden body/binding errors, not activation regressions.",
+    "A positive body sentinel proves only some body binding, never complete coverage.",
+    "Framework refs are selected coherently but do not establish whole-game API compatibility or semantics.",
+    "The old engine resolver is unchanged and includes its original Editor DLL population; this is not a byte-identical reference set to the earlier temporary engine-prefix-filtered experiment.",
+    "No re-pin, output promotion, semantic equivalence or performance improvement is claimed."
+  ],
+  "harness_correction": "First parent-proof run restored exact source successfully but expected a nonempty JUnit classname for an external temporary test; pytest emitted an empty classname. Corrected the harness expectation and reran the full scoped proof. No source change or test-behavior regression.",
+  "candidate_source_test_hashes": {
+    "tools/compile_gate.py": "5bb015130e858631f6075d7610b8749d75dc999d5ae3cb04f686de7aeffd5d72",
+    "tools/gate.py": "22733c5126d3488ea240758340127954237d1fdecf567dd730142cd827c6f009",
+    "tests/test_compile_framework_profile.py": "f90b9bf95aa9c8d9a85e2b924c31fae49a4ecd136e5e285d46bed9825ab1e85c"
+  },
+  "checks": {
+    "source_tests_tools_frozen_through_consumers": true,
+    "exact_restoration": true,
+    "compileall_import": true,
+    "lf_no_bom": true,
+    "git_diff_check": true
+  },
+  "next": "Investigate native-proved async builder/MethodInfo and stack aggregate recovery using actual body diagnostics; do not replace calls by text or adopt an unproved broad signature-slot rule."
+}

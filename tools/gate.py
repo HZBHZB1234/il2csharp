@@ -124,7 +124,20 @@ def gate_compile(args):
     engine = unity_refs(args.unity)
     if args.unity and not engine:
         raise FixtureError('no engine assemblies under %s' % args.unity)
-    framework = [] if args.no_framework else unity_framework_refs(args.unity)
+    if args.no_framework and args.framework_profile:
+        raise FixtureError('--framework-profile conflicts with --no-framework')
+    try:
+        if args.no_framework:
+            framework = []
+        elif args.framework_profile:
+            framework = unity_framework_refs(args.unity, profile=args.framework_profile)
+        else:
+            framework = unity_framework_refs(args.unity)
+    except ValueError as error:
+        raise FixtureError(str(error)) from error
+    if args.framework_profile and not framework:
+        raise FixtureError('no Editor framework assemblies for explicit profile %s'
+                           % args.framework_profile)
     original = []
     excludes = list(args.exclude or [])
     if args.managed_refs:
@@ -145,7 +158,10 @@ def gate_compile(args):
     rep = run_gate(tree, timeout=args.timeout, refs=refs, body_probe=args.body_probe,
                    assembly_name=assembly)
     payload = {'kind': 'roslyn compile gate', 'tree': str(Path(tree).resolve()),
-               'assembly': assembly or only or Path(tree).name, **rep}
+               'assembly': assembly or only or Path(tree).name,
+               'framework_profile': ('none' if args.no_framework else
+                                     args.framework_profile or 'netstandard2.1'),
+               'framework_refs': len(framework), **rep}
     path = Path(_report_path(args, 'compile'))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
@@ -212,7 +228,8 @@ def _normalize_argv(argv):
     ``brace --fixture X`` and ``--fixture X brace`` -- then work.
     """
     shared_flags = {'--fixture', '--label', '--tree', '--only',
-                    '--timeout', '--report', '--unity', '--refs-dir', '--exclude', '--assembly'}
+                    '--timeout', '--report', '--unity', '--refs-dir', '--exclude', '--assembly',
+                    '--framework-profile'}
     switches = {'--managed-refs', '--body-probe', '--no-framework'}
     hoisted, rest = [], []
     i = 0
@@ -234,6 +251,7 @@ def _normalize_argv(argv):
 
 
 def main(argv=None):
+    from compile_gate import FRAMEWORK_PROFILES
     argv = _normalize_argv(list(sys.argv[1:] if argv is None else argv))
     ap = argparse.ArgumentParser(
         prog='gate', description=__doc__,
@@ -247,6 +265,9 @@ def main(argv=None):
     ap.add_argument('--timeout', type=int, default=900)
     ap.add_argument('--report', help='explicit report path')
     ap.add_argument('--unity', help='compile gate: installed Unity Editor root')
+    ap.add_argument('--framework-profile', choices=FRAMEWORK_PROFILES,
+                    help='compile gate: Editor BCL profile (default: netstandard2.1); '
+                         'runtime profiles use their own Facades, not BCL shims')
     ap.add_argument('--no-framework', action='store_true',
                     help='compile gate: do not add Editor BCL shims')
     ap.add_argument('--body-probe', action='store_true',

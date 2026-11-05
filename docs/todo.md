@@ -4,6 +4,49 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Reproducible real-Editor body-gate reference profiles (2026-11-05)
+
+**Gate tooling, not a semantic fix.** Both compile CLIs now accept an explicit
+`--framework-profile`: historical `netstandard2.1` (still the unchanged default),
+`unityjit-win32`, `unityaot-win32` or `net_4_x-win32`. Runtime profiles use only
+their own real Editor Mono DLLs plus Facades; all four required core/facade files
+must exist. Invalid/incomplete explicit selections fail closed, never fall back
+to mixed NetStandard shims, and conflict with `--no-framework`. Original assembly
+identity, body probe, reference merging/overrides and exclusions remain intact.
+The fixture resolver remains the only source of game paths. No API stubs.
+
+**39 new authored tests; 96 focused and 5,410 portable passed** (380 game tests
+deselected). Frozen full excluding parallel: **5,525 passed / 259 skipped / one
+non-strict XPASS / the identical fixed three failures**; parallel **two passed**.
+Scoped clean-parent proof reproduces the unsupported-profile failure; the old
+57 focused tests pass on the parent. Exact restored repro, 96 focused and 5,410
+portable tests pass again. Source/tests/tools remained frozen throughout all
+consumers. Compileall/import, LF/no-BOM and diff checks pass.
+
+**Ten real compiles through the shipped gate CLI**, using the existing, read-only,
+visibility-preserving Linq pair (143 C# files, 214 lifted bodies), are identical
+between disabled/default output. Historical default and explicit netstandard
+both show **6 binding errors, no body sentinel** (121 framework / 270 total refs).
+The three real Mono profiles each show **4,185 errors with the body sentinel**:
+unityjit 283/430 refs, unityaot 214/361, net_4_x 280/427. Standalone CLI reproduces
+unityjit as well. **All Roslyn runs still return 1**; CLI 0 means syntax passed,
+not compilation. These newly visible errors were masked by reference/declaration
+failures, not introduced by default recovery. A sentinel proves some body binding,
+not full coverage. The same tree still has **2,106 explicit unrecovered bodies**.
+The unchanged historical engine resolver includes Editor DLLs too; its reference
+set is not the earlier temporary UnityEngine-prefix-filtered experiment.
+
+For a deeper Linq gate, use `tools/gate.py compile --fixture unitask` with the
+visibility-preserving tree, `--assembly UniTask.Linq --unity <Editor-root>
+--framework-profile unityjit-win32 --managed-refs --body-probe`; keep detailed
+reports local. This profile is explicit, not a universal API compatibility claim.
+No lifter/emitter changes, rebuilt output, re-pin, promotion or speedup claimed;
+last accepted/promoted output remains `game_out56`. **Next:** native-grounded
+async builder/MethodInfo and stack-aggregate recovery against these body errors.
+Evidence: `validation_reports/editor_framework_profiles_2026-11-05.json`.
+Goal remains **active, unachieved**. Earlier next-step sections are history.
+
+
 ### Bounded default activation and uncovered Linq body diagnostics (2026-11-05)
 
 **Current source now enables the existing proved Int32 entry recovery by

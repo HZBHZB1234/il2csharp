@@ -377,7 +377,11 @@ def unity_refs(root=None):
     return []
 
 
-def unity_framework_refs(root=None):
+FRAMEWORK_PROFILES = ('netstandard2.1', 'unityjit-win32', 'unityaot-win32',
+                      'net_4_x-win32')
+
+
+def unity_framework_refs(root=None, profile='netstandard2.1'):
     """BCL reference assemblies from the same Unity Editor.
 
     The game code uses `System.*`, `mscorlib` and `netstandard` types that
@@ -387,8 +391,35 @@ def unity_framework_refs(root=None):
       `Data/NetStandard/ref/2.1.0/netstandard.dll`
       `Data/NetStandard/compat/2.1.0/shims/netfx/*.dll`      (mscorlib, ...)
       `Data/NetStandard/compat/2.1.0/shims/netstandard/*.dll`
-    Returns [] when the root is not an Editor install.
+    The default preserves the historical netstandard2.1 shim closure.
+    An explicit Mono runtime profile instead selects ONLY its own top-level
+    DLLs and Facades, never mixing in NetStandard shims or silently falling
+    back. Runtime selection requires core BCL files and netstandard facade;
+    that checks a plausible layout, not API compatibility or body coverage.
+    Missing default roots return []; invalid/missing runtime profiles raise.
     """
+    if profile not in FRAMEWORK_PROFILES:
+        raise ValueError('unsupported Editor framework profile: %r' % (profile,))
+    if profile != 'netstandard2.1':
+        if not root:
+            raise ValueError('runtime framework profile requires --unity')
+        for editor in (os.path.join(root, 'Editor'), root):
+            base = os.path.join(editor, 'Data', 'MonoBleedingEdge', 'lib',
+                                'mono', profile)
+            refs = []
+            for directory in (base, os.path.join(base, 'Facades')):
+                if os.path.isdir(directory):
+                    refs.extend(os.path.join(directory, name)
+                                for name in sorted(os.listdir(directory))
+                                if name.lower().endswith('.dll')
+                                and os.path.isfile(os.path.join(directory, name)))
+            files = {os.path.relpath(path, base).replace('\\', '/').casefold()
+                     for path in refs}
+            if {'mscorlib.dll', 'system.dll', 'system.core.dll',
+                    'facades/netstandard.dll'} <= files:
+                return refs
+        raise ValueError('missing/incomplete Editor runtime framework profile '
+                         '%s under %s' % (profile, root))
     if not root:
         return []
     editors = [os.path.join(root, 'Editor'), root]
@@ -442,6 +473,9 @@ def main():
                     help="Unity Editor install root or its "
                          "Data/Managed/UnityEngine dir; reference those "
                          "assemblies (game-vs-engine gate)")
+    ap.add_argument("--framework-profile", choices=FRAMEWORK_PROFILES,
+                    help="Editor BCL closure (default: netstandard2.1); Mono "
+                         "profiles include their own Facades, not shim mixtures")
     ap.add_argument("--no-framework", action="store_true",
                     help="with --unity, reference ONLY the engine modules "
                          "(skip the Editor's mscorlib/netstandard shims)")
@@ -461,7 +495,23 @@ def main():
     if args.unity and not refs:
         print("no engine assemblies under %s" % args.unity)
         return 2
-    fw = [] if args.no_framework else unity_framework_refs(args.unity)
+    if args.no_framework and args.framework_profile:
+        print('--framework-profile conflicts with --no-framework')
+        return 2
+    try:
+        if args.no_framework:
+            fw = []
+        elif args.framework_profile:
+            fw = unity_framework_refs(args.unity, profile=args.framework_profile)
+        else:
+            fw = unity_framework_refs(args.unity)
+    except ValueError as error:
+        print(str(error))
+        return 2
+    if args.framework_profile and not fw:
+        print('no Editor framework assemblies for explicit profile %s' %
+              args.framework_profile)
+        return 2
     extra = []
     for d in (args.refs_dir or []):
         if not os.path.isdir(d):
@@ -483,6 +533,8 @@ def main():
         return 2
     print("%s: %d files, syntax=%d binding=%d (refs=%d, merged)" % (
         rep.get("assembly_name") or "?", rep["files"], rep["syntax"], rep["binding"], len(refs)))
+    print('  Editor framework profile: ' + (
+        'none' if args.no_framework else args.framework_profile or 'netstandard2.1'))
     if args.body_probe:
         print("  method-body probe: " + (
             "observed (not proof of full coverage)" if rep['body_probe_observed']
