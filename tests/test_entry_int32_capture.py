@@ -479,6 +479,7 @@ def full_model():
 
 def test_real_pipeline_dry_real_cleanup_capture_and_method_reuse():
     dec, method, owner = full_model()
+    dec._entry_int32_recovery = False
     baseline = dec.lift_method(method, owner)
     assert baseline == ['return p0;']
     lift, runtime, native, metadata = dec.L, dec.L.il, dec.L.bin, dec.L.meta
@@ -499,6 +500,7 @@ def test_real_pipeline_dry_real_cleanup_capture_and_method_reuse():
 @pytest.mark.parametrize('failing_stage', ['binding', 'cleanup'])
 def test_real_pipeline_failure_and_next_method_match_recovery_disabled(monkeypatch, failing_stage):
     dec, method, owner = full_model()
+    dec._entry_int32_recovery = False
     baseline = dec.lift_method(method, owner)
     dec._entry_int32_recovery = True
     def rejected(*args, **kwargs):

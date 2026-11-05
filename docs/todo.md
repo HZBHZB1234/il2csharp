@@ -4,6 +4,68 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Bounded default activation and uncovered Linq body diagnostics (2026-11-05)
+
+**Current source now enables the existing proved Int32 entry recovery by
+default.** No new native shape or semantic rule is admitted. The normal body
+finishes first; the existing independent arena may replace only final text.
+Exact MethodDef/native/ABI/unwind/CFG proofs, real-pass entry Expr binding,
+immutable snapshots, field/SIMD guards and every budget remain unchanged.
+Clone/binding/lift/finalization failure returns the exact completed baseline.
+The private disabled switch remains available for comparisons, not a new CLI.
+A cheap current-method/no-EH/no-comments/CVTDQ2PS/512 filter skips imports and
+cache allocation on non-candidates and resets stale per-method status.
+
+**21 new authored tests pass** (564 focused); portable **5,371 passed / 380
+deselected**. Frozen full excluding parallel: **5,486 passed / 259 skipped /
+one non-strict XPASS / exactly the fixed three failures**; parallel **two pass**.
+Scoped clean-parent checks reproduce the missing default conversion on parent,
+retain all disabled controls and restore exact source bytes. Restored focused
+and portable suites pass; compileall/import, LF/no-BOM and diff checks pass.
+
+Default-selected sweeps cover **2,242 / 1,936 / 923** methods. Only the four
+reviewed Survivors methods / five captures change; they exactly equal the prior
+opt-in output. UniTask and selected Limbus bodies remain unchanged. Limbus 35790
+still declines for missing unwind data. The live baseline continuation, next
+method, explicit disabled re-lift and global synthetic allocator remain intact.
+
+**Fresh emitted default-versus-disabled pair:** 474 UniTask / 293 Survivors C#
+files, zero body/fallback/emit/brace/parse failures. Disabled trees equal out56;
+default trees equal the reviewed round-67 opt-in trees byte-for-byte. All nine
+original-identity real-Editor-reference assembly gates run again without stubs:
+counts unchanged except Survivors Assembly-CSharp **3,766 -> 3,765**, one CS0266
+removed, zero message-aware additions. This is the existing recovery entering
+default output, not another arithmetic-rule improvement or successful compile.
+UniTask.Linq still has no body sentinel under this historical gate profile.
+New default-emitted arithmetic kernels pass both checked and unchecked builds:
+100,225 division inputs, 110,001 per circle kernel and 110,001 nonnegative sqrt
+inputs per mode, zero bit mismatches. These are not complete-method/game proofs.
+
+**Important separate gate diagnosis, not an error-count improvement.** Existing
+publicized Linq output has 13 declaration errors and no body sentinel under
+netstandard2.1. Three actual Editor Mono runtime profiles resolve six framework
+identity errors but still stop at seven CS0052 accessibility errors. Preserving
+metadata visibility removes those publicize-induced declarations; netstandard
+still stops at six reference/interface errors. Combining preserved visibility
+with the real Editor unityjit runtime references reaches the body sentinel and
+exposes **4,185 body/binding errors**. Disabled/default .cs trees and both profile
+diagnostic reports are identical. These are previously masked errors, **not
+4,185 activation regressions**, and even this sentinel is not full body coverage.
+This Linq tree also retains **2,106 explicit unrecovered-body throws** alongside
+its 214 lifted bodies; successful syntax is not semantic completeness.
+No synthetic game/engine API stubs or reference rewriting are used.
+
+The last accepted/promoted tree remains `game_out56`; current source defaults
+intentionally differ in the reviewed four methods. No re-pin or promotion.
+Whole-graph arena copying still costs time/memory; no end-to-end throughput or
+generated-game execution speedup is claimed. **Next:** use a coherent real Editor
+runtime/reference profile and preserved visibility for deeper game-assembly body
+gates, then address the newly visible error families with semantic proofs.
+Keep denominator wrapping and missing-unwind recovery separately scoped.
+Evidence: `validation_reports/entry_int32_default_2026-11-05.json`.
+Goal remains **active, unachieved**. Earlier next-step sections are history.
+
+
 ### Verified per-decompiler native unwind cache and new paired gates (2026-11-05)
 
 **Private opt-in infrastructure only; recovery remains off by default.** A

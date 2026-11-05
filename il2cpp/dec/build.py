@@ -273,10 +273,21 @@ class _BuildMixin:
     # ==================================================================
     def lift_method(self, m: MethodDef, td: TypeDef) -> List[str]:
         # Recovery is transactional: normal state/output always belongs to
-        # this decompiler; an optional attempt runs in a disjoint arena.
+        # this decompiler; a proved attempt runs in a disjoint arena.
         self.L._entry_int32_capture = None
         baseline = self._lift_method(m, td)
-        if not getattr(self, '_entry_int32_recovery', False):
+        self._entry_int32_status = 'disabled'
+        if not getattr(self, '_entry_int32_recovery', True):
+            return baseline
+        self._entry_int32_status = 'not-candidate'
+        insns = getattr(self, '_flat_insns', ())
+        # Keep the overwhelmingly common path free of recovery imports/cache
+        # allocation. The recovery preflight repeats these filters before its
+        # exact native/metadata/ABI/CFG proofs; this is only a cheap rejection.
+        if (getattr(self.L, 'asm_comments', False) or getattr(self, 'eh', None)
+                or getattr(self.L, '_current_method', None) is not m
+                or not insns or len(insns) > 512
+                or not any(ins.mnemonic == Mnemonic.CVTDQ2PS for ins in insns)):
             return baseline
         from il2cpp.dec.entrycapture import recover_entry_int32
         return recover_entry_int32(self, m, td, baseline)
