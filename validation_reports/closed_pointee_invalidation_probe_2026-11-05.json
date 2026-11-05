@@ -1,0 +1,147 @@
+{
+  "kind": "Declined closed-pointee-only byref invalidation experiment",
+  "date": "2026-11-05",
+  "parent_commit": "948828c05ec25c0b4f43d66c9f6d436b8564ea99",
+  "scope": "Process-local _kill_byref_slots pointee substitution only; no signature modifier/render changes; not landed",
+  "synthetic": {
+    "cases": 85,
+    "parent_failed": 70,
+    "parent_passed": 15,
+    "prototype_passed": 85
+  },
+  "selected_sweeps": [
+    {
+      "fixture": "unitask",
+      "methods": 2242,
+      "changed_method_rows": [
+        19936,
+        20290,
+        20304,
+        20318,
+        20334,
+        20348,
+        20362,
+        20376,
+        20445,
+        20473,
+        20501,
+        21472,
+        21639,
+        21834,
+        21850,
+        21870,
+        21890,
+        21911,
+        21932,
+        21953,
+        21984,
+        22955
+      ],
+      "changed": 22,
+      "crashes": 0
+    },
+    {
+      "fixture": "survivors-roguelike-kit",
+      "methods": 1936,
+      "changed_method_rows": [
+        69910,
+        69911,
+        69933,
+        70421,
+        70422,
+        70423,
+        70424,
+        70439,
+        70450,
+        70451,
+        70452,
+        70474,
+        71032,
+        71033,
+        71034,
+        71035,
+        71036,
+        71037,
+        71038,
+        71039,
+        71141
+      ],
+      "changed": 21,
+      "crashes": 0
+    },
+    {
+      "fixture": "limbus",
+      "methods": 923,
+      "changed_method_rows": [
+        101215,
+        146541,
+        156529
+      ],
+      "changed": 3,
+      "crashes": 0
+    }
+  ],
+  "repeat_subset": {
+    "methods": 41,
+    "changed": 38,
+    "changed_repeats_identical": true,
+    "raw_helper_target_multiplicities_identical": true,
+    "warning": "The 41-method subset is not the complete selected sweep, nor proof of full effect equivalence."
+  },
+  "real_editor_gate": {
+    "assemblies": 7,
+    "cs_files": 474,
+    "lifted": 2227,
+    "baseline_errors": 10437,
+    "prototype_errors": 10458,
+    "message_added": 22,
+    "message_removed": 1,
+    "added_codes": {
+      "CS0266": 21,
+      "CS1061": 1
+    },
+    "removed_codes": {
+      "CS1501": 1
+    },
+    "changed_cs_files": 7,
+    "unchanged_file_location_message_diagnostics_identical": true,
+    "changed_file_syntax_locations_not_identical": true,
+    "brace_unbalanced": 0,
+    "tree_sitter_errors": 0,
+    "all_roslyn_returncodes": 1,
+    "framework_profile": "unityjit-win32",
+    "framework_refs": 283,
+    "total_refs": 430,
+    "body_probe_observed": true,
+    "visibility_preserved": true,
+    "linq_errors": 3697
+  },
+  "exception_path_evidence": {
+    "method_row": 21639,
+    "existing_pads_are": "parent-function continuations, not actual catch entries",
+    "observed_handlers": 2,
+    "catch_object_offsets": [
+      72,
+      80
+    ],
+    "parent_frame_written_offsets": [
+      48,
+      88
+    ],
+    "warning": "Native funclet inspection identifies missing exception-frame effects; it does not establish a managed catch type or a complete frame transfer function.",
+    "primary_reference": {
+      "name": "MSVC ehdata4_export.h",
+      "version": "14.29.30133",
+      "sha256": "5238200f91179f8411f5518d1bdee143833bc35e5f869bfb3631983c747e3566"
+    }
+  },
+  "decision": "Decline standalone cache-width fix. Coordinate signature-owned byref modifiers and typed homes; independently prove actual catch-funclet effects before wiring exception continuations.",
+  "claims": {
+    "landed": false,
+    "promotion": false,
+    "repin": false,
+    "speedup": false,
+    "native_equivalence": false,
+    "goal_complete": false
+  }
+}

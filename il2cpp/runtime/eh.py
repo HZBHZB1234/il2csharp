@@ -117,7 +117,10 @@ class _EhMixin:
     def eh_regions(self, va):
         """Try/catch structure for the function containing va (PE x64,
         __CxxFrameHandler4 compressed tables). None when absent:
-        {'pads': [catch-funclet VAs], 'ntry': n, 'nhandlers': n}."""
+        {'pads': [in-parent continuation VAs], 'ntry': n, 'nhandlers': n,
+        'handlers': [decoded catch entries], 'try_handlers': [[entries], ...]}.
+        A pad is NOT the catch funclet entry. Handler metadata alone does not
+        establish the exception type or the funclet's parent-frame writes."""
         if not self._eh4_init() or self._eh4_handler is None:
             return None
         b = self.bin
@@ -132,6 +135,58 @@ class _EhMixin:
             out = None
         self._eh4_cache[rva] = out
         return out
+
+    def _eh4_handlers(self, harr, function_rva):
+        """Decode HandlerMap4, keeping catch entry and continuations distinct.
+
+        Layout follows MSVC ehdata4_export.h / HandlerMap4::DecompHandler:
+        optional compressed adjectives, signed type RVA, compressed catch
+        object displacement; then an unconditional signed handler RVA.
+        Each continuation is independently function-relative, unless bit 3
+        selects signed fixed-width RVAs. Nothing here models handler effects.
+        Unsupported layouts decline through eh_regions, never shift the next
+        entry by guessing a field width.
+        """
+        b = self.bin
+        ib = b.image_base
+        nh, hc = self._eh4_nib(harr)
+        if nh > 32:
+            raise ValueError('EH4 handler map exceeds supported bound')
+        handlers = []
+        for _ in range(nh):
+            flags = b.d[b.va2off(ib + hc)]
+            hc += 1
+            count = (flags >> 4) & 3
+            if flags & 0xC0 or count == 3:
+                raise ValueError('unsupported EH4 handler header')
+            adjectives = 0
+            type_rva = 0
+            catch_object_offset = None
+            if flags & 1:
+                adjectives, hc = self._eh4_nib(hc)
+            if flags & 2:
+                type_rva = struct.unpack_from('<i', b.d, b.va2off(ib + hc))[0]
+                hc += 4
+            if flags & 4:
+                catch_object_offset, hc = self._eh4_nib(hc)
+            handler_rva = struct.unpack_from('<i', b.d, b.va2off(ib + hc))[0]
+            hc += 4
+            continuations = []
+            for _ in range(count):
+                if flags & 8:
+                    target = struct.unpack_from('<i', b.d, b.va2off(ib + hc))[0]
+                    hc += 4
+                else:
+                    delta, hc = self._eh4_nib(hc)
+                    target = function_rva + delta
+                continuations.append(ib + target)
+            handlers.append({
+                'flags': flags, 'adjectives': adjectives,
+                'type_descriptor': ib + type_rva if type_rva else None,
+                'catch_object_offset': catch_object_offset,
+                'handler': ib + handler_rva, 'continuations': continuations,
+            })
+        return handlers
 
     def _eh4_parse(self, rva):
         b = self.bin
@@ -189,6 +244,8 @@ class _EhMixin:
         ntry, tc = self._eh4_nib(tc)
         pads = []
         nhandlers = 0
+        handlers = []
+        try_handlers = []
         trys = []
         try_pads = []                          # pads[i] belongs to trys[i]
         for _ in range(min(ntry, 32)):
@@ -198,34 +255,26 @@ class _EhMixin:
             trys.append((tlow, thigh, chigh))
             tpads = []
             try_pads.append(tpads)
+            thandlers = []
+            try_handlers.append(thandlers)
             harr = struct.unpack_from('<I', b.d, b.va2off(ib + tc))[0]
             tc += 4
             if not harr:
                 continue
-            hc = harr
-            nh, hc = self._eh4_nib(hc)
-            prev = bg                          # handler RVAs delta-chain from begin
-            for _ in range(min(nh, 32)):
-                fl = b.d[b.va2off(ib + hc)]
-                hc += 1
-                if fl & 1:
-                    _, hc = self._eh4_nib(hc)
-                if fl & 2:
-                    hc += 4
-                if fl & 4:
-                    _, hc = self._eh4_nib(hc)
-                hc += 4                        # always-present u32
-                if (fl & 0x30) == 0x10:
-                    v, hc = self._eh4_nib(hc)
-                    prev = prev + v
-                    if bg <= prev < en:
-                        pads.append(ib + prev)
-                        tpads.append(ib + prev)
+            thandlers.extend(self._eh4_handlers(harr, bg))
+            handlers.extend(thandlers)
+            for handler in thandlers:
+                continuations = handler['continuations']
+                # Preserve the existing single-continuation wiring boundary.
+                # TWO requires proving which return index the funclet selects;
+                # NONE requires lifting its returned address. Neither is a pad
+                # merely because it occurs in a handler map.
+                if len(continuations) == 1:
+                    pad = continuations[0]
+                    if ib + bg <= pad < ib + en:
+                        pads.append(pad)
+                        tpads.append(pad)
                         nhandlers += 1
-                elif (fl & 0x30) == 0x20:
-                    _, hc = self._eh4_nib(hc)
-                    v2, hc = self._eh4_nib(hc)
-                    prev = prev + v2
         if not pads:
             return None
         states = self._eh4_ipstates(ib, bg, ipmap) if ipmap else None
@@ -233,7 +282,8 @@ class _EhMixin:
         regions = self._eh4_regions(trys, try_pads, try_ranges) if try_ranges else None
         return {'pads': pads, 'ntry': ntry, 'nhandlers': nhandlers,
                 'trys': trys, 'states': states, 'try_ranges': try_ranges,
-                'regions': regions, 'try_pads': try_pads}
+                'regions': regions, 'try_pads': try_pads,
+                'handlers': handlers, 'try_handlers': try_handlers}
 
     @staticmethod
     def _eh4_regions(trys, try_pads, try_ranges):
