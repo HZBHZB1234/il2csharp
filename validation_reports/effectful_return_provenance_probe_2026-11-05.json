@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-05",
+  "parent_commit": "e0fc419d8d74bdbaea3f14976891c601d197e636",
+  "kind": "Declined process-local return-provenance experiment",
+  "fixture": "unitask",
+  "method_defs": [
+    17888,
+    17892,
+    17928,
+    17932
+  ],
+  "recording_events": 12,
+  "real_events": 6,
+  "real_inputs_with_metadata_provenance": 6,
+  "real_baseline_returns_without_metadata_provenance": 6,
+  "experiment": "Recognize one bounded nonvolatile-register save/call/restore return-copy shape; copy incoming MethodRef provenance onto the bound raw result without renaming or removing the call.",
+  "implementation": "Temporary process-local instrumentation only. No decompiler source/test/tool changes.",
+  "instrumentation_baseline_equal_to_committed_round71": true,
+  "prototype_changed_methods": 0,
+  "baseline_selected_bodies_sha256": "90e1c19cbf5c0c13210afa034269c4fddfdd1c4292a030a089f837203716c4b0",
+  "prototype_selected_bodies_sha256": "90e1c19cbf5c0c13210afa034269c4fddfdd1c4292a030a089f837203716c4b0",
+  "source_unchanged": true,
+  "status": "Declined for no measured output benefit in these four selected methods; not a general disproof.",
+  "limitations": [
+    "No whole-corpus evaluation, new compiled-tree gate or performance claim.",
+    "No pure-call identity rule extension, helper elision, helper naming or full helper semantics proof.",
+    "Preserving a correct value provenance fact alone does not establish any downstream managed callee identity.",
+    "No output promotion or golden re-pin. Goal remains active and unachieved."
+  ],
+  "next": "Prioritize the typed state-machine/builder aggregate homes. Revisit an effectful return-alias rule only with an actual output-changing consumer and separate effect/identity evidence.",
+  "local_probe_script_sha256": {
+    "return72_probe.py": "d657b1d01d5b4c74036933f22285c63f78d4f1ffdff450fc7d00879d4931e6a7",
+    "return72_prototype.py": "85debc0c186b258446ccc99822c719b440416ae03f6c69fe067fa3badb4259a8"
+  }
+}
