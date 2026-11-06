@@ -1,0 +1,434 @@
+{
+  "kind": "native_integer_model_preintegration_evidence",
+  "date": "2026-11-06",
+  "source_commit": "da76086d708b869c61dc2e846d19a0aa0e0c2951",
+  "status": "numeric prototype verified; production integration not started; goal active and unachieved",
+  "last_accepted_output": "game_out56",
+  "scope": [
+    "Authored x64 routines only; no game bodies, native addresses or disassembly published",
+    "All probe sources and executables remain local-only in a temporary directory",
+    "No change to production source, golden snapshots, accepted output or prior real-Editor game gate counts"
+  ],
+  "numeric_kernel": {
+    "operations": [
+      "MUL",
+      "one-operand IMUL",
+      "DIV",
+      "IDIV",
+      "CBW",
+      "CWDE",
+      "CDQE",
+      "CWD",
+      "CDQ",
+      "CQO"
+    ],
+    "widths_bits": [
+      8,
+      16,
+      32,
+      64
+    ],
+    "native_variants": 74,
+    "operand_forms": [
+      "R8-family register",
+      "stack memory",
+      "implicit accumulator overlap",
+      "implicit high-half overlap",
+      "AH for byte forms"
+    ],
+    "implementation": "Fixed-width bit patterns, four-limb 64-bit product, bounded high/low division with high-zero fast path, signed magnitude/range checks, partial-write merge and r32 zero extension; no Int128/BigInteger/new runtime APIs",
+    "test_design": [
+      "Deterministic edge cross-products and seeded random inputs",
+      "All 256x256 byte operand pairs for MUL/IMUL",
+      "All 65,536 AX bit patterns at divisors 1/127/128/255 for DIV/IDIV",
+      "Both signed/unsigned quotient overflow and zero divisors",
+      "Defined multiply CF/OF and preserved sign-extension flags; undefined division flags not asserted"
+    ],
+    "independent_oracle": "Python unbounded integer arithmetic, truncated quotient toward zero and architectural-width masks",
+    "corpus": {
+      "total": 879584,
+      "counts": {
+        "mul_8_register": 68264,
+        "mul_8_memory": 2728,
+        "mul_8_accumulator": 2728,
+        "mul_8_high": 2728,
+        "mul_8_ah": 2728,
+        "mul_16_register": 2728,
+        "mul_16_memory": 2728,
+        "mul_16_accumulator": 2728,
+        "mul_16_high": 2728,
+        "mul_32_register": 2728,
+        "mul_32_memory": 2728,
+        "mul_32_accumulator": 2728,
+        "mul_32_high": 2728,
+        "mul_64_register": 2000,
+        "mul_64_memory": 2000,
+        "mul_64_accumulator": 2000,
+        "mul_64_high": 2000,
+        "imul_8_register": 68264,
+        "imul_8_memory": 2728,
+        "imul_8_accumulator": 2728,
+        "imul_8_high": 2728,
+        "imul_8_ah": 2728,
+        "imul_16_register": 2728,
+        "imul_16_memory": 2728,
+        "imul_16_accumulator": 2728,
+        "imul_16_high": 2728,
+        "imul_32_register": 2728,
+        "imul_32_memory": 2728,
+        "imul_32_accumulator": 2728,
+        "imul_32_high": 2728,
+        "imul_64_register": 2000,
+        "imul_64_memory": 2000,
+        "imul_64_accumulator": 2000,
+        "imul_64_high": 2000,
+        "div_8_register": 265872,
+        "div_8_memory": 3728,
+        "div_8_accumulator": 3728,
+        "div_8_high": 3728,
+        "div_8_ah": 3728,
+        "div_16_register": 3728,
+        "div_16_memory": 3728,
+        "div_16_accumulator": 3728,
+        "div_16_high": 3728,
+        "div_32_register": 3728,
+        "div_32_memory": 3728,
+        "div_32_accumulator": 3728,
+        "div_32_high": 3728,
+        "div_64_register": 3000,
+        "div_64_memory": 3000,
+        "div_64_accumulator": 3000,
+        "div_64_high": 3000,
+        "idiv_8_register": 265872,
+        "idiv_8_memory": 3728,
+        "idiv_8_accumulator": 3728,
+        "idiv_8_high": 3728,
+        "idiv_8_ah": 3728,
+        "idiv_16_register": 3728,
+        "idiv_16_memory": 3728,
+        "idiv_16_accumulator": 3728,
+        "idiv_16_high": 3728,
+        "idiv_32_register": 3728,
+        "idiv_32_memory": 3728,
+        "idiv_32_accumulator": 3728,
+        "idiv_32_high": 3728,
+        "idiv_64_register": 3000,
+        "idiv_64_memory": 3000,
+        "idiv_64_accumulator": 3000,
+        "idiv_64_high": 3000,
+        "cbw_0_none": 2728,
+        "cwde_0_none": 2728,
+        "cdqe_0_none": 2728,
+        "cwd_0_none": 2728,
+        "cdq_0_none": 2728,
+        "cqo_0_none": 2728
+      },
+      "expected_divide_errors": {
+        "mul_8_register": 0,
+        "mul_8_memory": 0,
+        "mul_8_accumulator": 0,
+        "mul_8_high": 0,
+        "mul_8_ah": 0,
+        "mul_16_register": 0,
+        "mul_16_memory": 0,
+        "mul_16_accumulator": 0,
+        "mul_16_high": 0,
+        "mul_32_register": 0,
+        "mul_32_memory": 0,
+        "mul_32_accumulator": 0,
+        "mul_32_high": 0,
+        "mul_64_register": 0,
+        "mul_64_memory": 0,
+        "mul_64_accumulator": 0,
+        "mul_64_high": 0,
+        "imul_8_register": 0,
+        "imul_8_memory": 0,
+        "imul_8_accumulator": 0,
+        "imul_8_high": 0,
+        "imul_8_ah": 0,
+        "imul_16_register": 0,
+        "imul_16_memory": 0,
+        "imul_16_accumulator": 0,
+        "imul_16_high": 0,
+        "imul_32_register": 0,
+        "imul_32_memory": 0,
+        "imul_32_accumulator": 0,
+        "imul_32_high": 0,
+        "imul_64_register": 0,
+        "imul_64_memory": 0,
+        "imul_64_accumulator": 0,
+        "imul_64_high": 0,
+        "div_8_register": 132400,
+        "div_8_memory": 1086,
+        "div_8_accumulator": 1070,
+        "div_8_high": 2064,
+        "div_8_ah": 3728,
+        "div_16_register": 1464,
+        "div_16_memory": 1457,
+        "div_16_accumulator": 1488,
+        "div_16_high": 3728,
+        "div_32_register": 1467,
+        "div_32_memory": 1461,
+        "div_32_accumulator": 1456,
+        "div_32_high": 3728,
+        "div_64_register": 1075,
+        "div_64_memory": 1013,
+        "div_64_accumulator": 1052,
+        "div_64_high": 3000,
+        "idiv_8_register": 197467,
+        "idiv_8_memory": 1363,
+        "idiv_8_accumulator": 1455,
+        "idiv_8_high": 1863,
+        "idiv_8_ah": 3073,
+        "idiv_16_register": 1829,
+        "idiv_16_memory": 1831,
+        "idiv_16_accumulator": 1804,
+        "idiv_16_high": 3134,
+        "idiv_32_register": 1849,
+        "idiv_32_memory": 1861,
+        "idiv_32_accumulator": 1880,
+        "idiv_32_high": 3124,
+        "idiv_64_register": 1385,
+        "idiv_64_memory": 1402,
+        "idiv_64_accumulator": 1393,
+        "idiv_64_high": 2503,
+        "cbw_0_none": 0,
+        "cwde_0_none": 0,
+        "cdqe_0_none": 0,
+        "cwd_0_none": 0,
+        "cdq_0_none": 0,
+        "cqo_0_none": 0
+      },
+      "seed": 34054,
+      "sha256": "4fa3121a359b85833a8c4c0d51652290daddb5d30665d9c7b64ef8cafcb9deeb"
+    },
+    "native_net10_comparison": {
+      "scope": "Authored numeric kernel vs independently computed Python integer oracle and actual local native x64 instructions; not production-lifter integration, fault mapping or game equivalence",
+      "returncode": 0,
+      "seconds": 10.361,
+      "result": {
+        "cases": 879584,
+        "nativeMismatch": 0,
+        "kernelMismatch": 0,
+        "flagMismatch": 0,
+        "unexpectedException": 0,
+        "exceptions": {
+          "C0000094": 13831,
+          "C0000095": 378122
+        },
+        "details": []
+      },
+      "source_sha256": {
+        "Kernel.cs": "e8c90ddaae154f93bde0fb4b45766f5e096cb120f3f695a9f79b4bb0d564540e",
+        "Program.cs": "7f464d2a7d40ef8d4cbadcf599587d2edc2955bb8d8fc103ccadb5b606d2ae67",
+        "Native.asm": "fd9c8982d68465bfc90d67cdaab1f66431ed7b269c7aec4038ab57aa33ee86ec",
+        "Native.cpp": "9fb0d441657b74f79b6c0b2f1110f6385dde7b044ce14c791f5867a7aff7930f",
+        "prepare.py": "f3fe4b9ac65c2df8b75962b7fc22b79c3e4982ac8b2053f6ac36bd8826496040"
+      }
+    }
+  },
+  "unity_validation": {
+    "framework_profile": "unityjit-win32",
+    "framework_reference_count": 283,
+    "language_version": "7.3",
+    "checked_context": true,
+    "compile_reports": [
+      {
+        "label": "kernel",
+        "framework_profile": "unityjit-win32",
+        "framework_refs": 283,
+        "language_version": "7.3",
+        "checked": true,
+        "compiler_returncode": 0,
+        "diagnostics": ""
+      },
+      {
+        "label": "execute",
+        "framework_profile": "unityjit-win32",
+        "framework_refs": 283,
+        "language_version": "7.3",
+        "checked": true,
+        "compiler_returncode": 0,
+        "diagnostics": ""
+      }
+    ],
+    "execution": {
+      "runtime": "installed Unity Editor 32-bit Mono",
+      "cases": 879584,
+      "kernel_mismatches": 0,
+      "native_invocations": 0,
+      "returncode": 0,
+      "seconds": 1.521,
+      "source_sha256": {
+        "Kernel.cs": "e8c90ddaae154f93bde0fb4b45766f5e096cb120f3f695a9f79b4bb0d564540e",
+        "Program.cs": "ac886943050e22f5b1c4e17a8112a3b71fc750191ad3e7f07fe800dcb93c93d4"
+      }
+    },
+    "native_in_process_attempt": {
+      "returncode": 1,
+      "error": "DllNotFoundException",
+      "cause_verified": "Editor Mono PE machine 0x14c versus authored native probe DLL 0x8664",
+      "resolution": "Run native checks on x64 net10 separately; run identical kernel/oracle corpus on Editor Mono without native imports",
+      "limitation": "No claim that the native x64 routines executed inside 32-bit Editor Mono"
+    }
+  },
+  "fault_label_counterexample": {
+    "hypothesis": "zero divisor always maps to Windows status C0000094 and quotient overflow to C0000095",
+    "result": "declined",
+    "native_divide_error_presence_mismatches": 0,
+    "windows_label_mismatches": 4084,
+    "affected_forms": [
+      {
+        "operation": "DIV",
+        "width_bits": 8,
+        "source": "AH",
+        "mismatches": 2298
+      },
+      {
+        "operation": "IDIV",
+        "width_bits": 8,
+        "source": "AH",
+        "mismatches": 1786
+      }
+    ],
+    "observed_status_counts": {
+      "C0000094": 13831,
+      "C0000095": 378122
+    },
+    "limitation": "Observed local native statuses do not prove how an IL2CPP game converts faults to managed exceptions. Do not infer catch type or handler continuation from arithmetic cause alone."
+  },
+  "production_integration_barriers": {
+    "authored_existing_lifter_repro": {
+      "scope": "Authored scalar instruction sequences lifted by committed source, then compiled/executed; expected full-register bit patterns. Nonzero mismatch count is the existing integration barrier, not acceptance.",
+      "source_commit": "da76086d708b869c61dc2e846d19a0aa0e0c2951",
+      "program_returncode": 0,
+      "returncode_contract": "0 confirms exactly eight reproduced wrong results; it is NOT a correctness pass",
+      "cases": [
+        {
+          "name": "logical_right_32",
+          "instructions": "c1e801",
+          "source_type": "int",
+          "rendered_expression": "a >> 1",
+          "expected_register_bits": 2147483647
+        },
+        {
+          "name": "arithmetic_right_32",
+          "instructions": "c1f801",
+          "source_type": "uint",
+          "rendered_expression": "a >> 1",
+          "expected_register_bits": 3221225472
+        },
+        {
+          "name": "partial_low_byte",
+          "instructions": "88c8",
+          "source_type": "ulong",
+          "rendered_expression": "b",
+          "expected_register_bits": 1311768467463790081
+        },
+        {
+          "name": "partial_word",
+          "instructions": "6689c8",
+          "source_type": "ulong",
+          "rendered_expression": "b",
+          "expected_register_bits": 1311768467463746049
+        },
+        {
+          "name": "dword_zero_extension",
+          "instructions": "89c8",
+          "source_type": "ulong",
+          "rendered_expression": "b",
+          "expected_register_bits": 2147483649
+        },
+        {
+          "name": "signed_byte_to_dword",
+          "instructions": "0fbec1",
+          "source_type": "ulong",
+          "rendered_expression": "b",
+          "expected_register_bits": 4294967295
+        },
+        {
+          "name": "high_byte_read",
+          "instructions": "0fb6c4",
+          "source_type": "ulong",
+          "rendered_expression": "a",
+          "expected_register_bits": 127
+        },
+        {
+          "name": "accumulator_sign_extension",
+          "instructions": "4898",
+          "source_type": "ulong",
+          "rendered_expression": "a",
+          "expected_register_bits": 18446744071562067969
+        }
+      ],
+      "stdout": "logical_right_32=18446744073709551615,expected=2147483647\narithmetic_right_32=1073741824,expected=3221225472\npartial_low_byte=18369614219769557505,expected=1311768467463790081\npartial_word=18369614219769557505,expected=1311768467463746049\ndword_zero_extension=18369614219931811841,expected=2147483649\nsigned_byte_to_dword=255,expected=4294967295\nhigh_byte_read=1311768467750092545,expected=127\naccumulator_sign_extension=81985529054232577,expected=18446744071562067969\nfailures=8",
+      "source_freeze_verified": true
+    },
+    "isolated_effect_pass": {
+      "scope": "Authored isolated existing dead-temp pass, not whole-pipeline proof",
+      "cases": [
+        {
+          "name": "division",
+          "input": [
+            "var t0 = dividend / divisor;",
+            "return 0;"
+          ],
+          "output": [
+            "return 0;"
+          ],
+          "removed": true
+        },
+        {
+          "name": "field_load",
+          "input": [
+            "var t0 = receiver.field;",
+            "return 0;"
+          ],
+          "output": [
+            "return 0;"
+          ],
+          "removed": true
+        },
+        {
+          "name": "array_load",
+          "input": [
+            "var t0 = values[index];",
+            "return 0;"
+          ],
+          "output": [
+            "return 0;"
+          ],
+          "removed": true
+        },
+        {
+          "name": "owned_helper",
+          "input": [
+            "var t0 = NativeInteger.Divide(low, high, source);",
+            "return 0;"
+          ],
+          "output": [
+            "var t0 = NativeInteger.Divide(low, high, source);",
+            "return 0;"
+          ],
+          "removed": false
+        }
+      ]
+    },
+    "required_design": [
+      "Preserve per-register width/bit-range provenance; a managed Expr type alone cannot prove high bits or native lane meaning",
+      "Snapshot all consumed inputs before implicit writes, including source overlaps and one memory evaluation",
+      "Cover AL/AH/AX/EAX/RAX partial/zero-extension writes and consumers; SAR signedness and SHR unsignedness follow opcode width, not inherited managed type",
+      "Carry numeric provenance through moves and proved merges or explicitly invalidate it; never reuse a previous block/exception-path fact by register name or textual equality",
+      "Represent potentially faulting native execution as an owned effect so dead-result cleanup cannot discard it; prove its exceptional ABI/mapping separately",
+      "Keep unknown high dividend bits explicit; do not lower to single-width division without proof",
+      "Validate instruction chains after the full statement pipeline, not just isolated arithmetic kernels; preserve existing body/effect counts and repeated-lift determinism"
+    ]
+  },
+  "limitations": [
+    "879,584 kernel cases do not establish production decompiler correctness or native game equivalence",
+    "The existing lifter still fails all eight authored lane/shift examples; the kernel is not wired into it",
+    "The dead-temp pass check is isolated, not a whole-pipeline semantic proof",
+    "No benchmark-derived speedup claim; timing includes harness overhead",
+    "All previous broad actual game compiler invocations still fail; no output promotion or golden re-pin"
+  ]
+}

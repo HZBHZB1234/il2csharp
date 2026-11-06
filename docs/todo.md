@@ -4,6 +4,55 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Native integer model: verified kernel, integration barriers reproduced (2026-11-06)
+
+Round 85 is **pre-integration evidence, not a production arithmetic fix**.
+The round-84 source is committed as `da76086`; no new source, snapshot or
+output changes accompany this experiment. Last accepted output is still
+`game_out56`, and the goal is active and unachieved.
+
+An authored fixed-width C# kernel implements signed/unsigned product halves,
+double-width dividends, quotient range checks, remainders, all six scalar
+sign-extension forms, and partial/zero-extension register writes. It uses
+neither Int128 nor BigInteger. **879,584 cases / 74 native forms** compare
+against an independent Python integer oracle and actual local x64 routines:
+**zero numeric, defined-flag or divide-error-presence mismatches**. Tests cover
+all byte multiplication pairs, all AX values at four division operands,
+bounded edge/random cases, register/memory operands and RAX/RDX/AH overlaps.
+Undefined division flags are deliberately not asserted.
+
+The same unchanged kernel compiles against **283 actual Editor framework
+references**, **C# 7.3 / checked enabled**, and executes all **879,584 cases
+with zero mismatches** on the installed Editor's Mono. The native DLL cannot
+load there: this `mono.exe` is x86, while the authored native probes are x64.
+Native execution therefore belongs to the separate x64 net10 harness; the
+Editor Mono run compares the kernel to the independently generated oracle.
+Do not merge these scopes into an in-Editor native-equivalence claim.
+
+A stronger fault-label hypothesis **fails**: classifying zero as Windows
+C0000094 and overflow as C0000095 disagrees at **4,084 AH-source byte cases**
+(DIV 2,298 / IDIV 1,786). All cases still agree that a divide error occurs.
+This evidence does not establish the game's native-to-managed exception
+conversion; a helper must not invent a managed catch type from the cause.
+
+**Do not wire the kernel directly into the existing Expr-only path.** Eight
+compiled/executed authored examples reproduce wrong current results: SHR on
+signed storage, SAR on unsigned storage, byte/word partial writes, r32 zero
+extension, byte sign extension, AH reads and CDQE. The isolated dead-temp
+pass also deletes unused division/member/array reads, but retains a helper
+call. Kernel correctness alone cannot survive these consumer/effect losses.
+
+The next implementation must coordinate a width-aware register value layer,
+input snapshots before overlapping writes, signed/unsigned read views,
+proved CFG/EH provenance merges or explicit invalidation, and retained
+potentially faulting execution through the statement pipeline. Unknown high
+dividend bits cannot become ordinary `a / b`; compiler-count reduction is
+not an admission proof. Native helpers must remain Unity-compatible.
+
+Evidence: `validation_reports/native_integer_preintegration_2026-11-06.json`.
+All probe code/executables remain in the local temporary validation area.
+No speedup, game equivalence, full recompilability, promotion or re-pin claim.
+
 ### Coordinated guard, arithmetic-state, control-path and expression repair (2026-11-06)
 
 Round 84 deliberately fixes four interacting layers together rather than
