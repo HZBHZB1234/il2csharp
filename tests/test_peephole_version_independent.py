@@ -151,15 +151,16 @@ def test_jcc_behind_register_saves_is_found():
     assert cmp_ip in skip, 'jcc sits 2 saves past the cmp; window must reach it'
 
 
-def test_arithmetic_between_cmp_and_jcc_declines():
-    """A real arithmetic op (addss) is NOT a pure move: keep declining."""
+def test_eflags_neutral_arithmetic_between_cmp_and_jcc_is_retained():
+    """ADDSS changes SIMD state, not EFLAGS; keep it, remove only the guard."""
     # addss xmm0,xmm0 = F3 0F 58 C0
     moves = b'\xf3\x0f\x58\xc0'
     blob, cmp_ip = _guard_blob(n_types=1, moves=moves, barrier=True)
     raw = _insns(blob)
     dec = _bare_decompiler()
     skip = dec._guards(raw)
-    assert cmp_ip not in skip, 'arithmetic must not be treated as a save'
+    assert cmp_ip in skip, 'JNE still consumes the original compare flags'
+    assert raw[1].ip not in skip, 'the arithmetic instruction itself must run'
 
 
 # ------------------------------------------------------------------ P1-a
@@ -253,8 +254,10 @@ def _chain_lines():
     ]
 
 
-def test_multi_if_chain_still_lifts():
-    out = _bare_flow()._elseif_flatten_multi(_chain_lines())
+def test_multi_if_terminating_chain_still_lifts():
+    lines = _chain_lines()
+    lines.insert(9, '        return;')
+    out = _bare_flow()._elseif_flatten_multi(lines)
     assert out == [
         'if (a)',
         '{',
@@ -263,6 +266,7 @@ def test_multi_if_chain_still_lifts():
         'else if (b)',
         '    {',
         '        Y();',
+        '        return;',
         '    }',
         'else if (c)',
         '    {',

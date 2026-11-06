@@ -4,6 +4,7 @@ from il2cpp.metadata import MethodDef, TypeDef
 from il2cpp.names import safe_ident
 from il2cpp.runtime.core import Il2Cpp
 from il2cpp.text import imm_of, reg_name, sdisp, strip_outer
+from il2cpp.initguard import metadata_init_guards
 from il2cpp.x64 import ARG_REGS, ARG_XMM, GPRS, GPR_ALIAS, VOLATILE, _UNSIGNED_CMP_OPS
 
 class _StateMixin:
@@ -1877,55 +1878,8 @@ class _StateMixin:
                 if va <= t < last_ip:
                     self.targets.add(t)
 
-        # peephole: swallow metadata-init guards
-        #   cmp byte [rip+X],0 ; <benign movs> ; jcc T ; <lea/call init... + movs> ;
-        #   mov byte [rip+X],1 ; T:
-        # only the cmp/jcc/lea+call-init/mov-flag-store are skipped; other movs run.
-        self.skip_ips = set()
-        for i, ins in enumerate(insns):
-            if ins.mnemonic == Mnemonic.CMP and ins.op0_kind == OpKind.MEMORY                     and ins.memory_base == IReg.RIP and ins.memory_size == 1:
-                if imm_of(ins, 1) != 0:
-                    continue
-                slotA = ins.ip_rel_memory_address
-                # find the guard jcc within the next 4 instructions (movs may interleave)
-                j_idx = None
-                for k in range(i + 1, min(i + 5, len(insns))):
-                    w = insns[k]
-                    if w.flow_control == FlowControl.CONDITIONAL_BRANCH and w.op0_kind == OpKind.NEAR_BRANCH64:
-                        j_idx = k
-                        break
-                    if w.mnemonic not in (Mnemonic.MOV, Mnemonic.MOVZX):
-                        break
-                if j_idx is None:
-                    continue
-                T = insns[j_idx].near_branch_target
-                # scan forward for mov byte [rip+slotA],1 landing at/before T
-                found = False
-                for k in range(j_idx + 1, min(j_idx + 24, len(insns))):
-                    w = insns[k]
-                    if w.mnemonic == Mnemonic.MOV and w.op0_kind == OpKind.MEMORY                             and w.memory_base == IReg.RIP and w.memory_size == 1                             and w.ip_rel_memory_address == slotA and imm_of(w, 1) == 1:
-                        if w.next_ip == T or (k + 1 < len(insns) and insns[k + 1].ip == T):
-                            found = True
-                        break
-                    if w.mnemonic not in (Mnemonic.LEA, Mnemonic.MOV, Mnemonic.CALL,
-                                          Mnemonic.MOVZX, Mnemonic.XOR, Mnemonic.PUSH, Mnemonic.SUB):
-                        break
-                    if w.ip >= T:
-                        break
-                if not found:
-                    continue
-                # skip: cmp, jcc, the flag store, and every (lea rcx,[rip]; call) pair between
-                self.skip_ips.add(ins.ip)
-                self.skip_ips.add(insns[j_idx].ip)
-                for k in range(j_idx + 1, len(insns)):
-                    w = insns[k]
-                    if w.mnemonic == Mnemonic.MOV and w.op0_kind == OpKind.MEMORY                             and w.memory_base == IReg.RIP and w.memory_size == 1                             and w.ip_rel_memory_address == slotA:
-                        self.skip_ips.add(w.ip)
-                        break
-                    if w.mnemonic == Mnemonic.LEA and w.op0_register == IReg.RCX                             and w.memory_base == IReg.RIP:
-                        self.skip_ips.add(w.ip)
-                    elif w.mnemonic == Mnemonic.CALL and w.op0_kind == OpKind.NEAR_BRANCH64                             and w.near_branch_target == self.rt_init_meta:
-                        self.skip_ips.add(w.ip)
+        # Structured and flat lifting must share the same guard proof.
+        self.skip_ips = metadata_init_guards(insns, getattr(self, 'rt_init_meta', None))
         # peephole: swallow class-init guards
         #   mov rA,[rip slot->TypeInfo] ; cmp dword [rA+E4],0 ; jne T ;
         #   mov rcx,rA ; call class_init ; mov rA,[rip slot] ; T:
@@ -2584,12 +2538,11 @@ class _StateMixin:
             v = self.new_var()
             if getattr(self, 'dry', False):
                 return Expr(v, ty, kind)
-            # fix 134: the comment is opaque to textpass, so a load-
-            # width marker (`(__w_int)`) would leak into it verbatim
-            ct = text
-            if '(__w_' in ct:
-                ct = re.sub(r'\(__w_(?:sbyte|short|ushort|int)\)', '', ct)
-            self.emit(0, 'var %s = 0; // %s' % (v, ct[:cap] + ('...' if len(ct) > cap else '')), None)
+            # The cap bounds the expression GRAPH, not the value. Replacing
+            # a large RHS with zero discards arithmetic and calls, and hiding
+            # it in a comment also defeats identifier/width-marker passes.
+            # Keep the full executable RHS once; later uses refer to its temp.
+            self.emit(0, 'var %s = %s;' % (v, text), None)
             return Expr(v, ty, kind)
         return Expr(text, ty, kind)
 

@@ -409,6 +409,23 @@ class _InsnMixin:
             self.rsp_delta += 8
             return
 
+        # One-operand multiply/divide has IMPLICIT destinations: the explicit
+        # r/m operand is a source, not the ordinary binop's destination. Until
+        # the double-width result (and divide fault) is modelled, invalidate
+        # every written register family rather than reuse an old managed
+        # pointer/vector/bool as a quotient or high product. Byte forms write
+        # AX only; 16/32/64-bit forms write both accumulator and high half.
+        # A partial write conservatively loses the whole family. Both the
+        # dry and real passes must see the same clobber, including EFLAGS.
+        if (mn in (Mnemonic.MUL, Mnemonic.DIV, Mnemonic.IDIV)
+                or (mn == Mnemonic.IMUL and ins.op_count == 1)):
+            width = (_reg_size(ins.op0_register) if A(0) == OpKind.REGISTER
+                     else MemorySizeExt.size(ins.memory_size))
+            for name in (('RAX',) if width == 1 else ('RAX', 'RDX')):
+                self.set_reg(name, self._fp_operand(None))
+            self.flags = None
+            return
+
         # --- memory destinations ------------------------------------------
         # Must precede the register-move handlers: those key off op0_register,
         # which is NONE for a memory destination, so they would swallow the
@@ -1309,8 +1326,6 @@ class _InsnMixin:
             return
         if mn in (Mnemonic.CDQ, Mnemonic.CQO, Mnemonic.CQO if False else Mnemonic.CDQE):
             return
-        if mn in (Mnemonic.DIV, Mnemonic.IDIV, Mnemonic.MUL):
-            return  # rare in managed code; ignore
 
         # --- float compares ---------------------------------------------
         if mn in (Mnemonic.COMISS, Mnemonic.UCOMISS, Mnemonic.COMISD, Mnemonic.UCOMISD):

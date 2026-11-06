@@ -4,6 +4,30 @@ Reference material moved out of the root README: what native constructs
 recover as what C#, the implementation notes behind them, and the detailed
 validation and limitation records. Start at [`../README.md`](../README.md).
 
+## Coordinated control and value preservation (2026-11-06)
+
+Both lifting paths share the transactional metadata-initguard scanner in
+`il2cpp/initguard.py`. An owned helper sequence and exactly terminating flag
+store must be proved before any skip IP is committed. Register-zero proofs
+are bounded by explicit/implicit writes and CFG/EH entries; retained pre-JNE
+instructions must not consume or change flags. Unknown conditional effects
+decline rather than becoming unconditional after guard removal.
+
+Implicit one-operand multiply/divide consumes its explicit r/m source and
+invalidates only the implicit output families, with fresh unknown values.
+This prevents stale aggregate/type reuse and fabricated memory multiply
+stores; it does not yet model numeric results, sign extension or faults.
+Sequential conditionals need proved terminating arms before else-if folding.
+Oversized symbolic expressions emit their full executable RHS into a temp,
+not a fabricated zero with the original expression hidden in a comment.
+
+Round 84 adds 255 authored cases; 8,009 paired methods / 3,292 changed, no
+crashes, repeated lifts identical. Real-Editor diagnostics are 10,437 ->
+10,437 (seven UniTask assemblies) and 3,940 -> 3,926 (Survivors gameplay).
+All actual compilations still fail; native equivalence and speedup remain
+unproved. Full validation, unchanged failure set and bounds are in
+`coordinated_guard_arithmetic_expression_2026-11-06.json` and the live handoff.
+
 ## What gets recovered
 
 What gets resolved inside bodies:

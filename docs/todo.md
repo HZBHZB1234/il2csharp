@@ -4,6 +4,97 @@ The user resumed the goal. The pause at round 54 below is historical, not
 current status. Start with `docs/handoff-2026-11-03.md` and its continuation.
 The goal is **not achieved**; no output promotion or golden re-pin is authorized.
 
+### Coordinated guard, arithmetic-state, control-path and expression repair (2026-11-06)
+
+Round 84 deliberately fixes four interacting layers together rather than
+optimizing only compiler counts. The upstream ten-commit audit informed the
+initguard investigation; no upstream patch or gate count was imported.
+
+- `il2cpp/initguard.py` is the shared transactional proof used by flat and
+  structured lifting. It requires byte RIP CMP0 / forward JNE, a flag-neutral
+  retained gap, a separately owned RIP-relative RCX argument for each known
+  metadata helper, and the same-slot store1 ending exactly at the target.
+  Register-zero proof stops at CFG/EH entries, calls, decode gaps and explicit
+  or implicit overlapping writes. Only the exact post-helper locked stack
+  barrier is admitted. Unowned conditional writes decline the whole guard;
+  no partial skip set is committed.
+- One-operand IMUL and MUL/DIV/IDIV treat the explicit r/m operand as a
+  **source**, not a destination. Byte forms invalidate the accumulator family;
+  wider forms invalidate accumulator and high-half families, using distinct
+  fresh unknowns and cleared flags in both passes. Two/three-operand IMUL is
+  unchanged. Products, quotients, faults and sign extension are not recovered.
+- Sequential `if` arms become `else if` only when each nonfinal taken arm
+  proves an unconditional top-level transfer. Nested conditional transfers,
+  labels and unsupported controls decline; comments/literals cannot fake it.
+- Oversized expressions materialize their **complete executable RHS once**.
+  The cap bounds expression-graph growth, not the value. The previous zero
+  plus truncated comment fabricated values and hid effects and width markers.
+
+**255 new authored cases**: 120 guard / 71 arithmetic / 43 control / 21
+expression. Actual clean-parent stash replay: portable **5,607 passed**;
+135 control/arithmetic/expression cases **124 fail / 11 pass**. Separate
+parent-module guard replay **62 fail / 53 pass** (five integration cases
+excluded). Final frozen candidate: focused **416 passed**, portable
+**5,862 passed**, full excluding parallel **5,977 passed / 259 skipped /
+one non-strict XPASS / three failures**; separate parallel **two passed**.
+The exact unchanged failure set is:
+
+- `tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27494-PlayerActions-12]`
+- `tests.test_game_interface_delegate_ctor::test_interface_callback_delegate_construction[27511-UIActions-54]`
+- `tests.test_game_limbus_decompile::test_inventory_add_item_uses_stack_room`
+
+An intermediate arithmetic candidate exposed three existing float-denominator
+pins because it reached the old zero-expression fallback. The coordinated
+expression repair restores all three; none were accepted as new failures or
+re-pinned. One authored load-width assertion was corrected to require the
+executable RHS rather than the old fabricated zero/comment contract.
+
+Paired re-lifts cover **8,009 methods / 3,292 changed**, zero crashes and
+repeat-identical changed bodies on both sides (5,101 selected plus 2,908
+additional arithmetic methods). Opaque-target multiplicities outside strings
+and comments change only for two calls resolved as `System.TimeSpan.op_Equality`;
+native direct-call and metadata-owner checks support those targets, not
+whole-method or argument/effect equivalence.
+
+Fresh strict/raw-address, visibility-preserved real-Editor paired builds:
+
+| Scope | C# files / bodies | Actual Roslyn errors | Changed C# files |
+|---|---:|---:|---:|
+| UniTask, seven assemblies | 474 / 2,227 | 10,437 -> 10,437 | 1 |
+| Survivors, Assembly-CSharp | 281 / 1,521 | 3,940 -> 3,926 | 9 |
+
+Zero lift/fallback/type-emission failures; brace and tree-sitter clean.
+All **16 actual compiler invocations still return 1**. Both baselines match
+previous pristine-parent builds byte for byte; unchanged-file diagnostics
+match exactly. UniTask's message-aware delta is +1 CS0103 / -1 CS0122.
+Survivors adds 24 CS0103 + five CS0165 and removes four CS0029 + 31 CS0103 +
+seven CS0165 + one CS1061. All five added CS0165 messages are existing local
+uses renumbered by the corrected expressions; paired complete uses match
+after local-number normalization (zero unmatched additions / two removals).
+Fresh unknowns are not replaced by casts or defaults to hide diagnostics.
+
+Authored C# execution on installed net10.0: expression cases **60 / zero
+candidate mismatches** (parent 36), control cases **24 / zero mismatches**
+(parent two), existing unsafe smoke also passes. Initial net8.0 restore
+lacked reference packs; only temporary test projects were retargeted.
+This is not Unity/native-game execution equivalence or a speedup claim.
+
+Evidence: `validation_reports/coordinated_guard_arithmetic_expression_2026-11-06.json`.
+No game bodies, disassembly or raw logs published; no golden re-pin or output
+promotion. Last accepted output remains **`game_out56`**. Goal remains active
+and unachieved.
+
+**Next coherent slice:** operand snapshots, signed/unsigned product halves,
+CDQ/CQO/CDQE and division/fault semantics, not blind `a / b` with an unknown
+high half. The native census finds 394 / 1,959 / 5,266 implicit-arithmetic
+sites in UniTask / Survivors / Limbus, with 3,632 affected MethodDefs in total.
+The bounded same-block first-touch scan observes high-half reads before
+replacement at 316 / 1,144 / 3,224 sites. Nearby sign extension is not a
+reaching-definition proof. Preserve overlapping source registers, memory
+read count, partial/zero-extension semantics and Unity-compatible types.
+Exceptional funclet ABI/frame writes and signature-owned ref/out homes also
+remain open; P/Invoke needs descriptor/ABI/marshaling proof, not blind import.
+
 ### EH4 handler entries are distinct from continuation pads (2026-11-05)
 
 The native EH4 reader now retains actual catch funclet entry addresses,

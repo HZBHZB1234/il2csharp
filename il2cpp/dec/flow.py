@@ -243,13 +243,9 @@ class _FlowMixin:
 
 
     # ------------------------------------------------------------------
-    # An `else` block holding SEVERAL sequential lone ifs is exactly an
-    # else-if chain, so lift them out.  `_elseif_flatten` above declines
-    # this shape by design: it needs `lone_if`, and an else block with
-    # two ifs is not one construct.  Nothing is duplicated or deleted --
-    # only the braces move -- and every statement in the block must be
-    # an if, so the block has no work of its own that lifting could
-    # reorder.
+    # Sequential ifs are NOT mutually exclusive. Lifting an else-block's
+    # chunks into else-if arms is valid only when every nonfinal taken arm
+    # unconditionally transfers control away; the final chunk may fall through.
     # a tuple, not a frozenset: str.startswith takes a tuple
     _MULTI_IF_CTRL = (
         'while (', 'while(', 'do', 'for (', 'for(', 'foreach (',
@@ -282,18 +278,20 @@ class _FlowMixin:
         chunks = []
         depth = 0
         cur = None
+        in_comment = False
         for x in body:
-            t = x.strip()
+            masked, in_comment = mask_spans(x, in_comment)
+            t = masked.replace('\x00', ' ').strip()
             if depth == 0 and t.startswith('if (') and t.endswith(')'):
                 if cur is not None:
                     chunks.append(cur)
                 cur = [x]
-                depth += x.count('{') - x.count('}')
+                depth += t.count('{') - t.count('}')
                 continue
             if cur is None:
                 return None          # work before the first if
             cur.append(x)
-            depth += x.count('{') - x.count('}')
+            depth += t.count('{') - t.count('}')
         if cur is not None:
             chunks.append(cur)
         return chunks or None
@@ -314,19 +312,48 @@ class _FlowMixin:
         brace audit cannot see. Any non-brace line at depth 0 after the
         head declines."""
         depth = 0
+        in_comment = False
         for idx, x in enumerate(chunk):
-            t = x.strip()
+            masked, in_comment = mask_spans(x, in_comment)
+            t = masked.replace('\x00', ' ').strip()
             if depth == 0 and idx > 0 and t and t not in ('{', '}'):
                 return False
             if t == 'else':
                 return False
             if t.startswith(_FlowMixin._MULTI_IF_CTRL):
                 return False
-            if t.endswith(':') and not t.startswith(
-                    ('case ', 'default', 'L_')):
+            # A local target could turn a syntactic goto into fall-through,
+            # or admit entry into the middle of a rewritten chain.
+            if t.endswith(':'):
                 return False
-            depth += x.count('{') - x.count('}')
-        return True
+            depth += t.count('{') - t.count('}')
+            if depth < 0:
+                return False
+        return depth == 0 and not in_comment
+
+    @staticmethod
+    def _chunk_transfers(chunk):
+        """Prove a final direct transfer at the chunk body's top level.
+
+        A nested conditional return is not an unconditional transfer. Mask
+        literals/comments so a diagnostic string cannot serve as a proof.
+        Labels and control constructs are separately rejected by liftability.
+        """
+        depth = 0
+        last = None
+        in_comment = False
+        for line in chunk[1:]:
+            masked, in_comment = mask_spans(line, in_comment)
+            t = masked.replace('\x00', ' ').strip()
+            if t == '{':
+                depth += 1
+            elif t == '}':
+                depth -= 1
+            elif depth == 1 and t:
+                last = t
+        return bool(last and re.fullmatch(
+            r'(?:return(?:\s+[^;]+)?|throw\s+[^;]+|goto\s+L_[0-9a-fA-F]+|'
+            r'break|continue);', last))
 
     def _elseif_flatten_multi(self, lines):
         out = []
@@ -362,6 +389,8 @@ class _FlowMixin:
             if chunks is None or len(chunks) < 2:
                 out.append(lines[i]); i += 1; continue
             if not all(self._chunk_is_liftable(c) for c in chunks):
+                out.append(lines[i]); i += 1; continue
+            if not all(self._chunk_transfers(c) for c in chunks[:-1]):
                 out.append(lines[i]); i += 1; continue
             # emit: the outer if and its true arm verbatim, then each
             # chunk with its head rewritten to `else if (`

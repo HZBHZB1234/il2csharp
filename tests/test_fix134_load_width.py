@@ -101,9 +101,9 @@ def test_generic_call_paren_survives_member_fold():
     assert out[4] == 'w = (obj2.name);'
 
 
-def test_oversized_temp_comment_drops_width_markers():
-    # fix 134f: the `var vN = 0; // <expr>` spill comment is opaque to
-    # textpass, so the lifter strips the marker itself
+def test_oversized_temp_preserves_executable_width_markers_until_textpass():
+    # Materialization must not replace the load/arithmetic with zero. Width
+    # markers stay executable until textpass renders the complete native load.
     from il2cpp.lifter.state import _StateMixin
 
     class _L:
@@ -118,7 +118,10 @@ def test_oversized_temp_comment_drops_width_markers():
         def emit(self, _a, text, _b):
             self.lines.append(text)
     lst = _L()
-    e = _StateMixin._mk(lst, '(__w_int)*(v50 + 0x18) + ' + 'a' * 240)
+    rhs = '(__w_int)*(v50 + 0x18) + ' + 'a' * 240
+    e = _StateMixin._mk(lst, rhs)
     assert e.text == 'v9'
-    assert '__w_' not in lst.lines[0]
-    assert lst.lines[0].startswith('var v9 = 0; // *(v50 + 0x18) + aaa')
+    assert lst.lines == ['var v9 = ' + rhs + ';']
+    assert _u(lst.lines[0]) == ('var v9 = ((int*)((byte*)v50 + 0x18))[0] + '
+                               + 'a' * 240 + ';')
+    assert '__w_' not in _u(lst.lines[0])
